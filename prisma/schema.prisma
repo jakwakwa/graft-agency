@@ -46,6 +46,7 @@ model Client {
   leads                Lead[]
   emailTemplates       EmailTemplate[]
 
+  @@index([subdomain])
   @@map("clients")
 }
 
@@ -54,7 +55,7 @@ model AgentConfig {
   clientId            String   @unique @map("client_id")
   client              Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
   systemPrompt        String   @map("system_prompt")
-  knowledgeBase       Json?    @map("knowledge_base")
+  knowledgeBase       Json?    @db.JsonB @map("knowledge_base")
   agentName           String?  @map("agent_name")
   greetingMessage     String?  @map("greeting_message")
   widgetPrimaryColour String?  @default("#000000") @map("widget_primary_colour")
@@ -67,20 +68,21 @@ model AgentConfig {
 model Lead {
   id             String     @id @default(uuid())
   clientId       String?    @map("client_id")
-  client         Client?    @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  client         Client?    @relation(fields: [clientId], references: [id], onDelete: Cascade)
   customerName   String?    @map("customer_name")
   email          String?
   phone          String?
   source         LeadSource
   status         LeadStatus @default(SCRAPED)
-  scrapedData    Json?      @map("scraped_data")
-  chatTranscript Json?      @map("chat_transcript")
+  scrapedData    Json?      @db.JsonB @map("scraped_data")
+  chatTranscript Json?      @db.JsonB @map("chat_transcript")
   calBookingUid  String?    @unique @map("cal_booking_uid")
   nextActionDate DateTime?  @map("next_action_date")
   createdAt      DateTime   @default(now()) @map("created_at")
   updatedAt      DateTime   @updatedAt @map("updated_at")
 
   @@index([clientId, status])
+  @@index([status])
   @@map("leads")
 }
 
