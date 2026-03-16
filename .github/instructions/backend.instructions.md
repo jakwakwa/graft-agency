@@ -4,7 +4,7 @@ applyTo: "{app/api/**/*.{ts,tsx},lib/services/**/*.ts,lib/db/**/*.ts,lib/ai/**/*
 
 # Backend Instructions
 
-Use this file together with [AGENTS.md](../../AGENTS.md) and [vision.md](../../vision.md). If they conflict, follow the more specific instruction that matches the file you are editing.
+Use this file together with [AGENTS.md](../../AGENTS.md) and [docs/living-sop.md](../../docs/living-sop.md). If they conflict, follow the more specific instruction that matches the file you are editing.
 
 ## Scope
 
@@ -24,7 +24,7 @@ Use this file together with [AGENTS.md](../../AGENTS.md) and [vision.md](../../v
 - Follow `prisma/schema.prisma` as the source of truth for data modelling.
 - Keep validation strict at boundaries, especially for route inputs and tool contracts.
 - Prefer explicit types over `any`.
-- When changing schema, migrations, middleware, service boundaries, or backend commands, update [vision.md](../../vision.md) to keep the living SOP accurate.
+- When changing schema, migrations, middleware, service boundaries, or backend commands, update [docs/living-sop.md](../../docs/living-sop.md) to keep the living SOP accurate.
 
 ## Known Repo Constraints
 

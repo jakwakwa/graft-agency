@@ -250,3 +250,10 @@ describe('Chat Widget')
 2. **Step 03**: Service layer (lead, agent, conversation, cal) + AI layer (tools, model-router, system-prompt) + make tests green
 3. **Step 04**: Widget UI + chat route + embed route + Playwright spec
 4. **Step 05**: Verification (completion-verifier, full test suite, build)
+
+### Phase 05 — Cal.com v2 Integration
+
+- [x] Replace cal.service.ts with v2 API implementation
+- [x] Add/update scheduling tools (checkAvailability, bookAppointment) to use calService
+- [x] Unit test: Mock Cal.com v2 API and verify getAvailability parses the response correctly
+- [ ] E2E test: Verify that Kona can suggest 3 slots when a user asks "When are you free?"

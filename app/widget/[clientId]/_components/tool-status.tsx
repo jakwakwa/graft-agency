@@ -36,8 +36,8 @@ export function ToolStatus({ toolName, state }: ToolStatusProps) {
     complete: "Done",
   };
 
-  const isComplete = state === "result";
-  const isError = state === "error";
+  const isComplete = state === "output-available";
+  const isError = state === "output-error" || state === "output-denied";
 
   return (
     <div className="flex items-center gap-1.5 rounded-full bg-muted/60 px-2.5 py-1 text-xs text-muted-foreground">

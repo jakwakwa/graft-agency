@@ -4,6 +4,22 @@ import { type Prisma, PrismaClient } from "../../generated/prisma/client";
 
 type PrismaClientSingleton = PrismaClient;
 
+/**
+ * Local `prisma dev` encodes the real postgres:// URL inside the api_key
+ * query param as a base64 JSON payload. Decode it so we can connect via TCP.
+ */
+function extractDirectUrl(prismaUrl: string): string | null {
+  try {
+    const url = new URL(prismaUrl);
+    const apiKey = url.searchParams.get("api_key");
+    if (!apiKey) return null;
+    const payload = JSON.parse(Buffer.from(apiKey, "base64").toString("utf-8"));
+    return payload.databaseUrl ?? null;
+  } catch {
+    return null;
+  }
+}
+
 const prismaClientSingleton = (): PrismaClientSingleton => {
   const databaseUrl = process.env.DATABASE_URL;
   if (!databaseUrl) {
@@ -24,6 +40,16 @@ const prismaClientSingleton = (): PrismaClientSingleton => {
     });
   }
 
+  // Local prisma dev: decode the embedded TCP URL and connect directly
+  if (databaseUrl.startsWith("prisma+postgres://localhost")) {
+    const tcpUrl = extractDirectUrl(databaseUrl);
+    if (tcpUrl) {
+      const adapter = new PrismaPg({ connectionString: tcpUrl });
+      return new PrismaClient({ adapter, log });
+    }
+  }
+
+  // Remote Prisma Accelerate
   if (databaseUrl.startsWith("prisma://") || databaseUrl.startsWith("prisma+postgres://")) {
     return new PrismaClient({
       accelerateUrl: databaseUrl,

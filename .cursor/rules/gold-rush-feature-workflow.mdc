@@ -48,5 +48,5 @@ Invoked when the user says: "Execute the Feature Workflow for [Feature Name]" or
 ## Step 05: Verification
 
 1. Use the **completion-verifier** skill.
-2. Run targeted tests first, then `bun run test` and `bun run build`.
+2. Run targeted tests first, then `bun run test:all` and `bun run build`.
 3. Report: "Did I miss any logic? Are there any monolithic files?"

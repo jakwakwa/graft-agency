@@ -67,4 +67,27 @@ test.describe("Chat Widget", () => {
       timeout: 5000,
     });
   });
+
+  test("responds to 'When are you free?' with availability or helpful message", async ({ page }) => {
+    await page.goto(`/widget/${TEST_CLIENT_ID}`);
+
+    const input = page.getByLabel("Chat message");
+    await expect(input).toBeVisible();
+    await input.fill("When are you free?");
+    await page.getByLabel("Send message").click();
+
+    // User message should appear
+    await expect(page.getByText("When are you free?")).toBeVisible();
+
+    // Kona should respond — either with slot suggestions or a message about calendar config
+    const assistantMessages = page.locator('[class*="rounded-bl-sm"][class*="bg-muted"]');
+    await expect(assistantMessages.first()).toBeVisible({ timeout: 30000 });
+
+    // Response should mention availability, slots, or calendar (or explain config is needed)
+    const responseText = await assistantMessages.first().textContent();
+    const hasRelevantResponse =
+      /slot|available|calendar|book|time|schedule|configured|config/i.test(responseText ?? "") ||
+      /\d{1,2}:\d{2}/.test(responseText ?? "");
+    expect(hasRelevantResponse).toBe(true);
+  });
 });

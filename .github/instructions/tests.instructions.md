@@ -4,7 +4,7 @@ applyTo: "{tests/**/*.{ts,tsx},**/*.{test,spec}.{ts,tsx}}"
 
 # Test Instructions
 
-Use this file together with [AGENTS.md](../../AGENTS.md) and [vision.md](../../vision.md). These rules define how to choose the right test level and when work can be considered verified.
+Use this file together with [AGENTS.md](../../AGENTS.md) and [docs/living-sop.md](../../docs/living-sop.md). These rules define how to choose the right test level and when work can be considered verified.
 
 ## Test Selection
 
@@ -29,4 +29,4 @@ Use this file together with [AGENTS.md](../../AGENTS.md) and [vision.md](../../v
 
 - Do not claim work is complete until relevant tests pass.
 - If relevant coverage does not exist yet, add it or explicitly call out the gap.
-- If changes affect schema, middleware, API surface, services, or test strategy, update [vision.md](../../vision.md) so the SOP stays aligned with reality.
+- If changes affect schema, middleware, API surface, services, or test strategy, update [docs/living-sop.md](../../docs/living-sop.md) so the SOP stays aligned with reality.

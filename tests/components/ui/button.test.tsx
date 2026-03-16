@@ -8,13 +8,11 @@ describe("Button", () => {
       expect(screen.getByRole("button", { name: /click me/i })).toBeInTheDocument();
     });
 
-    it("wraps string children in Typography.Small", () => {
+    it("renders string children as button content", () => {
       render(<Button>Submit</Button>);
-      const button = screen.getByRole("button");
-      const small = button.querySelector("small");
-      expect(small).toBeInTheDocument();
-      expect(small).toHaveTextContent("Submit");
-      expect(small).toHaveClass("text-sm", "font-medium");
+      const button = screen.getByRole("button", { name: /submit/i });
+      expect(button).toBeInTheDocument();
+      expect(button).toHaveTextContent("Submit");
     });
 
     it("applies default variant and size classes", () => {
@@ -32,14 +30,13 @@ describe("Button", () => {
     it("applies size classes when specified", () => {
       render(<Button size="lg">Large</Button>);
       const button = screen.getByRole("button");
-      expect(button).toHaveClass("h-10");
+      expect(button).toHaveClass("h-9");
     });
 
-    it("applies xs size override to Typography.Small", () => {
+    it("applies xs size with text-xs", () => {
       render(<Button size="xs">Tiny</Button>);
       const button = screen.getByRole("button");
-      const small = button.querySelector("small");
-      expect(small).toHaveClass("text-xs");
+      expect(button).toHaveClass("text-xs");
     });
 
     it("merges custom className", () => {

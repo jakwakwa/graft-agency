@@ -1,6 +1,15 @@
 import { describe, expect, it, vi } from "vitest";
 import type { z } from "zod";
-import { checkAvailabilityTool } from "@/lib/ai/tools/check-availability";
+import { createCheckAvailabilityTool } from "@/lib/ai/tools/check-availability";
+
+vi.mock("@/lib/services/agent.service", () => ({
+  agentService: {
+    getConfig: vi.fn().mockResolvedValue({
+      calComUsername: "testuser",
+      defaultEventSlug: "15min",
+    }),
+  },
+}));
 
 vi.mock("@/lib/services/cal.service", () => ({
   calService: {
@@ -13,11 +22,12 @@ vi.mock("@/lib/services/cal.service", () => ({
   },
 }));
 
-const schema = checkAvailabilityTool.inputSchema as z.ZodType;
+const tool = createCheckAvailabilityTool("test-client");
+const schema = tool.inputSchema as z.ZodType;
 
-describe("checkAvailability tool", () => {
+describe("createCheckAvailabilityTool", () => {
   it("has a description", () => {
-    expect(checkAvailabilityTool.description).toBeDefined();
+    expect(tool.description).toBeDefined();
   });
 
   it("validates dateRange schema", () => {
@@ -27,21 +37,47 @@ describe("checkAvailability tool", () => {
     expect(result.success).toBe(true);
   });
 
-  it("calls calService.getAvailability", async () => {
+  it("validates username and eventTypeSlug as optional", () => {
+    const result = schema.safeParse({});
+    expect(result.success).toBe(true);
+  });
+
+  it("calls calService.getAvailability with config defaults", async () => {
     const { calService } = await import("@/lib/services/cal.service");
-    await checkAvailabilityTool.execute(
+    await tool.execute(
       { dateRange: { from: "2026-03-18", to: "2026-03-22" } },
       { toolCallId: "tc-1", messages: [], abortSignal: new AbortController().signal },
     );
-    expect(calService.getAvailability).toHaveBeenCalled();
+    expect(calService.getAvailability).toHaveBeenCalledWith(
+      expect.objectContaining({
+        username: "testuser",
+        eventTypeSlug: "15min",
+        dateRange: { from: "2026-03-18", to: "2026-03-22" },
+      }),
+    );
   });
 
   it("returns slots array", async () => {
-    const result = await checkAvailabilityTool.execute(
-      {},
+    const result = await tool.execute(
+      { dateRange: { from: "2026-03-18", to: "2026-03-22" } },
       { toolCallId: "tc-1", messages: [], abortSignal: new AbortController().signal },
     );
     expect(result).toHaveProperty("slots");
     expect(Array.isArray(result.slots)).toBe(true);
+  });
+
+  it("returns error when config has no calComUsername or defaultEventSlug", async () => {
+    const { agentService } = await import("@/lib/services/agent.service");
+    vi.mocked(agentService.getConfig).mockResolvedValueOnce({
+      calComUsername: null,
+      defaultEventSlug: null,
+    } as never);
+
+    const result = await tool.execute(
+      {},
+      { toolCallId: "tc-1", messages: [], abortSignal: new AbortController().signal },
+    );
+    expect(result).toHaveProperty("slots", []);
+    expect(result).toHaveProperty("error");
   });
 });

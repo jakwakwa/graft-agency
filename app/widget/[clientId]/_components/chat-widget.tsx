@@ -4,6 +4,7 @@ import { useChat } from "@ai-sdk/react";
 import type { UIMessage } from "ai";
 import { DefaultChatTransport } from "ai";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Streamdown } from "streamdown";
 import { TypographySmall } from "@/components/ui/typography";
 import { ChatInput } from "./chat-input";
 import { ToolStatus } from "./tool-status";
@@ -118,22 +119,27 @@ function MessageBubble({ message }: { message: UIMessage }) {
             return (
               <div
                 key={`text-${part.text.slice(0, 20)}`}
-                className={`rounded-2xl px-3 py-2 text-sm ${
-                  isUser ? "rounded-br-sm bg-primary text-primary-foreground" : "rounded-bl-sm bg-muted"
-                }`}
+                className={`rounded-2xl px-3 py-2 text-sm [&_a]:underline [&_a]:text-primary [&_a]:hover:opacity-80 ${isUser ? "rounded-br-sm bg-primary text-primary-foreground" : "rounded-bl-sm bg-muted"
+                  }`}
               >
-                {part.text}
+                {isUser ? (
+                  part.text
+                ) : (
+                  <Streamdown className="[&>*:first-child]:mt-0 [&>*:last-child]:mb-0">{part.text}</Streamdown>
+                )}
               </div>
             );
           }
 
           if (part.type.startsWith("tool-") && "toolCallId" in part) {
-            const toolName = part.type.replace(/^tool-/, "");
+            const toolPart = part as { type: string; toolCallId: string; state: string };
+            // AI SDK v6: type is "tool-{toolName}", e.g. "tool-captureLeadDetails"
+            const toolName = toolPart.type.slice(5);
             return (
               <ToolStatus
-                key={`tool-${part.toolCallId}`}
+                key={`tool-${toolPart.toolCallId}`}
                 toolName={toolName}
-                state={(part as { state: string }).state}
+                state={toolPart.state}
               />
             );
           }

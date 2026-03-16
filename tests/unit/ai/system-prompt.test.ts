@@ -43,4 +43,10 @@ describe("buildSystemPrompt", () => {
     const prompt = buildSystemPrompt(baseConfig);
     expect(prompt).toMatch(/colour|organisation|behaviour/i);
   });
+
+  it("includes South African scheduling rule (Africa/Johannesburg, load shedding)", () => {
+    const prompt = buildSystemPrompt(baseConfig);
+    expect(prompt).toContain("Africa/Johannesburg");
+    expect(prompt).toContain("load shedding");
+  });
 });

@@ -11,7 +11,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "playwright:install": "playwright install"
+    "test:all": "bun run test && bun run test:e2e",
+    "playwright:install": "playwright install",
+    "db:seed": "bun run prisma/seed.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "2.2.0",

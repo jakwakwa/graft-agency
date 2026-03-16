@@ -4,7 +4,7 @@ applyTo: "{app/**/*.{ts,tsx,css},components/**/*.{ts,tsx},hooks/**/*.{ts,tsx}}"
 
 # Frontend Instructions
 
-Use this file together with [AGENTS.md](../../AGENTS.md) and [vision.md](../../vision.md). If they conflict, follow the more specific instruction that matches the file you are editing.
+Use this file together with [AGENTS.md](../../AGENTS.md) and [docs/living-sop.md](../../docs/living-sop.md). If they conflict, follow the more specific instruction that matches the file you are editing.
 
 ## Scope
 

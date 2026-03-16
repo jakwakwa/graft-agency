@@ -80,7 +80,8 @@ Added/retained indexes to keep tenant and operational queries fast:
 - **Model router:** `lib/ai/model-router.ts` — selects Gemini Flash or Flash Lite based on tool scope.
 - **Embed delivery:** `app/api/embed/[clientId]/route.ts` — cached JS loader for iframe injection.
 - **Widget UI:** Minimal layout (no Clerk), server page loading AgentConfig, 3 client components (chat-widget, tool-status, chat-input).
-- **Services:** `agent.service.ts` (config + knowledge search), `conversation.service.ts` (save/load with tenant isolation), `cal.service.ts` (Cal.com v2 wrapper), `lead.service.ts` (create from chat + handoff flagging).
+- **Services:** `agent.service.ts` (config + knowledge search), `conversation.service.ts` (save/load with tenant isolation), `cal.service.ts` (Cal.com v2: username + eventTypeSlug), `lead.service.ts` (create from chat + handoff flagging).
+- **AgentConfig:** `calComUsername` and `defaultEventSlug` optional; scheduling tools inject when present.
 - **Outcome:** Visitor intent is captured, persisted to `Lead`, conversation stored in `Conversation`, then routed to booking flow.
 
 ## 2. Deep Scheduling Layer (Cal.com API v2)
@@ -103,3 +104,13 @@ Added/retained indexes to keep tenant and operational queries fast:
 - Strong contracts at boundaries (Zod + TypeScript strictness).
 - Tenant isolation first, then feature expansion.
 - Build and migration verification required before calling work complete.
+
+---
+
+## Update Block
+
+**Last updated:** 2026-03-16
+
+**What changed:** Cal.com API v2 integration. AgentConfig gained `calComUsername` and `defaultEventSlug` for per-client scheduling. `cal.service.ts` rewritten to v2 (username + eventTypeSlug). Scheduling tools converted to factories that inject config. South African scheduling rule added to system prompt. Vitest excludes e2e; `test:all` runs unit + Playwright. `.env.example` added.
+
+**Verification performed:** `bun run test` (90 passed), `bun run build` (passed). E2E requires port 3000 free.

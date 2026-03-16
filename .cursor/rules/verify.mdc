@@ -1,17 +1,20 @@
 ---
-name: completion-verifier
-description: Verifies task completion by checking for TODO/FIXME tags, env var documentation, Living SOP (vision.md) updates, and gaps. Use when the agent says "I have finished X" or "task is complete", or at Gold Rush Step 05.
+description: description: Verifies task completion by checking for TODO/FIXME tags, env var documentation, Living SOP (docs/living-sop.md) updates, and gaps. Use when the agent says "I have finished X" or "task is complete", or at Gold Rush Step 05.
+alwaysApply: false
 ---
+---
+name: verify
 
-# Completion Verifier
 
 ## Trigger
 
 Use this skill whenever:
 
 - The agent says "I have finished X", "task is complete", or "implementation complete"
-- Gold Rush Feature Pipeline Step 05: Verification
 - The user asks "did you verify this is complete?"
+When you are about to say a task is complete, STOP. Run: (1) grep TODO/FIXME, (2) check .env.example for new vars, (3) update living-sop.md if schema/API/tests changed, (4) report gaps. Only then may you declare completion.
+
+
 
 ## Workflow
 
@@ -32,10 +35,15 @@ Use this skill whenever:
      - Middleware or tenant-routing changes (`middleware.ts`, `proxy.ts`)
      - Test strategy or command changes (`package.json` scripts, `vitest.config.ts`, `playwright.config.*`)
      - Deployment or environment process changes
-   - Verify the "Update Block" at the bottom of `vision.md` reflects the change (last updated date, what changed, verification performed).
-   - If `vision.md` was not updated when it should have been, block completion and instruct the agent to update it.
+   - Verify the "Update Block" at the bottom of `docs/living-sop.md` reflects the change (last updated date, what changed, verification performed).
+   - If `docs/living-sop.md` was not updated when it should have been, block completion and instruct the agent to update it.
 
-4. **Report gaps**:
+4. **Kill any dev server you started**:
+   - If you ran `bun run dev`, `next dev`, or started a server on port 3000 during this session, kill it before declaring completion.
+   - Use `lsof -i :3000` to find the PID, then `kill <pid>` (or `kill -9 <pid>` if needed).
+   - Do not leave orphaned dev processes; they block port 3000 and cause lock-file conflicts.
+
+5. **Report gaps**:
    - List any logic that was not implemented
    - List any tests that were not added (per testing-governance)
    - Suggest updating `GAPS.md` with outstanding items
@@ -47,7 +55,8 @@ Use this skill whenever:
 
 - [ ] `// TODO` / `// FIXME` in changed files: None found / [list]
 - [ ] New env vars documented in `.env.example`: Yes / No
-- [ ] `vision.md` updated (if work touched schema, API, middleware, tests, or deployment): Yes / No / N/A
+- [ ] `docs/living-sop.md` updated (if work touched schema, API, middleware, tests, or deployment): Yes / No / N/A
+- [ ] Dev server killed (if started): Yes / N/A
 - [ ] Outstanding items: [list or "None"]
 
 **Verdict:** Ready for completion / Blocked by [reason]
@@ -57,4 +66,5 @@ Use this skill whenever:
 
 - Never claim a task is complete without running this verification.
 - If tests fail or build fails, the task is not complete.
-- If the work touched schema, API, middleware, tests, or deployment and `vision.md` was not updated, the task is not complete. Update the Living SOP and its Update Block before declaring done.
+- If the work touched schema, API, middleware, tests, or deployment and `docs/living-sop.md` was not updated, the task is not complete. Update the Living SOP and its Update Block before declaring done.
+- If you started a dev server during this session, kill it before declaring completion. Do not leave orphaned processes.

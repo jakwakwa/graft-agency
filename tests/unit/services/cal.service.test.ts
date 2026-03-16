@@ -7,30 +7,47 @@ vi.stubGlobal("fetch", mockFetch);
 describe("calService", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.stubEnv("CAL_COM_API_KEY", "test-api-key");
+    vi.stubEnv("CAL_COM_VERSION", "2026-02-25");
   });
 
   describe("getAvailability", () => {
-    it("calls Cal.com API with correct date range", async () => {
+    it("returns error when API key is missing", async () => {
+      vi.stubEnv("CAL_COM_API_KEY", "");
+      const result = await calService.getAvailability({
+        username: "testuser",
+        eventTypeSlug: "15min",
+      });
+      expect(result.error).toBeDefined();
+      expect(mockFetch).not.toHaveBeenCalled();
+    });
+
+    it("calls Cal.com v2 API with correct params and headers", async () => {
       mockFetch.mockResolvedValue({
         ok: true,
         json: () =>
           Promise.resolve({
             data: {
-              slots: {
-                "2026-03-20": [{ time: "2026-03-20T10:00:00Z" }, { time: "2026-03-20T14:00:00Z" }],
-              },
+              "2026-03-20": [{ time: "2026-03-20T10:00:00Z" }, { time: "2026-03-20T14:00:00Z" }],
             },
           }),
       });
 
       await calService.getAvailability({
+        username: "testuser",
+        eventTypeSlug: "15min",
         dateRange: { from: "2026-03-18", to: "2026-03-22" },
-        calComUserId: 123,
       });
 
       expect(mockFetch).toHaveBeenCalledWith(
-        expect.stringContaining("cal.com"),
-        expect.objectContaining({ method: "GET" }),
+        expect.stringMatching(/https:\/\/api\.cal\.com\/v2\/slots\?.*username=testuser.*eventTypeSlug=15min/),
+        expect.objectContaining({
+          method: "GET",
+          headers: expect.objectContaining({
+            Authorization: "Bearer test-api-key",
+            "cal-api-version": "2026-02-25",
+          }),
+        }),
       );
     });
 
@@ -40,67 +57,95 @@ describe("calService", () => {
         json: () =>
           Promise.resolve({
             data: {
-              slots: {
-                "2026-03-20": [{ time: "2026-03-20T10:00:00Z" }],
-              },
+              "2026-03-20": [{ time: "2026-03-20T10:00:00Z" }],
             },
           }),
       });
 
       const result = await calService.getAvailability({
+        username: "testuser",
+        eventTypeSlug: "15min",
         dateRange: { from: "2026-03-18", to: "2026-03-22" },
-        calComUserId: 123,
       });
 
       expect(result).toHaveProperty("slots");
       expect(Array.isArray(result.slots)).toBe(true);
       expect(result.slots.length).toBeGreaterThan(0);
+      expect(result.slots[0]).toMatchObject({ date: "2026-03-20", time: "2026-03-20T10:00:00Z" });
     });
 
     it("handles API error gracefully", async () => {
       mockFetch.mockResolvedValue({
         ok: false,
         status: 500,
-        statusText: "Internal Server Error",
+        text: () => Promise.resolve("Internal Server Error"),
       });
 
-      await expect(
-        calService.getAvailability({
-          dateRange: { from: "2026-03-18", to: "2026-03-22" },
-          calComUserId: 123,
-        }),
-      ).rejects.toThrow();
+      const result = await calService.getAvailability({
+        username: "testuser",
+        eventTypeSlug: "15min",
+        dateRange: { from: "2026-03-18", to: "2026-03-22" },
+      });
+
+      expect(result.slots).toEqual([]);
+      expect(result.error).toContain("500");
     });
   });
 
   describe("createBooking", () => {
-    it("sends booking request with correct payload", async () => {
+    it("returns error when API key is missing", async () => {
+      vi.stubEnv("CAL_COM_API_KEY", "");
+      const result = await calService.createBooking({
+        username: "testuser",
+        eventTypeSlug: "15min",
+        start: "2026-03-20T10:00:00Z",
+        name: "Alice",
+        email: "alice@example.com",
+      });
+      expect(result.error).toBeDefined();
+      expect(mockFetch).not.toHaveBeenCalled();
+    });
+
+    it("sends v2 booking request with correct payload and headers", async () => {
       mockFetch.mockResolvedValue({
         ok: true,
         json: () =>
           Promise.resolve({
-            data: {
-              uid: "booking-abc",
-              metadata: { videoCallUrl: null },
-            },
+            data: { uid: "booking-abc" },
           }),
       });
 
       await calService.createBooking({
-        slotStart: "2026-03-20T10:00:00Z",
-        slotEnd: "2026-03-20T10:30:00Z",
+        username: "testuser",
+        eventTypeSlug: "15min",
+        start: "2026-03-20T10:00:00Z",
         name: "Alice Smith",
         email: "alice@example.com",
-        eventTypeId: 1,
       });
 
       expect(mockFetch).toHaveBeenCalledWith(
-        expect.stringContaining("cal.com"),
+        expect.stringContaining("cal.com/v2/bookings"),
         expect.objectContaining({
           method: "POST",
-          body: expect.any(String),
+          headers: expect.objectContaining({
+            "Content-Type": "application/json",
+            Authorization: "Bearer test-api-key",
+            "cal-api-version": "2026-02-25",
+          }),
+          body: expect.stringContaining("testuser"),
         }),
       );
+      const body = JSON.parse(mockFetch.mock.calls[0][1].body);
+      expect(body).toMatchObject({
+        username: "testuser",
+        eventTypeSlug: "15min",
+        start: "2026-03-20T10:00:00Z",
+        attendee: {
+          name: "Alice Smith",
+          email: "alice@example.com",
+          timeZone: "Africa/Johannesburg",
+        },
+      });
     });
 
     it("returns bookingUid and confirmationUrl", async () => {
@@ -108,19 +153,16 @@ describe("calService", () => {
         ok: true,
         json: () =>
           Promise.resolve({
-            data: {
-              uid: "booking-abc",
-              metadata: { videoCallUrl: null },
-            },
+            data: { uid: "booking-abc" },
           }),
       });
 
       const result = await calService.createBooking({
-        slotStart: "2026-03-20T10:00:00Z",
-        slotEnd: "2026-03-20T10:30:00Z",
+        username: "testuser",
+        eventTypeSlug: "15min",
+        start: "2026-03-20T10:00:00Z",
         name: "Alice",
         email: "alice@example.com",
-        eventTypeId: 1,
       });
 
       expect(result).toHaveProperty("bookingUid", "booking-abc");
@@ -131,18 +173,18 @@ describe("calService", () => {
       mockFetch.mockResolvedValue({
         ok: false,
         status: 409,
-        statusText: "Conflict",
+        json: () => Promise.resolve({ message: "Slot no longer available" }),
       });
 
-      await expect(
-        calService.createBooking({
-          slotStart: "2026-03-20T10:00:00Z",
-          slotEnd: "2026-03-20T10:30:00Z",
-          name: "Alice",
-          email: "alice@example.com",
-          eventTypeId: 1,
-        }),
-      ).rejects.toThrow();
+      const result = await calService.createBooking({
+        username: "testuser",
+        eventTypeSlug: "15min",
+        start: "2026-03-20T10:00:00Z",
+        name: "Alice",
+        email: "alice@example.com",
+      });
+
+      expect(result.error).toBeDefined();
     });
   });
 });
