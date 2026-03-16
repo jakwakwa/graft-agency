@@ -29,6 +29,7 @@ The v1 schema includes:
 - `Lead`
 - `ProspectQueue`
 - `EmailTemplate`
+- `Conversation` (added for chat session persistence)
 
 Key modelling decisions:
 
@@ -57,14 +58,30 @@ Added/retained indexes to keep tenant and operational queries fast:
 - `ProspectQueue.status`
 - `EmailTemplate.clientId + isDefault` (composite)
 
+### 5) Conversation Model Added
+
+- `Conversation` model stores chat sessions as JSONB with a `@unique` `sessionId`.
+- Relations to `Client` (cascade) and optional `Lead` (set null).
+- Tenant-isolation enforced at the service layer: conversation writes verify `clientId` ownership before updating.
+
+### 6) Inbound Agent Tools Use Request-Scoped Factories
+
+- The `searchKnowledgeBase` tool requires tenant context (`clientId`), so it is created per-request via `createSearchKnowledgeBaseTool(clientId)`.
+- The tool barrel exports `createTools(clientId)` instead of a static object, keeping app-only context out of model-visible input.
+- `UIMessage[]` is serialised through `toPrismaJson()` before persistence to satisfy the `Prisma.InputJsonValue` boundary.
+
 ## Architectural Pillars
 
-## 1. Inbound Agent (Conversational Lead Capture)
+## 1. Inbound Agent (Conversational Lead Capture) — Implemented
 
-- **Chat interface:** React component using `useChat` for streaming.
-- **Route brain:** `app/api/chat/route.ts` with `streamText`.
-- **Tooling model:** Zod-typed tools (for example `captureLeadDetails`, booking tools).
-- **Outcome:** Visitor intent is captured, persisted to `Lead`, then routed to booking flow.
+- **Chat interface:** `app/widget/[clientId]/_components/chat-widget.tsx` — client component using `useChat` + `DefaultChatTransport` with sessionStorage persistence.
+- **Route brain:** `app/api/chat/route.ts` — Zod-validated POST handler using `createUIMessageStream` + `streamText` with `stepCountIs(5)` guard.
+- **Tools (5):** `captureLeadDetails`, `checkAvailability`, `bookAppointment`, `searchKnowledgeBase` (factory), `handoffToHuman` — all using `tool()` + `inputSchema`.
+- **Model router:** `lib/ai/model-router.ts` — selects Gemini Flash or Flash Lite based on tool scope.
+- **Embed delivery:** `app/api/embed/[clientId]/route.ts` — cached JS loader for iframe injection.
+- **Widget UI:** Minimal layout (no Clerk), server page loading AgentConfig, 3 client components (chat-widget, tool-status, chat-input).
+- **Services:** `agent.service.ts` (config + knowledge search), `conversation.service.ts` (save/load with tenant isolation), `cal.service.ts` (Cal.com v2 wrapper), `lead.service.ts` (create from chat + handoff flagging).
+- **Outcome:** Visitor intent is captured, persisted to `Lead`, conversation stored in `Conversation`, then routed to booking flow.
 
 ## 2. Deep Scheduling Layer (Cal.com API v2)
 

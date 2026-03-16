@@ -427,8 +427,8 @@ app/
       layout.tsx              # Minimal layout (no app chrome)
       _components/
         chat-widget.tsx       # Client component with useChat
-        conversation-view.tsx # Uses Conversation + Message + Reasoning + Suggestion
-        message-list.tsx      # Message rendering with ToolUIPart typing
+        conversation-view.tsx # Uses Conversation + Message + Reasoning + Suggestion (missing)
+        message-list.tsx      # Message rendering with ToolUIPart typing  (missing)
         tool-status.tsx       # Tool execution status using Tool / ToolHeader
         chat-input.tsx        # Uses PromptInput for send UX
 lib/
