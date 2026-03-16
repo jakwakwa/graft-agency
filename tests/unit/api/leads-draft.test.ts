@@ -1,9 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import prisma from "@/lib/db/prisma";
 
-const mockAuth = vi.fn();
-vi.mock("@clerk/nextjs/server", () => ({
-  auth: () => mockAuth(),
+const mockRequirePlatformAccess = vi.fn();
+vi.mock("@clerk/nextjs/server", () => ({ auth: vi.fn() }));
+vi.mock("@/lib/auth/resolve-client", () => ({
+  requirePlatformAccess: () => mockRequirePlatformAccess(),
 }));
 
 describe("leads API (DRAFT_PENDING)", () => {
@@ -18,7 +19,7 @@ describe("leads API (DRAFT_PENDING)", () => {
       },
     });
     clientId = client.id;
-    mockAuth.mockResolvedValue({ orgId: client.clerkOrganizationId });
+    mockRequirePlatformAccess.mockResolvedValue({ clientId });
   });
 
   afterEach(async () => {
@@ -28,7 +29,7 @@ describe("leads API (DRAFT_PENDING)", () => {
 
   describe("GET /api/leads?status=DRAFT_PENDING", () => {
     it("returns 401 when not authenticated", async () => {
-      mockAuth.mockResolvedValue({ orgId: null });
+      mockRequirePlatformAccess.mockResolvedValue({ error: "Unauthorized", status: 401 });
       const { GET } = await import("@/app/api/leads/route");
       const response = await GET(new Request("http://localhost/api/leads"));
       expect(response.status).toBe(401);

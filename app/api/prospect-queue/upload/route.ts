@@ -1,6 +1,6 @@
 import Papa from "papaparse";
 import { z } from "zod";
-import { resolveClientIdFromAuth } from "@/lib/auth/resolve-client";
+import { requirePlatformAccess } from "@/lib/auth/resolve-client";
 import prisma from "@/lib/db/prisma";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
@@ -13,10 +13,9 @@ const csvRowSchema = z.object({
 });
 
 export async function POST(req: Request) {
-  const clientId = await resolveClientIdFromAuth();
-  if (!clientId) {
-    return Response.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const result = await requirePlatformAccess();
+  if ("error" in result) return Response.json({ error: result.error }, { status: result.status });
+  const { clientId } = result;
 
   const formData = await req.formData();
   const file = formData.get("file");

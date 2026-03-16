@@ -4,14 +4,19 @@ overview: "Implement the Outbound Prospecting Engine with three core capabilitie
 todos:
   - id: schema-migration
     content: Add clientId and leadId to ProspectQueue; run migration
+    status: pending
   - id: dependencies
-    content: Add Firecrawl, document FIRECRAWL_API_KEY
+    content: Add Firecrawl, document FIRECRAWL_API_KEY in .env.example
+    status: pending
   - id: outbound-tools
     content: Implement gemini_google_search, scrape_target_website, draft_bespoke_outreach
+    status: pending
   - id: entry-point
     content: API route for manual prospecting (Option B)
+    status: pending
   - id: verification
     content: Unit tests, build, lint
+    status: pending
 isProject: false
 ---
 
@@ -101,57 +106,75 @@ Create [lib/ai/tools/outbound/](lib/ai/tools/outbound/) (or extend [lib/ai/tools
 
 ### 2.1 gemini_google_search
 
-- **Purpose:** Location + service → structured list of businesses (name, website, etc.)
-- **Implementation:** Server action or API route using `generateObject` with `google.tools.googleSearch({})` and a Zod schema, e.g.:
+- **Purpose:** Location + service → structured list of businesses (name, website, address)
+- **Implementation:** Use `@ai-sdk/google` (already in [package.json](package.json)) with `google.tools.googleSearch({})` and structured output. Uses `GOOGLE_GENERATIVE_AI_API_KEY` env var.
+
+**Reference implementation (AI SDK):**
 
 ```ts
-const BusinessSearchResultSchema = z.object({
-  businesses: z.array(z.object({
-    businessName: z.string(),
-    websiteUrl: z.string().url().optional(),
-    address: z.string().optional(),
-  })),
+import { google } from "@ai-sdk/google";
+import { generateText } from "ai";
+
+const prompt = `You are a helpful local business search assistant. Your task is to find and list 3 businesses that provide ${service_name} services in ${location}. For each business, you must provide its name, address, and website URL. Please ensure the businesses are actively targeting the specified service in the given location. Format your response as a numbered list, with each item containing: Name: [Business Name] Address: [Business Address] Website: [Website URL]`;
+
+const { text } = await generateText({
+  model: google("gemini-2.5-flash-lite-preview-09-2025"),
+  tools: { google_search: google.tools.googleSearch({}) },
+  prompt,
 });
+// Parse text as JSON or use generateObject if supported for structured output
 ```
 
-- **Model:** `google('gemini-2.5-flash-lite-preview-09-2025')` (or `gemini-3-flash-preview` if lite not available)
+**Prompt (parameterise `{service_name}` and `{location}`):**
 
-**Prompt:**   
-You are a helpful local business search assistant.  
-Your task is to find and list 3 businesses that provide plumbing services in durbanville, cape town.  
-For each business, you must provide its name, address, and website URL.  
-Please ensure the businesses are actively targeting the specified service in the given location.  
-Format your response as a numbered list, with each item containing:  
-Name: [Business Name]  
-Address: [Business Address]  
-Website: [Website URL]
+> You are a helpful local business search assistant. Your task is to find and list 3 businesses that provide {service_name} services in {location}. For each business, you must provide its name, address, and website URL. Please ensure the businesses are actively targeting the specified service in the given location. Format your response as a numbered list, with each item containing: Name: [Business Name] Address: [Business Address] Website: [Website URL]
 
-Prompt: "You are a helpful local business search assistant. Your task is to find and list 3 businesses that provide {service_name} services in {location}, For each business, you must provide its name, address, and website URL. Please ensure the businesses are actively targeting the specified service in the given location. Format your response as a numbered list, with each item containing: Name: [business_name] Address: [business_address] Website: [website_url]
+**Example:** `{service_name: "plumbing", location: "durbanville, cape town"}` → proven results (HB Plumbing, Anton's Plumbing Services, E. Warricker Plumbing).
 
-
-
-
-
-### 3.2 scrape_target_website
+### 2.2 scrape_target_website
 
 - **Purpose:** URL → canonical scraped data (hasChatbot, hasVoiceAgent, coreServices)
 - **Implementation:** Vercel AI SDK `tool()` calling `scraperService.scrapeTargetWebsite(url)`
 - **Input schema:** `z.object({ url: z.string().url() })`
 
-**Firecrawl returns domain-specific keys** (e.g. `stratcol_co_za_chatbot`, `stratcol_co_za_core_services`). Use [lib/scraper/normalize-firecrawl-response.ts](lib/scraper/normalize-firecrawl-response.ts) to map to our canonical shape before storing in `Lead.scrapedData`:
+**Firecrawl Agent (playground-verified):** Zod schema works with `@mendable/firecrawl-js`. Firecrawl returns domain-specific keys (e.g. `stratcol_co_za_chatbot`, `stratcol_co_za_core_services`). Use [lib/scraper/normalize-firecrawl-response.ts](lib/scraper/normalize-firecrawl-response.ts) to map to canonical shape before storing in `Lead.scrapedData`.
+
+**Reference implementation (playground-verified):**
 
 ```ts
-import { normalizeFirecrawlResponse } from "@/lib/scraper";
+import Firecrawl from "@mendable/firecrawl-js";
+import { z } from "zod";
 
-const raw = await firecrawl.agent({ prompt, schema, urls, model });
-const canonical = normalizeFirecrawlResponse(raw.data ?? raw);
-// canonical: { hasChatbot, hasVoiceAgent, coreServices: [{ service_name, service_description }] }
+const firecrawl = new Firecrawl({ apiKey: process.env.FIRECRAWL_API_KEY });
+
+const result = await firecrawl.agent({
+  prompt: `Extract whether the website has a chatbot and a voice agent, and list 5 core services including a short description for each from the public-facing pages of ${url}.`,
+  schema: z.object({
+    chatbot: z.boolean().describe("Whether the site has a chatbot"),
+    chatbot_citation: z.string().optional(),
+    voice_agent: z.boolean().describe("Whether the site has a voice agent"),
+    voice_agent_citation: z.string().optional(),
+    core_services: z.array(z.object({
+      service_name: z.string(),
+      service_name_citation: z.string().optional(),
+      service_description: z.string(),
+      service_description_citation: z.string().optional(),
+    })).describe("5 core services offered"),
+  }),
+  urls: [url],
+  model: "spark-1-mini",
+});
+
+const canonical = normalizeFirecrawlResponse(result.data ?? result);
 ```
 
-- **Firecrawl schema:** Use a generic schema that allows domain-specific keys, or a per-URL schema. The normaliser matches by key patterns (`*_chatbot`, `*_voice_agent`, `*_core_services`) and ignores citation keys.
+**Generic prompt:** Parameterise `{url}` — e.g. "Extract whether the website has a chatbot and a voice agent, and list 5 core services including a short description for each from the public-facing pages of {url}."
+
+**Schema note:** For domain-specific keys (e.g. `stratcol_co_za_core_services`), use a generic `core_services` key or let the normaliser match `*_core_services` patterns.
+
 - **Output:** `{ hasChatbot, hasVoiceAgent, coreServices }` (canonical shape)
 
-### 3.3 draft_bespoke_outreach
+### 2.3 draft_bespoke_outreach
 
 - **Purpose:** Generate contextual email from `coreServices`, write to DB as draft (never send)
 - **Implementation:**

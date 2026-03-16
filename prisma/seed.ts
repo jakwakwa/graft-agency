@@ -35,17 +35,20 @@ function resolveConnectionString(url: string): string {
 const connectionString = resolveConnectionString(databaseUrl);
 const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString }) });
 
+const PLATFORM_ORG_ID = process.env.PLATFORM_CLERK_ORG_ID ?? "org_seed_dev";
+
 async function main() {
   const client = await prisma.client.upsert({
-    where: { clerkOrganizationId: "org_seed_dev" },
-    update: {},
+    where: { clerkOrganizationId: PLATFORM_ORG_ID },
+    update: { isPlatformClient: true },
     create: {
-      clerkOrganizationId: "org_seed_dev",
+      clerkOrganizationId: PLATFORM_ORG_ID,
       businessName: "Kona Dev Agency",
       industry: "Digital Marketing",
       websiteUrl: "https://kona.agency",
       subscriptionActive: true,
       subscriptionStatus: "active",
+      isPlatformClient: true,
     },
   });
 

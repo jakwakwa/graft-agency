@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { resolveClientIdFromAuth } from "@/lib/auth/resolve-client";
+import { requirePlatformAccess } from "@/lib/auth/resolve-client";
 import prisma from "@/lib/db/prisma";
 import type { CreateProspectQueueInput } from "@/lib/types/prospect-queue";
 
@@ -10,10 +10,9 @@ const createSchema = z.object({
 });
 
 export async function GET() {
-  const clientId = await resolveClientIdFromAuth();
-  if (!clientId) {
-    return Response.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const result = await requirePlatformAccess();
+  if ("error" in result) return Response.json({ error: result.error }, { status: result.status });
+  const { clientId } = result;
 
   const items = await prisma.prospectQueue.findMany({
     where: { clientId },
@@ -24,10 +23,9 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-  const clientId = await resolveClientIdFromAuth();
-  if (!clientId) {
-    return Response.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const result = await requirePlatformAccess();
+  if ("error" in result) return Response.json({ error: result.error }, { status: result.status });
+  const { clientId } = result;
 
   const body = createSchema.safeParse(await req.json());
   if (!body.success) {

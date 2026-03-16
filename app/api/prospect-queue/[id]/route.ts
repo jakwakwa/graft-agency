@@ -1,6 +1,6 @@
 import { z } from "zod";
 import type { QueueStatus } from "@/generated/prisma/client";
-import { resolveClientIdFromAuth } from "@/lib/auth/resolve-client";
+import { requirePlatformAccess } from "@/lib/auth/resolve-client";
 import prisma from "@/lib/db/prisma";
 import { VALID_QUEUE_STATUS_TRANSITIONS } from "@/lib/types/prospect-queue";
 
@@ -11,10 +11,9 @@ const patchSchema = z.object({
 });
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const clientId = await resolveClientIdFromAuth();
-  if (!clientId) {
-    return Response.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const result = await requirePlatformAccess();
+  if ("error" in result) return Response.json({ error: result.error }, { status: result.status });
+  const { clientId } = result;
 
   const { id } = await params;
   const existing = await prisma.prospectQueue.findFirst({
@@ -49,10 +48,9 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 }
 
 export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const clientId = await resolveClientIdFromAuth();
-  if (!clientId) {
-    return Response.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const result = await requirePlatformAccess();
+  if ("error" in result) return Response.json({ error: result.error }, { status: result.status });
+  const { clientId } = result;
 
   const { id } = await params;
   const existing = await prisma.prospectQueue.findFirst({

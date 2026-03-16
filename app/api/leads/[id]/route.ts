@@ -1,6 +1,6 @@
 import { z } from "zod";
 import type { LeadStatus, Prisma } from "@/generated/prisma/client";
-import { resolveClientIdFromAuth } from "@/lib/auth/resolve-client";
+import { requirePlatformAccess } from "@/lib/auth/resolve-client";
 import prisma from "@/lib/db/prisma";
 
 const LEAD_STATUSES = ["DRAFT_PENDING", "CONTACTED", "SCRAPED", "REPLIED", "BOOKED", "CLOSED"] as const;
@@ -14,10 +14,9 @@ const toPrismaJson = (value: unknown): Prisma.InputJsonValue =>
   JSON.parse(JSON.stringify(value)) as Prisma.InputJsonValue;
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const clientId = await resolveClientIdFromAuth();
-  if (!clientId) {
-    return Response.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const result = await requirePlatformAccess();
+  if ("error" in result) return Response.json({ error: result.error }, { status: result.status });
+  const { clientId } = result;
 
   const { id } = await params;
   const existing = await prisma.lead.findFirst({

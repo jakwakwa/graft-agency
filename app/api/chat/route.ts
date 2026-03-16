@@ -7,6 +7,7 @@ import {
   type UIMessage,
 } from "ai";
 import { z } from "zod";
+import { getPlatformClientId } from "@/lib/auth/resolve-client";
 import { selectModel } from "@/lib/ai/model-router";
 import { buildSystemPrompt } from "@/lib/ai/system-prompt";
 import { createTools } from "@/lib/ai/tools";
@@ -29,7 +30,15 @@ export async function POST(req: Request) {
     return Response.json({ error: "Invalid request body" }, { status: 400 });
   }
 
-  const { messages, clientId, sessionId } = body.data;
+  let { clientId, messages, sessionId } = body.data;
+  if (clientId === "platform") {
+    const platformId = await getPlatformClientId();
+    if (!platformId) {
+      return Response.json({ error: "Platform client not configured" }, { status: 503 });
+    }
+    clientId = platformId;
+  }
+
   const config = await agentService.getConfig(clientId);
   const systemPrompt = buildSystemPrompt(config);
   const tools = createTools(clientId);

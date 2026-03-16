@@ -1,4 +1,5 @@
 import { Prisma, type ProspectQueue } from "@/generated/prisma/client";
+import { getPlatformClientId } from "@/lib/auth/resolve-client";
 import prisma from "@/lib/db/prisma";
 import { leadService } from "@/lib/services/lead.service";
 
@@ -54,17 +55,20 @@ export async function claimQueueBatch(batchSize: number = BATCH_SIZE): Promise<P
  */
 export async function processQueueItem(item: ProspectQueue): Promise<{ success: boolean; error?: string }> {
   try {
-    const clientId = item.clientId;
+    let clientId = item.clientId;
     if (!clientId) {
-      await prisma.prospectQueue.update({
-        where: { id: item.id },
-        data: {
-          status: "FAILED",
-          errorMessage: "Missing clientId",
-          attempts: { increment: 1 },
-        },
-      });
-      return { success: false, error: "Missing clientId" };
+      clientId = await getPlatformClientId();
+      if (!clientId) {
+        await prisma.prospectQueue.update({
+          where: { id: item.id },
+          data: {
+            status: "FAILED",
+            errorMessage: "Missing clientId and platform client not configured",
+            attempts: { increment: 1 },
+          },
+        });
+        return { success: false, error: "Missing clientId and platform client not configured" };
+      }
     }
 
     const lead = await leadService.createFromOutbound({

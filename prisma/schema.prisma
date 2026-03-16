@@ -36,6 +36,7 @@ model Client {
   industry             String?
   websiteUrl           String?          @map("website_url")
   subdomain            String?          @unique
+  isPlatformClient     Boolean          @default(false) @map("is_platform_client")
   calComUserId         Int?             @map("cal_com_user_id")
   subscriptionActive   Boolean          @default(false) @map("subscription_active")
   subscriptionStatus   String           @default("inactive") @map("subscription_status")

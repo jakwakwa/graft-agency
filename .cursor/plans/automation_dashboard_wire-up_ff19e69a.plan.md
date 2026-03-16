@@ -20,7 +20,7 @@ isProject: false
 2. **CRON_SECRET validation:** Use `crypto.timingSafeEqual()` to avoid timing attacks; reject when secret is empty.
 3. **Tenant isolation:** Resolve `clientId` from Clerk org only—never trust client-supplied `clientId` for auth.
 4. **CSV security:** Papa Parse + Zod; enforce 5MB max, row limit (e.g. 10,000), formula sanitisation; validate columns.
-5. **Batch size formula:** `N * 40s < timeout`; for 60s use N=2, for 300s use N=5–7; add `@@index([status, createdAt])` for FIFO claim.
+5. **Batch size formula:** `N * 40s < timeout`; for 60s use N=2, for 300s use N=5–7; add `@@index([status, createdAt])` he implementation follows “order by latest” (DESC),
 6. **Service layer:** Thin route handlers; all logic in `outbound.service`, `lead.service.createFromOutbound`, `scraper.service`.
 7. **Component splits:** Queue/Leads pages ≤150 lines; extract `QueueTable`, `QueueUploadForm`, `LeadsTable`, `LeadDetailCard` under `_components/`.
 8. **Vitest env:** Ensure `import "dotenv/config"` at top of `vitest.config.ts` (see `docs/solutions/integration-issues/vitest-database-url-not-loaded-testing-20260316.md`).
@@ -78,7 +78,7 @@ ProspectQueue model already has `clientId`, `leadId`, `businessName`, `websiteUr
 
 ### Research Insights
 
-**Index for FIFO claim:** Add composite index for atomic claim queries:
+**Index for** he implementation follows “order by latest” (DESC), **claim:** Add composite index for atomic claim queries:
 
 ```prisma
 @@index([status, createdAt])

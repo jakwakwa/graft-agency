@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { ClerkProvider, Show, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
+import { ClerkProvider } from "@clerk/nextjs";
 
 import { Geist_Mono, Lora, Nunito_Sans } from "next/font/google";
-import { Button } from "@/components/ui/button";
+import { NavHeader } from "@/components/shared/nav-header";
 import { cn } from "@/lib/utils";
 
 const nunitoSans = Nunito_Sans({ variable: "--font-sans" });
@@ -28,26 +28,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={cn(lora.variable, geistMono.variable, "font-sans", nunitoSans.variable)}>
       <body>
-        <ClerkProvider>
-          <header className="flex justify-end items-center p-4 gap-4 h-16">
-            <Show when="signed-out">
-              <SignInButton>
-                <Button size="default" variant="ghost">
-                  Sign In
-                </Button>
-              </SignInButton>
-              <SignUpButton>
-                <Button size="default" variant="default">
-                  Sign Up
-                </Button>
-              </SignUpButton>
-            </Show>
-            <Show when="signed-in">
-              <UserButton />
-            </Show>
-          </header>
-          {children}
-        </ClerkProvider>
+        <ClerkProvider>{children}</ClerkProvider>
       </body>
     </html>
   );

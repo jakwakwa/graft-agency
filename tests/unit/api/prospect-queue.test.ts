@@ -1,14 +1,14 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import prisma from "@/lib/db/prisma";
 
-const mockAuth = vi.fn();
-vi.mock("@clerk/nextjs/server", () => ({
-  auth: () => mockAuth(),
+const mockRequirePlatformAccess = vi.fn();
+vi.mock("@clerk/nextjs/server", () => ({ auth: vi.fn() }));
+vi.mock("@/lib/auth/resolve-client", () => ({
+  requirePlatformAccess: () => mockRequirePlatformAccess(),
 }));
 
 describe("prospect-queue API", () => {
   let clientId: string;
-  let orgId: string;
 
   beforeEach(async () => {
     vi.clearAllMocks();
@@ -19,8 +19,7 @@ describe("prospect-queue API", () => {
       },
     });
     clientId = client.id;
-    orgId = client.clerkOrganizationId;
-    mockAuth.mockResolvedValue({ orgId });
+    mockRequirePlatformAccess.mockResolvedValue({ clientId });
   });
 
   afterEach(async () => {
@@ -30,7 +29,7 @@ describe("prospect-queue API", () => {
 
   describe("GET /api/prospect-queue", () => {
     it("returns 401 when not authenticated", async () => {
-      mockAuth.mockResolvedValue({ orgId: null });
+      mockRequirePlatformAccess.mockResolvedValue({ error: "Unauthorized", status: 401 });
       const { GET } = await import("@/app/api/prospect-queue/route");
       const response = await GET(new Request("http://localhost/api/prospect-queue"));
       expect(response.status).toBe(401);
@@ -64,7 +63,7 @@ describe("prospect-queue API", () => {
 
   describe("POST /api/prospect-queue", () => {
     it("returns 401 when not authenticated", async () => {
-      mockAuth.mockResolvedValue({ orgId: null });
+      mockRequirePlatformAccess.mockResolvedValue({ error: "Unauthorized", status: 401 });
       const { POST } = await import("@/app/api/prospect-queue/route");
       const response = await POST(
         new Request("http://localhost/api/prospect-queue", {

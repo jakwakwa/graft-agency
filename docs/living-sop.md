@@ -1,113 +1,52 @@
-# Gold Rush Engine: Updated Architecture Vision
+**AI Website Gold Rush: Architecture & Implementation Blueprint**
 
-## Core Stack (Current Direction)
+This blueprint outlines the architecture for "Kona AI Web Solutions," a production-grade, multi-tenant AI platform designed for high performance and strict client isolation. The system operates on three core pillars:
 
-- **Framework:** Next.js App Router (multi-tenant routes + API handlers)
-- **Database:** PostgreSQL
-- **ORM:** Prisma v7 (ESM, generated client output, Prisma config)
-- **Validation:** Zod for strict tool contracts
-- **AI runtime:** Vercel AI SDK (`streamText`, `generateObject`)
-- **Auth & tenancy:** Clerk Organisations for tenant identity
-- **Infra:** Vercel Edge + Cron jobs
+1. **Inbound Platform-Level Lead Capture Bot:**  
+   * **Purpose:** To capture leads, answer supporting questions, and schedule online consultation conferences, replacing the traditional contact form or phone call.  
+   * **Implementation:** Must be a native integration on the Kona platform website (no `iframe` needed).  
+   * **Tooling:** Relies on **deterministic tool calling** using Zod-validated "skills" to perform controlled actions:  
+     * `captureLeadDetails`: Extracts customer details and creates a Lead record, returning the `leadId`.  
+     * `checkCalendarAvailability`: Queries the Cal.com v2 API for free time slots.  
+     * `bookAppointment`: Finalizes the process, pushing lead data to Cal.com and updating the Lead status to `BOOKED`.  
+2. **White-Labeled AI Bots for Clients (Tenants):**  
+   * **Core Function:** A 90% mirror of the Platform-Level Lead Capture bot, packaged as an `iframe` snippet for clients to embed on their own websites.  
+   * **Monetization:** Clients subscribe monthly for this service (MRR model).  
+   * **Client Isolation/Access:**  
+     * Provided as an `iframe` snippet with a unique token.  
+     * Connects to the Kona platform database and AI bot control room.  
+     * Clients **do not** have access to the Outbound Prospecting Agent (Pillar 3).  
+   * **Configuration & Customization:**  
+     * **Activation:** Activated by a unique token generated upon purchase.  
+     * **API Keys:** Clients must securely enter their own API keys for the AI model (currently Gemini, with future support for others via Vercel SDK) and their own Cal.com account.  
+     * **Scheduling:** Bookings are managed directly on the client's Cal.com account, not on the Kona platform.  
+     * **Analytics:** Kona pulls analytics and metrics to display on the client's single-page tenant dashboard.  
+     * **Brain Customization:** Clients can update their bot's "Knowledge Base" via a user-friendly UI/UX dashboard, which updates the backend JSON configuration.  
+     * **Local Context:** The bot can be customized by the client (via their dashboard) to understand localized terms (e.g., "bakkie") and local schedules (e.g., load shedding).  
+3. **Autonomous Outbound Prospecting Engine (Exclusively Platform-Owned):**  
+   * **Purpose:** To programmatically find and qualify potential clients (businesses without existing AI bots).  
+   * **Process:** An autonomous Extract, Transform, Load (ETL) pipeline.  
+     * **Extraction & Audit:** Identifies businesses and audits their web presence for AI readiness using `generateObject`.  
+     * **Scraping:** Uses a Scraper tool (Firecrawl and Google Search combo) that trims the output to a token-friendly 25,000 characters.  
+     * **Logic:** The `processOutboundProspect` server action uses tools to perform a structured audit against a `prospectAuditSchema`. It **skips** pitching businesses that already have detected AI capabilities.  
+     * **Transformation:** If the audit is successful, it drafts hyper-contextualized outreach messages.  
+     * **Load:** A new Lead is created with the status `DRAFT_PENDING`.  
+   * **Automation:** Configured as a Vercel Cron job, scheduled to run daily at 3:00 AM, processing a batch size of 5 prospects per run.
 
-## What Changed
+\-----Key Operational Components
 
-### 1) Data Layer Is Now Prisma v7 Native
+**Operational Dashboard & Client Onboarding (The "CEO View"):**
 
-- Prisma client uses the `prisma-client` generator with explicit output path.
-- Database URLs are configured through `prisma.config.ts` (Prisma v7 style).
-- Runtime client initialisation supports both:
-  - direct Postgres connections (adapter mode), and
-  - Prisma Accelerate URLs when required.
+* **Platform Dashboard:** Provides aggregated metrics such as Monthly Recurring Revenue (MRR) and Lead Conversion Rates.  
+* **Prospect Triage & Context-Rich Editing:** A split-pane UI allows the agency to review the AI-generated `scrapedData` (pain points) while editing the final pitch draft, providing essential oversight before dispatch.  
+* **Transactional Client Onboarding:** Uses Prisma's "Nested Write" for transactional integrity, simultaneously creating the Client record and the associated `AgentConfig` when provisioning a new tenant.
 
-### 2) Schema Is Standardised for Multi-Tenant AI Workloads
+**Third-Party Integrations:**
 
-The v1 schema includes:
-
-- `Client`
-- `AgentConfig`
-- `Lead`
-- `ProspectQueue`
-- `EmailTemplate`
-- `Conversation` (added for chat session persistence)
-
-Key modelling decisions:
-
-- UUID primary keys for safer external-facing identifiers.
-- `clerkOrganizationId` on `Client` for tenant resolution.
-- Snake_case table and column mapping for SQL clarity.
-- `onDelete: Cascade` from `Lead -> Client` and `AgentConfig -> Client`.
-
-### 3) AI Payload Fields Are JSONB
-
-To support search and analytics on AI output, these fields use `@db.JsonB`:
-
-- `Lead.chatTranscript`
-- `Lead.scrapedData`
-- `AgentConfig.knowledgeBase`
-
-This enables future JSON-path filtering and better performance for structured AI data queries.
-
-### 4) Indexing Is Explicit for Scale
-
-Added/retained indexes to keep tenant and operational queries fast:
-
-- `Client.subdomain`
-- `Lead.status`
-- `Lead.clientId + status` (composite)
-- `ProspectQueue.status`
-- `ProspectQueue.clientId + status` (composite, for tenant-scoped queue queries)
-- `ProspectQueue.status + createdAt` (composite, for FIFO cron claim)
-- `EmailTemplate.clientId + isDefault` (composite)
-
-### 5) Conversation Model Added
-
-- `Conversation` model stores chat sessions as JSONB with a `@unique` `sessionId`.
-- Relations to `Client` (cascade) and optional `Lead` (set null).
-- Tenant-isolation enforced at the service layer: conversation writes verify `clientId` ownership before updating.
-
-### 6) Inbound Agent Tools Use Request-Scoped Factories
-
-- The `searchKnowledgeBase` tool requires tenant context (`clientId`), so it is created per-request via `createSearchKnowledgeBaseTool(clientId)`.
-- The tool barrel exports `createTools(clientId)` instead of a static object, keeping app-only context out of model-visible input.
-- `UIMessage[]` is serialised through `toPrismaJson()` before persistence to satisfy the `Prisma.InputJsonValue` boundary.
-
-## Architectural Pillars
-
-## 1. Inbound Agent (Conversational Lead Capture) — Implemented
-
-- **Chat interface:** `app/widget/[clientId]/_components/chat-widget.tsx` — client component using `useChat` + `DefaultChatTransport` with sessionStorage persistence.
-- **Route brain:** `app/api/chat/route.ts` — Zod-validated POST handler using `createUIMessageStream` + `streamText` with `stepCountIs(5)` guard.
-- **Tools (5):** `captureLeadDetails`, `checkAvailability`, `bookAppointment`, `searchKnowledgeBase` (factory), `handoffToHuman` — all using `tool()` + `inputSchema`.
-- **Model router:** `lib/ai/model-router.ts` — selects Gemini Flash or Flash Lite based on tool scope.
-- **Embed delivery:** `app/api/embed/[clientId]/route.ts` — cached JS loader for iframe injection.
-- **Widget UI:** Minimal layout (no Clerk), server page loading AgentConfig, 3 client components (chat-widget, tool-status, chat-input).
-- **Services:** `agent.service.ts` (config + knowledge search), `conversation.service.ts` (save/load with tenant isolation), `cal.service.ts` (Cal.com v2: username + eventTypeSlug), `lead.service.ts` (create from chat + handoff flagging).
-- **AgentConfig:** `calComUsername` and `defaultEventSlug` optional; scheduling tools inject when present.
-- **Outcome:** Visitor intent is captured, persisted to `Lead`, conversation stored in `Conversation`, then routed to booking flow.
-
-## 2. Deep Scheduling Layer (Cal.com API v2)
-
-- Use Cal.com API instead of a simple embed for full control.
-- Provision users/event types during client onboarding.
-- Consume booking/cancellation webhooks to keep lead state accurate.
-- Build a white-labelled scheduling UI in-app.
-
-## 3. Outbound Prospector (Programmatic Acquisition) — Implemented
-
-- **Cron:** `GET /api/cron/prospecting` — Vercel cron (daily 03:00 UTC), validates `CRON_SECRET`, claims PENDING batch via `FOR UPDATE SKIP LOCKED`, processes sequentially (scrape stub → create Lead DRAFT_PENDING → mark queue COMPLETED/FAILED).
-- **Queue API:** `GET/POST /api/prospect-queue`, `POST /api/prospect-queue/upload` (CSV), `PATCH/DELETE /api/prospect-queue/[id]` — tenant-scoped via Clerk org.
-- **Leads API:** `GET /api/leads?status=DRAFT_PENDING`, `PATCH /api/leads/[id]` — approve/edit drafts.
-- **Services:** `outbound.service.ts` (claimQueueBatch, processQueueItem, processQueue), `lead.service.createFromOutbound`.
-- **Dashboard:** `/dashboard/automation` (hub), `/dashboard/automation/queue` (table, add-one form, CSV upload), `/dashboard/automation/leads` (DRAFT_PENDING table, Approve).
-- **Schema:** `QueueStatus` includes `CANCELED`; `ProspectQueue` has `@@index([status, createdAt])` for FIFO claim.
-
-## Delivery Principles
-
-- Data-first changes before UI wiring.
-- Strong contracts at boundaries (Zod + TypeScript strictness).
-- Tenant isolation first, then feature expansion.
-- Build and migration verification required before calling work complete.
+* **Payment API (Paddle):** Used as the Merchant of Record to offload tax and payment complexity.  
+  * **"Gatekeeper" Logic:** The `clientId` is passed via Paddle's `customData` field during checkout. The webhook handler uses this ID to update the Client record to `subscriptionActive: true` upon a `subscription.activated` event.  
+* **Scheduling API (Cal.com):** Provides a headless API for scheduling.  
+  * **Webhook Security & State Recovery:** Webhook security is ensured via HMAC SHA-256 signature verification. State recovery is implemented for events like `BOOKING_CANCELLED` to maintain dashboard accuracy, updating the Lead status and setting a follow-up date.
 
 ---
 
@@ -115,6 +54,6 @@ Added/retained indexes to keep tenant and operational queries fast:
 
 **Last updated:** 2026-03-16
 
-**What changed:** Automation Dashboard wire-up: `QueueStatus` + `CANCELED`, `@@index([status, createdAt])` on ProspectQueue. New API routes: cron/prospecting, prospect-queue (CRUD + CSV upload), leads (GET/PATCH). Services: `outbound.service.ts`, `lead.service.createFromOutbound`, `lib/auth/resolve-client.ts`. Dashboard UI: automation hub, queue page (AddOneForm, QueueUploadForm, QueueTable), leads page (LeadsTable). `vercel.json` cron, `.env.example` (CRON_SECRET, PROSPECTING_BATCH_SIZE). Vitest: cron, prospect-queue, leads-draft, outbound.service. Playwright: automation-dashboard.spec.ts. Fixed widget-chat E2E (main header locator).
+**What changed:** Living SOP adaptation. Platform vs tenant split: `Client.isPlatformClient`, `getPlatformClientId()`. `captureLeadDetails` now a factory with `clientId`. Native platform chat on home page (`clientId: "platform"`). Outbound restricted to platform-only (queue, leads APIs). Restored automation dashboard (hub, queue, leads) with prospect triage split-pane. Customer portal at `/portal` (dashboard, embed, billing, settings)—replaced tenant dashboard at `/dashboard/tenant`; removed dynamic `[domain]` segment. Paddle webhook (`subscription.activated`), Cal.com webhook (`BOOKING_CANCELLED`). Client onboarding API `POST /api/admin/clients`. Auth: `proxy.ts` uses `createRouteMatcher` for public routes; dashboard protected.
 
-**Verification performed:** `bun run test` (118 passed), `bun run test:e2e` (8 passed), `bun run build` (passed).
+**Verification performed:** `bun run test` (126 passed), `bun run build` (passed).

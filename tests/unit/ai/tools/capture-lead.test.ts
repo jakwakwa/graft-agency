@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import type { z } from "zod";
-import { captureLeadDetailsTool } from "@/lib/ai/tools/capture-lead";
+import { createCaptureLeadDetailsTool } from "@/lib/ai/tools/capture-lead";
 
 vi.mock("@/lib/services/lead.service", () => ({
   leadService: {
@@ -8,6 +8,7 @@ vi.mock("@/lib/services/lead.service", () => ({
   },
 }));
 
+const captureLeadDetailsTool = createCaptureLeadDetailsTool("client-1");
 const schema = captureLeadDetailsTool.inputSchema as z.ZodType;
 
 describe("captureLeadDetails tool", () => {
@@ -38,14 +39,18 @@ describe("captureLeadDetails tool", () => {
     expect(result.success).toBe(false);
   });
 
-  it("calls leadService.createFromChat with correct params", async () => {
+  it("calls leadService.createFromChat with clientId and correct params", async () => {
     const { leadService } = await import("@/lib/services/lead.service");
     await captureLeadDetailsTool.execute(
       { name: "Alice", email: "alice@example.com" },
       { toolCallId: "tc-1", messages: [], abortSignal: new AbortController().signal },
     );
     expect(leadService.createFromChat).toHaveBeenCalledWith(
-      expect.objectContaining({ name: "Alice", email: "alice@example.com" }),
+      expect.objectContaining({
+        name: "Alice",
+        email: "alice@example.com",
+        clientId: "client-1",
+      }),
     );
   });
 

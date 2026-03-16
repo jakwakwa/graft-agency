@@ -13,26 +13,28 @@ Invoked when the user says: "Execute the Feature Workflow for [Feature Name]" or
 
 | Step | Phase | Agent Requirement |
 |------|-------|-------------------|
-| 01 | Blueprint | Generate `feature-plan.md` with files + Vitest/Playwright cases. Wait for user approval. |
-| 02 | Types & DB + Contract | Prisma schema, interfaces, **and failing Vitest test**. Wait for user approval. |
+
+| 01| Types & DB + Contract | Prisma schema, interfaces, if applicable
+
+| 02 | failing Vitest tests
+ **TTD failing Vitest test**.
+
+ Wait for user approval. |
 | 03 | Logic (Modular) | Services and Server Actions. **TDD:** Write minimum code to make Vitest pass. |
 | 04 | UI (Atomic) | Build UI. **TDD:** Write or update Playwright for the affected flow. |
 | 05 | Verification | Completion-verifier, run tests, build, audit. |
 
-## Step 01: Blueprint (TDD: planned files + test cases)
+## Step 1
+Playwright
+ (TDD: planned files + test cases)
 
-1. Use the **structural-auditor** skill.
-2. Map the file tree and verify no logic duplication.
-3. Create `feature-plan.md` in `.cursor/plans/` with:
-   - Every file to create or edit
-   - **Exact Vitest and Playwright cases to cover**
-4. **Stop and wait for user approval** before proceeding.
+## step 1 Use the **structural-auditor** skill.
 
 ## Step 02: Types & DB + Contract (TDD: interfaces + failing test)
 
 1. Implement Prisma schema changes and TypeScript interfaces.
 2. **Write a failing Vitest test** that defines the expected behaviour.
-3. **Stop and wait for user approval** before proceeding.
+
 
 ## Step 03: Logic (Modular) (TDD: implementation)
 
@@ -49,4 +51,6 @@ Invoked when the user says: "Execute the Feature Workflow for [Feature Name]" or
 
 1. Use the **completion-verifier** skill.
 2. Run targeted tests first, then `bun run test:all` and `bun run build`.
-3. Report: "Did I miss any logic? Are there any monolithic files?"
+3.   use **compound-docs** skill
+4. Walktrough report of implementation
+

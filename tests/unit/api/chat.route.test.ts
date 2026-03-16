@@ -44,6 +44,11 @@ vi.mock("@/lib/services/conversation.service", () => ({
   },
 }));
 
+const getPlatformClientId = vi.fn();
+vi.mock("@/lib/auth/resolve-client", () => ({
+  getPlatformClientId,
+}));
+
 describe("POST /api/chat", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -105,6 +110,50 @@ describe("POST /api/chat", () => {
 
     expect(response.status).toBe(400);
     expect(createUIMessageStream).not.toHaveBeenCalled();
+  });
+
+  it("resolves clientId 'platform' to platform client and persists", async () => {
+    getPlatformClientId.mockResolvedValue("platform-client-uuid");
+
+    const { POST } = await import("@/app/api/chat/route");
+    const response = await POST(
+      new Request("http://localhost/api/chat", {
+        body: JSON.stringify({
+          clientId: "platform",
+          messages: [{ id: "u1", parts: [{ text: "Hi", type: "text" }], role: "user" }],
+          sessionId: "session-1",
+        }),
+        headers: { "Content-Type": "application/json" },
+        method: "POST",
+      }),
+    );
+
+    expect(response.status).toBe(200);
+    expect(getPlatformClientId).toHaveBeenCalled();
+    expect(createTools).toHaveBeenCalledWith("platform-client-uuid");
+    expect(saveConversation).toHaveBeenCalledWith(
+      expect.objectContaining({ clientId: "platform-client-uuid", sessionId: "session-1" }),
+    );
+  });
+
+  it("returns 503 when clientId is 'platform' but platform client not configured", async () => {
+    getPlatformClientId.mockResolvedValue(null);
+
+    const { POST } = await import("@/app/api/chat/route");
+    const response = await POST(
+      new Request("http://localhost/api/chat", {
+        body: JSON.stringify({
+          clientId: "platform",
+          messages: [],
+          sessionId: "session-1",
+        }),
+        headers: { "Content-Type": "application/json" },
+        method: "POST",
+      }),
+    );
+
+    expect(response.status).toBe(503);
+    expect(getConfig).not.toHaveBeenCalled();
   });
 
   it("persists serialised messages on successful completion", async () => {

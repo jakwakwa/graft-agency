@@ -3,19 +3,21 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Typography } from "@/components/ui/typography";
+import { LeadDetailCard } from "./_components/lead-detail-card";
 import { LeadsTable } from "./_components/leads-table";
 
 interface LeadItem {
   id: string;
   customerName: string | null;
   status: string;
-  scrapedData: { draftSubject?: string; draftBody?: string } | null;
+  scrapedData: { draftSubject?: string; draftBody?: string; websiteUrl?: string; [key: string]: unknown } | null;
 }
 
 export default function LeadsPage() {
   const [leads, setLeads] = useState<LeadItem[]>([]);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [loading, setLoading] = useState(true);
+  const [editingLead, setEditingLead] = useState<LeadItem | null>(null);
 
   async function fetchLeads() {
     setLoading(true);
@@ -23,6 +25,11 @@ export default function LeadsPage() {
       const res = await fetch("/api/leads?status=DRAFT_PENDING");
       if (res.status === 401) {
         setMessage({ type: "error", text: "Please sign in to view leads." });
+        setLeads([]);
+        return;
+      }
+      if (res.status === 403) {
+        setMessage({ type: "error", text: "Access denied. This area is for platform owners only." });
         setLeads([]);
         return;
       }
@@ -49,10 +56,27 @@ export default function LeadsPage() {
       });
       if (!res.ok) throw new Error("Approve failed");
       setMessage({ type: "success", text: "Lead approved." });
+      setEditingLead(null);
       fetchLeads();
     } catch {
       setMessage({ type: "error", text: "Failed to approve." });
     }
+  }
+
+  async function handleSave(
+    id: string,
+    updates: { draftSubject?: string; draftBody?: string },
+  ) {
+    const lead = leads.find((l) => l.id === id);
+    const merged = { ...(lead?.scrapedData ?? {}), ...updates };
+    const res = await fetch(`/api/leads/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ scrapedData: merged }),
+    });
+    if (!res.ok) throw new Error("Save failed");
+    setMessage({ type: "success", text: "Draft saved." });
+    fetchLeads();
   }
 
   if (loading) {
@@ -85,8 +109,23 @@ export default function LeadsPage() {
 
       <div className="mt-8">
         <Typography.H3>DRAFT_PENDING leads</Typography.H3>
-        <LeadsTable leads={leads} onApprove={handleApprove} onEdit={() => {}} />
+        <LeadsTable
+          leads={leads}
+          onApprove={handleApprove}
+          onEdit={(id) => setEditingLead(leads.find((l) => l.id === id) ?? null)}
+        />
       </div>
+
+      {editingLead && (
+        <LeadDetailCard
+          id={editingLead.id}
+          customerName={editingLead.customerName}
+          scrapedData={editingLead.scrapedData}
+          onApprove={handleApprove}
+          onSave={handleSave}
+          onClose={() => setEditingLead(null)}
+        />
+      )}
     </div>
   );
 }
