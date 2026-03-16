@@ -1,0 +1,33 @@
+---
+description: Kona project governance - truth first, modular integrity, no assumptions, UK English
+alwaysApply: true
+---
+
+# KONA PROJECT GOVERNANCE
+
+## Core Philosophy (The South African Engineer's Code)
+
+1. **Truth First:** Never say a task is complete until you have verified the file changes. No "should work" or "mocking" unless explicitly asked.
+2. **Modular Integrity:** No component exceeds 150 lines. If it does, extract sub-components or logic hooks immediately.
+3. **No Assumptions:** As per user requirement: No guessing. If a variable or API response is unknown, ask the user or look at the types/docs.
+4. **UK English:** All UI text and comments must use UK English (e.g. 'optimise', 'colour').
+
+## Technical Constraints
+
+- **Stack:** Next.js 14+ (App Router), TypeScript (Strict), Prisma, Tailwind CSS, Shadcn/UI, Base UI.
+- **Server Actions:** Separate business logic from actions. Actions call Services (e.g. `lib/services/email.service.ts`).
+- **Data Safety:** Every database write must be wrapped in a try/catch with proper logging.
+
+## "Completion" Definition
+
+A task is NOT complete until:
+
+- Types are verified (no `any`).
+- File structure follows the modular plan.
+- The user is told EXACTLY what files were changed and what logic was added.
+
+## Tactical Advice
+
+- **Step-back prompt:** When the agent drifts, ask: "Step back. You are starting to drift. Read the governance rules again. Before you write another line, give me a bullet-point summary of the technical gaps in the current implementation compared to the PRD."
+- **GAPS command:** After a session, ask: "What did you NOT implement in this feature? Update GAPS.md with the outstanding items."
+- **Base UI / Tailwind:** Use Tailwind only. Use Shadcn for complex Radix-based components. Keep logic in a separate `use-feature.ts` hook.

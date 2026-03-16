@@ -1,0 +1,27 @@
+---
+description: Standardize the Next.js testing stack and Bun-native commands
+alwaysApply: true
+---
+
+# Next Testing Stack
+
+- Standard stack: Vitest with React Testing Library and `jsdom` for unit and integration tests, plus Playwright for end-to-end tests.
+- In TypeScript Next.js apps with path aliases, include `vite-tsconfig-paths` in the Vitest config.
+- Prefer package scripts over one-off package runners so commands stay Bun-native and repeatable.
+- Use these dependency defaults when bootstrapping a Next.js app:
+  - `bun add -D vitest @vitejs/plugin-react jsdom @testing-library/react @testing-library/dom vite-tsconfig-paths`
+  - `bun add -D @playwright/test`
+- Add scripts similar to:
+
+```json
+{
+  "test": "vitest run",
+  "test:watch": "vitest",
+  "test:e2e": "playwright test",
+  "test:all": "bun run test && bun run test:e2e",
+  "playwright:install": "playwright install"
+}
+```
+
+- Run browser installation through the script: `bun run playwright:install`
+- For async Server Components or full tenant routing validation, prefer Playwright over Vitest.
