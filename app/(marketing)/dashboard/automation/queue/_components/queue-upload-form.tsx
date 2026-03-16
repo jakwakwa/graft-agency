@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Typography } from "@/components/ui/typography";
 
 interface QueueUploadFormProps {
@@ -39,7 +40,15 @@ export function QueueUploadForm({ onSuccess, onError }: QueueUploadFormProps) {
 
   return (
     <div>
-      <input ref={inputRef} type="file" accept=".csv" onChange={handleChange} className="hidden" disabled={loading} />
+      <Input
+        ref={inputRef}
+        type="file"
+        accept=".csv"
+        onChange={handleChange}
+        className="hidden"
+        disabled={loading}
+        id="file"
+      />
       <Button type="button" variant="outline" onClick={() => inputRef.current?.click()} disabled={loading}>
         {loading ? "Uploading…" : "Upload CSV"}
       </Button>

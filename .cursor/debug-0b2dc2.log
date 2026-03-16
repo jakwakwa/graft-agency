@@ -467,3 +467,16 @@
 {"location":"check-availability:result","message":"checkAvailability result","data":{"slotCount":2,"hasError":false},"hypothesisId":"H3","timestamp":1773687412615}
 {"location":"check-availability:config","message":"checkAvailability config","data":{"clientId":"test-client","calComUsername":null,"defaultEventSlug":null,"username":null,"eventTypeSlug":null,"hasBoth":false},"hypothesisId":"H1","timestamp":1773687412616}
 {"location":"check-availability:noConfig","message":"early return","data":{"reason":"missing username or eventTypeSlug"},"hypothesisId":"H1","timestamp":1773687412617}
+{"location":"check-availability:config","message":"checkAvailability config","data":{"clientId":"test-client","calComUsername":"testuser","defaultEventSlug":"15min","username":"testuser","eventTypeSlug":"15min","hasBoth":true},"hypothesisId":"H1","timestamp":1773689951959}
+{"location":"check-availability:result","message":"checkAvailability result","data":{"slotCount":2,"hasError":false},"hypothesisId":"H3","timestamp":1773689951960}
+{"location":"check-availability:config","message":"checkAvailability config","data":{"clientId":"test-client","calComUsername":"testuser","defaultEventSlug":"15min","username":"testuser","eventTypeSlug":"15min","hasBoth":true},"hypothesisId":"H1","timestamp":1773689951964}
+{"location":"check-availability:result","message":"checkAvailability result","data":{"slotCount":2,"hasError":false},"hypothesisId":"H3","timestamp":1773689951965}
+{"location":"check-availability:config","message":"checkAvailability config","data":{"clientId":"test-client","calComUsername":null,"defaultEventSlug":null,"username":null,"eventTypeSlug":null,"hasBoth":false},"hypothesisId":"H1","timestamp":1773689951966}
+{"location":"check-availability:noConfig","message":"early return","data":{"reason":"missing username or eventTypeSlug"},"hypothesisId":"H1","timestamp":1773689951966}
+{"location":"cal.service:getAvailability","message":"entry","data":{"apiKeyPresent":false,"username":"testuser","eventTypeSlug":"15min"},"hypothesisId":"H2","timestamp":1773689952825}
+{"location":"cal.service:getAvailability","message":"entry","data":{"apiKeyPresent":true,"username":"testuser","eventTypeSlug":"15min"},"hypothesisId":"H2","timestamp":1773689952828}
+{"location":"cal.service:success","message":"getAvailability success","data":{"slotCount":2,"rawKeys":["2026-03-20"]},"hypothesisId":"H3","timestamp":1773689952829}
+{"location":"cal.service:getAvailability","message":"entry","data":{"apiKeyPresent":true,"username":"testuser","eventTypeSlug":"15min"},"hypothesisId":"H2","timestamp":1773689952834}
+{"location":"cal.service:success","message":"getAvailability success","data":{"slotCount":1,"rawKeys":["2026-03-20"]},"hypothesisId":"H3","timestamp":1773689952834}
+{"location":"cal.service:getAvailability","message":"entry","data":{"apiKeyPresent":true,"username":"testuser","eventTypeSlug":"15min"},"hypothesisId":"H2","timestamp":1773689952836}
+{"location":"cal.service:apiError","message":"Cal.com API error","data":{"status":500,"errorPreview":"Internal Server Error"},"hypothesisId":"H3","timestamp":1773689952836}

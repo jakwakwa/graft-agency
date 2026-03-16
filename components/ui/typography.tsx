@@ -5,7 +5,7 @@ const TypographyH1 = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<H
   ({ className, ...props }, ref) => (
     <h1
       ref={ref}
-      className={cn("scroll-m-20 text-4xl font-extrabold tracking-tight text-balance", className)}
+      className={cn("scroll-m-20 text-4xl leading-relaxed m-1  font-extrabold tracking-tight text-balance", className)}
       {...props}
     />
   ),
@@ -17,7 +17,7 @@ const TypographyH2 = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<H
     <h2
       ref={ref}
       className={cn(
-        "scroll-m-20 border-b border-border pb-2 text-3xl font-semibold tracking-tight first:mt-0",
+        "scroll-m-20 border-b border-border pb-2 text-3xl leading-relaxed m-1  font-semibold tracking-tight first:mt-0",
         className,
       )}
       {...props}
@@ -28,28 +28,36 @@ TypographyH2.displayName = "TypographyH2";
 
 const TypographyH3 = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadingElement>>(
   ({ className, ...props }, ref) => (
-    <h3 ref={ref} className={cn("scroll-m-20 text-2xl font-semibold tracking-tight", className)} {...props} />
+    <h3
+      ref={ref}
+      className={cn("scroll-m-20 text-lg leading-relaxed mt-6 mb-8  font-semibold tracking-tight", className)}
+      {...props}
+    />
   ),
 );
 TypographyH3.displayName = "TypographyH3";
 
 const TypographyH4 = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadingElement>>(
   ({ className, ...props }, ref) => (
-    <h4 ref={ref} className={cn("scroll-m-20 text-xl font-semibold tracking-tight", className)} {...props} />
+    <h4
+      ref={ref}
+      className={cn("scroll-m-20 text-sm leading-relaxed m-1  font-semibold tracking-tight", className)}
+      {...props}
+    />
   ),
 );
 TypographyH4.displayName = "TypographyH4";
 
 const TypographyP = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
   ({ className, ...props }, ref) => (
-    <p ref={ref} className={cn("leading-7 [&:not(:first-child)]:mt-6", className)} {...props} />
+    <p ref={ref} className={cn("leading-8 [&:not(:first-child)]:mt-6", className)} {...props} />
   ),
 );
 TypographyP.displayName = "TypographyP";
 
 const TypographyBlockquote = React.forwardRef<HTMLQuoteElement, React.HTMLAttributes<HTMLQuoteElement>>(
   ({ className, ...props }, ref) => (
-    <blockquote ref={ref} className={cn("mt-6 border-s-2 border-border ps-6 italic", className)} {...props} />
+    <blockquote ref={ref} className={cn("mt-6 border-s-2 border-border italic", className)} {...props} />
   ),
 );
 TypographyBlockquote.displayName = "TypographyBlockquote";
@@ -62,7 +70,9 @@ const TypographyLead = React.forwardRef<HTMLParagraphElement, React.HTMLAttribut
 TypographyLead.displayName = "TypographyLead";
 
 const TypographyLarge = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => <div ref={ref} className={cn("text-lg font-semibold", className)} {...props} />,
+  ({ className, ...props }, ref) => (
+    <div ref={ref} className={cn("text-lg leading-normal m-1  font-semibold", className)} {...props} />
+  ),
 );
 TypographyLarge.displayName = "TypographyLarge";
 
@@ -149,7 +159,7 @@ const TypographyTableCell = React.forwardRef<HTMLTableCellElement, React.TdHTMLA
     <td
       ref={ref}
       className={cn(
-        "border border-border px-4 py-2 text-start [&[align=center]]:text-center [&[align=end]]:text-end",
+        "border border-border px-4 py-8 text-start [&[align=center]]:text-center [&[align=end]]:text-end",
         className,
       )}
       {...props}

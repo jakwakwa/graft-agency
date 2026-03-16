@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Typography } from "@/components/ui/typography";
 
 interface ScrapedData {
@@ -20,14 +23,7 @@ interface LeadDetailCardProps {
   onClose: () => void;
 }
 
-export function LeadDetailCard({
-  id,
-  customerName,
-  scrapedData,
-  onApprove,
-  onSave,
-  onClose,
-}: LeadDetailCardProps) {
+export function LeadDetailCard({ id, customerName, scrapedData, onApprove, onSave, onClose }: LeadDetailCardProps) {
   const draft = scrapedData ?? {};
   const [subject, setSubject] = useState(draft.draftSubject ?? "");
   const [body, setBody] = useState(draft.draftBody ?? "");
@@ -61,19 +57,25 @@ export function LeadDetailCard({
           </div>
           <div className="flex flex-col p-4">
             <Typography.H4 className="mb-2">Edit Draft</Typography.H4>
-            <label className="mb-1 text-sm font-medium">Subject</label>
-            <input
+            <Label className="mb-1 text-sm font-medium" htmlFor="subject">
+              Subject
+            </Label>
+            <Input
               className="mb-4 rounded border border-input bg-background px-3 py-2 text-sm"
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
               placeholder="Draft subject"
+              id="subject"
             />
-            <label className="mb-1 text-sm font-medium">Body</label>
-            <textarea
+            <Label className="mb-1 text-sm font-medium" htmlFor="body">
+              Body
+            </Label>
+            <Textarea
               className="mb-4 min-h-[200px] flex-1 rounded border border-input bg-background px-3 py-2 text-sm"
               value={body}
               onChange={(e) => setBody(e.target.value)}
               placeholder="Draft body"
+              id="body"
             />
             <div className="flex gap-2">
               <Button variant="outline" size="sm" onClick={handleSave} disabled={saving}>

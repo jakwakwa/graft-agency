@@ -8,7 +8,7 @@ export default async function AutomationHubPage() {
   if (!isAuthenticated) return redirectToSignIn();
 
   return (
-    <div className="container max-w-4xl bg-gray-50 py-8">
+    <div className=" max-w-4xl  py-8">
       <Typography.H1>Automation</Typography.H1>
       <Typography.Lead className="mt-2">
         Manage your prospect queue and review draft outreach before dispatch.

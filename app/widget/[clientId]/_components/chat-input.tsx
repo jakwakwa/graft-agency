@@ -1,7 +1,6 @@
 "use client";
 
 import { SendIcon } from "lucide-react";
-import type { FormEvent } from "react";
 
 interface ChatInputProps {
   input: string;
@@ -12,7 +11,7 @@ interface ChatInputProps {
 }
 
 export function ChatInput({ input, onChange, onSend, isLoading, primaryColour }: ChatInputProps) {
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     onSend(input);
   };

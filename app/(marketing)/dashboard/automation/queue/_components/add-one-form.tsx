@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Typography } from "@/components/ui/typography";
 
 interface AddOneFormProps {
@@ -41,9 +42,9 @@ export function AddOneForm({ onSuccess, onError }: AddOneFormProps) {
   return (
     <form onSubmit={handleSubmit} className="flex flex-wrap gap-4">
       <div className="flex-1 min-w-[200px]">
-        <label htmlFor="businessName" className="block">
+        <Label htmlFor="businessName" className="block">
           <Typography.Small className="mb-1 block">Business name</Typography.Small>
-        </label>
+        </Label>
         <Input
           id="businessName"
           value={businessName}
@@ -53,9 +54,9 @@ export function AddOneForm({ onSuccess, onError }: AddOneFormProps) {
         />
       </div>
       <div className="flex-1 min-w-[200px]">
-        <label htmlFor="websiteUrl" className="block">
+        <Label htmlFor="websiteUrl" className="block">
           <Typography.Small className="mb-1 block">Website URL</Typography.Small>
-        </label>
+        </Label>
         <Input
           id="websiteUrl"
           type="url"

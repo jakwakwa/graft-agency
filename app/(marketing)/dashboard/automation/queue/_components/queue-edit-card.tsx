@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Typography } from "@/components/ui/typography";
 
 interface QueueEditCardProps {
@@ -34,9 +35,9 @@ export function QueueEditCard({ id, businessName, websiteUrl, onSave, onClose }:
         <Typography.H3 className="mb-4">Edit prospect</Typography.H3>
         <div className="space-y-4">
           <div>
-            <label htmlFor="edit-businessName" className="block">
+            <Label htmlFor="edit-businessName" className="block">
               <Typography.Small className="mb-1">Business name</Typography.Small>
-            </label>
+            </Label>
             <Input
               id="edit-businessName"
               value={name}
@@ -45,9 +46,9 @@ export function QueueEditCard({ id, businessName, websiteUrl, onSave, onClose }:
             />
           </div>
           <div>
-            <label htmlFor="edit-websiteUrl" className="block">
+            <Label htmlFor="edit-websiteUrl" className="block">
               <Typography.Small className="mb-1">Website URL</Typography.Small>
-            </label>
+            </Label>
             <Input
               id="edit-websiteUrl"
               type="url"

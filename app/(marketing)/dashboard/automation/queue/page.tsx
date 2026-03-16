@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Typography } from "@/components/ui/typography";
 import type { QueueStatus } from "@/generated/prisma/client";
@@ -47,10 +47,13 @@ export default function QueuePage() {
     }
   }
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: fetch on mount only
+  useCallback(fetchQueue, []);
+
+  const fetchQueueCallback = useCallback(fetchQueue, []);
+
   useEffect(() => {
-    fetchQueue();
-  }, []);
+    fetchQueueCallback();
+  }, [fetchQueueCallback]);
 
   async function handleEditSave(id: string, data: { businessName: string; websiteUrl: string }) {
     try {
@@ -121,12 +124,7 @@ export default function QueuePage() {
             Add prospects via CSV or single row. View and manage items before processing.
           </Typography.Lead>
         </div>
-        <Button
-          variant="default"
-          size="sm"
-          onClick={handleProcessQueue}
-          disabled={processing || items.length === 0}
-        >
+        <Button variant="default" size="sm" onClick={handleProcessQueue} disabled={processing || items.length === 0}>
           {processing ? "Processing…" : "Process queue now"}
         </Button>
       </div>

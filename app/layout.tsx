@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
-
+import { ThemeProvider } from "@/components/theme-provider";
 import { Geist_Mono, Lora, Nunito_Sans } from "next/font/google";
-import { NavHeader } from "@/components/shared/nav-header";
 import { cn } from "@/lib/utils";
 
 const nunitoSans = Nunito_Sans({ variable: "--font-sans" });
@@ -26,9 +25,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={cn(lora.variable, geistMono.variable, "font-sans", nunitoSans.variable)}>
+    <html lang="en" suppressHydrationWarning className={cn(lora.variable, geistMono.variable, "font-sans", nunitoSans.variable)}>
       <body>
-        <ClerkProvider>{children}</ClerkProvider>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+          <ClerkProvider>{children}</ClerkProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

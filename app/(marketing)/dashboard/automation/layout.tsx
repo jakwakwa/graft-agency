@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
-import { getPlatformClientId, isPlatformAdmin, resolveClientIdFromAuth } from "@/lib/auth/resolve-client";
 import type { ReactNode } from "react";
+import { getPlatformClientId, isPlatformAdmin, resolveClientIdFromAuth } from "@/lib/auth/resolve-client";
 
 interface AutomationLayoutProps {
   children: ReactNode;
