@@ -56,6 +56,7 @@ Added/retained indexes to keep tenant and operational queries fast:
 - `Lead.status`
 - `Lead.clientId + status` (composite)
 - `ProspectQueue.status`
+- `ProspectQueue.clientId + status` (composite, for tenant-scoped queue queries)
 - `EmailTemplate.clientId + isDefault` (composite)
 
 ### 5) Conversation Model Added
@@ -96,7 +97,7 @@ Added/retained indexes to keep tenant and operational queries fast:
 - Cron/server workflow ingests local business websites.
 - Scraped content is audited with `generateObject` + strict Zod schema.
 - If no AI capability is detected, draft personalised outreach and store for review.
-- Queue status and retries are tracked in `ProspectQueue`.
+- Queue status and retries are tracked in `ProspectQueue`. `ProspectQueue.clientId` and `ProspectQueue.leadId` link queue items to tenants and created Leads.
 
 ## Delivery Principles
 
@@ -111,6 +112,6 @@ Added/retained indexes to keep tenant and operational queries fast:
 
 **Last updated:** 2026-03-16
 
-**What changed:** Cal.com API v2 integration. AgentConfig gained `calComUsername` and `defaultEventSlug` for per-client scheduling. `cal.service.ts` rewritten to v2 (username + eventTypeSlug). Scheduling tools converted to factories that inject config. South African scheduling rule added to system prompt. Vitest excludes e2e; `test:all` runs unit + Playwright. `.env.example` added.
+**What changed:** ProspectQueue schema: added `clientId` and `leadId` for tenant association and queue→Lead linkage. Migration `20260316144600_add_prospect_queue_client_lead`. New `lib/scraper/` module with `normalizeFirecrawlResponse` to map Firecrawl domain-specific keys to canonical scraped data shape. Vitest: `dotenv/config` in `vitest.config.ts` so `.env` loads before tests. Integration tests for ProspectQueue schema (`tests/unit/db/prospect-queue-schema.test.ts`).
 
-**Verification performed:** `bun run test` (90 passed), `bun run build` (passed). E2E requires port 3000 free.
+**Verification performed:** `bun run test` (97 passed), `bun run build` (passed).

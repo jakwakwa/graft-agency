@@ -35,6 +35,10 @@ Use this skill whenever:
 - `bun run test:e2e -- <path>` or `bun run playwright test <path>` for Playwright
 - `bun run build` when the change also needs compile-time verification
 
+## Prerequisites (Test Environment)
+
+If tests fail at import time with `DATABASE_URL is required to initialise Prisma`, the test process is not loading `.env`. Apply the fix in `references/test-setup.md` (add `import "dotenv/config"` to `vitest.config.ts`) before running the sentinel.
+
 ## Guardrails
 
 - Never claim a change is safe because it "looks right."

@@ -1,5 +1,5 @@
-import { appendFileSync } from "fs";
-import { join } from "path";
+import { appendFileSync } from "node:fs";
+import { join } from "node:path";
 import { tool } from "ai";
 import { z } from "zod";
 import { agentService } from "@/lib/services/agent.service";
@@ -8,7 +8,10 @@ import { calService } from "@/lib/services/cal.service";
 const DEBUG_LOG = join(process.cwd(), ".cursor", "debug-0b2dc2.log");
 const dbg = (loc: string, msg: string, data: object, h: string) => {
   try {
-    appendFileSync(DEBUG_LOG, JSON.stringify({ location: loc, message: msg, data, hypothesisId: h, timestamp: Date.now() }) + "\n");
+    appendFileSync(
+      DEBUG_LOG,
+      `${JSON.stringify({ location: loc, message: msg, data, hypothesisId: h, timestamp: Date.now() })}\n`,
+    );
   } catch {}
 };
 
@@ -35,7 +38,19 @@ export const createCheckAvailabilityTool = (clientId: string) =>
       const eventTypeSlug = input.eventTypeSlug ?? config.defaultEventSlug ?? null;
 
       // #region agent log
-      dbg("check-availability:config", "checkAvailability config", { clientId, calComUsername: config.calComUsername, defaultEventSlug: config.defaultEventSlug, username, eventTypeSlug, hasBoth: !!(username && eventTypeSlug) }, "H1");
+      dbg(
+        "check-availability:config",
+        "checkAvailability config",
+        {
+          clientId,
+          calComUsername: config.calComUsername,
+          defaultEventSlug: config.defaultEventSlug,
+          username,
+          eventTypeSlug,
+          hasBoth: !!(username && eventTypeSlug),
+        },
+        "H1",
+      );
       // #endregion
 
       if (!username || !eventTypeSlug) {
@@ -60,7 +75,12 @@ export const createCheckAvailabilityTool = (clientId: string) =>
       });
 
       // #region agent log
-      dbg("check-availability:result", "checkAvailability result", { slotCount: result.slots?.length ?? 0, hasError: !!result.error, errorPreview: result.error?.slice(0, 120) }, "H3");
+      dbg(
+        "check-availability:result",
+        "checkAvailability result",
+        { slotCount: result.slots?.length ?? 0, hasError: !!result.error, errorPreview: result.error?.slice(0, 120) },
+        "H3",
+      );
       // #endregion
 
       return result;

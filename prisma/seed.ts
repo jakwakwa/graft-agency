@@ -140,7 +140,10 @@ async function main() {
       calComUsername: devCalUsername ?? null,
       defaultEventSlug: devCalEventSlug ?? null,
       knowledgeBase: [
-        { question: "What services do you offer?", answer: "We offer AI chatbots, lead generation, and digital marketing." },
+        {
+          question: "What services do you offer?",
+          answer: "We offer AI chatbots, lead generation, and digital marketing.",
+        },
         { question: "What are your prices?", answer: "Plans start at R2,500/month. Contact us for a quote." },
       ],
     },

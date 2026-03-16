@@ -119,8 +119,9 @@ function MessageBubble({ message }: { message: UIMessage }) {
             return (
               <div
                 key={`text-${part.text.slice(0, 20)}`}
-                className={`rounded-2xl px-3 py-2 text-sm [&_a]:underline [&_a]:text-primary [&_a]:hover:opacity-80 ${isUser ? "rounded-br-sm bg-primary text-primary-foreground" : "rounded-bl-sm bg-muted"
-                  }`}
+                className={`rounded-2xl px-3 py-2 text-sm [&_a]:underline [&_a]:text-primary [&_a]:hover:opacity-80 ${
+                  isUser ? "rounded-br-sm bg-primary text-primary-foreground" : "rounded-bl-sm bg-muted"
+                }`}
               >
                 {isUser ? (
                   part.text
@@ -135,13 +136,7 @@ function MessageBubble({ message }: { message: UIMessage }) {
             const toolPart = part as { type: string; toolCallId: string; state: string };
             // AI SDK v6: type is "tool-{toolName}", e.g. "tool-captureLeadDetails"
             const toolName = toolPart.type.slice(5);
-            return (
-              <ToolStatus
-                key={`tool-${toolPart.toolCallId}`}
-                toolName={toolName}
-                state={toolPart.state}
-              />
-            );
+            return <ToolStatus key={`tool-${toolPart.toolCallId}`} toolName={toolName} state={toolPart.state} />;
           }
 
           return null;

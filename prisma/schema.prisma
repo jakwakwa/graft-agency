@@ -29,23 +29,24 @@ enum QueueStatus {
 }
 
 model Client {
-  id                   String         @id @default(uuid())
-  clerkOrganizationId  String         @unique @map("clerk_organization_id")
-  businessName         String         @map("business_name")
+  id                   String           @id @default(uuid())
+  clerkOrganizationId  String           @unique @map("clerk_organization_id")
+  businessName         String           @map("business_name")
   industry             String?
-  websiteUrl           String?        @map("website_url")
-  subdomain            String?        @unique
-  calComUserId         Int?           @map("cal_com_user_id")
-  subscriptionActive   Boolean        @default(false) @map("subscription_active")
-  subscriptionStatus   String         @default("inactive") @map("subscription_status")
-  paddleCustomerId     String?        @unique @map("paddle_customer_id")
-  paddleSubscriptionId String?        @unique @map("paddle_subscription_id")
-  createdAt            DateTime       @default(now()) @map("created_at")
-  updatedAt            DateTime       @updatedAt @map("updated_at")
+  websiteUrl           String?          @map("website_url")
+  subdomain            String?          @unique
+  calComUserId         Int?             @map("cal_com_user_id")
+  subscriptionActive   Boolean          @default(false) @map("subscription_active")
+  subscriptionStatus   String           @default("inactive") @map("subscription_status")
+  paddleCustomerId     String?          @unique @map("paddle_customer_id")
+  paddleSubscriptionId String?          @unique @map("paddle_subscription_id")
+  createdAt            DateTime         @default(now()) @map("created_at")
+  updatedAt            DateTime         @updatedAt @map("updated_at")
   agentConfig          AgentConfig?
   leads                Lead[]
   emailTemplates       EmailTemplate[]
   conversations        Conversation[]
+  prospectQueues       ProspectQueue[]
 
   @@index([subdomain])
   @@map("clients")
@@ -69,21 +70,22 @@ model AgentConfig {
 }
 
 model Lead {
-  id             String     @id @default(uuid())
-  clientId       String?    @map("client_id")
-  client         Client?    @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  customerName   String?    @map("customer_name")
+  id             String          @id @default(uuid())
+  clientId       String?         @map("client_id")
+  client         Client?         @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  customerName   String?         @map("customer_name")
   email          String?
   phone          String?
   source         LeadSource
-  status         LeadStatus @default(SCRAPED)
-  scrapedData    Json?      @db.JsonB @map("scraped_data")
-  chatTranscript Json?      @db.JsonB @map("chat_transcript")
-  calBookingUid  String?        @unique @map("cal_booking_uid")
-  nextActionDate DateTime?      @map("next_action_date")
+  status         LeadStatus      @default(SCRAPED)
+  scrapedData    Json?           @db.JsonB @map("scraped_data")
+  chatTranscript Json?           @db.JsonB @map("chat_transcript")
+  calBookingUid  String?         @unique @map("cal_booking_uid")
+  nextActionDate DateTime?       @map("next_action_date")
   createdAt      DateTime       @default(now()) @map("created_at")
   updatedAt      DateTime       @updatedAt @map("updated_at")
   conversations  Conversation[]
+  prospectQueue  ProspectQueue?
 
   @@index([clientId, status])
   @@index([status])
@@ -91,16 +93,22 @@ model Lead {
 }
 
 model ProspectQueue {
-  id           String      @id @default(uuid())
-  businessName String      @map("business_name")
-  websiteUrl   String      @map("website_url")
-  status       QueueStatus @default(PENDING)
-  attempts     Int         @default(0)
-  lastAttemptAt DateTime?  @map("last_attempt_at")
-  errorMessage String?     @map("error_message")
-  createdAt    DateTime    @default(now()) @map("created_at")
-  updatedAt    DateTime    @updatedAt @map("updated_at")
+  id            String       @id @default(uuid())
+  clientId      String?      @map("client_id")
+  leadId        String?      @unique @map("lead_id")
+  businessName  String       @map("business_name")
+  websiteUrl    String       @map("website_url")
+  status        QueueStatus  @default(PENDING)
+  attempts      Int          @default(0)
+  lastAttemptAt DateTime?    @map("last_attempt_at")
+  errorMessage  String?      @map("error_message")
+  createdAt     DateTime     @default(now()) @map("created_at")
+  updatedAt     DateTime     @updatedAt @map("updated_at")
 
+  client Client? @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  lead   Lead?   @relation(fields: [leadId], references: [id], onDelete: SetNull)
+
+  @@index([clientId, status])
   @@index([status])
   @@map("prospect_queue")
 }

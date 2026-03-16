@@ -1,12 +1,15 @@
-import { appendFileSync } from "fs";
-import { join } from "path";
+import { appendFileSync } from "node:fs";
+import { join } from "node:path";
 
 const CAL_API_BASE = "https://api.cal.com/v2";
 const CAL_API_VERSION = "2026-02-25";
 const DEBUG_LOG = join(process.cwd(), ".cursor", "debug-0b2dc2.log");
 const dbg = (loc: string, msg: string, data: object, h: string) => {
   try {
-    appendFileSync(DEBUG_LOG, JSON.stringify({ location: loc, message: msg, data, hypothesisId: h, timestamp: Date.now() }) + "\n");
+    appendFileSync(
+      DEBUG_LOG,
+      `${JSON.stringify({ location: loc, message: msg, data, hypothesisId: h, timestamp: Date.now() })}\n`,
+    );
   } catch {}
 };
 
@@ -33,7 +36,12 @@ export const calService = {
   }) {
     const apiKey = process.env.CAL_COM_API_KEY;
     // #region agent log
-    dbg("cal.service:getAvailability", "entry", { apiKeyPresent: !!apiKey, username: input.username, eventTypeSlug: input.eventTypeSlug }, "H2");
+    dbg(
+      "cal.service:getAvailability",
+      "entry",
+      { apiKeyPresent: !!apiKey, username: input.username, eventTypeSlug: input.eventTypeSlug },
+      "H2",
+    );
     // #endregion
     if (!apiKey) {
       return { slots: [], error: "Calendar integration is not configured yet." };
@@ -73,7 +81,12 @@ export const calService = {
       const text = await response.text().catch(() => "");
       const errMsg = `Calendar API error: ${response.status} ${text.slice(0, 200)}`;
       // #region agent log
-      dbg("cal.service:apiError", "Cal.com API error", { status: response.status, errorPreview: text.slice(0, 200) }, "H3");
+      dbg(
+        "cal.service:apiError",
+        "Cal.com API error",
+        { status: response.status, errorPreview: text.slice(0, 200) },
+        "H3",
+      );
       // #endregion
       return { slots: [], error: errMsg };
     }
@@ -94,7 +107,12 @@ export const calService = {
     });
 
     // #region agent log
-    dbg("cal.service:success", "getAvailability success", { slotCount: slots.length, rawKeys: Object.keys(slotsObj) }, "H3");
+    dbg(
+      "cal.service:success",
+      "getAvailability success",
+      { slotCount: slots.length, rawKeys: Object.keys(slotsObj) },
+      "H3",
+    );
     // #endregion
 
     return { slots };
