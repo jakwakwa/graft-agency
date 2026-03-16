@@ -1,6 +1,6 @@
 ---
 name: completion-verifier
-description: Verifies task completion by checking for TODO/FIXME tags, env var documentation, and gaps. Use when the agent says "I have finished X" or "task is complete", or at Gold Rush Step 05.
+description: Verifies task completion by checking for TODO/FIXME tags, env var documentation, Living SOP (vision.md) updates, and gaps. Use when the agent says "I have finished X" or "task is complete", or at Gold Rush Step 05.
 ---
 
 # Completion Verifier
@@ -25,7 +25,17 @@ Use this skill whenever:
    - If new environment variables were introduced, verify they are documented in `.env.example`
    - If `.env.example` missing a required var, add it.
 
-3. **Report gaps**:
+3. **Enforce Living SOP update** (mandatory):
+   - If the completed work touched any of these, `living-sop.md` MUST have been updated:
+     - Schema/model or migration changes (`prisma/schema.prisma`, `prisma/migrations/`)
+     - New API route or service (`app/api/`, `lib/services/`)
+     - Middleware or tenant-routing changes (`middleware.ts`, `proxy.ts`)
+     - Test strategy or command changes (`package.json` scripts, `vitest.config.ts`, `playwright.config.*`)
+     - Deployment or environment process changes
+   - Verify the "Update Block" at the bottom of `vision.md` reflects the change (last updated date, what changed, verification performed).
+   - If `vision.md` was not updated when it should have been, block completion and instruct the agent to update it.
+
+4. **Report gaps**:
    - List any logic that was not implemented
    - List any tests that were not added (per testing-governance)
    - Suggest updating `GAPS.md` with outstanding items
@@ -37,6 +47,7 @@ Use this skill whenever:
 
 - [ ] `// TODO` / `// FIXME` in changed files: None found / [list]
 - [ ] New env vars documented in `.env.example`: Yes / No
+- [ ] `vision.md` updated (if work touched schema, API, middleware, tests, or deployment): Yes / No / N/A
 - [ ] Outstanding items: [list or "None"]
 
 **Verdict:** Ready for completion / Blocked by [reason]
@@ -46,3 +57,4 @@ Use this skill whenever:
 
 - Never claim a task is complete without running this verification.
 - If tests fail or build fails, the task is not complete.
+- If the work touched schema, API, middleware, tests, or deployment and `vision.md` was not updated, the task is not complete. Update the Living SOP and its Update Block before declaring done.
