@@ -29,4 +29,26 @@ export const leadService = {
     }
     return { status: "flagged" };
   },
+
+  async createFromOutbound(input: {
+    clientId: string;
+    customerName: string;
+    websiteUrl?: string;
+    draftSubject?: string;
+    draftBody?: string;
+  }) {
+    return prisma.lead.create({
+      data: {
+        clientId: input.clientId,
+        customerName: input.customerName,
+        source: "OUTBOUND_PROSPECT",
+        status: "DRAFT_PENDING",
+        scrapedData: {
+          websiteUrl: input.websiteUrl,
+          draftSubject: input.draftSubject,
+          draftBody: input.draftBody,
+        },
+      },
+    });
+  },
 };

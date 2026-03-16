@@ -57,6 +57,7 @@ Added/retained indexes to keep tenant and operational queries fast:
 - `Lead.clientId + status` (composite)
 - `ProspectQueue.status`
 - `ProspectQueue.clientId + status` (composite, for tenant-scoped queue queries)
+- `ProspectQueue.status + createdAt` (composite, for FIFO cron claim)
 - `EmailTemplate.clientId + isDefault` (composite)
 
 ### 5) Conversation Model Added
@@ -92,12 +93,14 @@ Added/retained indexes to keep tenant and operational queries fast:
 - Consume booking/cancellation webhooks to keep lead state accurate.
 - Build a white-labelled scheduling UI in-app.
 
-## 3. Outbound Prospector (Programmatic Acquisition)
+## 3. Outbound Prospector (Programmatic Acquisition) — Implemented
 
-- Cron/server workflow ingests local business websites.
-- Scraped content is audited with `generateObject` + strict Zod schema.
-- If no AI capability is detected, draft personalised outreach and store for review.
-- Queue status and retries are tracked in `ProspectQueue`. `ProspectQueue.clientId` and `ProspectQueue.leadId` link queue items to tenants and created Leads.
+- **Cron:** `GET /api/cron/prospecting` — Vercel cron (daily 03:00 UTC), validates `CRON_SECRET`, claims PENDING batch via `FOR UPDATE SKIP LOCKED`, processes sequentially (scrape stub → create Lead DRAFT_PENDING → mark queue COMPLETED/FAILED).
+- **Queue API:** `GET/POST /api/prospect-queue`, `POST /api/prospect-queue/upload` (CSV), `PATCH/DELETE /api/prospect-queue/[id]` — tenant-scoped via Clerk org.
+- **Leads API:** `GET /api/leads?status=DRAFT_PENDING`, `PATCH /api/leads/[id]` — approve/edit drafts.
+- **Services:** `outbound.service.ts` (claimQueueBatch, processQueueItem, processQueue), `lead.service.createFromOutbound`.
+- **Dashboard:** `/dashboard/automation` (hub), `/dashboard/automation/queue` (table, add-one form, CSV upload), `/dashboard/automation/leads` (DRAFT_PENDING table, Approve).
+- **Schema:** `QueueStatus` includes `CANCELED`; `ProspectQueue` has `@@index([status, createdAt])` for FIFO claim.
 
 ## Delivery Principles
 
@@ -112,6 +115,6 @@ Added/retained indexes to keep tenant and operational queries fast:
 
 **Last updated:** 2026-03-16
 
-**What changed:** ProspectQueue schema: added `clientId` and `leadId` for tenant association and queue→Lead linkage. Migration `20260316144600_add_prospect_queue_client_lead`. New `lib/scraper/` module with `normalizeFirecrawlResponse` to map Firecrawl domain-specific keys to canonical scraped data shape. Vitest: `dotenv/config` in `vitest.config.ts` so `.env` loads before tests. Integration tests for ProspectQueue schema (`tests/unit/db/prospect-queue-schema.test.ts`).
+**What changed:** Automation Dashboard wire-up: `QueueStatus` + `CANCELED`, `@@index([status, createdAt])` on ProspectQueue. New API routes: cron/prospecting, prospect-queue (CRUD + CSV upload), leads (GET/PATCH). Services: `outbound.service.ts`, `lead.service.createFromOutbound`, `lib/auth/resolve-client.ts`. Dashboard UI: automation hub, queue page (AddOneForm, QueueUploadForm, QueueTable), leads page (LeadsTable). `vercel.json` cron, `.env.example` (CRON_SECRET, PROSPECTING_BATCH_SIZE). Vitest: cron, prospect-queue, leads-draft, outbound.service. Playwright: automation-dashboard.spec.ts. Fixed widget-chat E2E (main header locator).
 
-**Verification performed:** `bun run test` (97 passed), `bun run build` (passed).
+**Verification performed:** `bun run test` (118 passed), `bun run test:e2e` (8 passed), `bun run build` (passed).

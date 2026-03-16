@@ -2,3 +2,4 @@ export { agentService } from "./agent.service";
 export { calService } from "./cal.service";
 export { conversationService } from "./conversation.service";
 export { leadService } from "./lead.service";
+export { processQueue } from "./outbound.service";

@@ -14,10 +14,10 @@ test.describe("Chat Widget", () => {
   test("displays agent name from AgentConfig", async ({ page }) => {
     await page.goto(`/widget/${TEST_CLIENT_ID}`);
 
-    // Header should show the agent name (or default)
-    const header = page.locator("header");
-    await expect(header).toBeVisible();
-    await expect(header).toContainText(/AI Assistant|[A-Z]/);
+    // Widget header (inside main) should show the agent name
+    const widgetHeader = page.locator("main header");
+    await expect(widgetHeader).toBeVisible();
+    await expect(widgetHeader).toContainText(/AI Assistant|[A-Z]/);
   });
 
   test("sends a message and receives a streamed response", async ({ page }) => {

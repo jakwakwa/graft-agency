@@ -149,6 +149,30 @@ async function main() {
     },
   });
 
+  // Automation dashboard: ProspectQueue samples for org_seed_dev
+  await prisma.prospectQueue.upsert({
+    where: { id: "seed-pq-pending" },
+    update: {},
+    create: {
+      id: "seed-pq-pending",
+      clientId: client.id,
+      businessName: "Seed Prospect Pending",
+      websiteUrl: "https://seed-pending.example.com",
+      status: "PENDING",
+    },
+  });
+  await prisma.prospectQueue.upsert({
+    where: { id: "seed-pq-completed" },
+    update: {},
+    create: {
+      id: "seed-pq-completed",
+      clientId: client.id,
+      businessName: "Seed Prospect Completed",
+      websiteUrl: "https://seed-completed.example.com",
+      status: "COMPLETED",
+    },
+  });
+
   console.log(`Seeded client: ${client.id}`);
   console.log(`Seeded E2E client: ${e2eClient.id}`);
   console.log(`Seeded dev client: ${devClient.id}`);

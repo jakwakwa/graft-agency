@@ -26,6 +26,7 @@ enum QueueStatus {
   PROCESSING
   COMPLETED
   FAILED
+  CANCELED
 }
 
 model Client {
@@ -110,6 +111,7 @@ model ProspectQueue {
 
   @@index([clientId, status])
   @@index([status])
+  @@index([status, createdAt])
   @@map("prospect_queue")
 }
 
