@@ -62,7 +62,7 @@ describe("Button", () => {
       render(
         <Button disabled onClick={handleClick}>
           Disabled
-        </Button>
+        </Button>,
       );
       fireEvent.click(screen.getByRole("button"));
       expect(handleClick).not.toHaveBeenCalled();

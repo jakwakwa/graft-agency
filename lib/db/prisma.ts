@@ -1,15 +1,16 @@
 import { PrismaPg } from "@prisma/adapter-pg";
 import { withAccelerate } from "@prisma/extension-accelerate";
-import { PrismaClient, type Prisma } from "../../generated/prisma/client";
+import { type Prisma, PrismaClient } from "../../generated/prisma/client";
 
-const prismaClientSingleton = () => {
+type PrismaClientSingleton = PrismaClient;
+
+const prismaClientSingleton = (): PrismaClientSingleton => {
   const databaseUrl = process.env.DATABASE_URL;
   if (!databaseUrl) {
     throw new Error("DATABASE_URL is required to initialise Prisma");
   }
 
-  const log: Prisma.PrismaClientOptions["log"] =
-    process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"];
+  const log: Prisma.PrismaClientOptions["log"] = process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"];
   const directConnectionString = process.env.DIRECT_DATABASE_URL;
 
   if (directConnectionString) {
@@ -27,7 +28,7 @@ const prismaClientSingleton = () => {
     return new PrismaClient({
       accelerateUrl: databaseUrl,
       log,
-    }).$extends(withAccelerate());
+    }).$extends(withAccelerate()) as unknown as PrismaClientSingleton;
   }
 
   const adapter = new PrismaPg({
@@ -41,7 +42,7 @@ const prismaClientSingleton = () => {
 };
 
 declare global {
-  var prismaGlobal: undefined | ReturnType<typeof prismaClientSingleton>;
+  var prismaGlobal: PrismaClientSingleton | undefined;
 }
 
 const prisma = globalThis.prismaGlobal ?? prismaClientSingleton();

@@ -1,5 +1,5 @@
-import { $ } from "bun";
 import { existsSync } from "node:fs";
+import { $ } from "bun";
 
 async function install() {
   console.log("🚀 Starting Kona Engine Installation (Base UI Edition)...");
@@ -9,20 +9,37 @@ async function install() {
   }
 
   const deps = [
-    "next@latest", "react@19", "react-dom@19",
-    "ai@latest", "@ai-sdk/openai@latest", "@ai-sdk/react@latest",
+    "next@latest",
+    "react@19",
+    "react-dom@19",
+    "ai@latest",
+    "@ai-sdk/openai@latest",
+    "@ai-sdk/react@latest",
     "@clerk/nextjs@latest",
     "@prisma/client@latest",
-    "@paddle/paddle-node-sdk@latest", "@paddle/paddle-js@latest",
+    "@paddle/paddle-node-sdk@latest",
+    "@paddle/paddle-js@latest",
     "@base-ui-components/react@latest",
-    "resend@latest", "lucide-react", "zod", "clsx", "tailwind-merge", 
-    "cheerio", "svix", "date-fns"
+    "resend@latest",
+    "lucide-react",
+    "zod",
+    "clsx",
+    "tailwind-merge",
+    "cheerio",
+    "svix",
+    "date-fns",
   ];
 
   const devDeps = [
-    "prisma@latest", "tailwindcss@latest", "@tailwindcss/postcss@latest",
-    "@types/node", "@types/react@19", "@types/react-dom@19", "typescript", 
-    "@playwright/test", "vitest"
+    "prisma@latest",
+    "tailwindcss@latest",
+    "@tailwindcss/postcss@latest",
+    "@types/node",
+    "@types/react@19",
+    "@types/react-dom@19",
+    "typescript",
+    "@playwright/test",
+    "vitest",
   ];
 
   console.log("📦 Installing dependencies...");

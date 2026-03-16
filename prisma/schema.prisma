@@ -45,6 +45,7 @@ model Client {
   agentConfig          AgentConfig?
   leads                Lead[]
   emailTemplates       EmailTemplate[]
+  conversations        Conversation[]
 
   @@index([subdomain])
   @@map("clients")
@@ -76,10 +77,11 @@ model Lead {
   status         LeadStatus @default(SCRAPED)
   scrapedData    Json?      @db.JsonB @map("scraped_data")
   chatTranscript Json?      @db.JsonB @map("chat_transcript")
-  calBookingUid  String?    @unique @map("cal_booking_uid")
-  nextActionDate DateTime?  @map("next_action_date")
-  createdAt      DateTime   @default(now()) @map("created_at")
-  updatedAt      DateTime   @updatedAt @map("updated_at")
+  calBookingUid  String?        @unique @map("cal_booking_uid")
+  nextActionDate DateTime?      @map("next_action_date")
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @updatedAt @map("updated_at")
+  conversations  Conversation[]
 
   @@index([clientId, status])
   @@index([status])
@@ -114,4 +116,20 @@ model EmailTemplate {
 
   @@index([clientId, isDefault])
   @@map("email_templates")
+}
+
+model Conversation {
+  id        String   @id @default(uuid())
+  clientId  String   @map("client_id")
+  client    Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  leadId    String?  @map("lead_id")
+  lead      Lead?    @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  messages  Json     @db.JsonB
+  sessionId String   @unique @map("session_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([clientId])
+  @@index([sessionId])
+  @@map("conversations")
 }

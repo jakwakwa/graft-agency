@@ -54,10 +54,7 @@ body {
   margin: 0;
   color: var(--foreground, #111827);
   background: var(--background, #ffffff);
-  font-family:
-    Arial,
-    Helvetica,
-    sans-serif;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 a {

@@ -1,17 +1,17 @@
 import { render, screen } from "@testing-library/react";
 import {
+  TypographyBlockquote,
+  TypographyCode,
   TypographyH1,
   TypographyH2,
   TypographyH3,
   TypographyH4,
-  TypographyP,
-  TypographyBlockquote,
-  TypographyLead,
   TypographyLarge,
-  TypographySmall,
-  TypographyMuted,
-  TypographyCode,
+  TypographyLead,
   TypographyList,
+  TypographyMuted,
+  TypographyP,
+  TypographySmall,
 } from "@/components/ui/typography";
 
 describe("Typography", () => {
@@ -124,7 +124,7 @@ describe("Typography", () => {
         <TypographyList>
           <li>Item 1</li>
           <li>Item 2</li>
-        </TypographyList>
+        </TypographyList>,
       );
       const el = screen.getByRole("list");
       expect(el.tagName).toBe("UL");
