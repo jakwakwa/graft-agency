@@ -36,17 +36,16 @@ yarn-error.log*
 # vercel
 .vercel
 .next/**
-*.md
+# Ignore root-level .md only; keep standard docs and all .md in subdirs
+/*.md
 !README.md
+!vision.md
 !LICENSE.md
+!CHANGELOG.md
 !CONTRIBUTING.md
 !CODE_OF_CONDUCT.md
 !SECURITY.md
 !SUPPORT.md
-!CONTRIBUTING.md
-!CONTRIBUTING.md
-!docs/**/*
-!.cursor/**/*
 
 # typescript
 *.tsbuildinfo

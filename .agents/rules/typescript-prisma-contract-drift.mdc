@@ -1,0 +1,66 @@
+---
+description: Prevent TypeScript/Prisma contract drift at library boundaries (Prisma singleton, Base UI wrappers, AI tools, route handlers)
+globs: "**/*.ts, **/*.tsx, lib/db/**/*, lib/services/**/*, lib/ai/**/*, app/api/**/*"
+alwaysApply: false
+---
+
+# TypeScript and Prisma Contract Drift Prevention
+
+Avoid contract drift at library boundaries. When integrating Prisma, Base UI, AI SDK, or route handlers, enforce these patterns.
+
+## UI Wrappers (Base UI, Radix, etc.)
+
+Derive event and prop types from the wrapped component instead of hand-writing DOM types:
+
+```ts
+// ❌ BAD: guessed DOM Event
+const handleSelect = (event: Event) => onSelect?.(event);
+
+// ✅ GOOD: derive from wrapped component
+type SelectEvent = Parameters<NonNullable<ComponentProps<typeof DropdownMenuItem>["onSelect"]>>[0];
+const handleSelect = (event: SelectEvent) => onSelect?.(event);
+```
+
+Place timing props (`openDelay`, `closeDelay`) on the component that actually accepts them; check the upstream API.
+
+## Prisma Singleton
+
+When using multiple init branches (e.g. Accelerate vs standard), export one stable type:
+
+```ts
+// ❌ BAD: inferred union causes "This expression is not callable"
+const prisma = databaseUrl.startsWith("prisma://")
+  ? new PrismaClient().$extends(withAccelerate())
+  : new PrismaClient();
+
+// ✅ GOOD: single stable exported type
+type PrismaClientSingleton = PrismaClient;
+const prisma = (): PrismaClientSingleton =>
+  databaseUrl.startsWith("prisma://")
+    ? new PrismaClient().$extends(withAccelerate()) as unknown as PrismaClientSingleton
+    : new PrismaClient();
+```
+
+## AI Tools and Services
+
+Keep app-only context (e.g. `clientId`) in request-scoped factories; do not overload service functions:
+
+```ts
+// ✅ GOOD: tools built per request, close over clientId
+export const createSearchKnowledgeBaseTool = (clientId: string) =>
+  tool({
+    inputSchema: z.object({ query: z.string().trim().min(1) }),
+    execute: async (input) => agentService.searchKnowledge({ clientId, ...input }),
+  });
+```
+
+## Route Handlers and Persistence
+
+- Add an explicit serialisation boundary when persisting SDK payloads (e.g. `UIMessage[]`) to Prisma JSON:
+  `JSON.parse(JSON.stringify(value)) as Prisma.InputJsonValue`
+- Enforce tenant ownership when persisting/reading by `sessionId`: verify `clientId` matches before update/read.
+- Add route-level tests when handlers validate JSON or convert third-party payloads.
+
+## Completion Gate
+
+Treat "fix IDE errors" as incomplete until `bun run build` passes. Several contract bugs only surface at compile time.
