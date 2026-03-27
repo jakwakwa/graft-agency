@@ -7,6 +7,119 @@ datasource db {
   provider = "postgresql"
 }
 
+model Client {
+  id                   String          @id @default(uuid())
+  clerkOrganizationId  String          @unique @map("clerk_organization_id")
+  businessName         String          @map("business_name")
+  industry             String?
+  websiteUrl           String?         @map("website_url")
+  subdomain            String?         @unique
+  calComUserId         Int?            @map("cal_com_user_id")
+  subscriptionActive   Boolean         @default(false) @map("subscription_active")
+  subscriptionStatus   String          @default("inactive") @map("subscription_status")
+  paddleCustomerId     String?         @unique @map("paddle_customer_id")
+  paddleSubscriptionId String?         @unique @map("paddle_subscription_id")
+  createdAt            DateTime        @default(now()) @map("created_at")
+  updatedAt            DateTime        @updatedAt @map("updated_at")
+  agentConfig          AgentConfig?
+  conversations        Conversation[]
+  emailTemplates       EmailTemplate[]
+  leads                Lead[]
+  prospectQueues       ProspectQueue[]
+
+  @@index([subdomain])
+  @@map("clients")
+}
+
+model AgentConfig {
+  id                  String   @id @default(uuid())
+  clientId            String   @unique @map("client_id")
+  systemPrompt        String   @map("system_prompt")
+  knowledgeBase       Json?    @map("knowledge_base")
+  agentName           String?  @map("agent_name")
+  greetingMessage     String?  @map("greeting_message")
+  widgetPrimaryColour String?  @default("#000000") @map("widget_primary_colour")
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+  client              Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@map("agent_configs")
+}
+
+model Lead {
+  id             String         @id @default(uuid())
+  clientId       String?        @map("client_id")
+  customerName   String?        @map("customer_name")
+  email          String?
+  phone          String?
+  source         LeadSource
+  status         LeadStatus     @default(SCRAPED)
+  scrapedData    Json?          @map("scraped_data")
+  chatTranscript Json?          @map("chat_transcript")
+  calBookingUid  String?        @unique @map("cal_booking_uid")
+  nextActionDate DateTime?      @map("next_action_date")
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @updatedAt @map("updated_at")
+  conversations  Conversation[]
+  client         Client?        @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  prospectQueue  ProspectQueue?
+
+  @@index([clientId, status])
+  @@index([status])
+  @@map("leads")
+}
+
+model ProspectQueue {
+  id            String      @id @default(uuid())
+  businessName  String      @map("business_name")
+  websiteUrl    String      @map("website_url")
+  status        QueueStatus @default(PENDING)
+  attempts      Int         @default(0)
+  lastAttemptAt DateTime?   @map("last_attempt_at")
+  errorMessage  String?     @map("error_message")
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
+  clientId      String?     @map("client_id")
+  leadId        String?     @unique @map("lead_id")
+  client        Client?     @relation(fields: [clientId], references: [id])
+  lead          Lead?       @relation(fields: [leadId], references: [id])
+
+  @@index([clientId, status])
+  @@index([status])
+  @@map("prospect_queue")
+}
+
+model EmailTemplate {
+  id        String   @id @default(uuid())
+  clientId  String?  @map("client_id")
+  name      String
+  subject   String
+  body      String
+  isDefault Boolean  @default(false) @map("is_default")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  client    Client?  @relation(fields: [clientId], references: [id])
+
+  @@index([clientId, isDefault])
+  @@map("email_templates")
+}
+
+model Conversation {
+  id        String   @id @default(uuid())
+  clientId  String   @map("client_id")
+  leadId    String?  @map("lead_id")
+  messages  Json
+  sessionId String   @unique @map("session_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  client    Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  lead      Lead?    @relation(fields: [leadId], references: [id])
+
+  @@index([clientId])
+  @@index([sessionId])
+  @@map("conversations")
+}
+
 enum LeadSource {
   INBOUND
   OUTBOUND_PROSPECT
@@ -26,123 +139,4 @@ enum QueueStatus {
   PROCESSING
   COMPLETED
   FAILED
-  CANCELED
-}
-
-model Client {
-  id                   String           @id @default(uuid())
-  clerkOrganizationId  String           @unique @map("clerk_organization_id")
-  businessName         String           @map("business_name")
-  industry             String?
-  websiteUrl           String?          @map("website_url")
-  subdomain            String?          @unique
-  isPlatformClient     Boolean          @default(false) @map("is_platform_client")
-  calComUserId         Int?             @map("cal_com_user_id")
-  subscriptionActive   Boolean          @default(false) @map("subscription_active")
-  subscriptionStatus   String           @default("inactive") @map("subscription_status")
-  paddleCustomerId     String?          @unique @map("paddle_customer_id")
-  paddleSubscriptionId String?          @unique @map("paddle_subscription_id")
-  createdAt            DateTime         @default(now()) @map("created_at")
-  updatedAt            DateTime         @updatedAt @map("updated_at")
-  agentConfig          AgentConfig?
-  leads                Lead[]
-  emailTemplates       EmailTemplate[]
-  conversations        Conversation[]
-  prospectQueues       ProspectQueue[]
-
-  @@index([subdomain])
-  @@map("clients")
-}
-
-model AgentConfig {
-  id                  String   @id @default(uuid())
-  clientId            String   @unique @map("client_id")
-  client              Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  systemPrompt        String   @map("system_prompt")
-  knowledgeBase       Json?    @db.JsonB @map("knowledge_base")
-  agentName           String?  @map("agent_name")
-  greetingMessage     String?  @map("greeting_message")
-  widgetPrimaryColour String?  @default("#000000") @map("widget_primary_colour")
-  calComUsername      String?  @map("cal_com_username")
-  defaultEventSlug    String?  @map("default_event_slug")
-  createdAt           DateTime @default(now()) @map("created_at")
-  updatedAt           DateTime @updatedAt @map("updated_at")
-
-  @@map("agent_configs")
-}
-
-model Lead {
-  id             String          @id @default(uuid())
-  clientId       String?         @map("client_id")
-  client         Client?         @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  customerName   String?         @map("customer_name")
-  email          String?
-  phone          String?
-  source         LeadSource
-  status         LeadStatus      @default(SCRAPED)
-  scrapedData    Json?           @db.JsonB @map("scraped_data")
-  chatTranscript Json?           @db.JsonB @map("chat_transcript")
-  calBookingUid  String?         @unique @map("cal_booking_uid")
-  nextActionDate DateTime?       @map("next_action_date")
-  createdAt      DateTime       @default(now()) @map("created_at")
-  updatedAt      DateTime       @updatedAt @map("updated_at")
-  conversations  Conversation[]
-  prospectQueue  ProspectQueue?
-
-  @@index([clientId, status])
-  @@index([status])
-  @@map("leads")
-}
-
-model ProspectQueue {
-  id            String       @id @default(uuid())
-  clientId      String?      @map("client_id")
-  leadId        String?      @unique @map("lead_id")
-  businessName  String       @map("business_name")
-  websiteUrl    String       @map("website_url")
-  status        QueueStatus  @default(PENDING)
-  attempts      Int          @default(0)
-  lastAttemptAt DateTime?    @map("last_attempt_at")
-  errorMessage  String?      @map("error_message")
-  createdAt     DateTime     @default(now()) @map("created_at")
-  updatedAt     DateTime     @updatedAt @map("updated_at")
-
-  client Client? @relation(fields: [clientId], references: [id], onDelete: SetNull)
-  lead   Lead?   @relation(fields: [leadId], references: [id], onDelete: SetNull)
-
-  @@index([clientId, status])
-  @@index([status])
-  @@index([status, createdAt])
-  @@map("prospect_queue")
-}
-
-model EmailTemplate {
-  id        String   @id @default(uuid())
-  clientId  String?  @map("client_id")
-  client    Client?  @relation(fields: [clientId], references: [id], onDelete: SetNull)
-  name      String
-  subject   String
-  body      String
-  isDefault Boolean  @default(false) @map("is_default")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  @@index([clientId, isDefault])
-  @@map("email_templates")
-}
-
-model Conversation {
-  id        String   @id @default(uuid())
-  clientId  String   @map("client_id")
-  client    Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  leadId    String?  @map("lead_id")
-  lead      Lead?    @relation(fields: [leadId], references: [id], onDelete: SetNull)
-  messages  Json     @db.JsonB
-  sessionId String   @unique @map("session_id")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  @@index([clientId])
-  @@index([sessionId])
-  @@map("conversations")
 }

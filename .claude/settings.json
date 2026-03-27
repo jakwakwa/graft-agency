@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bun run:*)",
+      "Bash(curl -v http://localhost:3000/dashboard)",
+      "Bash(curl -s http://localhost:3000/portal)",
+      "Bash(curl -s http://localhost:3000/dashboard/automation)"
+    ]
+  }
+}

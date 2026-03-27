@@ -4,6 +4,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Geist_Mono, Lora, Nunito_Sans } from "next/font/google";
 import { cn } from "@/lib/utils";
+import { NavHeader } from "@/components/shared/nav-header";
 
 const nunitoSans = Nunito_Sans({ variable: "--font-sans" });
 
@@ -28,7 +29,10 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning className={cn(lora.variable, geistMono.variable, "font-sans", nunitoSans.variable)}>
       <body>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-          <ClerkProvider>{children}</ClerkProvider>
+          <ClerkProvider>
+            <NavHeader />
+
+            {children}</ClerkProvider>
         </ThemeProvider>
       </body>
     </html>

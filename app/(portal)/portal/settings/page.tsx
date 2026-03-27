@@ -1,10 +1,12 @@
 import { redirect } from "next/navigation";
+import { auth } from "@clerk/nextjs/server";
 import { Typography } from "@/components/ui/typography";
 import { resolveClientIdFromAuth } from "@/lib/auth/resolve-client";
 
 export default async function PortalSettingsPage() {
+  const { redirectToSignIn } = await auth();
   const clientId = await resolveClientIdFromAuth();
-  if (!clientId) redirect("/sign-in");
+  if (!clientId) return redirectToSignIn();
 
   return (
     <section className="flex min-h-screen items-center justify-center p-8">

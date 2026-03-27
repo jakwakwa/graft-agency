@@ -3,6 +3,7 @@ import { Typography } from "@/components/ui/typography";
 import { getPlatformClientId } from "@/lib/auth/resolve-client";
 import { agentService } from "@/lib/services/agent.service";
 import { ChatWidget } from "@/app/widget/[clientId]/_components/chat-widget";
+import { NavHeader } from "@/components/shared/nav-header";
 
 export default async function Home() {
   const platformClientId = await getPlatformClientId();
