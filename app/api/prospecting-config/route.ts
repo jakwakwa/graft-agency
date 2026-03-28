@@ -1,6 +1,9 @@
 import { z } from "zod";
+import { snapUtcTimeToNearestMinutes } from "@/lib/cron/prospecting-utc";
 import { requirePlatformAccess } from "@/lib/auth/resolve-client";
 import prisma from "@/lib/db/prisma";
+
+const PROSPECTING_CRON_GRID_MINUTES = 15;
 
 const configSchema = z.object({
   cronEnabled: z.boolean().optional(),
@@ -44,7 +47,9 @@ export async function POST(req: Request) {
     ...(body.data.cronEnabled !== undefined && { cronEnabled: body.data.cronEnabled }),
     ...(body.data.cronFrequency !== undefined && { cronFrequency: body.data.cronFrequency }),
     ...(body.data.cronDay !== undefined && { cronDay: body.data.cronDay }),
-    ...(body.data.cronTime !== undefined && { cronTime: body.data.cronTime }),
+    ...(body.data.cronTime !== undefined && {
+      cronTime: snapUtcTimeToNearestMinutes(body.data.cronTime, PROSPECTING_CRON_GRID_MINUTES),
+    }),
     ...(body.data.cronStartDate !== undefined && { cronStartDate: body.data.cronStartDate ? new Date(body.data.cronStartDate) : null }),
     ...(body.data.searchEnabled !== undefined && { searchEnabled: body.data.searchEnabled }),
     ...(body.data.searchCriteria !== undefined && { searchCriteria: body.data.searchCriteria }),

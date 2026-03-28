@@ -42,6 +42,7 @@ model ProspectingConfig {
   cronDay           Int?      @map("cron_day")
   cronTime          String    @default("22:45") @map("cron_time")
   cronStartDate     DateTime? @map("cron_start_date")
+  lastCronRunAt     DateTime? @map("last_cron_run_at")
   searchEnabled     Boolean   @default(false) @map("search_enabled")
   searchCriteria    Json?     @map("search_criteria")
   valueProposition  String?   @map("value_proposition")
