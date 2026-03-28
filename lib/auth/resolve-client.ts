@@ -1,5 +1,8 @@
 import { auth } from "@clerk/nextjs/server";
+import { getPlatformClientId } from "@/lib/auth/platform-client";
 import prisma from "@/lib/db/prisma";
+
+export { getPlatformClientId } from "@/lib/auth/platform-client";
 
 /**
  * Resolves clientId from the current user's Clerk org.
@@ -22,30 +25,6 @@ export async function resolveClientIdFromAuth(): Promise<string | null> {
 export async function isPlatformAdmin(): Promise<boolean> {
   const { has, orgRole } = await auth();
   return (typeof has === "function" && has({ role: "org:admin" })) || orgRole === "org:admin";
-}
-
-/**
- * Returns the platform client ID.
- * Priority: PLATFORM_CLIENT_ID env > client for PLATFORM_CLERK_ORG_ID > first isPlatformClient.
- */
-export async function getPlatformClientId(): Promise<string | null> {
-  const envClientId = process.env.PLATFORM_CLIENT_ID;
-  if (envClientId) return envClientId;
-
-  const orgId = process.env.PLATFORM_CLERK_ORG_ID;
-  if (orgId) {
-    const client = await prisma.client.findUnique({
-      where: { clerkOrganizationId: orgId },
-      select: { id: true },
-    });
-    if (client) return client.id;
-  }
-
-  const client = await prisma.client.findFirst({
-    where: { isPlatformClient: true },
-    select: { id: true },
-  });
-  return client?.id ?? null;
 }
 
 /**

@@ -6,13 +6,9 @@ const mockGetPlatformClientId = vi.fn();
 vi.mock("@clerk/nextjs/server", () => ({
   auth: () => mockAuth(),
 }));
-vi.mock("@/lib/auth/resolve-client", async (importOriginal) => {
-  const mod = await importOriginal<typeof import("@/lib/auth/resolve-client")>();
-  return {
-    ...mod,
-    getPlatformClientId: mockGetPlatformClientId,
-  };
-});
+vi.mock("@/lib/auth/platform-client", () => ({
+  getPlatformClientId: (...args: unknown[]) => mockGetPlatformClientId(...args),
+}));
 
 describe("requirePlatformAccess", () => {
   let platformClientId: string;

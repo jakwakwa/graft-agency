@@ -1,14 +1,15 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { auth } from "@clerk/nextjs/server";
 import { Typography } from "@/components/ui/typography";
+import { redirectToAccessRequired, requireAuthOrSignIn } from "@/lib/auth/guards";
 import { getPlatformClientId, resolveClientIdFromAuth } from "@/lib/auth/resolve-client";
 import prisma from "@/lib/db/prisma";
 
 export default async function TenantDashboardPage() {
-  const { redirectToSignIn } = await auth();
+  await requireAuthOrSignIn();
+
   const clientId = await resolveClientIdFromAuth();
-  if (!clientId) return redirectToSignIn();
+  if (!clientId) redirectToAccessRequired();
 
   const platformId = await getPlatformClientId();
   if (platformId && clientId === platformId) {

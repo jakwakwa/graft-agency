@@ -1,14 +1,15 @@
 import { redirect } from "next/navigation";
-import { auth } from "@clerk/nextjs/server";
 import { Card } from "@/components/ui/card";
 import { Typography } from "@/components/ui/typography";
+import { redirectToAccessRequired, requireAuthOrSignIn } from "@/lib/auth/guards";
 import { getPlatformClientId, resolveClientIdFromAuth } from "@/lib/auth/resolve-client";
 import prisma from "@/lib/db/prisma";
 
 export default async function PortalDashboardPage() {
-  const { redirectToSignIn } = await auth();
+  await requireAuthOrSignIn();
+
   const clientId = await resolveClientIdFromAuth();
-  if (!clientId) return redirectToSignIn();
+  if (!clientId) redirectToAccessRequired();
 
   const platformId = await getPlatformClientId();
   if (platformId && clientId === platformId) {

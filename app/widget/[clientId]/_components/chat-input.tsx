@@ -22,9 +22,9 @@ export function ChatInput({ input, onChange, onSend, isLoading, primaryColour }:
         type="text"
         value={input}
         onChange={(e) => onChange(e.target.value)}
-        placeholder="Type a message\u2026"
+        placeholder="Type a message"
         disabled={isLoading}
-        className="flex-1 rounded-full border border-border bg-background px-3 py-2 text-sm outline-none placeholder:text-muted-foreground focus:ring-1 focus:ring-ring disabled:opacity-50"
+        className="flex-1 rounded-full placeholder:text-white/20 focus-visible:border-indigo-500 focus-visible:shadow-indigo focus-visible:shadow-[0_0px_25px_violet]/60 border border-border bg-background px-3 py-2 text-sm outline-none  focus:ring-1 focus:ring-ring disabled:opacity-50"
         aria-label="Chat message"
       />
       <button

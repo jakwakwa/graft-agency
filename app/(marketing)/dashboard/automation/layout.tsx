@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
-import { auth } from "@clerk/nextjs/server";
 import type { ReactNode } from "react";
+import { redirectToAccessRequired, requireAuthOrSignIn } from "@/lib/auth/guards";
 import { getPlatformClientId, isPlatformAdmin, resolveClientIdFromAuth } from "@/lib/auth/resolve-client";
 
 interface AutomationLayoutProps {
@@ -8,12 +8,16 @@ interface AutomationLayoutProps {
 }
 
 export default async function AutomationLayout({ children }: AutomationLayoutProps) {
-  const { redirectToSignIn } = await auth();
-  const clientId = await resolveClientIdFromAuth();
-  if (!clientId) return redirectToSignIn();
+  await requireAuthOrSignIn();
 
-  const isAdmin = await isPlatformAdmin();
-  if (isAdmin) return <>{children}</>;
+  if (await isPlatformAdmin()) {
+    return <>{children}</>;
+  }
+
+  const clientId = await resolveClientIdFromAuth();
+  if (!clientId) {
+    redirectToAccessRequired();
+  }
 
   const platformId = await getPlatformClientId();
   if (!platformId || clientId !== platformId) redirect("/portal");

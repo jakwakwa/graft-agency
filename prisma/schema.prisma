@@ -19,6 +19,7 @@ model Client {
   subscriptionStatus   String          @default("inactive") @map("subscription_status")
   paddleCustomerId     String?         @unique @map("paddle_customer_id")
   paddleSubscriptionId String?         @unique @map("paddle_subscription_id")
+  isPlatformClient     Boolean         @default(false) @map("is_platform_client")
   createdAt            DateTime        @default(now()) @map("created_at")
   updatedAt            DateTime        @updatedAt @map("updated_at")
   agentConfig          AgentConfig?
@@ -28,6 +29,7 @@ model Client {
   prospectQueues       ProspectQueue[]
 
   @@index([subdomain])
+  @@index([isPlatformClient])
   @@map("clients")
 }
 
@@ -38,6 +40,8 @@ model AgentConfig {
   knowledgeBase       Json?    @map("knowledge_base")
   agentName           String?  @map("agent_name")
   greetingMessage     String?  @map("greeting_message")
+  calComUsername      String?  @map("cal_com_username")
+  defaultEventSlug    String?  @map("default_event_slug")
   widgetPrimaryColour String?  @default("#000000") @map("widget_primary_colour")
   createdAt           DateTime @default(now()) @map("created_at")
   updatedAt           DateTime @updatedAt @map("updated_at")
@@ -139,4 +143,5 @@ enum QueueStatus {
   PROCESSING
   COMPLETED
   FAILED
+  CANCELED
 }

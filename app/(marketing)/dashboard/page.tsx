@@ -1,14 +1,14 @@
 import { redirect } from "next/navigation";
-import { auth } from "@clerk/nextjs/server";
+import { redirectToAccessRequired, requireAuthOrSignIn } from "@/lib/auth/guards";
 import { getPlatformClientId, isPlatformAdmin, resolveClientIdFromAuth } from "@/lib/auth/resolve-client";
 
 export default async function DashboardPage() {
-  const { redirectToSignIn } = await auth();
-  const clientId = await resolveClientIdFromAuth();
-  if (!clientId) return redirectToSignIn();
+  await requireAuthOrSignIn();
 
-  const isAdmin = await isPlatformAdmin();
-  if (isAdmin) redirect("/dashboard/automation");
+  if (await isPlatformAdmin()) redirect("/dashboard/automation");
+
+  const clientId = await resolveClientIdFromAuth();
+  if (!clientId) redirectToAccessRequired();
 
   const platformId = await getPlatformClientId();
   if (platformId && clientId === platformId) redirect("/dashboard/automation");
