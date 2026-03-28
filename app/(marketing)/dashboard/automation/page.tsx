@@ -2,21 +2,24 @@ import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Typography } from "@/components/ui/typography";
+import { AutomationHubClient } from "./_components/automation-hub-client";
 
 export default async function AutomationHubPage() {
   const { isAuthenticated, redirectToSignIn } = await auth();
   if (!isAuthenticated) return redirectToSignIn();
 
   return (
-    <div className=" max-w-4xl  py-8">
+    <div className="max-w-4xl py-8">
       <Typography.H1>Automation</Typography.H1>
       <Typography.Lead className="mt-2">
         Manage your prospect queue and review draft outreach before dispatch.
       </Typography.Lead>
 
       <Typography.P className="mt-4 text-sm text-muted-foreground">
-        Cron runs daily at 03:00 UTC. Use &quot;Process queue now&quot; on the queue page to run manually.
+        Cron runs daily at 22:45 UTC. Use &quot;Process queue now&quot; on the queue page to run manually.
       </Typography.P>
+
+      <AutomationHubClient />
 
       <div className="mt-8 grid gap-4 sm:grid-cols-2">
         <Link href="/dashboard/automation/queue">

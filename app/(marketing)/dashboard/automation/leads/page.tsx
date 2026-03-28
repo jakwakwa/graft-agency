@@ -49,17 +49,14 @@ export default function LeadsPage() {
 
   async function handleApprove(id: string) {
     try {
-      const res = await fetch(`/api/leads/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: "CONTACTED" }),
-      });
-      if (!res.ok) throw new Error("Approve failed");
-      setMessage({ type: "success", text: "Lead approved." });
+      const res = await fetch(`/api/leads/${id}/approve`, { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Approve failed");
+      setMessage({ type: "success", text: "Lead approved and email sent." });
       setEditingLead(null);
       fetchLeads();
-    } catch {
-      setMessage({ type: "error", text: "Failed to approve." });
+    } catch (err) {
+      setMessage({ type: "error", text: err instanceof Error ? err.message : "Failed to approve." });
     }
   }
 

@@ -4,7 +4,8 @@
       "Bash(bun run:*)",
       "Bash(curl -v http://localhost:3000/dashboard)",
       "Bash(curl -s http://localhost:3000/portal)",
-      "Bash(curl -s http://localhost:3000/dashboard/automation)"
+      "Bash(curl -s http://localhost:3000/dashboard/automation)",
+      "Bash(find /Users/jakwakwa/Repos/saas/kona-agency -maxdepth 2 -name .env* -type f)"
     ]
   }
 }

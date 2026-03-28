@@ -1,9 +1,28 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const processQueue = vi.fn();
+const findAndAuditProspects = vi.fn();
 
-vi.mock("@/lib/services/outbound.service", () => ({
-  processQueue,
+vi.mock("@/lib/services/gemini-prospecting.service", () => ({
+  geminiProspectingService: { findAndAuditProspects },
+}));
+
+vi.mock("@/lib/db/prisma", () => ({
+  default: {
+    prospectingConfig: {
+      findUnique: vi.fn().mockResolvedValue({
+        cronEnabled: true,
+        cronFrequency: "daily",
+        cronDay: null,
+        cronStartDate: null,
+        searchCriteria: { industries: ["dental"], locations: ["Cape Town"], keywords: [] },
+        valueProposition: null,
+      }),
+    },
+  },
+}));
+
+vi.mock("@/lib/auth/resolve-client", () => ({
+  getPlatformClientId: vi.fn().mockResolvedValue("client-123"),
 }));
 
 describe("GET /api/cron/prospecting", () => {
@@ -19,7 +38,7 @@ describe("GET /api/cron/prospecting", () => {
     const { GET } = await import("@/app/api/cron/prospecting/route");
     const response = await GET(new Request("http://localhost/api/cron/prospecting"));
     expect(response.status).toBe(401);
-    expect(processQueue).not.toHaveBeenCalled();
+    expect(findAndAuditProspects).not.toHaveBeenCalled();
   });
 
   it("returns 401 when Bearer token does not match CRON_SECRET", async () => {
@@ -31,7 +50,7 @@ describe("GET /api/cron/prospecting", () => {
       }),
     );
     expect(response.status).toBe(401);
-    expect(processQueue).not.toHaveBeenCalled();
+    expect(findAndAuditProspects).not.toHaveBeenCalled();
   });
 
   it("returns 500 when CRON_SECRET is not configured", async () => {
@@ -43,12 +62,12 @@ describe("GET /api/cron/prospecting", () => {
       }),
     );
     expect(response.status).toBe(500);
-    expect(processQueue).not.toHaveBeenCalled();
+    expect(findAndAuditProspects).not.toHaveBeenCalled();
   });
 
-  it("returns 200 with processedCount when auth is valid and queue has items", async () => {
+  it("returns 200 with created count when auth is valid", async () => {
     process.env.CRON_SECRET = "test-secret-123";
-    processQueue.mockResolvedValue({ processedCount: 2, message: "Processed 2 of 2 prospects." });
+    findAndAuditProspects.mockResolvedValue({ created: 3, errors: 0 });
     const { GET } = await import("@/app/api/cron/prospecting/route");
     const response = await GET(
       new Request("http://localhost/api/cron/prospecting", {
@@ -57,25 +76,7 @@ describe("GET /api/cron/prospecting", () => {
     );
     expect(response.status).toBe(200);
     const json = await response.json();
-    expect(json).toEqual({ processedCount: 2, message: "Processed 2 of 2 prospects." });
-    expect(processQueue).toHaveBeenCalledOnce();
-  });
-
-  it("returns 200 with empty message when queue is empty", async () => {
-    process.env.CRON_SECRET = "test-secret-123";
-    processQueue.mockResolvedValue({
-      processedCount: 0,
-      message: "Queue is empty. No prospects to process.",
-    });
-    const { GET } = await import("@/app/api/cron/prospecting/route");
-    const response = await GET(
-      new Request("http://localhost/api/cron/prospecting", {
-        headers: { Authorization: "Bearer test-secret-123" },
-      }),
-    );
-    expect(response.status).toBe(200);
-    const json = await response.json();
-    expect(json.processedCount).toBe(0);
-    expect(json.message).toContain("Queue is empty");
+    expect(json).toEqual({ created: 3, errors: 0 });
+    expect(findAndAuditProspects).toHaveBeenCalledOnce();
   });
 });

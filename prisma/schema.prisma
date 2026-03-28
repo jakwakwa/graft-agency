@@ -23,6 +23,7 @@ model Client {
   createdAt            DateTime        @default(now()) @map("created_at")
   updatedAt            DateTime        @updatedAt @map("updated_at")
   agentConfig          AgentConfig?
+  prospectingConfig    ProspectingConfig?
   conversations        Conversation[]
   emailTemplates       EmailTemplate[]
   leads                Lead[]
@@ -31,6 +32,25 @@ model Client {
   @@index([subdomain])
   @@index([isPlatformClient])
   @@map("clients")
+}
+
+model ProspectingConfig {
+  id                String    @id @default(uuid())
+  clientId          String    @unique @map("client_id")
+  cronEnabled       Boolean   @default(false) @map("cron_enabled")
+  cronFrequency     String    @default("daily") @map("cron_frequency")
+  cronDay           Int?      @map("cron_day")
+  cronTime          String    @default("22:45") @map("cron_time")
+  cronStartDate     DateTime? @map("cron_start_date")
+  searchEnabled     Boolean   @default(false) @map("search_enabled")
+  searchCriteria    Json?     @map("search_criteria")
+  valueProposition  String?   @map("value_proposition")
+  outreachFromEmail String?   @map("outreach_from_email")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+  client            Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@map("prospecting_configs")
 }
 
 model AgentConfig {

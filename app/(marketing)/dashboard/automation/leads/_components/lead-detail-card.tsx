@@ -11,6 +11,12 @@ interface ScrapedData {
   websiteUrl?: string;
   draftSubject?: string;
   draftBody?: string;
+  hasChatbot?: boolean;
+  hasVoiceAgent?: boolean;
+  businessDescription?: string;
+  coreServices?: Array<{ name: string; description: string }>;
+  painPoints?: string[];
+  targetOutreachAngle?: string;
   [key: string]: unknown;
 }
 
@@ -49,11 +55,77 @@ export function LeadDetailCard({ id, customerName, scrapedData, onApprove, onSav
           </Button>
         </div>
         <div className="grid flex-1 overflow-auto md:grid-cols-2">
-          <div className="border-r border-border p-4">
-            <Typography.H4 className="mb-2">Scraped Data (read-only)</Typography.H4>
-            <pre className="max-h-[400px] overflow-auto rounded bg-muted p-3 text-xs">
-              {JSON.stringify(scrapedData ?? {}, null, 2)}
-            </pre>
+          <div className="border-r border-border p-4 overflow-auto">
+            <Typography.H4 className="mb-2">Prospect Audit</Typography.H4>
+            {scrapedData?.businessDescription ? (
+              <div className="space-y-4">
+                <div className="flex gap-2">
+                  <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${scrapedData.hasChatbot ? "bg-yellow-100 text-yellow-800" : "bg-green-100 text-green-800"}`}>
+                    {scrapedData.hasChatbot ? "Has Chatbot" : "No Chatbot"}
+                  </span>
+                  <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${scrapedData.hasVoiceAgent ? "bg-yellow-100 text-yellow-800" : "bg-green-100 text-green-800"}`}>
+                    {scrapedData.hasVoiceAgent ? "Has Voice Agent" : "No Voice Agent"}
+                  </span>
+                </div>
+
+                <div>
+                  <Typography.Small className="font-medium text-muted-foreground">About</Typography.Small>
+                  <Typography.P className="mt-1 text-sm">{scrapedData.businessDescription}</Typography.P>
+                </div>
+
+                {scrapedData.coreServices && scrapedData.coreServices.length > 0 && (
+                  <div>
+                    <Typography.Small className="font-medium text-muted-foreground">Services</Typography.Small>
+                    <ul className="mt-1 space-y-1">
+                      {scrapedData.coreServices.map((s, i) => (
+                        <li key={i} className="text-sm">
+                          <span className="font-medium">{s.name}</span>
+                          <span className="text-muted-foreground"> — {s.description}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {scrapedData.painPoints && scrapedData.painPoints.length > 0 && (
+                  <div>
+                    <Typography.Small className="font-medium text-muted-foreground">Pain Points</Typography.Small>
+                    <ul className="mt-1 list-disc pl-4 space-y-1">
+                      {scrapedData.painPoints.map((p, i) => (
+                        <li key={i} className="text-sm">{p}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {scrapedData.targetOutreachAngle && (
+                  <div className="rounded-md border border-blue-200 bg-blue-50 p-3">
+                    <Typography.Small className="font-medium text-blue-800">Outreach Angle</Typography.Small>
+                    <Typography.P className="mt-1 text-sm text-blue-900">{scrapedData.targetOutreachAngle}</Typography.P>
+                  </div>
+                )}
+
+                {scrapedData.websiteUrl && (
+                  <div>
+                    <Typography.Small className="font-medium text-muted-foreground">Website</Typography.Small>
+                    <Typography.P className="mt-1 text-sm">
+                      <a href={scrapedData.websiteUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                        {scrapedData.websiteUrl}
+                      </a>
+                    </Typography.P>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="text-sm text-muted-foreground">
+                <Typography.P>No audit data available.</Typography.P>
+                {scrapedData && Object.keys(scrapedData).length > 0 && (
+                  <pre className="mt-2 max-h-[300px] overflow-auto rounded bg-muted p-3 text-xs">
+                    {JSON.stringify(scrapedData, null, 2)}
+                  </pre>
+                )}
+              </div>
+            )}
           </div>
           <div className="flex flex-col p-4">
             <Typography.H4 className="mb-2">Edit Draft</Typography.H4>

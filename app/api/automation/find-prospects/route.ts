@@ -2,15 +2,9 @@ import { requirePlatformAccess } from "@/lib/auth/resolve-client";
 import prisma from "@/lib/db/prisma";
 import { geminiProspectingService } from "@/lib/services/gemini-prospecting.service";
 
-/**
- * Manual trigger for the prospecting pipeline (Gemini-powered).
- * Platform-owner or org:admin only. Same logic as the cron job.
- */
 export async function POST() {
   const result = await requirePlatformAccess();
-  if ("error" in result) {
-    return Response.json({ error: result.error }, { status: result.status });
-  }
+  if ("error" in result) return Response.json({ error: result.error }, { status: result.status });
   const { clientId } = result;
 
   const config = await prisma.prospectingConfig.findUnique({
@@ -29,14 +23,27 @@ export async function POST() {
     locations?: string[];
     keywords?: string[];
   };
+  const parts = [
+    ...(criteria.industries ?? []),
+    ...(criteria.locations ?? []),
+    ...(criteria.keywords ?? []),
+  ];
+
+  if (parts.length === 0) {
+    return Response.json(
+      { error: "Search criteria is empty. Add industries, locations, or keywords." },
+      { status: 400 },
+    );
+  }
 
   try {
-    const data = await geminiProspectingService.findAndAuditProspects({
+    const { created, errors } = await geminiProspectingService.findAndAuditProspects({
       clientId,
       searchCriteria: criteria,
       valueProposition: config.valueProposition,
     });
-    return Response.json({ ...data, message: `Created ${data.created} prospect(s).` });
+
+    return Response.json({ created, errors });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Prospecting failed";
     return Response.json({ error: message }, { status: 500 });

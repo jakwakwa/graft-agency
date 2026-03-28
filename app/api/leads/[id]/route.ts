@@ -3,6 +3,23 @@ import type { LeadStatus, Prisma } from "@/generated/prisma/client";
 import { requirePlatformAccess } from "@/lib/auth/resolve-client";
 import prisma from "@/lib/db/prisma";
 
+export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const result = await requirePlatformAccess();
+  if ("error" in result) return Response.json({ error: result.error }, { status: result.status });
+  const { clientId } = result;
+
+  const { id } = await params;
+  const lead = await prisma.lead.findFirst({
+    where: { id, clientId },
+  });
+
+  if (!lead) {
+    return Response.json({ error: "Not found" }, { status: 404 });
+  }
+
+  return Response.json(lead);
+}
+
 const LEAD_STATUSES = ["DRAFT_PENDING", "CONTACTED", "SCRAPED", "REPLIED", "BOOKED", "CLOSED"] as const;
 
 const patchSchema = z.object({

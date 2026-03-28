@@ -10,16 +10,17 @@ export async function GET(req: Request) {
   const { clientId } = result;
 
   const { searchParams } = new URL(req.url);
-  const statusParam = searchParams.get("status") ?? "DRAFT_PENDING";
-  const status = VALID_LEAD_STATUSES.includes(statusParam as LeadStatus)
-    ? (statusParam as LeadStatus)
-    : "DRAFT_PENDING";
+  const statusParam = searchParams.get("status");
+  const status =
+    statusParam && VALID_LEAD_STATUSES.includes(statusParam as LeadStatus)
+      ? (statusParam as LeadStatus)
+      : null;
 
   const leads = await prisma.lead.findMany({
     where: {
       clientId,
       source: "OUTBOUND_PROSPECT",
-      status,
+      ...(status ? { status } : {}),
     },
     orderBy: { createdAt: "desc" },
   });

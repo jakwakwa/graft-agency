@@ -1,5 +1,7 @@
 import { timingSafeEqual } from "node:crypto";
-import { processQueue } from "@/lib/services/outbound.service";
+import { getPlatformClientId } from "@/lib/auth/resolve-client";
+import prisma from "@/lib/db/prisma";
+import { geminiProspectingService } from "@/lib/services/gemini-prospecting.service";
 
 function validateCronSecret(req: Request): boolean {
   const secret = process.env.CRON_SECRET;
@@ -30,6 +32,51 @@ export async function GET(req: Request) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const result = await processQueue();
-  return Response.json(result);
+  const platformClientId = await getPlatformClientId();
+  if (!platformClientId) {
+    return Response.json({ error: "Platform client not found" }, { status: 500 });
+  }
+
+  const config = await prisma.prospectingConfig.findUnique({
+    where: { clientId: platformClientId },
+  });
+
+  if (!config || config.cronEnabled === false) {
+    return Response.json({ message: "Cron disabled" });
+  }
+
+  if (config.cronStartDate && config.cronStartDate > new Date()) {
+    return Response.json({ message: "Cron: start date not yet reached" });
+  }
+
+  if (
+    config.cronFrequency === "weekly" &&
+    config.cronDay !== null &&
+    config.cronDay !== undefined
+  ) {
+    if (new Date().getUTCDay() !== config.cronDay) {
+      return Response.json({ message: "Cron: not scheduled for today" });
+    }
+  }
+
+  if (!config.searchCriteria) {
+    return Response.json({ message: "No search criteria configured" });
+  }
+
+  try {
+    const criteria = config.searchCriteria as {
+      industries?: string[];
+      locations?: string[];
+      keywords?: string[];
+    };
+    const result = await geminiProspectingService.findAndAuditProspects({
+      clientId: platformClientId,
+      searchCriteria: criteria,
+      valueProposition: config.valueProposition,
+    });
+    return Response.json(result);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Prospecting failed";
+    return Response.json({ error: message }, { status: 500 });
+  }
 }

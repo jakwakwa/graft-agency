@@ -9,7 +9,7 @@
     "editor.copyWithSyntaxHighlighting": false,
     "editor.occurrencesHighlight": "off",
     "editor.hover.above": false,
-    "editor.hover.enabled": true,
+    "editor.hover.enabled": "on",
     "editor.hover.sticky": false,
     "css.hover.documentation": false,
     "css.hover.references": false,

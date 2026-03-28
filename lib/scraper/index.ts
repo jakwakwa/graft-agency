@@ -1,2 +1,2 @@
-export { normalizeFirecrawlResponse } from "./normalize-firecrawl-response";
-export type { CanonicalScrapedData } from "./types";
+export type { CanonicalScrapedData, ProspectAudit, OutboundLeadData } from "./types";
+export { prospectAuditSchema } from "./prospect-audit-schema";

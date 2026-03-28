@@ -1,108 +1,139 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
 import { Typography } from "@/components/ui/typography";
-import type { QueueStatus } from "@/generated/prisma/client";
-import { AddOneForm } from "./_components/add-one-form";
-import { QueueEditCard } from "./_components/queue-edit-card";
-import { QueueTable } from "./_components/queue-table";
-import { QueueUploadForm } from "./_components/queue-upload-form";
+import { TriageTable } from "./_components/triage-table";
 
-interface QueueItem {
+interface TriageLead {
   id: string;
-  businessName: string;
-  websiteUrl: string;
-  status: QueueStatus;
+  customerName: string | null;
+  status: string;
   createdAt: string;
+  scrapedData: {
+    websiteUrl?: string;
+    draftSubject?: string;
+  } | null;
+}
+
+interface ProspectingConfig {
+  cronEnabled: boolean;
+  cronFrequency: string;
+  cronDay: number | null;
+  cronTime: string;
+  cronStartDate: string | null;
+  searchEnabled: boolean;
+  searchCriteria: { industries?: string[]; locations?: string[]; keywords?: string[] } | null;
+  valueProposition: string | null;
+  outreachFromEmail: string | null;
+}
+
+const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+function utcToSast(utcTime: string): string {
+  const [h = 0, m = 0] = utcTime.split(":").map(Number);
+  const sast = (h + 2) % 24;
+  return `${String(sast).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+}
+
+function ScheduledJobCard({ config }: { config: ProspectingConfig }) {
+  const scheduleLabel =
+    config.cronFrequency === "weekly" && config.cronDay !== null
+      ? `Weekly on ${DAYS[config.cronDay]} at ${utcToSast(config.cronTime)} SAST`
+      : `Daily at ${utcToSast(config.cronTime)} SAST`;
+
+  const criteria = config.searchCriteria;
+  const targetParts = [
+    ...(criteria?.industries ?? []),
+    ...(criteria?.locations ?? []),
+    ...(criteria?.keywords ?? []),
+  ];
+
+  return (
+    <div className="rounded-lg border border-border bg-card p-4">
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex items-center gap-2">
+          <span
+            className={`inline-flex h-2 w-2 rounded-full ${
+              config.cronEnabled ? "bg-green-500" : "bg-muted-foreground"
+            }`}
+          />
+          <Typography.Small className="font-medium">
+            {config.cronEnabled ? "Active" : "Paused"}
+          </Typography.Small>
+        </div>
+        <Link
+          href="/dashboard/automation"
+          className="text-xs text-muted-foreground hover:text-foreground"
+        >
+          Edit config →
+        </Link>
+      </div>
+
+      <div className="mt-3 grid gap-3 sm:grid-cols-3 text-sm">
+        <div>
+          <Typography.Small className="text-muted-foreground">Schedule</Typography.Small>
+          <p className="mt-0.5 font-medium">{scheduleLabel}</p>
+          {config.cronStartDate && (
+            <p className="text-xs text-muted-foreground mt-0.5">
+              From {new Date(config.cronStartDate).toLocaleDateString("en-ZA", { day: "numeric", month: "short", year: "numeric" })}
+            </p>
+          )}
+        </div>
+
+        <div>
+          <Typography.Small className="text-muted-foreground">Targeting</Typography.Small>
+          <p className="mt-0.5 font-medium">
+            {targetParts.length > 0 ? targetParts.join(", ") : "Not configured"}
+          </p>
+        </div>
+
+        <div>
+          <Typography.Small className="text-muted-foreground">Value proposition</Typography.Small>
+          <p className="mt-0.5 font-medium line-clamp-2">
+            {config.valueProposition ?? "Not set"}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default function QueuePage() {
-  const [items, setItems] = useState<QueueItem[]>([]);
-  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [leads, setLeads] = useState<TriageLead[]>([]);
+  const [config, setConfig] = useState<ProspectingConfig | null>(null);
   const [loading, setLoading] = useState(true);
-  const [editingItem, setEditingItem] = useState<QueueItem | null>(null);
+  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
-  async function fetchQueue() {
-    setLoading(true);
-    try {
-      const res = await fetch("/api/prospect-queue");
-      if (res.status === 401) {
-        setMessage({ type: "error", text: "Please sign in to view the queue." });
-        setItems([]);
-        return;
-      }
-      if (res.status === 403) {
-        setMessage({ type: "error", text: "Access denied. This area is for platform owners only." });
-        setItems([]);
-        return;
-      }
-      const data = await res.json();
-      setItems(Array.isArray(data) ? data : []);
-    } catch {
-      setMessage({ type: "error", text: "Failed to load queue." });
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  useCallback(fetchQueue, []);
-
-  const fetchQueueCallback = useCallback(fetchQueue, []);
-
+  // biome-ignore lint/correctness/useExhaustiveDependencies: fetch on mount only
   useEffect(() => {
-    fetchQueueCallback();
-  }, [fetchQueueCallback]);
+    async function fetchAll() {
+      try {
+        const [leadsRes, configRes] = await Promise.all([
+          fetch("/api/leads"),
+          fetch("/api/prospecting-config"),
+        ]);
 
-  async function handleEditSave(id: string, data: { businessName: string; websiteUrl: string }) {
-    try {
-      const res = await fetch(`/api/prospect-queue/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      if (!res.ok) throw new Error("Save failed");
-      setMessage({ type: "success", text: "Prospect updated." });
-      setEditingItem(null);
-      fetchQueue();
-    } catch {
-      setMessage({ type: "error", text: "Failed to update prospect." });
-    }
-  }
+        if (leadsRes.status === 401 || leadsRes.status === 403) {
+          setMessage({ type: "error", text: "Access denied." });
+          return;
+        }
 
-  async function handleDelete(id: string) {
-    try {
-      const res = await fetch(`/api/prospect-queue/${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Delete failed");
-      setMessage({ type: "success", text: "Prospect removed." });
-      fetchQueue();
-    } catch {
-      setMessage({ type: "error", text: "Failed to delete." });
-    }
-  }
+        const [leadsData, configData] = await Promise.all([
+          leadsRes.json(),
+          configRes.ok ? configRes.json() : null,
+        ]);
 
-  const [processing, setProcessing] = useState(false);
-  async function handleProcessQueue() {
-    setProcessing(true);
-    try {
-      const res = await fetch("/api/automation/process-queue", { method: "POST" });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Process failed");
-      setMessage({
-        type: "success",
-        text: data.message ?? `Processed ${data.processedCount ?? 0} prospects.`,
-      });
-      fetchQueue();
-    } catch (err) {
-      setMessage({
-        type: "error",
-        text: err instanceof Error ? err.message : "Failed to process queue.",
-      });
-    } finally {
-      setProcessing(false);
+        setLeads(Array.isArray(leadsData) ? leadsData : []);
+        setConfig(configData);
+      } catch {
+        setMessage({ type: "error", text: "Failed to load." });
+      } finally {
+        setLoading(false);
+      }
     }
-  }
+    fetchAll();
+  }, []);
 
   if (loading) {
     return (
@@ -113,75 +144,51 @@ export default function QueuePage() {
   }
 
   return (
-    <div className="container max-w-4xl py-8">
-      <div className="flex items-center justify-between">
-        <div>
-          <Link href="/dashboard/automation" className="text-muted-foreground hover:text-foreground">
-            ← Automation
-          </Link>
-          <Typography.H1 className="mt-2">Prospect Queue</Typography.H1>
-          <Typography.Lead className="mt-1">
-            Add prospects via CSV or single row. View and manage items before processing.
-          </Typography.Lead>
-        </div>
-        <Button variant="default" size="sm" onClick={handleProcessQueue} disabled={processing || items.length === 0}>
-          {processing ? "Processing…" : "Process queue now"}
-        </Button>
+    <div className="container max-w-4xl py-8 space-y-8">
+      <div>
+        <Link href="/dashboard/automation" className="text-muted-foreground hover:text-foreground text-sm">
+          ← Automation
+        </Link>
+        <Typography.H1 className="mt-2">Prospect Queue</Typography.H1>
+        <Typography.Lead className="mt-1">
+          Scheduled prospecting job and all results generated by the pipeline.
+        </Typography.Lead>
       </div>
 
       {message && (
-        <div
-          className={`mt-4 rounded-lg p-4 ${
-            message.type === "success" ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"
-          }`}
-        >
+        <div className="rounded-lg p-4 bg-destructive/10 text-destructive">
           <Typography.Small>{message.text}</Typography.Small>
         </div>
       )}
 
-      <div className="mt-8 space-y-6">
-        <div>
-          <Typography.H3>Add single prospect</Typography.H3>
-          <AddOneForm
-            onSuccess={() => {
-              setMessage({ type: "success", text: "Prospect added." });
-              fetchQueue();
-            }}
-            onError={(text) => setMessage({ type: "error", text })}
-          />
-        </div>
-
-        <div>
-          <Typography.H3>Upload CSV</Typography.H3>
-          <QueueUploadForm
-            onSuccess={(text) => {
-              setMessage({ type: "success", text });
-              fetchQueue();
-            }}
-            onError={(text) => setMessage({ type: "error", text })}
-          />
-        </div>
-
-        <div>
-          <Typography.H3>Queue items</Typography.H3>
-          <QueueTable
-            items={items}
-            onEdit={(id) => setEditingItem(items.find((i) => i.id === id) ?? null)}
-            onDelete={handleDelete}
-            onRefresh={fetchQueue}
-          />
-        </div>
+      {/* Scheduled job */}
+      <div>
+        <Typography.H3 className="mb-3">Scheduled Job</Typography.H3>
+        {config ? (
+          <ScheduledJobCard config={config} />
+        ) : (
+          <div className="rounded-lg border border-dashed border-border p-6 text-center">
+            <Typography.Small className="text-muted-foreground">
+              No job configured.{" "}
+              <Link href="/dashboard/automation" className="underline hover:text-foreground">
+                Set up your prospecting config
+              </Link>{" "}
+              to get started.
+            </Typography.Small>
+          </div>
+        )}
       </div>
 
-      {editingItem && (
-        <QueueEditCard
-          id={editingItem.id}
-          businessName={editingItem.businessName}
-          websiteUrl={editingItem.websiteUrl}
-          onSave={handleEditSave}
-          onClose={() => setEditingItem(null)}
-        />
-      )}
+      {/* Results */}
+      <div>
+        <div className="mb-3 flex items-center justify-between">
+          <Typography.H3>Results</Typography.H3>
+          <Typography.Small className="text-muted-foreground">
+            {leads.length} prospect{leads.length !== 1 ? "s" : ""} total
+          </Typography.Small>
+        </div>
+        <TriageTable leads={leads} />
+      </div>
     </div>
   );
 }

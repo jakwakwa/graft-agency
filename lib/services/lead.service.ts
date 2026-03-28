@@ -34,6 +34,7 @@ export const leadService = {
     clientId: string;
     customerName: string;
     websiteUrl?: string;
+    auditData?: import("@/lib/scraper").ProspectAudit;
     draftSubject?: string;
     draftBody?: string;
   }) {
@@ -47,6 +48,7 @@ export const leadService = {
           websiteUrl: input.websiteUrl,
           draftSubject: input.draftSubject,
           draftBody: input.draftBody,
+          ...(input.auditData ?? {}),
         },
       },
     });
