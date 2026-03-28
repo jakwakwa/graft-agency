@@ -23,7 +23,7 @@ Scheduled prospecting was originally tied to **Vercel Cron** in `vercel.json`. O
 
 - Deploying or validating `vercel.json` crons against a frequent pattern conflicts with Hobby limits or product expectations.
 - Operations want **one** scheduling story: Inngest (or similar) for the tick, app logic for “should this client run now?”.
-- After adding `app/api/inngest/route.ts`, Inngest Dev Server or cloud may fail to sync or invoke if `/api/inngest` is behind Clerk `auth.protect()`.
+- After adding `app/api/kona/inngest/route.ts`, Inngest Dev Server or cloud may fail to sync or invoke if `/api/kona/inngest` is behind Clerk `auth.protect()`.
 
 ## What did not work
 
@@ -71,9 +71,9 @@ export const prospectingScheduledTick = inngest.createFunction(
 );
 ```
 
-4. **Serve Inngest** from the App Router:
+4. **Serve Inngest** from a **non-default path** (`/api/kona/inngest`, not `/api/inngest`) so this Vercel project can host more than one Inngest app on different URL paths if needed:
 
-```1:8:app/api/inngest/route.ts
+```1:8:app/api/kona/inngest/route.ts
 import { serve } from "inngest/next";
 import { inngest } from "@/lib/inngest/client";
 import { prospectingScheduledTick } from "@/lib/inngest/functions/prospecting-tick";
@@ -84,7 +84,7 @@ export const { GET, POST, PUT } = serve({
 });
 ```
 
-5. **Allowlist `/api/inngest`** in Clerk middleware so Inngest can hit the serve endpoint:
+5. **Allowlist `/api/kona/inngest`** in Clerk middleware so Inngest can hit the serve endpoint:
 
 ```3:11:proxy.ts
 const isPublicRoute = createRouteMatcher([
@@ -93,18 +93,18 @@ const isPublicRoute = createRouteMatcher([
   "/api/embed/(.*)",
   "/api/webhooks/(.*)",
   "/api/cron/(.*)",
-  "/api/inngest",
+  "/api/kona/inngest",
   "/widget/(.*)",
 ]);
 ```
 
-6. **Environment (production / preview):** set `KONA_INNGEST_SIGNING_KEY` (and `KONA_INNGEST_EVENT_KEY` when sending events). Point the Inngest app’s sync URL at `https://<host>/api/inngest`.
+6. **Environment (production / preview):** set `KONA_INNGEST_SIGNING_KEY` (and `KONA_INNGEST_EVENT_KEY` when sending events). Point the Inngest app’s sync URL at `https://<host>/api/kona/inngest`.
 
 ## Why this works
 
 - **Inngest** owns the **repeating schedule** (`*/15 * * * *`) in a way that is independent of Vercel’s cron tier. The app still decides **per client** whether to run (`runProspectingScheduledJob` + UTC drift window + dedupe), so behaviour stays aligned with `ProspectingConfig`.
 - **`serve`** exposes the contract Inngest expects; **signing key** env vars authenticate requests.
-- **Public `/api/inngest`** avoids Clerk rejecting Inngest before the SDK runs.
+- **Public `/api/kona/inngest`** avoids Clerk rejecting Inngest before the SDK runs.
 
 ## Prevention
 
