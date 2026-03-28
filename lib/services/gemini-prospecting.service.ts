@@ -61,8 +61,10 @@ For each of these businesses:
 
 Return the results as a JSON array.`;
 
+
+
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-pro-preview-03-25",
+      model: "gemini-3-flash-preview",
       contents: prompt,
       config: {
         thinkingConfig: { thinkingLevel: ThinkingLevel.HIGH },
