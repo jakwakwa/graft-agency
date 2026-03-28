@@ -10,10 +10,6 @@ export type ProspectingScheduleOutcome =
   | { status: "ok"; result: unknown }
   | { status: "error"; message: string };
 
-/**
- * Database-driven prospecting run: reads ProspectingConfig and only executes when the
- * saved schedule says so. Intended to be invoked on a fixed tick (e.g. every 15 minutes).
- */
 export async function runProspectingScheduledJob(
   platformClientId: string,
   now: Date = new Date(),

@@ -153,7 +153,7 @@ export function ProspectingConfigForm({
       <div className="rounded-md border border-border bg-muted/30 p-4 space-y-3">
         <Typography.Small className="font-medium text-muted-foreground uppercase tracking-wide">Cron Schedule</Typography.Small>
         <Typography.Muted className="text-xs leading-relaxed">
-          Set your schedule here. Times use SAST (GMT+2); we convert them to UTC and align them to 15-minute intervals so the background job can run on schedule. This form is the only place you configure it.
+          Set your schedule here. Times use SAST (GMT+2); we convert to UTC and snap to 15-minute intervals.
         </Typography.Muted>
         <div className="grid gap-3 sm:grid-cols-2">
           <div>

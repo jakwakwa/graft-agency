@@ -1,6 +1,5 @@
 import { getISOWeek, getISOWeekYear } from "date-fns";
 
-/** Snap stored UTC HH:mm to a minute grid so ticks (e.g. every 15 min) align with the saved time. */
 export function snapUtcTimeToNearestMinutes(cronTimeUtc: string, gridMinutes: number): string {
   const parts = cronTimeUtc.split(":");
   const h = parseInt(parts[0] ?? "0", 10);
@@ -13,7 +12,6 @@ export function snapUtcTimeToNearestMinutes(cronTimeUtc: string, gridMinutes: nu
   return `${String(hh).padStart(2, "0")}:${String(mm).padStart(2, "0")}`;
 }
 
-/** Tick invocations may land a few minutes off; keep tolerance wide enough for 15-minute ticks. */
 export function isWithinUtcCronDriftWindow(now: Date, cronTimeUtc: string, toleranceMinutes = 15): boolean {
   const minutesNow = now.getUTCHours() * 60 + now.getUTCMinutes();
   const parts = cronTimeUtc.split(":");
