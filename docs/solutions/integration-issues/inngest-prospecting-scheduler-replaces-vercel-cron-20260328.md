@@ -102,7 +102,7 @@ const isPublicRoute = createRouteMatcher([
 
 ## Why this works
 
-- **Inngest** owns the **repeating schedule** (`*/15 * * * *`) in a way that is independent of Vercel’s cron tier. The app still decides **per client** whether to run (`runProspectingScheduledJob` + UTC drift window + dedupe), so behaviour stays aligned with `ProspectingConfig`.
+- **Inngest** owns the **repeating schedule** (e.g. `*/15 * * * *` or a tighter cron you set) independently of Vercel’s cron tier. **`runProspectingScheduledJob` does not re-check a UTC “drift window”** against `ProspectingConfig.cronTime`: when Inngest invokes the function, the job runs **Gemini** if cron is enabled, the weekly day matches (when weekly), dedupe allows, and search criteria exist. Align your Inngest cron with the wall-clock you want; `cronTime` in the DB remains for UI and snapping, not as a second scheduler.
 - **`serve`** exposes the contract Inngest expects; **signing key** env vars authenticate requests.
 - **Public `/api/kona/inngest`** avoids Clerk rejecting Inngest before the SDK runs.
 

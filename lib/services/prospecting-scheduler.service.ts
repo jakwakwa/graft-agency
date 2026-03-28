@@ -1,7 +1,4 @@
-import {
-  isWithinUtcCronDriftWindow,
-  shouldSkipDuplicateRun,
-} from "@/lib/cron/prospecting-utc";
+import { shouldSkipDuplicateRun } from "@/lib/cron/prospecting-utc";
 import prisma from "@/lib/db/prisma";
 import { geminiProspectingService } from "@/lib/services/gemini-prospecting.service";
 
@@ -36,10 +33,6 @@ export async function runProspectingScheduledJob(
     if (now.getUTCDay() !== config.cronDay) {
       return { status: "skipped", reason: "Cron: not scheduled for today" };
     }
-  }
-
-  if (!isWithinUtcCronDriftWindow(now, config.cronTime)) {
-    return { status: "skipped", reason: "Cron: outside configured UTC time window" };
   }
 
   if (shouldSkipDuplicateRun(frequency, config.cronDay, config.lastCronRunAt, now)) {
