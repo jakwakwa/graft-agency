@@ -45,7 +45,7 @@ isProject: false
 
 ## 1. What We're Building
 
-An AI-powered chat widget that Kona Agency clients embed on their websites. When a visitor chats, the LLM naturally gathers their details, answers questions from the client's knowledge base, checks calendar availability, and books appointments -- all through tool calling under the hood. The visitor sees a fluid conversation with subtle tool status indicators; the agency admin sees captured leads and full transcripts.
+An AI-powered chat widget that GRAFT.TODAYclients embed on their websites. When a visitor chats, the LLM naturally gathers their details, answers questions from the client's knowledge base, checks calendar availability, and books appointments -- all through tool calling under the hood. The visitor sees a fluid conversation with subtle tool status indicators; the agency admin sees captured leads and full transcripts.
 
 ---
 
@@ -343,7 +343,7 @@ The script:
 
 A standalone page rendered inside the iframe:
 
-- Minimal layout (no Kona chrome, no navigation)
+- Minimal layout (no GRAFT chrome, no navigation)
 - Loads AgentConfig (greeting, colours, agent name) server-side
 - Renders the chat UI using `useChat` with `DefaultChatTransport` pointing to `/api/chat`
 - Passes `clientId` in every request body
@@ -470,7 +470,7 @@ lib/
 
 ## 10. Open Questions for Implementation Phase
 
-1. **Cal.com API credentials**: Will each client have their own Cal.com API key, or does Kona Agency use a single platform key with per-client event types?
+1. **Cal.com API credentials**: Will each client have their own Cal.com API key, or does GRAFT.TODAYuse a single platform key with per-client event types?
 2. **Knowledge base format**: What structure should `AgentConfig.knowledgeBase` JSONB follow? (FAQ pairs? markdown docs? embeddings?)
 3. **Rate limiting**: Should the chat endpoint be rate-limited per session/IP to prevent abuse?
 4. **Handoff notification**: How should human handoff notify the agency admin? (Email via Resend? In-app notification? Both?)

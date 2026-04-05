@@ -7,7 +7,7 @@ export default function AccessRequiredPage() {
     <div className="mx-auto max-w-lg py-16">
       <Typography.H1>Organisation access required</Typography.H1>
       <Typography.Lead className="mt-3">
-        Your account is signed in, but this workspace is not linked to a provisioned organisation in Kona yet.
+        Your account is signed in, but this workspace is not linked to a provisioned organisation in Graft yet.
       </Typography.Lead>
       <Typography.P className="mt-4 text-muted-foreground">
         Select an organisation you belong to, or ask your administrator to invite you and ensure your Clerk organisation

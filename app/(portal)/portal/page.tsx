@@ -42,7 +42,7 @@ export default async function PortalDashboardPage() {
     <div className="container max-w-4xl py-8">
       <Typography.H1>{client?.businessName ?? "Your"} Dashboard</Typography.H1>
       <Typography.Lead className="mt-2">
-        View your inbound leads from your white-labelled Kona Bot and conversion metrics.
+        View your inbound leads from your white-labelled Graft Bot and conversion metrics.
       </Typography.Lead>
 
       <div className="mt-8 flex flex-col gap-4 sm:grid-cols-2">

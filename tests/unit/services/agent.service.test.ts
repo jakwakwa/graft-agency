@@ -22,7 +22,7 @@ describe("agentService", () => {
         clientId: "client-1",
         systemPrompt: "You are helpful.",
         knowledgeBase: null,
-        agentName: "Kona Bot",
+        agentName: "GRAFT Bot",
         greetingMessage: "Hello!",
         widgetPrimaryColour: "#000000",
         createdAt: new Date(),

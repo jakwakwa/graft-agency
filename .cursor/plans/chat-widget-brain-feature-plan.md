@@ -256,4 +256,4 @@ describe('Chat Widget')
 - [x] Replace cal.service.ts with v2 API implementation
 - [x] Add/update scheduling tools (checkAvailability, bookAppointment) to use calService
 - [x] Unit test: Mock Cal.com v2 API and verify getAvailability parses the response correctly
-- [ ] E2E test: Verify that Kona can suggest 3 slots when a user asks "When are you free?"
+- [ ] E2E test: Verify that GRAFT can suggest 3 slots when a user asks "When are you free?"

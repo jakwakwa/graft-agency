@@ -1,10 +1,10 @@
 **AI Website Gold Rush: Architecture & Implementation Blueprint**
 
-This blueprint outlines the architecture for "Kona AI Web Solutions," a production-grade, multi-tenant AI platform designed for high performance and strict client isolation. The system operates on three core pillars:
+This blueprint outlines the architecture for "GRAFT AI Web Solutions," a production-grade, multi-tenant AI platform designed for high performance and strict client isolation. The system operates on three core pillars:
 
 1. **Inbound Platform-Level Lead Capture Bot:**  
    * **Purpose:** To capture leads, answer supporting questions, and schedule online consultation conferences, replacing the traditional contact form or phone call.  
-   * **Implementation:** Must be a native integration on the Kona platform website (no `iframe` needed).  
+   * **Implementation:** Must be a native integration on the Graft platform website (no `iframe` needed).  
    * **Tooling:** Relies on **deterministic tool calling** using Zod-validated "skills" to perform controlled actions:  
      * `captureLeadDetails`: Extracts customer details and creates a Lead record, returning the `leadId`.  
      * `checkCalendarAvailability`: Queries the Cal.com v2 API for free time slots.  
@@ -14,13 +14,13 @@ This blueprint outlines the architecture for "Kona AI Web Solutions," a producti
    * **Monetization:** Clients subscribe monthly for this service (MRR model).  
    * **Client Isolation/Access:**  
      * Provided as an `iframe` snippet with a unique token.  
-     * Connects to the Kona platform database and AI bot control room.  
+     * Connects to the Graft platform database and AI bot control room.  
      * Clients **do not** have access to the Outbound Prospecting Agent (Pillar 3).  
    * **Configuration & Customization:**  
      * **Activation:** Activated by a unique token generated upon purchase.  
      * **API Keys:** Clients must securely enter their own API keys for the AI model (currently Gemini, with future support for others via Vercel SDK) and their own Cal.com account.  
-     * **Scheduling:** Bookings are managed directly on the client's Cal.com account, not on the Kona platform.  
-     * **Analytics:** Kona pulls analytics and metrics to display on the client's single-page tenant dashboard.  
+     * **Scheduling:** Bookings are managed directly on the client's Cal.com account, not on the Graft platform.  
+     * **Analytics:** Graft pulls analytics and metrics to display on the client's single-page tenant dashboard.  
      * **Brain Customization:** Clients can update their bot's "Knowledge Base" via a user-friendly UI/UX dashboard, which updates the backend JSON configuration.  
      * **Local Context:** The bot can be customized by the client (via their dashboard) to understand localized terms (e.g., "bakkie") and local schedules (e.g., load shedding).  
 3. **Autonomous Outbound Prospecting Engine (Exclusively Platform-Owned):**  

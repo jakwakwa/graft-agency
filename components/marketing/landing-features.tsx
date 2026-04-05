@@ -34,7 +34,7 @@ export function LandingFeatures() {
     <section className="border-b border-border bg-muted/30 px-6 py-20 md:py-24" aria-labelledby="features-heading">
       <div className="mx-auto max-w-5xl">
         <Typography.H2 id="features-heading" className="border-0 pb-0 text-center font-serif">
-          What you can do with Kona
+          What you can do with GRAFT
         </Typography.H2>
         <Typography.P className="mx-auto mt-4 max-w-2xl text-center text-muted-foreground">
           Everything ties together: your site, your queue, and your AI assistant—so you ship faster with fewer hand-offs.

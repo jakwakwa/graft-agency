@@ -13,7 +13,7 @@ export function LandingFooter() {
     <footer className="border-t border-border bg-background px-6 py-12">
       <div className="mx-auto flex max-w-5xl flex-col gap-8 md:flex-row md:items-start md:justify-between">
         <div>
-          <Typography.Large className="font-serif">Kona Agency</Typography.Large>
+          <Typography.Large className="font-serif">GRAFT TODAY</Typography.Large>
           <Typography.Muted className="mt-2 max-w-sm">
             Multi-tenant AI for agencies that want reliable automation and a clear hand-off to humans.
           </Typography.Muted>
@@ -34,7 +34,7 @@ export function LandingFooter() {
         </nav>
       </div>
       <Typography.Small className="mx-auto mt-10 block max-w-5xl text-center text-muted-foreground">
-        © {new Date().getFullYear()} Kona Agency. All rights reserved.
+        © {new Date().getFullYear()} Graft Agency. All rights reserved.
       </Typography.Small>
     </footer>
   );

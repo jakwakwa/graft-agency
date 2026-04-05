@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Kona Agency",
+  title: "GRAFT TODAY",
   description: "Multi-tenant AI agency platform.",
 };
 

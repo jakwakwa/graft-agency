@@ -19,7 +19,7 @@ export function LandingHero() {
           AI agency automation, built for growth teams
         </Typography.H1>
         <Typography.Lead className="mx-auto mt-6 max-w-2xl text-muted-foreground">
-          Kona Agency helps you qualify prospects, draft leads, and keep conversations moving—without losing the human touch.
+          Graft Agency helps you qualify prospects, draft leads, and keep conversations moving—without losing the human touch.
         </Typography.Lead>
         <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
           <Link href="/sign-up" className={cn(buttonVariants({ variant: "default", size: "lg" }))}>

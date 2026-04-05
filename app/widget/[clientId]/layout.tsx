@@ -3,7 +3,7 @@ import "@/app/globals.css";
 
 export const metadata: Metadata = {
   title: "Chat Widget",
-  description: "Kona Agency chat widget",
+  description: "GRAFT TODAY chat widget",
 };
 
 export default function WidgetLayout({ children }: { children: React.ReactNode }) {

@@ -71,7 +71,7 @@ describe("POST /api/chat", () => {
       toUIMessageStream: () => "ui-stream",
     });
     getConfig.mockResolvedValue({
-      agentName: "Kona",
+      agentName: "GRAFT",
       greetingMessage: "Hello!",
       knowledgeBase: null,
       systemPrompt: "Be helpful",

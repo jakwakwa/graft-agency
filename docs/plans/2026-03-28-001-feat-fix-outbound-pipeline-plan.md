@@ -173,7 +173,7 @@ Human reviews in /dashboard/automation/leads
   - `hasVoiceAgent: z.boolean()` — any voice/phone AI agent
   - `businessDescription: z.string()` — 1–2 sentence summary
   - `coreServices: z.array(z.object({ name: z.string(), description: z.string() }))` — what they sell
-  - `painPoints: z.array(z.string())` — implied problems Kona AI could solve
+  - `painPoints: z.array(z.string())` — implied problems Graft AI could solve
   - `targetOutreachAngle: z.string()` — single best angle for cold outreach
 - Extend `CanonicalScrapedData` in `types.ts` to match these fields plus `draftSubject` and `draftBody` for the email draft stored alongside audit data
 

@@ -13,7 +13,7 @@ Add a manual "Push to Attio" button to the prospect triage dashboard. Clicking i
 
 ## Problem Frame
 
-Prospects discovered by the Gemini AI pipeline live only in the local PostgreSQL database. Sales follow-up happens in Attio. There is no way to get a prospect from the Kona Agency triage queue into the Attio list without manually re-entering data. A "Push to Attio" button removes this manual handoff.
+Prospects discovered by the Gemini AI pipeline live only in the local PostgreSQL database. Sales follow-up happens in Attio. There is no way to get a prospect from the Graft Agency triage queue into the Attio list without manually re-entering data. A "Push to Attio" button removes this manual handoff.
 
 **Core outcome**: prospect appears in the Attio List (`ATTIO_LIST_ID`). Company record creation is a required prerequisite, not the end goal.
 
@@ -30,7 +30,7 @@ Prospects discovered by the Gemini AI pipeline live only in the local PostgreSQL
 
 - No OAuth — API key auth only (`ATTIO_API_KEY`)
 - No bulk push — per-lead only in this iteration
-- No Attio → Kona sync (one-directional)
+- No Attio → Graft sync (one-directional)
 - No Attio People/Contact records — prospects are businesses, only Company records
 - No retry logic on rate limiting — user retries manually
 - No Inngest background job — synchronous user-triggered action

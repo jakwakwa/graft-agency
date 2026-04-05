@@ -6,7 +6,7 @@
 
 ## 🌟 New Features
 
-- New repo baseline landed directly on `main`: Next.js + TypeScript + Tailwind setup, core config files, and initial project structure (`Initialize Kona Agency project`).
+- New repo baseline landed directly on `main`: Next.js + TypeScript + Tailwind setup, core config files, and initial project structure (`Initialize Graft Agency project`).
 
 ## 🐛 Bug Fixes
 

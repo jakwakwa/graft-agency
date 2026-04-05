@@ -2,7 +2,7 @@ import { existsSync } from "node:fs";
 import { $ } from "bun";
 
 async function install() {
-  console.log("🚀 Starting Kona Engine Installation (Base UI Edition)...");
+  console.log("🚀 Starting GRAFT Engine Installation (Base UI Edition)...");
 
   if (!existsSync("./package.json")) {
     await $`bun init -y`;
@@ -50,7 +50,7 @@ async function install() {
     await $`bunx prisma init`;
   }
 
-  console.log("\n✅ Kona Engine (Base UI) dependencies installed.");
+  console.log("\n✅ GRAFT Engine (Base UI) dependencies installed.");
   console.log("Note: Manual configuration of Base UI components is required as shadcn-ui is Radix-centric.");
 }
 

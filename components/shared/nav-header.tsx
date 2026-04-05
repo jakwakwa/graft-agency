@@ -15,7 +15,7 @@ export function NavHeader() {
     <header className="flex h-16 items-center justify-between border-b border-border bg-background px-4 md:px-6">
       <nav className="flex items-center gap-6">
         <Link href="/" className="text-foreground hover:text-foreground/80 transition-colors">
-          <Typography.Large>Kona Agency</Typography.Large>
+          <Typography.Large>GRAFT TODAY</Typography.Large>
         </Link>
         <Link
           href="/dashboard/automation"

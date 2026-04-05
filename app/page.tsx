@@ -7,8 +7,8 @@ import { agentService } from "@/lib/services/agent.service";
 
 export default async function Home() {
   const platformClientId = await getPlatformClientId();
-  let agentName = "Kona";
-  let greetingMessage = "Hi! I'm Kona — how can I help you today?";
+  let agentName = "GRAFT";
+  let greetingMessage = "Hi! I'm Graft — how can I help you today?";
   let primaryColour = "#7c3aed";
 
   if (platformClientId) {

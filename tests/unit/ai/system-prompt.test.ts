@@ -6,7 +6,7 @@ const baseConfig = {
   clientId: "client-1",
   systemPrompt: "You are a helpful assistant.",
   knowledgeBase: null as unknown,
-  agentName: "Kona Bot",
+  agentName: "GRAFT Bot",
   greetingMessage: "Hello! How can I help you today?",
   widgetPrimaryColour: "#000000",
   createdAt: new Date(),
@@ -16,7 +16,7 @@ const baseConfig = {
 describe("buildSystemPrompt", () => {
   it("includes the agent name from config", () => {
     const prompt = buildSystemPrompt(baseConfig);
-    expect(prompt).toContain("Kona Bot");
+    expect(prompt).toContain("GRAFT Bot");
   });
 
   it("includes the greeting message", () => {

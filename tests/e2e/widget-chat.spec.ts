@@ -79,7 +79,7 @@ test.describe("Chat Widget", () => {
     // User message should appear
     await expect(page.getByText("When are you free?")).toBeVisible();
 
-    // Kona should respond — either with slot suggestions or a message about calendar config
+    // Graft should respond — either with slot suggestions or a message about calendar config
     const assistantMessages = page.locator('[class*="rounded-bl-sm"][class*="bg-muted"]');
     await expect(assistantMessages.first()).toBeVisible({ timeout: 30000 });
 

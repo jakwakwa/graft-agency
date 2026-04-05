@@ -23,7 +23,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ cli
   frame.src='${origin}/widget/${encodeURIComponent(clientId)}';
   frame.style.cssText='display:none;width:380px;height:560px;border:none;border-radius:16px;box-shadow:0 8px 30px rgba(0,0,0,0.12);margin-bottom:12px;';
   frame.setAttribute('allow','clipboard-write');
-  frame.title='Kona chat widget';
+  frame.title='GRAFT chat widget';
   c.appendChild(frame);
   c.appendChild(btn);
   document.body.appendChild(c);
