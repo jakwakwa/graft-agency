@@ -72,15 +72,9 @@ export function TriageTable({ leads }: { leads: TriageLead[] }) {
         </thead>
         <tbody>
           {leads.map((lead) => (
-            <tr
-              key={lead.id}
-              className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors"
-            >
+            <tr key={lead.id} className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors">
               <td className="px-4 py-3">
-                <Link
-                  href={`/dashboard/automation/queue/${lead.id}`}
-                  className="font-medium hover:underline"
-                >
+                <Link href={`/dashboard/automation/queue/${lead.id}`} className="font-medium hover:underline">
                   {lead.customerName ?? "Unknown"}
                 </Link>
               </td>
@@ -95,8 +89,10 @@ export function TriageTable({ leads }: { leads: TriageLead[] }) {
                   >
                     {(() => {
                       try {
+                        // biome-ignore lint/style/noNonNullAssertion: <allowed>
                         return new URL(lead.scrapedData!.websiteUrl!).hostname;
                       } catch {
+                        // biome-ignore lint/style/noNonNullAssertion: <allowed>
                         return lead.scrapedData!.websiteUrl;
                       }
                     })()}

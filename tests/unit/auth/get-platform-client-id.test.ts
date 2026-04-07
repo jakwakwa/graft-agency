@@ -35,7 +35,10 @@ describe("getPlatformClientId", () => {
     const { getPlatformClientId } = await import("@/lib/auth/platform-client");
     const id = await getPlatformClientId();
     expect(id).not.toBeNull();
-    const row = await prisma.client.findUnique({ where: { id: id! } });
+    if (id === null) {
+      throw new Error("expected getPlatformClientId to return a client id");
+    }
+    const row = await prisma.client.findUnique({ where: { id } });
     expect(row?.isPlatformClient).toBe(true);
   });
 

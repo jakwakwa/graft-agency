@@ -23,11 +23,7 @@ export async function POST() {
     locations?: string[];
     keywords?: string[];
   };
-  const parts = [
-    ...(criteria.industries ?? []),
-    ...(criteria.locations ?? []),
-    ...(criteria.keywords ?? []),
-  ];
+  const parts = [...(criteria.industries ?? []), ...(criteria.locations ?? []), ...(criteria.keywords ?? [])];
 
   if (parts.length === 0) {
     return Response.json(

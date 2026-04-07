@@ -60,9 +60,7 @@ export function PushToAttioButton({ leadId, initialSynced = false }: PushToAttio
             Push again
           </Button>
         </div>
-        {criticalWarning && (
-          <p className="text-xs text-yellow-700">⚠ {criticalWarning.error}</p>
-        )}
+        {criticalWarning && <p className="text-xs text-yellow-700">⚠ {criticalWarning.error}</p>}
       </div>
     );
   }
@@ -81,9 +79,7 @@ export function PushToAttioButton({ leadId, initialSynced = false }: PushToAttio
       <Button variant="outline" size="sm" onClick={handlePush}>
         Push to Attio
       </Button>
-      {state === "error" && errorText && (
-        <p className="text-xs text-destructive">{errorText}</p>
-      )}
+      {state === "error" && errorText && <p className="text-xs text-destructive">{errorText}</p>}
     </div>
   );
 }

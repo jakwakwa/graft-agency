@@ -44,11 +44,7 @@ function ScheduledJobCard({ config }: { config: ProspectingConfig }) {
       : `Daily at ${utcToSast(config.cronTime)} SAST`;
 
   const criteria = config.searchCriteria;
-  const targetParts = [
-    ...(criteria?.industries ?? []),
-    ...(criteria?.locations ?? []),
-    ...(criteria?.keywords ?? []),
-  ];
+  const targetParts = [...(criteria?.industries ?? []), ...(criteria?.locations ?? []), ...(criteria?.keywords ?? [])];
 
   return (
     <div className="rounded-lg border border-border bg-card p-4">
@@ -59,14 +55,9 @@ function ScheduledJobCard({ config }: { config: ProspectingConfig }) {
               config.cronEnabled ? "bg-green-500" : "bg-muted-foreground"
             }`}
           />
-          <Typography.Small className="font-medium">
-            {config.cronEnabled ? "Active" : "Paused"}
-          </Typography.Small>
+          <Typography.Small className="font-medium">{config.cronEnabled ? "Active" : "Paused"}</Typography.Small>
         </div>
-        <Link
-          href="/dashboard/automation"
-          className="text-xs text-muted-foreground hover:text-foreground"
-        >
+        <Link href="/dashboard/automation" className="text-xs text-muted-foreground hover:text-foreground">
           Edit config →
         </Link>
       </div>
@@ -77,23 +68,24 @@ function ScheduledJobCard({ config }: { config: ProspectingConfig }) {
           <p className="mt-0.5 font-medium">{scheduleLabel}</p>
           {config.cronStartDate && (
             <p className="text-xs text-muted-foreground mt-0.5">
-              From {new Date(config.cronStartDate).toLocaleDateString("en-ZA", { day: "numeric", month: "short", year: "numeric" })}
+              From{" "}
+              {new Date(config.cronStartDate).toLocaleDateString("en-ZA", {
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+              })}
             </p>
           )}
         </div>
 
         <div>
           <Typography.Small className="text-muted-foreground">Targeting</Typography.Small>
-          <p className="mt-0.5 font-medium">
-            {targetParts.length > 0 ? targetParts.join(", ") : "Not configured"}
-          </p>
+          <p className="mt-0.5 font-medium">{targetParts.length > 0 ? targetParts.join(", ") : "Not configured"}</p>
         </div>
 
         <div>
           <Typography.Small className="text-muted-foreground">Value proposition</Typography.Small>
-          <p className="mt-0.5 font-medium line-clamp-2">
-            {config.valueProposition ?? "Not set"}
-          </p>
+          <p className="mt-0.5 font-medium line-clamp-2">{config.valueProposition ?? "Not set"}</p>
         </div>
       </div>
     </div>
@@ -106,24 +98,17 @@ export default function QueuePage() {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: fetch on mount only
   useEffect(() => {
     async function fetchAll() {
       try {
-        const [leadsRes, configRes] = await Promise.all([
-          fetch("/api/leads"),
-          fetch("/api/prospecting-config"),
-        ]);
+        const [leadsRes, configRes] = await Promise.all([fetch("/api/leads"), fetch("/api/prospecting-config")]);
 
         if (leadsRes.status === 401 || leadsRes.status === 403) {
           setMessage({ type: "error", text: "Access denied." });
           return;
         }
 
-        const [leadsData, configData] = await Promise.all([
-          leadsRes.json(),
-          configRes.ok ? configRes.json() : null,
-        ]);
+        const [leadsData, configData] = await Promise.all([leadsRes.json(), configRes.ok ? configRes.json() : null]);
 
         setLeads(Array.isArray(leadsData) ? leadsData : []);
         setConfig(configData);

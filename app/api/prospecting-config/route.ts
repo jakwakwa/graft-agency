@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { snapUtcTimeToNearestMinutes } from "@/lib/cron/prospecting-utc";
 import { requirePlatformAccess } from "@/lib/auth/resolve-client";
+import { snapUtcTimeToNearestMinutes } from "@/lib/cron/prospecting-utc";
 import prisma from "@/lib/db/prisma";
 
 const PROSPECTING_CRON_GRID_MINUTES = 15;
@@ -9,7 +9,10 @@ const configSchema = z.object({
   cronEnabled: z.boolean().optional(),
   cronFrequency: z.enum(["daily", "weekly"]).optional(),
   cronDay: z.number().int().min(0).max(6).nullable().optional(),
-  cronTime: z.string().regex(/^\d{2}:\d{2}$/).optional(),
+  cronTime: z
+    .string()
+    .regex(/^\d{2}:\d{2}$/)
+    .optional(),
   cronStartDate: z.string().datetime().nullable().optional(),
   searchEnabled: z.boolean().optional(),
   searchCriteria: z
@@ -31,7 +34,9 @@ export async function GET() {
     where: { clientId: result.clientId },
   });
 
-  return Response.json(config ?? { cronEnabled: false, searchEnabled: false, searchCriteria: null, outreachFromEmail: null });
+  return Response.json(
+    config ?? { cronEnabled: false, searchEnabled: false, searchCriteria: null, outreachFromEmail: null },
+  );
 }
 
 export async function POST(req: Request) {
@@ -50,7 +55,9 @@ export async function POST(req: Request) {
     ...(body.data.cronTime !== undefined && {
       cronTime: snapUtcTimeToNearestMinutes(body.data.cronTime, PROSPECTING_CRON_GRID_MINUTES),
     }),
-    ...(body.data.cronStartDate !== undefined && { cronStartDate: body.data.cronStartDate ? new Date(body.data.cronStartDate) : null }),
+    ...(body.data.cronStartDate !== undefined && {
+      cronStartDate: body.data.cronStartDate ? new Date(body.data.cronStartDate) : null,
+    }),
     ...(body.data.searchEnabled !== undefined && { searchEnabled: body.data.searchEnabled }),
     ...(body.data.searchCriteria !== undefined && { searchCriteria: body.data.searchCriteria }),
     ...(body.data.outreachFromEmail !== undefined && { outreachFromEmail: body.data.outreachFromEmail }),

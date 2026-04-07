@@ -30,12 +30,12 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
 
   // Validate websiteUrl from scrapedData
   const parsed = scrapedDataSchema.safeParse(
-    lead.scrapedData && typeof lead.scrapedData === "object" ? lead.scrapedData : {}
+    lead.scrapedData && typeof lead.scrapedData === "object" ? lead.scrapedData : {},
   );
   if (!parsed.success) {
     return Response.json(
       { error: "Lead has no valid website URL — required for Attio domain matching" },
-      { status: 422 }
+      { status: 422 },
     );
   }
 
@@ -51,10 +51,7 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
   });
 
   if ("error" in companyResult) {
-    return Response.json(
-      { error: `Attio company upsert failed: ${companyResult.error}` },
-      { status: 502 }
-    );
+    return Response.json({ error: `Attio company upsert failed: ${companyResult.error}` }, { status: 502 });
   }
 
   const { recordId } = companyResult;

@@ -211,8 +211,8 @@ export default function QueueDetailPage() {
             <div>
               <Typography.Small className="font-medium text-muted-foreground">Services</Typography.Small>
               <ul className="mt-1 space-y-1">
-                {d.coreServices.map((s, i) => (
-                  <li key={i} className="text-sm">
+                {d.coreServices.map((s) => (
+                  <li key={s.name} className="text-sm">
                     <span className="font-medium">{s.name}</span>
                     <span className="text-muted-foreground"> — {s.description}</span>
                   </li>
@@ -225,8 +225,10 @@ export default function QueueDetailPage() {
             <div>
               <Typography.Small className="font-medium text-muted-foreground">Pain Points</Typography.Small>
               <ul className="mt-1 list-disc pl-4 space-y-1">
-                {d.painPoints.map((p, i) => (
-                  <li key={i} className="text-sm">{p}</li>
+                {d.painPoints.map((p) => (
+                  <li key={p} className="text-sm">
+                    {p}
+                  </li>
                 ))}
               </ul>
             </div>
@@ -245,7 +247,9 @@ export default function QueueDetailPage() {
           <Typography.H4>Email Draft</Typography.H4>
 
           <div>
-            <Label htmlFor="subject" className="text-sm font-medium">Subject</Label>
+            <Label htmlFor="subject" className="text-sm font-medium">
+              Subject
+            </Label>
             <Input
               id="subject"
               value={subject}
@@ -256,7 +260,9 @@ export default function QueueDetailPage() {
           </div>
 
           <div className="flex flex-col flex-1">
-            <Label htmlFor="body" className="text-sm font-medium">Body</Label>
+            <Label htmlFor="body" className="text-sm font-medium">
+              Body
+            </Label>
             <Textarea
               id="body"
               value={body}

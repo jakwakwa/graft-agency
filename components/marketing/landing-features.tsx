@@ -6,26 +6,22 @@ const features = [
   {
     icon: Inbox,
     title: "Prospect queue",
-    description:
-      "Review and prioritise inbound interest in one place—clear status, less spreadsheet chaos.",
+    description: "Review and prioritise inbound interest in one place—clear status, less spreadsheet chaos.",
   },
   {
     icon: Sparkles,
     title: "Draft leads",
-    description:
-      "Turn conversations into structured lead records your team can trust and act on quickly.",
+    description: "Turn conversations into structured lead records your team can trust and act on quickly.",
   },
   {
     icon: Bot,
     title: "AI assistant",
-    description:
-      "A configurable agent that answers questions, captures details, and hands off smoothly.",
+    description: "A configurable agent that answers questions, captures details, and hands off smoothly.",
   },
   {
     icon: LineChart,
     title: "Automation visibility",
-    description:
-      "See what runs, what’s queued, and where human review is needed—without digging through logs.",
+    description: "See what runs, what’s queued, and where human review is needed—without digging through logs.",
   },
 ] as const;
 
@@ -37,7 +33,8 @@ export function LandingFeatures() {
           What you can do with GRAFT
         </Typography.H2>
         <Typography.P className="mx-auto mt-4 max-w-2xl text-center text-muted-foreground">
-          Everything ties together: your site, your queue, and your AI assistant—so you ship faster with fewer hand-offs.
+          Everything ties together: your site, your queue, and your AI assistant—so you ship faster with fewer
+          hand-offs.
         </Typography.P>
         <ul className="mt-12 grid gap-6 sm:grid-cols-2">
           {features.map(({ icon: Icon, title, description }) => (

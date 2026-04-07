@@ -63,9 +63,7 @@ export const attioService = {
     return { recordId };
   },
 
-  async addToList(input: {
-    recordId: string;
-  }): Promise<{ entryId: string } | { error: string }> {
+  async addToList(input: { recordId: string }): Promise<{ entryId: string } | { error: string }> {
     const apiKey = getApiKey();
     if (!apiKey) {
       return { error: "ATTIO_API_KEY is not configured" };
@@ -119,9 +117,7 @@ export const attioService = {
     }
 
     const painPointsText =
-      input.painPoints.length > 0
-        ? input.painPoints.map((p, i) => `  ${i + 1}. ${p}`).join("\n")
-        : "  None identified";
+      input.painPoints.length > 0 ? input.painPoints.map((p, i) => `  ${i + 1}. ${p}`).join("\n") : "  None identified";
 
     const content = [
       `GRAFT TODAY Prospect Push — Lead ID: ${input.leadId}`,

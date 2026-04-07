@@ -32,15 +32,12 @@ export async function isPlatformAdmin(): Promise<boolean> {
  * Org admins get full access (platform client). Others must match platform client.
  */
 export async function requirePlatformAccess(): Promise<
-  | { clientId: string }
-  | { error: "Unauthorized"; status: 401 }
-  | { error: "Forbidden"; status: 403 }
+  { clientId: string } | { error: "Unauthorized"; status: 401 } | { error: "Forbidden"; status: 403 }
 > {
   const { orgId, has, orgRole } = await auth();
   if (!orgId) return { error: "Unauthorized", status: 401 };
 
-  const isAdmin =
-    (typeof has === "function" && has({ role: "org:admin" })) || orgRole === "org:admin";
+  const isAdmin = (typeof has === "function" && has({ role: "org:admin" })) || orgRole === "org:admin";
   if (isAdmin) {
     const platformId = await getPlatformClientId();
     if (platformId) return { clientId: platformId };

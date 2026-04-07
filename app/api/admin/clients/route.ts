@@ -47,7 +47,8 @@ export async function POST(req: Request) {
       await tx.agentConfig.create({
         data: {
           clientId: c.id,
-          systemPrompt: input.systemPrompt ?? "You are a helpful assistant. Help visitors and capture their contact details.",
+          systemPrompt:
+            input.systemPrompt ?? "You are a helpful assistant. Help visitors and capture their contact details.",
           agentName: input.agentName ?? "AI Assistant",
           greetingMessage: input.greetingMessage ?? "Hello! How can I help you today?",
         },

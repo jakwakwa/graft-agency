@@ -1,11 +1,17 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
+const displayTracking = "tracking-[-0.04em]";
+
 const TypographyH1 = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadingElement>>(
   ({ className, ...props }, ref) => (
     <h1
       ref={ref}
-      className={cn("scroll-m-20 text-4xl leading-relaxed m-1  font-extrabold tracking-tight text-balance", className)}
+      className={cn(
+        "scroll-m-20 font-display text-[3.5rem] leading-none font-bold text-balance",
+        displayTracking,
+        className,
+      )}
       {...props}
     />
   ),
@@ -17,7 +23,7 @@ const TypographyH2 = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<H
     <h2
       ref={ref}
       className={cn(
-        "scroll-m-20 border-b border-border pb-2 text-3xl leading-relaxed m-1  font-semibold tracking-tight first:mt-0",
+        "scroll-m-20 font-display pb-4 text-3xl font-semibold tracking-tight text-balance first:mt-0",
         className,
       )}
       {...props}
@@ -30,7 +36,7 @@ const TypographyH3 = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<H
   ({ className, ...props }, ref) => (
     <h3
       ref={ref}
-      className={cn("scroll-m-20 text-lg leading-relaxed mt-6 mb-8  font-semibold tracking-tight", className)}
+      className={cn("scroll-m-20 font-display mt-6 mb-8 text-2xl font-semibold tracking-tight text-balance", className)}
       {...props}
     />
   ),
@@ -41,7 +47,10 @@ const TypographyH4 = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<H
   ({ className, ...props }, ref) => (
     <h4
       ref={ref}
-      className={cn("scroll-m-20 text-sm leading-relaxed m-1  font-semibold tracking-tight", className)}
+      className={cn(
+        "scroll-m-20 font-data text-sm font-semibold tracking-wide text-muted-foreground uppercase",
+        className,
+      )}
       {...props}
     />
   ),
@@ -50,42 +59,42 @@ TypographyH4.displayName = "TypographyH4";
 
 const TypographyP = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
   ({ className, ...props }, ref) => (
-    <p ref={ref} className={cn("leading-8 [&:not(:first-child)]:mt-6", className)} {...props} />
+    <p ref={ref} className={cn(`scroll-m-20 font-sans text-base leading-relaxed not-first:mt-6`)} {...props} />
   ),
 );
 TypographyP.displayName = "TypographyP";
 
 const TypographyBlockquote = React.forwardRef<HTMLQuoteElement, React.HTMLAttributes<HTMLQuoteElement>>(
   ({ className, ...props }, ref) => (
-    <blockquote ref={ref} className={cn("mt-6 border-s-2 border-border italic", className)} {...props} />
+    <blockquote ref={ref} className={cn("mt-6 border-s-2 border-outline-ghost ps-4 italic", className)} {...props} />
   ),
 );
 TypographyBlockquote.displayName = "TypographyBlockquote";
 
 const TypographyLead = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
   ({ className, ...props }, ref) => (
-    <p ref={ref} className={cn("text-xl text-muted-foreground", className)} {...props} />
+    <p ref={ref} className={cn("font-sans text-xl text-muted-foreground", className)} {...props} />
   ),
 );
 TypographyLead.displayName = "TypographyLead";
 
 const TypographyLarge = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn("text-lg leading-normal m-1  font-semibold", className)} {...props} />
+    <div ref={ref} className={cn("font-display text-lg leading-normal font-semibold", className)} {...props} />
   ),
 );
 TypographyLarge.displayName = "TypographyLarge";
 
 const TypographySmall = React.forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(
   ({ className, ...props }, ref) => (
-    <small ref={ref} className={cn("text-sm leading-none font-medium", className)} {...props} />
+    <small ref={ref} className={cn("font-data text-sm leading-none font-medium", className)} {...props} />
   ),
 );
 TypographySmall.displayName = "TypographySmall";
 
 const TypographyMuted = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
   ({ className, ...props }, ref) => (
-    <p ref={ref} className={cn("text-sm text-muted-foreground", className)} {...props} />
+    <p ref={ref} className={cn("font-sans text-sm text-muted-foreground", className)} {...props} />
   ),
 );
 TypographyMuted.displayName = "TypographyMuted";
@@ -94,7 +103,7 @@ const TypographyCode = React.forwardRef<HTMLElement, React.HTMLAttributes<HTMLEl
   ({ className, ...props }, ref) => (
     <code
       ref={ref}
-      className={cn("rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold", className)}
+      className={cn("font-data rounded bg-muted px-[0.3rem] py-[0.2rem] text-sm font-semibold", className)}
       {...props}
     />
   ),
@@ -103,7 +112,7 @@ TypographyCode.displayName = "TypographyCode";
 
 const TypographyList = React.forwardRef<HTMLUListElement, React.HTMLAttributes<HTMLUListElement>>(
   ({ className, ...props }, ref) => (
-    <ul ref={ref} className={cn("my-6 ms-6 list-disc [&>li]:mt-2", className)} {...props} />
+    <ul ref={ref} className={cn("my-6 ms-6 list-disc font-sans [&>li]:mt-2", className)} {...props} />
   ),
 );
 TypographyList.displayName = "TypographyList";
@@ -118,7 +127,9 @@ const TypographyTable = React.forwardRef<HTMLTableElement, React.HTMLAttributes<
 TypographyTable.displayName = "TypographyTable";
 
 const TypographyTableHeader = React.forwardRef<HTMLTableSectionElement, React.HTMLAttributes<HTMLTableSectionElement>>(
-  ({ className, ...props }, ref) => <thead ref={ref} className={cn("[&_tr]:border-b", className)} {...props} />,
+  ({ className, ...props }, ref) => (
+    <thead ref={ref} className={cn("[&_tr]:border-b [&_tr]:border-outline-ghost", className)} {...props} />
+  ),
 );
 TypographyTableHeader.displayName = "TypographyTableHeader";
 
@@ -133,7 +144,7 @@ const TypographyTableRow = React.forwardRef<HTMLTableRowElement, React.HTMLAttri
   ({ className, ...props }, ref) => (
     <tr
       ref={ref}
-      className={cn("m-0 border-t border-border p-0 even:bg-muted transition-colors", className)}
+      className={cn("m-0 border-t border-outline-ghost p-0 even:bg-muted/50 transition-colors", className)}
       {...props}
     />
   ),
@@ -145,7 +156,7 @@ const TypographyTableHead = React.forwardRef<HTMLTableCellElement, React.ThHTMLA
     <th
       ref={ref}
       className={cn(
-        "border border-border px-4 py-2 text-start font-bold [&[align=center]]:text-center [&[align=end]]:text-end",
+        `border border-outline-ghost px-4 py-2 text-start font-data font-bold [[align=center]]:text-center [[align=end]]:text-end`,
         className,
       )}
       {...props}
@@ -159,7 +170,7 @@ const TypographyTableCell = React.forwardRef<HTMLTableCellElement, React.TdHTMLA
     <td
       ref={ref}
       className={cn(
-        "border border-border px-4 py-8 text-start [&[align=center]]:text-center [&[align=end]]:text-end",
+        "border border-outline-ghost px-4 py-8 text-start font-sans [[align=center]]:text-center[&[align=end]]:text-end",
         className,
       )}
       {...props}

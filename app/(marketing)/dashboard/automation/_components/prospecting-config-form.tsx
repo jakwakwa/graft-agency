@@ -98,7 +98,11 @@ export function ProspectingConfigForm({
   async function handleSave() {
     setSaving(true);
     try {
-      const splitTrim = (s: string) => s.split(",").map((v) => v.trim()).filter(Boolean);
+      const splitTrim = (s: string) =>
+        s
+          .split(",")
+          .map((v) => v.trim())
+          .filter(Boolean);
       const res = await fetch("/api/prospecting-config", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -151,17 +155,27 @@ export function ProspectingConfigForm({
       </div>
 
       <div className="rounded-md border border-border bg-muted/30 p-4 space-y-3">
-        <Typography.Small className="font-medium text-muted-foreground uppercase tracking-wide">Cron Schedule</Typography.Small>
+        <Typography.Small className="font-medium text-muted-foreground uppercase tracking-wide">
+          Cron Schedule
+        </Typography.Small>
         <Typography.Muted className="text-xs leading-relaxed">
           Set your schedule here. Times use SAST (GMT+2); we convert to UTC and snap to 15-minute intervals.
         </Typography.Muted>
         <div className="grid gap-3 sm:grid-cols-2">
           <div>
-            <Label htmlFor="cronFrequency" className="text-sm font-medium">Frequency</Label>
+            <Label htmlFor="cronFrequency" className="text-sm font-medium">
+              Frequency
+            </Label>
             <select
               id="cronFrequency"
               value={config.cronFrequency}
-              onChange={(e) => setConfig((c) => ({ ...c, cronFrequency: e.target.value as "daily" | "weekly", cronDay: e.target.value === "weekly" ? (c.cronDay ?? 1) : null }))}
+              onChange={(e) =>
+                setConfig((c) => ({
+                  ...c,
+                  cronFrequency: e.target.value as "daily" | "weekly",
+                  cronDay: e.target.value === "weekly" ? (c.cronDay ?? 1) : null,
+                }))
+              }
               className="mt-1 flex h-8 w-full rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
             >
               <option value="daily">Daily</option>
@@ -171,7 +185,9 @@ export function ProspectingConfigForm({
 
           {config.cronFrequency === "weekly" && (
             <div>
-              <Label htmlFor="cronDay" className="text-sm font-medium">Day of week</Label>
+              <Label htmlFor="cronDay" className="text-sm font-medium">
+                Day of week
+              </Label>
               <select
                 id="cronDay"
                 value={config.cronDay ?? 1}
@@ -179,14 +195,18 @@ export function ProspectingConfigForm({
                 className="mt-1 flex h-8 w-full rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
               >
                 {DAYS_OF_WEEK.map((d) => (
-                  <option key={d.value} value={d.value}>{d.label}</option>
+                  <option key={d.value} value={d.value}>
+                    {d.label}
+                  </option>
                 ))}
               </select>
             </div>
           )}
 
           <div>
-            <Label htmlFor="cronTime" className="text-sm font-medium">Time (SAST / GMT+2)</Label>
+            <Label htmlFor="cronTime" className="text-sm font-medium">
+              Time (SAST / GMT+2)
+            </Label>
             <input
               id="cronTime"
               type="time"
@@ -197,7 +217,9 @@ export function ProspectingConfigForm({
           </div>
 
           <div>
-            <Label htmlFor="cronStartDate" className="text-sm font-medium">Start date</Label>
+            <Label htmlFor="cronStartDate" className="text-sm font-medium">
+              Start date
+            </Label>
             <input
               id="cronStartDate"
               type="date"
@@ -211,7 +233,9 @@ export function ProspectingConfigForm({
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <Label htmlFor="industries" className="text-sm font-medium">Industries</Label>
+          <Label htmlFor="industries" className="text-sm font-medium">
+            Industries
+          </Label>
           <Input
             id="industries"
             value={industries}
@@ -220,7 +244,9 @@ export function ProspectingConfigForm({
           />
         </div>
         <div>
-          <Label htmlFor="locations" className="text-sm font-medium">Locations</Label>
+          <Label htmlFor="locations" className="text-sm font-medium">
+            Locations
+          </Label>
           <Input
             id="locations"
             value={locations}
@@ -231,7 +257,9 @@ export function ProspectingConfigForm({
       </div>
 
       <div>
-        <Label htmlFor="keywords" className="text-sm font-medium">Keywords</Label>
+        <Label htmlFor="keywords" className="text-sm font-medium">
+          Keywords
+        </Label>
         <Input
           id="keywords"
           value={keywords}
@@ -241,7 +269,9 @@ export function ProspectingConfigForm({
       </div>
 
       <div>
-        <Label htmlFor="fromEmail" className="text-sm font-medium">Outreach from email</Label>
+        <Label htmlFor="fromEmail" className="text-sm font-medium">
+          Outreach from email
+        </Label>
         <Input
           id="fromEmail"
           type="email"
@@ -252,7 +282,9 @@ export function ProspectingConfigForm({
       </div>
 
       <div>
-        <Label htmlFor="valueProposition" className="text-sm font-medium">Value proposition</Label>
+        <Label htmlFor="valueProposition" className="text-sm font-medium">
+          Value proposition
+        </Label>
         <textarea
           id="valueProposition"
           value={valueProposition}

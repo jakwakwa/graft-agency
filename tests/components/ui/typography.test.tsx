@@ -21,7 +21,7 @@ describe("Typography", () => {
       const el = screen.getByRole("heading", { level: 1 });
       expect(el.tagName).toBe("H1");
       expect(el).toHaveTextContent("Heading 1");
-      expect(el).toHaveClass("text-4xl", "font-extrabold", "tracking-tight");
+      expect(el).toHaveClass("font-display", "text-[3.5rem]", "font-bold", "tracking-[-0.04em]");
     });
   });
 
@@ -31,7 +31,8 @@ describe("Typography", () => {
       const el = screen.getByRole("heading", { level: 2 });
       expect(el.tagName).toBe("H2");
       expect(el).toHaveTextContent("Heading 2");
-      expect(el).toHaveClass("text-3xl", "font-semibold", "border-b");
+      expect(el).toHaveClass("font-display", "text-3xl", "font-semibold");
+      expect(el).not.toHaveClass("border-b");
     });
   });
 
@@ -41,7 +42,7 @@ describe("Typography", () => {
       const el = screen.getByRole("heading", { level: 3 });
       expect(el.tagName).toBe("H3");
       expect(el).toHaveTextContent("Heading 3");
-      expect(el).toHaveClass("text-2xl", "font-semibold");
+      expect(el).toHaveClass("font-display", "text-2xl", "font-semibold");
     });
   });
 
@@ -51,7 +52,7 @@ describe("Typography", () => {
       const el = screen.getByRole("heading", { level: 4 });
       expect(el.tagName).toBe("H4");
       expect(el).toHaveTextContent("Heading 4");
-      expect(el).toHaveClass("text-xl", "font-semibold");
+      expect(el).toHaveClass("font-data", "text-sm", "uppercase");
     });
   });
 
@@ -60,7 +61,7 @@ describe("Typography", () => {
       render(<TypographyP>Paragraph text</TypographyP>);
       const el = screen.getByText("Paragraph text");
       expect(el.tagName).toBe("P");
-      expect(el).toHaveClass("leading-7");
+      expect(el).toHaveClass("text-base", "leading-relaxed", "font-sans");
     });
   });
 
@@ -69,7 +70,7 @@ describe("Typography", () => {
       render(<TypographyBlockquote>Quote text</TypographyBlockquote>);
       const el = screen.getByText("Quote text");
       expect(el.tagName).toBe("BLOCKQUOTE");
-      expect(el).toHaveClass("border-s-2", "italic");
+      expect(el).toHaveClass("border-s-2", "border-outline-ghost", "italic");
     });
   });
 
@@ -87,7 +88,7 @@ describe("Typography", () => {
       render(<TypographyLarge>Large text</TypographyLarge>);
       const el = screen.getByText("Large text");
       expect(el.tagName).toBe("DIV");
-      expect(el).toHaveClass("text-lg", "font-semibold");
+      expect(el).toHaveClass("font-display", "text-lg", "font-semibold");
     });
   });
 
@@ -96,7 +97,7 @@ describe("Typography", () => {
       render(<TypographySmall>Small text</TypographySmall>);
       const el = screen.getByText("Small text");
       expect(el.tagName).toBe("SMALL");
-      expect(el).toHaveClass("text-sm", "font-medium");
+      expect(el).toHaveClass("font-data", "text-sm", "font-medium");
     });
   });
 
@@ -110,11 +111,11 @@ describe("Typography", () => {
   });
 
   describe("TypographyCode", () => {
-    it("renders as code with font-mono", () => {
+    it("renders as code with font-data", () => {
       render(<TypographyCode>@radix-ui/react</TypographyCode>);
       const el = screen.getByText("@radix-ui/react");
       expect(el.tagName).toBe("CODE");
-      expect(el).toHaveClass("font-mono", "bg-muted");
+      expect(el).toHaveClass("font-data", "bg-muted");
     });
   });
 
@@ -136,7 +137,7 @@ describe("Typography", () => {
     it("merges custom className with base styles", () => {
       render(<TypographyH1 className="custom-class">Title</TypographyH1>);
       const el = screen.getByRole("heading", { level: 1 });
-      expect(el).toHaveClass("custom-class", "text-4xl");
+      expect(el).toHaveClass("custom-class", "font-display");
     });
   });
 });

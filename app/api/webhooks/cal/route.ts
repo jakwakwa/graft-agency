@@ -1,5 +1,5 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
-import { NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 import prisma from "@/lib/db/prisma";
 
 function verifyCalSignature(body: string, signature: string, secret: string): boolean {

@@ -5,9 +5,7 @@ import "dotenv/config";
  * Create `Client` records through onboarding, admin APIs, or Clerk webhooks.
  */
 async function main(): Promise<void> {
-  console.log(
-    "Prisma seed: skipped (no default data). Use onboarding or admin APIs to create clients.",
-  );
+  console.log("Prisma seed: skipped (no default data). Use onboarding or admin APIs to create clients.");
 }
 
 main().catch((e: unknown) => {

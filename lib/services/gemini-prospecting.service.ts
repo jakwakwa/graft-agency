@@ -27,17 +27,17 @@ export const geminiProspectingService = {
     const locations = criteria.locations ?? [];
     const keywords = criteria.keywords ?? [];
 
-    const targetAudience = [
-      industries.length ? industries.join(", ") : "",
-      locations.length ? `in ${locations.join(", ")}` : "",
-      keywords.length ? `(${keywords.join(", ")})` : "",
-    ]
-      .filter(Boolean)
-      .join(" ")
-      .trim() || "small businesses";
+    const targetAudience =
+      [
+        industries.length ? industries.join(", ") : "",
+        locations.length ? `in ${locations.join(", ")}` : "",
+        keywords.length ? `(${keywords.join(", ")})` : "",
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .trim() || "small businesses";
 
-    const valueProposition =
-      config.valueProposition ?? "AI automation solutions to save time and grow revenue";
+    const valueProposition = config.valueProposition ?? "AI automation solutions to save time and grow revenue";
 
     // Step 1: Find businesses using Google Search (grounded)
     const mapsResponse = await ai.models.generateContent({
@@ -60,8 +60,6 @@ For each of these businesses:
 3. Draft a highly personalised cold outreach email offering this value proposition: "${valueProposition}". The email should mention a specific pain point and how our solution helps. Keep it concise and professional.
 
 Return the results as a JSON array.`;
-
-
 
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",

@@ -60,10 +60,7 @@ export default function LeadsPage() {
     }
   }
 
-  async function handleSave(
-    id: string,
-    updates: { draftSubject?: string; draftBody?: string },
-  ) {
+  async function handleSave(id: string, updates: { draftSubject?: string; draftBody?: string }) {
     const lead = leads.find((l) => l.id === id);
     const merged = { ...(lead?.scrapedData ?? {}), ...updates };
     const res = await fetch(`/api/leads/${id}`, {

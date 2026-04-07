@@ -26,9 +26,7 @@ describe("runProspectingScheduledJob", () => {
 
   it("skips when cron is disabled", async () => {
     mockFindUnique.mockResolvedValue({ cronEnabled: false });
-    const { runProspectingScheduledJob } = await import(
-      "@/lib/services/prospecting-scheduler.service"
-    );
+    const { runProspectingScheduledJob } = await import("@/lib/services/prospecting-scheduler.service");
     const out = await runProspectingScheduledJob("client-1", new Date("2026-03-28T04:35:00.000Z"));
     expect(out).toEqual({ status: "skipped", reason: "Cron disabled" });
     expect(mockFindAndAudit).not.toHaveBeenCalled();
@@ -48,9 +46,7 @@ describe("runProspectingScheduledJob", () => {
     mockFindAndAudit.mockResolvedValue({ created: 1, errors: 0 });
     mockUpdate.mockResolvedValue({});
 
-    const { runProspectingScheduledJob } = await import(
-      "@/lib/services/prospecting-scheduler.service"
-    );
+    const { runProspectingScheduledJob } = await import("@/lib/services/prospecting-scheduler.service");
     const now = new Date("2026-03-28T04:35:00.000Z");
     const out = await runProspectingScheduledJob("client-1", now);
     expect(out.status).toBe("ok");

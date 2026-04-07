@@ -10,7 +10,7 @@ const dbg = (loc: string, msg: string, data: object, h: string) => {
       DEBUG_LOG,
       `${JSON.stringify({ location: loc, message: msg, data, hypothesisId: h, timestamp: Date.now() })}\n`,
     );
-  } catch { }
+  } catch {}
 };
 
 function getHeaders(): Record<string, string> {

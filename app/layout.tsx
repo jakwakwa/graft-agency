@@ -1,18 +1,27 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
-import { ThemeProvider } from "@/components/theme-provider";
-import { Geist_Mono, Lora, Nunito_Sans } from "next/font/google";
-import { cn } from "@/lib/utils";
+import { Inter, Plus_Jakarta_Sans, Space_Grotesk } from "next/font/google";
 import { NavHeader } from "@/components/shared/nav-header";
+import { ThemeProvider } from "@/components/theme-provider";
+import { cn } from "@/lib/utils";
 
-const nunitoSans = Nunito_Sans({ variable: "--font-sans" });
-
-const lora = Lora({ subsets: ["latin"], variable: "--font-serif" });
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const inter = Inter({
   subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
+});
+
+const plusJakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  variable: "--font-display",
+  display: "swap",
+});
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-data",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -26,13 +35,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className={cn(lora.variable, geistMono.variable, "font-sans", nunitoSans.variable)}>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={cn(inter.variable, plusJakarta.variable, spaceGrotesk.variable, "font-sans")}
+    >
       <body>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           <ClerkProvider>
             <NavHeader />
 
-            {children}</ClerkProvider>
+            {children}
+          </ClerkProvider>
         </ThemeProvider>
       </body>
     </html>

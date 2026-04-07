@@ -8,8 +8,8 @@ export const metadata: Metadata = {
 
 export default function WidgetLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body className="bg-white text-foreground m-0 p-0 overflow-hidden">{children}</body>
+    <html lang="en" className="dark">
+      <body className="bg-background text-foreground m-0 overflow-hidden p-0">{children}</body>
     </html>
   );
 }

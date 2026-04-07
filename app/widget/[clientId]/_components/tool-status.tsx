@@ -53,7 +53,9 @@ export function ToolStatus({ toolName, state }: ToolStatusProps) {
         </>
       ) : (
         <>
-          <Loader2Icon className="size-3 animate-spin" />
+          <span className="status-pulse inline-flex rounded-full p-0.5 text-primary">
+            <Loader2Icon className="size-3 animate-spin" />
+          </span>
           <span>{labels.pending}</span>
         </>
       )}

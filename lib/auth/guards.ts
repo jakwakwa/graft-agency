@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 
 /** In-app destination when the user is signed in but has no provisioned organisation / Client row. */
 export const ACCESS_REQUIRED_PATH = "/dashboard/access-required" as const;

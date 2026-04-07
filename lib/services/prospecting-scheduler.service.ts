@@ -25,11 +25,7 @@ export async function runProspectingScheduledJob(
 
   const frequency = config.cronFrequency === "weekly" ? "weekly" : "daily";
 
-  if (
-    frequency === "weekly" &&
-    config.cronDay !== null &&
-    config.cronDay !== undefined
-  ) {
+  if (frequency === "weekly" && config.cronDay !== null && config.cronDay !== undefined) {
     if (now.getUTCDay() !== config.cronDay) {
       return { status: "skipped", reason: "Cron: not scheduled for today" };
     }

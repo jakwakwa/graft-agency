@@ -18,7 +18,7 @@ describe("Button", () => {
     it("applies default variant and size classes", () => {
       render(<Button>Default</Button>);
       const button = screen.getByRole("button");
-      expect(button).toHaveClass("bg-primary", "text-primary-foreground");
+      expect(button).toHaveClass("from-primary-kinetic", "to-primary", "text-primary-foreground");
     });
 
     it("applies variant classes when specified", () => {
@@ -69,12 +69,13 @@ describe("Button", () => {
   describe("buttonVariants", () => {
     it("returns correct classes for default variant", () => {
       const classes = buttonVariants({ variant: "default", size: "default" });
-      expect(classes).toContain("bg-primary");
+      expect(classes).toContain("from-primary-kinetic");
+      expect(classes).toContain("to-primary");
     });
 
     it("returns correct classes for outline variant", () => {
       const classes = buttonVariants({ variant: "outline", size: "default" });
-      expect(classes).toContain("border-border");
+      expect(classes).toContain("border-outline-ghost");
     });
   });
 });

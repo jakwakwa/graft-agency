@@ -1,23 +1,58 @@
 {
-    "terminal.integrated.shellIntegration.decorationsEnabled": "gutter",
-    "git.decorations.enabled": false,
-    "merge-conflict.decorators.enabled": false,
-    "cursor.inlineDiff.enablePerformanceProtection": false,
-    "cursor.cmdk.useThemedDiffBackground2": false,
-    "diffEditor.experimental.showEmptyDecorations": false,
-    "editor.foldingHighlight": false,
-    "editor.copyWithSyntaxHighlighting": false,
-    "editor.occurrencesHighlight": "off",
-    "editor.hover.above": false,
-    "editor.hover.enabled": "on",
-    "editor.hover.sticky": false,
-    "css.hover.documentation": false,
-    "css.hover.references": false,
-    "less.hover.documentation": false,
-    "scss.hover.documentation": false,
-    "less.hover.references": false,
-    "scss.hover.references": false,
-    "html.hover.documentation": false,
-    "scm.diffDecorationsGutterVisibility": "hover",
-    "tailwindCSS.hovers": false
+  "terminal.integrated.shellIntegration.decorationsEnabled": "gutter",
+  "git.decorations.enabled": false,
+  "merge-conflict.decorators.enabled": false,
+  "cursor.inlineDiff.enablePerformanceProtection": false,
+  "cursor.cmdk.useThemedDiffBackground2": false,
+  "diffEditor.experimental.showEmptyDecorations": false,
+  "editor.foldingHighlight": false,
+  "editor.copyWithSyntaxHighlighting": false,
+  "editor.occurrencesHighlight": "off",
+  "editor.hover.above": false,
+  "editor.hover.sticky": false,
+  "css.hover.documentation": false,
+  "css.hover.references": false,
+  "less.hover.documentation": false,
+  "scss.hover.documentation": false,
+  "less.hover.references": false,
+  "scss.hover.references": false,
+  "html.hover.documentation": false,
+  "scm.diffDecorationsGutterVisibility": "hover",
+  "tailwindCSS.hovers": false,
+  "editor.defaultFormatter": "biomejs.biome",
+  "editor.formatOnSave": true,
+  "[typescript]": {
+    "editor.defaultFormatter": "biomejs.biome",
+    "editor.codeActionsOnSave": {
+      "source.organizeImports.biome": "explicit",
+      "source.fixAll.biome": "explicit"
+    }
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "biomejs.biome",
+    "editor.codeActionsOnSave": {
+      "source.organizeImports.biome": "explicit",
+      "source.fixAll.biome": "explicit"
+    }
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "biomejs.biome",
+    "editor.codeActionsOnSave": {
+      "source.organizeImports.biome": "explicit",
+      "source.fixAll.biome": "explicit"
+    }
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "biomejs.biome",
+    "editor.codeActionsOnSave": {
+      "source.organizeImports.biome": "explicit",
+      "source.fixAll.biome": "never"
+    }
+  },
+  "gradle.autoDetect": "off",
+  "biome.enabled": true,
+  "biome.configurationPath": "biome.json",
+  "[json]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  }
 }

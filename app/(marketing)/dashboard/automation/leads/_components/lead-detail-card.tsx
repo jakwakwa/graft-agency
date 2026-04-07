@@ -60,10 +60,14 @@ export function LeadDetailCard({ id, customerName, scrapedData, onApprove, onSav
             {scrapedData?.businessDescription ? (
               <div className="space-y-4">
                 <div className="flex gap-2">
-                  <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${scrapedData.hasChatbot ? "bg-yellow-100 text-yellow-800" : "bg-green-100 text-green-800"}`}>
+                  <span
+                    className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${scrapedData.hasChatbot ? "bg-yellow-100 text-yellow-800" : "bg-green-100 text-green-800"}`}
+                  >
                     {scrapedData.hasChatbot ? "Has Chatbot" : "No Chatbot"}
                   </span>
-                  <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${scrapedData.hasVoiceAgent ? "bg-yellow-100 text-yellow-800" : "bg-green-100 text-green-800"}`}>
+                  <span
+                    className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${scrapedData.hasVoiceAgent ? "bg-yellow-100 text-yellow-800" : "bg-green-100 text-green-800"}`}
+                  >
                     {scrapedData.hasVoiceAgent ? "Has Voice Agent" : "No Voice Agent"}
                   </span>
                 </div>
@@ -77,8 +81,8 @@ export function LeadDetailCard({ id, customerName, scrapedData, onApprove, onSav
                   <div>
                     <Typography.Small className="font-medium text-muted-foreground">Services</Typography.Small>
                     <ul className="mt-1 space-y-1">
-                      {scrapedData.coreServices.map((s, i) => (
-                        <li key={i} className="text-sm">
+                      {scrapedData.coreServices.map((s) => (
+                        <li key={s.name} className="text-sm">
                           <span className="font-medium">{s.name}</span>
                           <span className="text-muted-foreground"> — {s.description}</span>
                         </li>
@@ -91,8 +95,10 @@ export function LeadDetailCard({ id, customerName, scrapedData, onApprove, onSav
                   <div>
                     <Typography.Small className="font-medium text-muted-foreground">Pain Points</Typography.Small>
                     <ul className="mt-1 list-disc pl-4 space-y-1">
-                      {scrapedData.painPoints.map((p, i) => (
-                        <li key={i} className="text-sm">{p}</li>
+                      {scrapedData.painPoints.map((p) => (
+                        <li key={p} className="text-sm">
+                          {p}
+                        </li>
                       ))}
                     </ul>
                   </div>
@@ -101,7 +107,9 @@ export function LeadDetailCard({ id, customerName, scrapedData, onApprove, onSav
                 {scrapedData.targetOutreachAngle && (
                   <div className="rounded-md border border-blue-200 bg-blue-50 p-3">
                     <Typography.Small className="font-medium text-blue-800">Outreach Angle</Typography.Small>
-                    <Typography.P className="mt-1 text-sm text-blue-900">{scrapedData.targetOutreachAngle}</Typography.P>
+                    <Typography.P className="mt-1 text-sm text-blue-900">
+                      {scrapedData.targetOutreachAngle}
+                    </Typography.P>
                   </div>
                 )}
 
@@ -109,7 +117,12 @@ export function LeadDetailCard({ id, customerName, scrapedData, onApprove, onSav
                   <div>
                     <Typography.Small className="font-medium text-muted-foreground">Website</Typography.Small>
                     <Typography.P className="mt-1 text-sm">
-                      <a href={scrapedData.websiteUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                      <a
+                        href={scrapedData.websiteUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:underline"
+                      >
                         {scrapedData.websiteUrl}
                       </a>
                     </Typography.P>

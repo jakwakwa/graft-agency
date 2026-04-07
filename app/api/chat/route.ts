@@ -7,10 +7,10 @@ import {
   type UIMessage,
 } from "ai";
 import { z } from "zod";
-import { getPlatformClientId } from "@/lib/auth/resolve-client";
 import { selectModel } from "@/lib/ai/model-router";
 import { buildSystemPrompt } from "@/lib/ai/system-prompt";
 import { createTools } from "@/lib/ai/tools";
+import { getPlatformClientId } from "@/lib/auth/resolve-client";
 import { agentService } from "@/lib/services/agent.service";
 import { conversationService } from "@/lib/services/conversation.service";
 import type { Prisma } from "../../../generated/prisma/client";

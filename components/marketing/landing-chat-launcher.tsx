@@ -1,14 +1,9 @@
 "use client";
 
+import { MessageCircle } from "lucide-react";
 import { ChatWidget } from "@/app/widget/[clientId]/_components/chat-widget";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { MessageCircle } from "lucide-react";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 export function shouldShowLandingChat(platformClientId: string | null | undefined): boolean {
   return Boolean(platformClientId?.trim());
