@@ -1,5 +1,6 @@
 "use client";
 
+import { ArrowLeft, Clock, Cpu, List, Settings } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Typography } from "@/components/ui/typography";
@@ -47,46 +48,67 @@ function ScheduledJobCard({ config }: { config: ProspectingConfig }) {
   const targetParts = [...(criteria?.industries ?? []), ...(criteria?.locations ?? []), ...(criteria?.keywords ?? [])];
 
   return (
-    <div className="rounded-lg border border-border bg-card p-4">
-      <div className="flex items-start justify-between gap-4">
+    <div className="glass-card p-8 rounded-2xl border-l-4 border-primary relative overflow-hidden">
+      <div className="absolute top-0 right-0 p-4">
         <div className="flex items-center gap-2">
           <span
             className={`inline-flex h-2 w-2 rounded-full ${
-              config.cronEnabled ? "bg-green-500" : "bg-muted-foreground"
+              config.cronEnabled ? "bg-green-500 shadow-neon" : "bg-muted-foreground"
             }`}
           />
-          <Typography.Small className="font-medium">{config.cronEnabled ? "Active" : "Paused"}</Typography.Small>
+          <Typography.Small className="font-data uppercase tracking-widest text-[10px]">
+            {config.cronEnabled ? "Active" : "Paused"}
+          </Typography.Small>
         </div>
-        <Link href="/dashboard/automation" className="text-xs text-muted-foreground hover:text-foreground">
-          Edit config →
-        </Link>
       </div>
 
-      <div className="mt-3 grid gap-3 sm:grid-cols-3 text-sm">
-        <div>
-          <Typography.Small className="text-muted-foreground">Schedule</Typography.Small>
-          <p className="mt-0.5 font-medium">{scheduleLabel}</p>
+      <div className="grid gap-8 sm:grid-cols-3">
+        <div className="space-y-1">
+          <Typography.Small className="text-muted-foreground uppercase tracking-widest text-[10px] font-data">
+            Schedule
+          </Typography.Small>
+          <p className="font-bold text-foreground">{scheduleLabel}</p>
           {config.cronStartDate && (
-            <p className="text-xs text-muted-foreground mt-0.5">
-              From{" "}
-              {new Date(config.cronStartDate).toLocaleDateString("en-ZA", {
-                day: "numeric",
-                month: "short",
-                year: "numeric",
-              })}
+            <p className="text-[10px] text-muted-foreground font-data">
+              FROM{" "}
+              {new Date(config.cronStartDate)
+                .toLocaleDateString("en-ZA", {
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric",
+                })
+                .toUpperCase()}
             </p>
           )}
         </div>
 
-        <div>
-          <Typography.Small className="text-muted-foreground">Targeting</Typography.Small>
-          <p className="mt-0.5 font-medium">{targetParts.length > 0 ? targetParts.join(", ") : "Not configured"}</p>
+        <div className="space-y-1">
+          <Typography.Small className="text-muted-foreground uppercase tracking-widest text-[10px] font-data">
+            Targeting
+          </Typography.Small>
+          <p className="font-bold text-foreground">
+            {targetParts.length > 0 ? targetParts.join(", ") : "Not configured"}
+          </p>
         </div>
 
-        <div>
-          <Typography.Small className="text-muted-foreground">Value proposition</Typography.Small>
-          <p className="mt-0.5 font-medium line-clamp-2">{config.valueProposition ?? "Not set"}</p>
+        <div className="space-y-1">
+          <Typography.Small className="text-muted-foreground uppercase tracking-widest text-[10px] font-data">
+            Value Proposition
+          </Typography.Small>
+          <p className="font-bold text-foreground line-clamp-2 italic">
+            &quot;{config.valueProposition ?? "Not set"}&quot;
+          </p>
         </div>
+      </div>
+
+      <div className="mt-6 pt-6 border-t border-outline-ghost/10 flex justify-end">
+        <Link
+          href="/dashboard/automation"
+          className="text-xs font-data uppercase tracking-widest text-primary hover:text-primary-kinetic transition-colors flex items-center gap-1"
+        >
+          Edit Configuration
+          <Settings className="h-3 w-3" />
+        </Link>
       </div>
     </div>
   );
@@ -123,40 +145,68 @@ export default function QueuePage() {
 
   if (loading) {
     return (
-      <div className="container max-w-4xl py-8">
-        <Typography.P className="text-muted-foreground">Loading…</Typography.P>
+      <div className="container max-w-6xl py-8 space-y-12">
+        <div className="flex flex-col gap-4">
+          <div className="h-4 w-32 animate-pulse rounded bg-muted" />
+          <div className="h-12 w-64 animate-pulse rounded bg-muted" />
+          <div className="h-6 w-full animate-pulse rounded bg-muted" />
+        </div>
+        <div className="grid gap-6 sm:grid-cols-3">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-32 animate-pulse rounded-2xl bg-muted/50" />
+          ))}
+        </div>
+        <div className="h-96 animate-pulse rounded-2xl bg-muted/30" />
       </div>
     );
   }
 
   return (
-    <div className="container max-w-4xl py-8 space-y-8">
-      <div>
-        <Link href="/dashboard/automation" className="text-muted-foreground hover:text-foreground text-sm">
-          ← Automation
-        </Link>
-        <Typography.H1 className="mt-2">Prospect Queue</Typography.H1>
-        <Typography.Lead className="mt-1">
-          Scheduled prospecting job and all results generated by the pipeline.
-        </Typography.Lead>
+    <div className="container max-w-6xl py-8 space-y-12">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <Link
+            href="/dashboard/automation"
+            className="text-muted-foreground hover:text-primary text-xs uppercase tracking-widest font-data flex items-center gap-1 transition-colors"
+          >
+            <ArrowLeft className="h-3 w-3" />
+            Automation Hub
+          </Link>
+          <Typography.H1 className="mt-4 mb-0">Prospect Queue</Typography.H1>
+          <Typography.Lead className="mt-2">
+            Scheduled prospecting job and all results generated by the pipeline.
+          </Typography.Lead>
+        </div>
+        <div className="flex items-center gap-3 glass-card p-3 rounded-xl">
+          <div className="w-10 h-10 rounded-lg bg-primary-kinetic/20 flex items-center justify-center">
+            <Cpu className="h-5 w-5 text-primary-kinetic" />
+          </div>
+          <div>
+            <p className="text-xs font-data uppercase tracking-widest text-primary font-bold">Super Agent</p>
+            <p className="text-[10px] text-muted-foreground uppercase tracking-tighter">High-Performance Active</p>
+          </div>
+        </div>
       </div>
 
       {message && (
-        <div className="rounded-lg p-4 bg-destructive/10 text-destructive">
+        <div className="rounded-lg p-4 bg-destructive/10 text-destructive border border-destructive/20">
           <Typography.Small>{message.text}</Typography.Small>
         </div>
       )}
 
       {/* Scheduled job */}
-      <div>
-        <Typography.H3 className="mb-3">Scheduled Job</Typography.H3>
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <Clock className="h-4 w-4 text-primary" />
+          <Typography.H4 className="mb-0">Scheduled Job</Typography.H4>
+        </div>
         {config ? (
           <ScheduledJobCard config={config} />
         ) : (
-          <div className="rounded-lg border border-dashed border-border p-6 text-center">
+          <div className="rounded-2xl border border-dashed border-outline-ghost/30 p-12 text-center glass-card">
             <Typography.Small className="text-muted-foreground">
               No job configured.{" "}
-              <Link href="/dashboard/automation" className="underline hover:text-foreground">
+              <Link href="/dashboard/automation" className="text-primary hover:underline">
                 Set up your prospecting config
               </Link>{" "}
               to get started.
@@ -166,10 +216,13 @@ export default function QueuePage() {
       </div>
 
       {/* Results */}
-      <div>
-        <div className="mb-3 flex items-center justify-between">
-          <Typography.H3>Results</Typography.H3>
-          <Typography.Small className="text-muted-foreground">
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <List className="h-4 w-4 text-secondary" />
+            <Typography.H4 className="mb-0">Queue Results</Typography.H4>
+          </div>
+          <Typography.Small className="text-muted-foreground font-data uppercase tracking-widest text-[10px]">
             {leads.length} prospect{leads.length !== 1 ? "s" : ""} total
           </Typography.Small>
         </div>

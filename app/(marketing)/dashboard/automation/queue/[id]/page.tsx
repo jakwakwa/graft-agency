@@ -118,8 +118,12 @@ export default function QueueDetailPage() {
 
   if (loading) {
     return (
-      <div className="container max-w-5xl py-8">
-        <Typography.P className="text-muted-foreground">Loading…</Typography.P>
+      <div className="container max-w-6xl py-8 space-y-8">
+        <div className="h-4 w-32 animate-pulse rounded bg-muted" />
+        <div className="grid gap-8 lg:grid-cols-2">
+          <div className="h-[600px] animate-pulse rounded-2xl bg-muted/50" />
+          <div className="h-[600px] animate-pulse rounded-2xl bg-muted/30" />
+        </div>
       </div>
     );
   }

@@ -38,9 +38,12 @@ export function AutomationHubClient() {
         </div>
       )}
 
-      <div className="mt-8 rounded-lg border border-border bg-card p-6">
-        <div className="flex items-center justify-between mb-4">
-          <Typography.H3>Prospecting Config</Typography.H3>
+      <div className="glass-card rounded-2xl p-8 relative overflow-hidden">
+        <div className="absolute top-0 right-0 p-4">
+          <span className="text-[10px] font-data uppercase tracking-widest text-primary/40">Configuration Node 01</span>
+        </div>
+        <div className="flex items-center justify-between mb-8">
+          <Typography.H3 className="mt-0 mb-0">Agent Performance Tuning</Typography.H3>
           <Button variant="default" size="sm" onClick={handleFindProspects} disabled={finding}>
             {finding ? "Searching..." : "Find Prospects"}
           </Button>

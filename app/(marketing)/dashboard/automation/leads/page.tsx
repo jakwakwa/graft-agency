@@ -75,8 +75,13 @@ export default function LeadsPage() {
 
   if (loading) {
     return (
-      <div className="container max-w-4xl py-8">
-        <Typography.P className="text-muted-foreground">Loading…</Typography.P>
+      <div className="container max-w-6xl py-8 space-y-8">
+        <div className="h-12 w-64 animate-pulse rounded bg-muted" />
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="h-64 animate-pulse rounded-2xl bg-muted/50" />
+          ))}
+        </div>
       </div>
     );
   }
