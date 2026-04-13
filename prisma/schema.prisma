@@ -29,6 +29,7 @@ model Client {
   emailTemplates       EmailTemplate[]
   leads                Lead[]
   prospectQueues       ProspectQueue[]
+  productSpecs         ProductSpec[]
 
   @@index([subdomain])
   @@index([isPlatformClient])
@@ -90,6 +91,7 @@ model Lead {
   conversations  Conversation[]
   client         Client?        @relation(fields: [clientId], references: [id], onDelete: Cascade)
   prospectQueue  ProspectQueue?
+  productSpec    ProductSpec?
 
   @@index([clientId, status])
   @@index([status])
@@ -167,4 +169,46 @@ enum QueueStatus {
   COMPLETED
   FAILED
   CANCELED
+}
+
+model ProductSpec {
+  id              String          @id @default(uuid())
+  leadId          String          @unique @map("lead_id")
+  clientId        String          @map("client_id")
+  stage           EngagementStage @default(PENDING)
+  profiledNeeds   Json?           @map("profiled_needs")
+  prdContent      String?         @map("prd_content")
+  designConcepts  Json?           @map("design_concepts")
+  chosenDesign    Int?            @map("chosen_design")
+  githubRepo      String?         @map("github_repo")
+  githubIssueUrl  String?         @map("github_issue_url")
+  deploymentUrl   String?         @map("deployment_url")
+  paddleProductId String?         @map("paddle_product_id")
+  paddlePriceId   String?         @map("paddle_price_id")
+  offerSentAt     DateTime?       @map("offer_sent_at")
+  errorMessage    String?         @map("error_message")
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+  lead            Lead            @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  client          Client          @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([clientId, stage])
+  @@index([leadId])
+  @@map("product_specs")
+}
+
+enum EngagementStage {
+  PENDING
+  PROFILING
+  PROFILED
+  WRITING_PRD
+  PRD_WRITTEN
+  DESIGNING
+  DESIGN_COMPLETE
+  BUILDING
+  BUILDING_COMPLETE
+  DEPLOYING
+  DEPLOYED
+  OFFER_SENT
+  FAILED
 }
