@@ -1,0 +1,29 @@
+import { NextRequest, NextResponse } from "next/server";
+import { requirePlatformAccess } from "@/lib/auth/guards";
+import prisma from "@/lib/db/prisma";
+
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ leadId: string }> },
+): Promise<NextResponse> {
+  const authResult = await requirePlatformAccess();
+  if (!authResult.ok) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const { leadId } = await params;
+  const spec = await prisma.productSpec.findUnique({
+    where: { leadId },
+    select: {
+      stage: true,
+      githubRepo: true,
+      githubIssueUrl: true,
+      deploymentUrl: true,
+      offerSentAt: true,
+      errorMessage: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+
+  if (!spec) return NextResponse.json({ stage: "NOT_STARTED" });
+  return NextResponse.json(spec);
+}
