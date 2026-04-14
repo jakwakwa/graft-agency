@@ -4,6 +4,9 @@
 /node_modules
 /.pnp
 .pnp.*
+
+.clerk
+bin
 .yarn/*
 !.yarn/patches
 !.yarn/plugins
@@ -54,6 +57,13 @@ next-env.d.ts
 .DS_Store
 
 /generated/prisma 
+
+# Local Pinggy CLI binaries (see bin/README.md)
+/bin/pinggy
+/bin/pinggy-macos-arm64
+/bin/pinggy-macos-x64
+/bin/pinggy-linux-x64
+/bin/pinggy-linux-arm64
 
 # clerk configuration (can include secrets)
 /.clerk/

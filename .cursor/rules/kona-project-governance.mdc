@@ -14,7 +14,7 @@ alwaysApply: true
 
 ## Technical Constraints
 
-- **Stack:** Next.js 14+ (App Router), TypeScript (Strict), Prisma, Tailwind CSS, Shadcn/UI, Base UI.
+- **Stack:** Next.js 16+ (App Router), TypeScript (Strict), Prisma, Tailwind CSS, Shadcn/UI, Base UI.
 - **Server Actions:** Separate business logic from actions. Actions call Services (e.g. `lib/services/email.service.ts`).
 - **Data Safety:** Every database write must be wrapped in a try/catch with proper logging.
 

@@ -1,8 +1,5 @@
 {
   "plugins": {
-    "compound-engineering": {
-      "enabled": true
-    },
     "cursor-team-kit": {
       "enabled": true
     },
@@ -13,6 +10,9 @@
       "enabled": true
     },
     "context7-plugin": {
+      "enabled": true
+    },
+    "superpowers": {
       "enabled": true
     }
   }

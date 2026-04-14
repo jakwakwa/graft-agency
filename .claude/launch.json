@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "dev (Next.js + Pinggy tunnel)",
+      "runtimeExecutable": "bun",
+      "runtimeArgs": ["run", "dev"],
+      "port": 25336
+    },
+    {
+      "name": "dev:next-only (Next.js, no tunnel)",
+      "runtimeExecutable": "bun",
+      "runtimeArgs": ["run", "dev:next-only"],
+      "port": 3000
+    }
+  ]
+}
