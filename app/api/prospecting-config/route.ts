@@ -5,6 +5,19 @@ import prisma from "@/lib/db/prisma";
 
 const PROSPECTING_CRON_GRID_MINUTES = 15;
 
+/** Matches `ProspectingConfig` Prisma defaults when no row exists (serialised for the client). */
+const DEFAULT_PROSPECTING_CONFIG_JSON = {
+  cronEnabled: false,
+  cronFrequency: "daily",
+  cronDay: null,
+  cronTime: "22:45",
+  cronStartDate: null,
+  searchEnabled: false,
+  searchCriteria: null,
+  valueProposition: null,
+  outreachFromEmail: null,
+} as const;
+
 const configSchema = z.object({
   cronEnabled: z.boolean().optional(),
   cronFrequency: z.enum(["daily", "weekly"]).optional(),
@@ -34,9 +47,7 @@ export async function GET() {
     where: { clientId: result.clientId },
   });
 
-  return Response.json(
-    config ?? { cronEnabled: false, searchEnabled: false, searchCriteria: null, outreachFromEmail: null },
-  );
+  return Response.json(config ?? DEFAULT_PROSPECTING_CONFIG_JSON);
 }
 
 export async function POST(req: Request) {

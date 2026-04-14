@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 import { redirectToAccessRequired, requireAuthOrSignIn } from "@/lib/auth/guards";
-import { getPlatformClientId, isPlatformAdmin, resolveClientIdFromAuth } from "@/lib/auth/resolve-client";
+import { hasPlatformAccess, resolveClientIdFromAuth } from "@/lib/auth/resolve-client";
 
 interface AutomationLayoutProps {
   children: ReactNode;
@@ -10,17 +10,10 @@ interface AutomationLayoutProps {
 export default async function AutomationLayout({ children }: AutomationLayoutProps) {
   await requireAuthOrSignIn();
 
-  if (await isPlatformAdmin()) {
-    return <>{children}</>;
-  }
-
   const clientId = await resolveClientIdFromAuth();
-  if (!clientId) {
-    redirectToAccessRequired();
-  }
+  if (!clientId) redirectToAccessRequired();
 
-  const platformId = await getPlatformClientId();
-  if (!platformId || clientId !== platformId) redirect("/portal");
+  if (!(await hasPlatformAccess())) redirect("/portal");
 
   return <>{children}</>;
 }

@@ -1,5 +1,4 @@
 import { auth } from "@clerk/nextjs/server";
-import { getPlatformClientId } from "@/lib/auth/platform-client";
 import prisma from "@/lib/db/prisma";
 
 export { getPlatformClientId } from "@/lib/auth/platform-client";
@@ -12,45 +11,60 @@ export async function resolveClientIdFromAuth(): Promise<string | null> {
   const { orgId } = await auth();
   if (!orgId) return null;
 
-  const client = await prisma.client.findUnique({
-    where: { clerkOrganizationId: orgId },
+  const client = await prisma.client.findFirst({
+    where: { clerkOrganizationId: orgId, deletedAt: null },
     select: { id: true },
   });
   return client?.id ?? null;
 }
 
 /**
- * Returns true if the user has org:admin role (full platform access).
+ * Returns true if the current user's Client has platform-level access.
+ * Grants access to: isPlatformOwner (Jaco) OR isReseller (white-label owners).
  */
-export async function isPlatformAdmin(): Promise<boolean> {
-  const { has, orgRole } = await auth();
-  return (typeof has === "function" && has({ role: "org:admin" })) || orgRole === "org:admin";
+export async function hasPlatformAccess(): Promise<boolean> {
+  const clientId = await resolveClientIdFromAuth();
+  if (!clientId) return false;
+
+  const client = await prisma.client.findUnique({
+    where: { id: clientId },
+    select: { isPlatformOwner: true, isReseller: true },
+  });
+  return (client?.isPlatformOwner ?? false) || (client?.isReseller ?? false);
 }
 
 /**
- * Resolves effective clientId for platform-scoped operations.
- * Org admins get full access (platform client). Others must match platform client.
+ * Returns true if the current user's Client has chatbot access.
+ * Only the platform owner (Jaco) can configure chatbot agents.
+ */
+export async function hasChatbotAccess(): Promise<boolean> {
+  const clientId = await resolveClientIdFromAuth();
+  if (!clientId) return false;
+
+  const client = await prisma.client.findUnique({
+    where: { id: clientId },
+    select: { isPlatformOwner: true },
+  });
+  return client?.isPlatformOwner ?? false;
+}
+
+/**
+ * Returns the resolved clientId for the current user if they have platform access.
+ * Platform owners and resellers both get their own clientId (data is scoped per client).
  */
 export async function requirePlatformAccess(): Promise<
   { clientId: string } | { error: "Unauthorized"; status: 401 } | { error: "Forbidden"; status: 403 }
 > {
-  const { orgId, has, orgRole } = await auth();
+  const { orgId } = await auth();
   if (!orgId) return { error: "Unauthorized", status: 401 };
 
-  const isAdmin = (typeof has === "function" && has({ role: "org:admin" })) || orgRole === "org:admin";
-  if (isAdmin) {
-    const platformId = await getPlatformClientId();
-    if (platformId) return { clientId: platformId };
-    const adminClientId = await resolveClientIdFromAuth();
-    if (adminClientId) return { clientId: adminClientId };
-    return { error: "Forbidden", status: 403 };
-  }
+  const client = await prisma.client.findFirst({
+    where: { clerkOrganizationId: orgId, deletedAt: null },
+    select: { id: true, isPlatformOwner: true, isReseller: true },
+  });
 
-  const clientId = await resolveClientIdFromAuth();
-  if (!clientId) return { error: "Unauthorized", status: 401 };
+  if (!client) return { error: "Unauthorized", status: 401 };
+  if (!client.isPlatformOwner && !client.isReseller) return { error: "Forbidden", status: 403 };
 
-  const platformId = await getPlatformClientId();
-  if (!platformId || clientId !== platformId) return { error: "Forbidden", status: 403 };
-
-  return { clientId };
+  return { clientId: client.id };
 }

@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 import {
   Pagination,
   PaginationContent,
-  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
@@ -31,7 +30,7 @@ interface ProspectingConfig {
   cronEnabled: boolean;
   cronFrequency: string;
   cronDay: number | null;
-  cronTime: string;
+  cronTime?: string | null;
   cronStartDate: string | null;
   searchEnabled: boolean;
   searchCriteria: { industries?: string[]; locations?: string[]; keywords?: string[] } | null;
@@ -41,7 +40,10 @@ interface ProspectingConfig {
 
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-function utcToSast(utcTime: string): string {
+function utcToSast(utcTime: string | null | undefined): string {
+  if (!utcTime || !/^\d{2}:\d{2}$/.test(utcTime)) {
+    return "--:--";
+  }
   const [h = 0, m = 0] = utcTime.split(":").map(Number);
   const sast = (h + 2) % 24;
   return `${String(sast).padStart(2, "0")}:${String(m).padStart(2, "0")}`;

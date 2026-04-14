@@ -3,13 +3,29 @@
 import { Show, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import { ModeToggle } from "@/components/mode-toggle";
 import { Button } from "@/components/ui/button";
 import { Typography } from "@/components/ui/typography";
 
+type ClientFlags = { isPlatformOwner: boolean; isReseller: boolean };
+
 export function NavHeader() {
   const pathname = usePathname();
+  const [flags, setFlags] = useState<ClientFlags>({ isPlatformOwner: false, isReseller: false });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/me/client-flags")
+      .then((r) => r.json())
+      .then((data: ClientFlags) => setFlags(data))
+      .catch((err) => console.error("[NavHeader] failed to load client flags", err))
+      .finally(() => setLoading(false));
+  }, []);
+
   if (pathname?.startsWith("/widget/")) return null;
+
+  const hasPlatformAccess = flags.isPlatformOwner || flags.isReseller;
 
   return (
     <header className="flex h-16 items-center justify-between bg-muted/50 px-4 shadow-ambient backdrop-blur-sm md:px-6">
@@ -17,27 +33,44 @@ export function NavHeader() {
         <Link href="/" className="text-foreground transition-colors hover:text-secondary">
           <Typography.Large>GRAFT TODAY</Typography.Large>
         </Link>
-        <Link
-          href="/dashboard/automation"
-          className="text-sm font-medium text-secondary transition-colors hover:text-secondary/80"
-        >
-          Dashboard
-        </Link>
-        <Link
-          href="/dashboard/automation/queue"
-          className="text-sm font-medium text-secondary transition-colors hover:text-secondary/80"
-        >
-          Prospect Queue
-        </Link>
-        <Link
-          href="/dashboard/automation/leads"
-          className="text-sm font-medium text-secondary transition-colors hover:text-secondary/80"
-        >
-          Draft Leads
-        </Link>
-        <Link href="/portal" className="text-sm font-medium text-secondary transition-colors hover:text-secondary/80">
-          Portal
-        </Link>
+
+        {loading ? (
+          <>
+            <div className="h-4 w-20 animate-pulse rounded bg-muted" />
+            <div className="h-4 w-24 animate-pulse rounded bg-muted" />
+          </>
+        ) : (
+          <>
+            {hasPlatformAccess && (
+              <>
+                <Link
+                  href="/dashboard/automation"
+                  className="text-sm font-medium text-secondary transition-colors hover:text-secondary/80"
+                >
+                  Dashboard
+                </Link>
+                <Link
+                  href="/dashboard/automation/queue"
+                  className="text-sm font-medium text-secondary transition-colors hover:text-secondary/80"
+                >
+                  Prospect Queue
+                </Link>
+                <Link
+                  href="/dashboard/automation/leads"
+                  className="text-sm font-medium text-secondary transition-colors hover:text-secondary/80"
+                >
+                  Draft Leads
+                </Link>
+              </>
+            )}
+
+            {!hasPlatformAccess && (
+              <Link href="/portal" className="text-sm font-medium text-secondary transition-colors hover:text-secondary/80">
+                My Portal
+              </Link>
+            )}
+          </>
+        )}
       </nav>
       <div className="flex items-center gap-4">
         <ModeToggle />

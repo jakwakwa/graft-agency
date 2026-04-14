@@ -1,9 +1,5 @@
 import prisma from "@/lib/db/prisma";
 
-/**
- * If `PLATFORM_CLIENT_ID` is set, returns it only when a matching `Client` row exists.
- * Stale or wrong-database UUIDs are ignored so we fall back to org / `isPlatformClient` lookup.
- */
 async function resolvePlatformClientIdFromEnv(): Promise<string | null> {
   const raw = process.env.PLATFORM_CLIENT_ID?.trim();
   if (!raw) return null;
@@ -16,15 +12,15 @@ async function resolvePlatformClientIdFromEnv(): Promise<string | null> {
 
   if (process.env.NODE_ENV === "development") {
     console.warn(
-      "[resolve-client] PLATFORM_CLIENT_ID is set but no Client exists with that id; ignoring and using PLATFORM_CLERK_ORG_ID / isPlatformClient fallback.",
+      "[resolve-client] PLATFORM_CLIENT_ID is set but no Client exists with that id; ignoring and using PLATFORM_CLERK_ORG_ID / isPlatformOwner fallback.",
     );
   }
   return null;
 }
 
 /**
- * Returns the platform client ID.
- * Priority: validated PLATFORM_CLIENT_ID > client for PLATFORM_CLERK_ORG_ID > first isPlatformClient.
+ * Returns the platform owner's client ID.
+ * Priority: validated PLATFORM_CLIENT_ID > client for PLATFORM_CLERK_ORG_ID > first isPlatformOwner.
  */
 export async function getPlatformClientId(): Promise<string | null> {
   const fromEnv = await resolvePlatformClientIdFromEnv();
@@ -40,7 +36,8 @@ export async function getPlatformClientId(): Promise<string | null> {
   }
 
   const client = await prisma.client.findFirst({
-    where: { isPlatformClient: true },
+    where: { isPlatformOwner: true },
+    orderBy: { createdAt: "desc" },
     select: { id: true },
   });
   return client?.id ?? null;

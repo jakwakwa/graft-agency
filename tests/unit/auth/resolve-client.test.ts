@@ -1,86 +1,123 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import prisma from "@/lib/db/prisma";
 
 const mockAuth = vi.fn();
-const mockGetPlatformClientId = vi.fn();
-vi.mock("@clerk/nextjs/server", () => ({
-  auth: () => mockAuth(),
-}));
-vi.mock("@/lib/auth/platform-client", () => ({
-  getPlatformClientId: (...args: unknown[]) => mockGetPlatformClientId(...args),
-}));
+vi.mock("@clerk/nextjs/server", () => ({ auth: () => mockAuth() }));
 
 describe("requirePlatformAccess", () => {
-  let platformClientId: string;
+  afterEach(() => vi.clearAllMocks());
 
-  beforeEach(async () => {
-    vi.clearAllMocks();
+  it("returns clientId for isPlatformOwner client", async () => {
     const client = await prisma.client.create({
-      data: {
-        clerkOrganizationId: `test-org-resolve-${Date.now()}`,
-        businessName: "Platform Client",
-        isPlatformClient: true,
-      },
+      data: { clerkOrganizationId: `test-rpa-owner-${Date.now()}`, businessName: "Owner", isPlatformOwner: true },
     });
-    platformClientId = client.id;
-    mockGetPlatformClientId.mockResolvedValue(platformClientId);
-  });
-
-  afterEach(async () => {
-    await prisma.client.deleteMany({ where: { id: platformClientId } });
-  });
-
-  it("returns clientId when user has org:admin role (has)", async () => {
-    mockAuth.mockResolvedValue({ orgId: "any-org", has: () => true });
+    mockAuth.mockResolvedValue({ orgId: client.clerkOrganizationId });
     const { requirePlatformAccess } = await import("@/lib/auth/resolve-client");
     const result = await requirePlatformAccess();
-    expect(result).toEqual({ clientId: platformClientId });
+    expect(result).toEqual({ clientId: client.id });
+    await prisma.client.delete({ where: { id: client.id } });
   });
 
-  it("returns clientId when user has orgRole org:admin (fallback)", async () => {
-    mockAuth.mockResolvedValue({ orgId: "any-org", orgRole: "org:admin", has: () => false });
+  it("returns clientId for isReseller client", async () => {
+    const client = await prisma.client.create({
+      data: { clerkOrganizationId: `test-rpa-reseller-${Date.now()}`, businessName: "Reseller", isReseller: true },
+    });
+    mockAuth.mockResolvedValue({ orgId: client.clerkOrganizationId });
     const { requirePlatformAccess } = await import("@/lib/auth/resolve-client");
     const result = await requirePlatformAccess();
-    expect(result).toEqual({ clientId: platformClientId });
+    expect(result).toEqual({ clientId: client.id });
+    await prisma.client.delete({ where: { id: client.id } });
   });
 
-  it("returns clientId when admin and getPlatformClientId null but org has client", async () => {
-    mockGetPlatformClientId.mockResolvedValue(null);
-    const client = await prisma.client.findUniqueOrThrow({ where: { id: platformClientId } });
-    mockAuth.mockResolvedValue({ orgId: client.clerkOrganizationId, orgRole: "org:admin" });
+  it("returns 403 for chatbot-only client", async () => {
+    const client = await prisma.client.create({
+      data: { clerkOrganizationId: `test-rpa-chatbot-${Date.now()}`, businessName: "Chatbot Client" },
+    });
+    mockAuth.mockResolvedValue({ orgId: client.clerkOrganizationId });
     const { requirePlatformAccess } = await import("@/lib/auth/resolve-client");
     const result = await requirePlatformAccess();
-    expect(result).toEqual({ clientId: platformClientId });
+    expect(result).toEqual({ error: "Forbidden", status: 403 });
+    await prisma.client.delete({ where: { id: client.id } });
   });
 
   it("returns 401 when user has no org", async () => {
-    mockAuth.mockResolvedValue({ orgId: null, has: () => false });
+    mockAuth.mockResolvedValue({ orgId: null });
     const { requirePlatformAccess } = await import("@/lib/auth/resolve-client");
     const result = await requirePlatformAccess();
     expect(result).toEqual({ error: "Unauthorized", status: 401 });
   });
 
-  it("returns clientId when user's org matches platform client", async () => {
-    const client = await prisma.client.findUniqueOrThrow({
-      where: { id: platformClientId },
-    });
-    mockAuth.mockResolvedValue({ orgId: client.clerkOrganizationId, has: () => false });
-    const { requirePlatformAccess } = await import("@/lib/auth/resolve-client");
-    const result = await requirePlatformAccess();
-    expect(result).toEqual({ clientId: platformClientId });
-  });
-
-  it("returns 403 when user's org does not match platform client", async () => {
-    const otherClient = await prisma.client.create({
+  it("returns 401 for a soft-deleted org", async () => {
+    const client = await prisma.client.create({
       data: {
-        clerkOrganizationId: `other-org-${Date.now()}`,
-        businessName: "Other Client",
+        clerkOrganizationId: `test-rpa-deleted-${Date.now()}`,
+        businessName: "Deleted Org",
+        isPlatformOwner: true,
+        deletedAt: new Date(),
       },
     });
-    mockAuth.mockResolvedValue({ orgId: otherClient.clerkOrganizationId, has: () => false });
+    mockAuth.mockResolvedValue({ orgId: client.clerkOrganizationId });
     const { requirePlatformAccess } = await import("@/lib/auth/resolve-client");
     const result = await requirePlatformAccess();
-    expect(result).toEqual({ error: "Forbidden", status: 403 });
-    await prisma.client.delete({ where: { id: otherClient.id } });
+    expect(result).toEqual({ error: "Unauthorized", status: 401 });
+    await prisma.client.delete({ where: { id: client.id } });
+  });
+});
+
+describe("hasPlatformAccess", () => {
+  afterEach(() => vi.clearAllMocks());
+
+  it("returns true for isPlatformOwner", async () => {
+    const client = await prisma.client.create({
+      data: { clerkOrganizationId: `test-hpa-owner-${Date.now()}`, businessName: "Owner", isPlatformOwner: true },
+    });
+    mockAuth.mockResolvedValue({ orgId: client.clerkOrganizationId });
+    const { hasPlatformAccess } = await import("@/lib/auth/resolve-client");
+    expect(await hasPlatformAccess()).toBe(true);
+    await prisma.client.delete({ where: { id: client.id } });
+  });
+
+  it("returns true for isReseller", async () => {
+    const client = await prisma.client.create({
+      data: { clerkOrganizationId: `test-hpa-reseller-${Date.now()}`, businessName: "Reseller", isReseller: true },
+    });
+    mockAuth.mockResolvedValue({ orgId: client.clerkOrganizationId });
+    const { hasPlatformAccess } = await import("@/lib/auth/resolve-client");
+    expect(await hasPlatformAccess()).toBe(true);
+    await prisma.client.delete({ where: { id: client.id } });
+  });
+
+  it("returns false for chatbot-only client", async () => {
+    const client = await prisma.client.create({
+      data: { clerkOrganizationId: `test-hpa-chatbot-${Date.now()}`, businessName: "Chatbot" },
+    });
+    mockAuth.mockResolvedValue({ orgId: client.clerkOrganizationId });
+    const { hasPlatformAccess } = await import("@/lib/auth/resolve-client");
+    expect(await hasPlatformAccess()).toBe(false);
+    await prisma.client.delete({ where: { id: client.id } });
+  });
+});
+
+describe("hasChatbotAccess", () => {
+  afterEach(() => vi.clearAllMocks());
+
+  it("returns true only for isPlatformOwner", async () => {
+    const client = await prisma.client.create({
+      data: { clerkOrganizationId: `test-hca-owner-${Date.now()}`, businessName: "Owner", isPlatformOwner: true },
+    });
+    mockAuth.mockResolvedValue({ orgId: client.clerkOrganizationId });
+    const { hasChatbotAccess } = await import("@/lib/auth/resolve-client");
+    expect(await hasChatbotAccess()).toBe(true);
+    await prisma.client.delete({ where: { id: client.id } });
+  });
+
+  it("returns false for isReseller", async () => {
+    const client = await prisma.client.create({
+      data: { clerkOrganizationId: `test-hca-reseller-${Date.now()}`, businessName: "Reseller", isReseller: true },
+    });
+    mockAuth.mockResolvedValue({ orgId: client.clerkOrganizationId });
+    const { hasChatbotAccess } = await import("@/lib/auth/resolve-client");
+    expect(await hasChatbotAccess()).toBe(false);
+    await prisma.client.delete({ where: { id: client.id } });
   });
 });

@@ -1,3 +1,4 @@
+
 generator client {
   provider = "prisma-client"
   output   = "../generated/prisma"
@@ -8,21 +9,23 @@ datasource db {
 }
 
 model Client {
-  id                   String          @id @default(uuid())
-  clerkOrganizationId  String          @unique @map("clerk_organization_id")
-  businessName         String          @map("business_name")
+  id                   String             @id @default(uuid())
+  clerkOrganizationId  String             @unique @map("clerk_organization_id")
+  businessName         String             @map("business_name")
   industry             String?
-  websiteUrl           String?         @map("website_url")
-  subdomain            String?         @unique
-  calComUserId         Int?            @map("cal_com_user_id")
-  subscriptionActive   Boolean         @default(false) @map("subscription_active")
-  subscriptionStatus   String          @default("inactive") @map("subscription_status")
-  paddleCustomerId     String?         @unique @map("paddle_customer_id")
-  paddleSubscriptionId String?         @unique @map("paddle_subscription_id")
-  isPlatformClient     Boolean         @default(false) @map("is_platform_client")
-  allowedDomains       String[]        @default([]) @map("allowed_domains")
-  createdAt            DateTime        @default(now()) @map("created_at")
-  updatedAt            DateTime        @updatedAt @map("updated_at")
+  websiteUrl           String?            @map("website_url")
+  subdomain            String?            @unique
+  calComUserId         Int?               @map("cal_com_user_id")
+  subscriptionActive   Boolean            @default(false) @map("subscription_active")
+  subscriptionStatus   String             @default("inactive") @map("subscription_status")
+  paddleCustomerId     String?            @unique @map("paddle_customer_id")
+  paddleSubscriptionId String?            @unique @map("paddle_subscription_id")
+  isPlatformOwner      Boolean            @default(false) @map("is_platform_owner")
+  isReseller           Boolean            @default(false) @map("is_reseller")
+  allowedDomains       String[]           @default([]) @map("allowed_domains")
+  createdAt            DateTime           @default(now()) @map("created_at")
+  updatedAt            DateTime           @updatedAt @map("updated_at")
+  deletedAt            DateTime?          @map("deleted_at")
   agentConfig          AgentConfig?
   prospectingConfig    ProspectingConfig?
   conversations        Conversation[]
@@ -32,7 +35,8 @@ model Client {
   productSpecs         ProductSpec[]
 
   @@index([subdomain])
-  @@index([isPlatformClient])
+  @@index([isPlatformOwner])
+  @@index([deletedAt])
   @@map("clients")
 }
 

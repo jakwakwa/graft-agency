@@ -19,12 +19,12 @@ describe("getPlatformClientId", () => {
     }
   });
 
-  it("ignores PLATFORM_CLIENT_ID when no Client row exists and falls back to isPlatformClient", async () => {
+  it("ignores PLATFORM_CLIENT_ID when no Client row exists and falls back to isPlatformOwner", async () => {
     const platform = await prisma.client.create({
       data: {
         clerkOrganizationId: `test-gpc-${Date.now()}`,
         businessName: "Platform",
-        isPlatformClient: true,
+        isPlatformOwner: true,
       },
     });
     createdIds.push(platform.id);
@@ -38,8 +38,10 @@ describe("getPlatformClientId", () => {
     if (id === null) {
       throw new Error("expected getPlatformClientId to return a client id");
     }
+    // Newest isPlatformOwner wins when multiple exist (shared dev DB).
+    expect(id).toBe(platform.id);
     const row = await prisma.client.findUnique({ where: { id } });
-    expect(row?.isPlatformClient).toBe(true);
+    expect(row?.isPlatformOwner).toBe(true);
   });
 
   it("uses PLATFORM_CLIENT_ID when it matches a Client row", async () => {
