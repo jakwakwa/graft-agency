@@ -11,7 +11,7 @@ export default async function AutomationHubPage() {
   if (!isAuthenticated) return redirectToSignIn();
 
   return (
-    <div className="max-w-6xl py-8 space-y-12">
+    <div className="w-full max-w-6xl space-y-12">
       {/* Progress Indicator (Stylistic Example) */}
       <div className="mb-12">
         <div className="flex items-center justify-between max-w-4xl mx-auto">
@@ -81,12 +81,12 @@ export default async function AutomationHubPage() {
         </Card>
       </div>
 
-      <div className="grid grid-cols-12 gap-8">
-        <div className="col-span-12 xl:col-span-8 space-y-8">
+      <div className="grid grid-cols-12 gap-8 xl:items-stretch">
+        <div className="col-span-12 min-w-0 space-y-8 xl:col-span-8">
           <AutomationHubClient />
         </div>
 
-        <div className="col-span-12 xl:col-span-4 space-y-6">
+        <div className="col-span-12 flex min-h-0 flex-col gap-6 xl:col-span-4">
           <div className="grid gap-4">
             <Link href="/dashboard/automation/queue">
               <Card className="hover:bg-muted/30 transition-colors cursor-pointer group">
@@ -126,15 +126,15 @@ export default async function AutomationHubPage() {
             </Link>
           </div>
 
-          <Card className="h-full flex flex-col overflow-hidden">
-            <CardHeader className="border-b border-outline-ghost/10 flex flex-row justify-between items-center py-4">
-              <Typography.H4 className="text-xs text-primary mb-0">High-Speed Log</Typography.H4>
+          <Card className="flex min-h-0 flex-1 flex-col overflow-hidden">
+            <CardHeader className="flex shrink-0 flex-row items-center justify-between border-b border-outline-ghost/10 py-4">
+              <Typography.H4 className="mb-0 text-xs text-primary">High-Speed Log</Typography.H4>
               <span className="flex items-center gap-2 text-[10px] font-data font-bold text-muted-foreground">
-                <span className="w-2 h-2 bg-green-500 rounded-full" />
+                <span className="h-2 w-2 rounded-full bg-green-500" />
                 Live Engine
               </span>
             </CardHeader>
-            <CardContent className="flex-1 p-6 space-y-4 overflow-y-auto max-h-[400px] font-data">
+            <CardContent className="min-h-0 flex-1 space-y-4 overflow-y-auto p-6 font-data">
               <div className="flex gap-3 text-[11px] border-l-2 border-primary/40 pl-3 py-1">
                 <span className="text-muted-foreground whitespace-nowrap">14:02:11</span>
                 <span className="text-primary font-bold">SYSTEM:</span>
@@ -151,7 +151,7 @@ export default async function AutomationHubPage() {
                 <span className="text-foreground font-bold">Meeting booked for Friday (10:00 AM)</span>
               </div>
             </CardContent>
-            <div className="p-6 bg-muted/20 border-t border-outline-ghost/10">
+            <div className="shrink-0 border-t border-outline-ghost/10 bg-muted/20 p-6">
               <div className="flex items-center gap-4">
                 <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
                   <div className="w-[65%] h-full bg-primary shadow-neon" />

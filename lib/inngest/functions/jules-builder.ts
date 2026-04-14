@@ -36,6 +36,7 @@ export const julesBuilderFunction = inngest.createFunction(
     );
 
     const chosenDesign = designConcepts[chosenDesignIndex] ?? designConcepts[0];
+    if (!chosenDesign) throw new Error("No design concept found");
     const designDescription = `**${chosenDesign.name}**
 
 ${chosenDesign.description}

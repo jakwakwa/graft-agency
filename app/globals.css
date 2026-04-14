@@ -89,8 +89,8 @@ a {
   --card-foreground: #f2f2f4;
   --popover: #3a3841;
   --popover-foreground: #f2f2f4;
-  --primary: #ff24e4;
-  --primary-kinetic: #fface8;
+  --primary: #DD3B71ED;
+  --primary-kinetic: #AC44C3;
   --primary-foreground: #0c0c0f;
   --secondary: #c9bfff;
   --secondary-foreground: #13121b;
@@ -228,8 +228,22 @@ a {
     animation: progress 2s ease-in-out infinite;
   }
 
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      .landing-scroll-reveal {
+        animation: landing-section-in linear both;
+        animation-timeline: view();
+        animation-range: entry 0% cover 32%;
+      }
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .status-pulse {
+      animation: none;
+    }
+
+    .landing-scroll-reveal {
       animation: none;
     }
   }
@@ -257,6 +271,18 @@ a {
   }
 }
 
+/* Marketing landing: subtle section reveal on scroll (transform + opacity only). */
+@keyframes landing-section-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 1.25rem, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
 @layer base {
   *,
   ::before,
@@ -270,5 +296,11 @@ a {
 
   html {
     @apply font-sans;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
   }
 }

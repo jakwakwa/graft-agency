@@ -15,6 +15,7 @@ function getOctokit(): Octokit {
 function getTemplateRepo(): { owner: string; repo: string } {
   const templateRepo = process.env.GITHUB_TEMPLATE_REPO ?? "graft-today-agency/prototype-template";
   const [owner, repo] = templateRepo.split("/");
+  if (!owner || !repo) throw new Error("Invalid GITHUB_TEMPLATE_REPO format — expected 'owner/repo'");
   return { owner, repo };
 }
 
@@ -49,7 +50,10 @@ export async function createJulesIssue(params: {
   designDescription: string;
 }): Promise<string> {
   const octokit = getOctokit();
-  const [owner, repo] = params.repoFullName.split("/");
+  const parts = params.repoFullName.split("/");
+  const owner = parts[0];
+  const repo = parts[1];
+  if (!owner || !repo) throw new Error("Invalid repoFullName format — expected 'owner/repo'");
 
   const issueBody = `## Build Request — GRAFT.TODAY Autonomous Pipeline
 

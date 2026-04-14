@@ -1049,7 +1049,11 @@ function Ab6AXuCMg22QMzPm5VhFxSec1QOl1Mf0QEv6ZjaT1KwFfWpXpHvcpFhmSkhzPVhGolTyR8I
   return (
     <div className="absolute inset-[-19px_16.01px_19px_-16.01px] mix-blend-lighten" data-name="AB6AXuCMg22qMZPm5vhFXSec1qOL1mf0QEv6ZjaT1kwFFWpXP_HvcpFHMSkhzPVhGolTy-R8i2fjN6I3Vhbr_iX0qwnUqvgG_riAGjb13C3a2OwgiUz1BD-r93tYuTOxhkPq88BeYS1puJdndGWXi3dnanTryP0A3x9TFZx5ChOdmst3k6OeMEPlMXMxJdv9B-q3_04ckpG9PtMEtbg5SwxHIO7kO8cMXzC1km2g0TrDZiPWhXD_5AERAc3CdONNYgX7pMALXRDiyq-p8pbU">
       <div className="absolute inset-0 mix-blend-darken overflow-hidden pointer-events-none">
-        <img alt="" className="absolute h-full left-[-1.2%] max-w-none top-0 w-[102.4%]" src={imgAb6AXuCMg22QMzPm5VhFxSec1QOl1Mf0QEv6ZjaT1KwFfWpXpHvcpFhmSkhzPVhGolTyR8I2FjN6I3VhbrIX0QwnUqvgGRiAGjb13C3A2OwgiUz1BdR93TYuTOxhkPq88BeYs1PuJdndGwXi3DnanTryP0A3X9TfZx5ChOdmst3K6OeMePlMxMxJdv9BQ304CkpG9PtMEtbg5SwxHio7KO8CMXzC1Km2G0TrDZiPWhXd5AerAc3CdOnnYgX7PMalxrDiyqP8PbU} />
+        <img
+          alt=""
+          className="absolute h-full left-[-1.2%] max-w-none top-0 w-[102.4%]"
+          src={imgAb6AXuCMg22QMzPm5VhFxSec1QOl1Mf0QEv6ZjaT1KwFfWpXpHvcpFhmSkhzPVhGolTyR8I2FjN6I3VhbrIX0QwnUqvgGRiAGjb13C3A2OwgiUz1BdR93TYuTOxhkPq88BeYs1PuJdndGwXi3DnanTryP0A3X9TfZx5ChOdmst3K6OeMePlMxMxJdv9BQ304CkpG9PtMEtbg5SwxHio7KO8CMXzC1Km2G0TrDZiPWhXd5AerAc3CdOnnYgX7PMalxrDiyqP8PbU.src}
+        />
       </div>
     </div>
   );

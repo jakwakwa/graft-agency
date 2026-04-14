@@ -19,20 +19,20 @@ export async function createProductOffer(params: {
   const product = await paddle.products.create({
     name: params.productName,
     description: params.description,
-    tax_category: "standard",
+    taxCategory: "standard",
   });
 
   const price = await paddle.prices.create({
-    product_id: product.data.id,
+    productId: product.id,
     description: `${params.productName} — one-time purchase`,
-    unit_price: { amount: String(params.priceGBP * 100), currency_code: "GBP" },
-    billing_cycle: null,
+    unitPrice: { amount: String(params.priceGBP * 100), currencyCode: "GBP" },
+    billingCycle: null,
   });
 
   const sellerId = process.env.PADDLE_SELLER_ID ?? "test-seller";
-  const checkoutUrl = `https://checkout.paddle.com/checkout/${price.data.id}?seller=${sellerId}`;
+  const checkoutUrl = `https://checkout.paddle.com/checkout/${price.id}?seller=${sellerId}`;
 
-  return { productId: product.data.id, priceId: price.data.id, checkoutUrl };
+  return { productId: product.id, priceId: price.id, checkoutUrl };
 }
 
 export async function sendOfferEmail(params: {

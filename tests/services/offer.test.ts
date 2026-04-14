@@ -4,10 +4,10 @@ import { createProductOffer, sendOfferEmail } from "@/lib/services/offer.service
 vi.mock("@paddle/paddle-node-sdk", () => ({
   Paddle: vi.fn().mockImplementation(() => ({
     products: {
-      create: vi.fn().mockResolvedValue({ data: { id: "pro_test_abc123" } }),
+      create: vi.fn().mockResolvedValue({ id: "pro_test_abc123" }),
     },
     prices: {
-      create: vi.fn().mockResolvedValue({ data: { id: "pri_test_xyz456" } }),
+      create: vi.fn().mockResolvedValue({ id: "pri_test_xyz456" }),
     },
   })),
   Environment: { sandbox: "sandbox", production: "production" },

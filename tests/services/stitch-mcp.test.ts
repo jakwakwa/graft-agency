@@ -55,7 +55,7 @@ describe("generateDesignConcepts", () => {
       components: ["BookingForm", "Dashboard"],
     });
     expect(concepts).toHaveLength(3);
-    expect(concepts[0].name).toBeTruthy();
-    expect(concepts[0].colorScheme.primary).toMatch(/^#/);
+    expect(concepts[0]?.name).toBeTruthy();
+    expect(concepts[0]?.colorScheme.primary).toMatch(/^#/);
   });
 });

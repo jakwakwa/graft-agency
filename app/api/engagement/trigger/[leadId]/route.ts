@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requirePlatformAccess } from "@/lib/auth/guards";
+import { requirePlatformAccess } from "@/lib/auth/resolve-client";
 import prisma from "@/lib/db/prisma";
 import { inngest } from "@/lib/inngest/client";
 
@@ -8,7 +8,7 @@ export async function POST(
   { params }: { params: Promise<{ leadId: string }> },
 ): Promise<NextResponse> {
   const authResult = await requirePlatformAccess();
-  if (!authResult.ok) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if ("error" in authResult) return NextResponse.json({ error: authResult.error }, { status: authResult.status });
 
   const { leadId } = await params;
   const lead = await prisma.lead.findUnique({ where: { id: leadId } });
