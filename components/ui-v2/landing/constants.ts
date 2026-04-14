@@ -24,6 +24,6 @@ export const LANDING_HEADER_SECTIONS = [
 ] as const;
 
 export const landingShellClassName =
-  "min-h-screen bg-[#13121b] text-[#e5e0ed] font-['Inter',sans-serif] overflow-x-hidden selection:bg-[#9888ff]/30 selection:text-white relative";
+  "min-h-screen bg-[#070708] text-[#e5e0ed] h-full font-['Inter',sans-serif] overflow-x-hidden selection:bg-[#9888ff]/30 selection:text-white relative";
 
 export const landingContainerClassName = "mx-auto max-w-7xl px-6";

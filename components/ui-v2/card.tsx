@@ -2,22 +2,19 @@ import { cva, type VariantProps } from "class-variance-authority";
 import type * as React from "react";
 import { cn } from "./utils";
 
-const cardVariants = cva(
-  "bg-transparent  glass-super-agent text-card-foreground flex flex-col gap-6 rounded-xl border",
-  {
-    variants: {
-      variant: {
-        default: "text-card-foreground flex flex-col gap-6 rounded-xl border",
-        bento: " glass-super-agent",
-        inner: " glass-super-agent",
-        dashboard: "text-card-foreground flex flex-col gap-6 rounded-xl border",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
+const cardVariants = cva("text-card-foreground flex flex-col gap-6 rounded-xl border", {
+  variants: {
+    variant: {
+      default: "text-card-foreground flex flex-col gap-6 rounded-xl border",
+      bento: " glass-super-agent",
+      inner: " glass-super-agent",
+      dashboard: "text-card-foreground flex flex-col gap-6 rounded-xl border",
     },
   },
-);
+  defaultVariants: {
+    variant: "default",
+  },
+});
 
 function Card({
   className,

@@ -11,7 +11,7 @@ export default function LandingPageV2() {
     <div className={landingShellClassName}>
       <LandingBackground />
       <LandingSiteHeader />
-      <main className="relative z-10 pt-32 lg:pt-40">
+      <main className="relative z-10 pt-0 lg:mt-4 lg:pt-0">
         <LandingHeroSection />
         <LandingFeaturesSection />
         <LandingCtaSection />

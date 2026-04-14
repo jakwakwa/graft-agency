@@ -9,7 +9,10 @@ import { LandingSectionLink } from "./landing-section-link";
 
 export function LandingHeroSection() {
   return (
-    <section id="lead-capture" className="relative isolate scroll-mt-28 overflow-hidden pb-24 lg:scroll-mt-32 lg:pb-32">
+    <section
+      id="lead-capture"
+      className="relative pt-8 isolate scroll-mt-28 overflow-hidden pb-24 lg:scroll-mt-32 lg:pb-32"
+    >
       <div className="pointer-events-none absolute inset-0 -z-10" aria-hidden>
         <div className="absolute top-[10%] left-1/2 h-[min(70vh,560px)] w-[min(92vw,780px)] -translate-x-1/2 rounded-full bg-linear-to-tr from-[#C825E9]/12 to-[#1149f0]/22 blur-[80px]" />
       </div>
@@ -29,7 +32,7 @@ export function LandingHeroSection() {
             <TextGradient gradient="primary">Never</TextGradient>
             <br />
             <TextGradient gradient="secondary">Sleeps</TextGradient>
-            <span className="text-[#fface8]">.</span>
+            <span className="text-[#d0dada]">.</span>
           </H1>
 
           <BodyText variant="large">

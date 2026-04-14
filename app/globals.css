@@ -37,11 +37,14 @@
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.9 0.02 17.57);
   --input: oklch(0.922 0 0);
+  /* Field fill (opaque). Avoid Tailwind /opacity on translucent --input or the surface vanishes. */
+  --input-background: #f3f3f5;
+  --input-background-hover: #e9e9ed;
   --ring: oklch(0.708 0 0);
   --outline-ghost: color-mix(in srgb, #574050 15%, transparent);
   --surface-container-high: oklch(0.94 0.01 280);
-  --surface-highest: oklch(0.28 0.01 286.04 / 0.1);
-  --surface-variant: oklch(0.34 0.02 280.9);
+  --surface-highest: oklch(0.73 0.05 284.96 / 0.75);
+  --surface-variant: oklch(0.64 0.14 277.5);
   --chart-1: oklch(0.38 0.18 283.75);
   --chart-2: oklch(0.606 0.25 292.717);
   --chart-3: oklch(0.541 0.281 293.009);
@@ -83,47 +86,51 @@ a {
 }
 
 .dark {
-  --background: rgb(40 39 46);
+  --background: rgb(27 22 21);
   --foreground: #f2f2f4;
-  --card: rgba(27 27 29 / 0.09);
+  --card: rgba(174 118 188 / 0.04);
   --card-foreground: #f2f2f4;
-  --popover: #3a3841;
+  --popover: #0B0A0C1B;
   --popover-foreground: #f2f2f4;
-  --primary: #DD3B71ED;
-  --primary-kinetic: #AC44C3;
-  --primary-foreground: #0c0c0f;
+  --primary: hsla(7.16 98.53% 73.33% / 0.98);
+  --primary-kinetic: #3C5EE9;
+  --primary-foreground: #D3D3EC;
   --secondary: #c9bfff;
   --secondary-foreground: #13121b;
-  --muted: #1c1b23;
-  --muted-foreground: #9c9ba3;
-  --accent: #ff571a;
-  --accent-foreground: #13121b;
+  --muted: #D6809E20;
+  --muted-foreground: #AB8F6E;
+  --accent: #FD929A;
+  --accent-foreground: #322A6E;
   --destructive: oklch(0.65 0.2 25);
   --border: transparent;
-  --input: color-mix(in srgb, #f2f2f4 14%, transparent);
-  --ring: #fface8;
-  --outline-ghost: color-mix(in srgb, #574050 15%, transparent);
-  --surface-container-high: #28262f18;
-  --surface-highest: #544c5537;
-  --surface-variant: #2927331b;
-  --chart-1: #fface8;
-  --chart-2: #c9bfff;
-  --chart-3: #ff24e4;
-  --chart-4: #ff571a;
-  --chart-5: #9c9ba3;
-  --sidebar: #1c1b23;
+  /* Border tint: mix with a solid stop so edges stay visible (transparent + Tailwind /opacity utilities wipe it out). */
+  --input: color-mix(in srgb, #6a6ae4 42%, #2a2933);
+  /* Field fill: mix accent into muted base — visible tint without a second opacity pass. */
+  --input-background: color-mix(in srgb, #EA9DBB78 16%, #273B7C0B);
+  --input-background-hover: color-mix(in srgb, #DB2178 24%, #30266C);
+  --ring: #7EFDD1;
+  --outline-ghost: color-mix(in srgb, #BB7DA8 15%, transparent);
+  --surface-container-high: #E2843D18;
+  --surface-highest: #B5D0F837;
+  --surface-variant: #9711911B;
+  --chart-1: #63DB93;
+  --chart-2: #2195B5;
+  --chart-3: #B94BD2;
+  --chart-4: #C9785A;
+  --chart-5: #5DE9AF;
+  --sidebar: #2C2E38;
   --sidebar-foreground: #f2f2f4;
   --sidebar-primary: #ff24e4;
-  --sidebar-primary-foreground: #0c0c0f;
+  --sidebar-primary-foreground: #632775;
   --sidebar-accent: #222228;
   --sidebar-accent-foreground: #f2f2f4;
   --sidebar-border: color-mix(in srgb, #f2f2f4 8%, transparent);
   --sidebar-ring: #fface8;
   --shadow-ambient: 0 24px 48px -12px rgb(255 172 232 / 0.08);
-  --shadow-neon: 0 0 10px rgba(255, 172, 232, 0.5);
-  --shadow-neon-primary: 0 0 15px rgba(255, 172, 232, 0.3);
-  --glass-background: rgba(24 24 28 / 0.6);
-  --glass-border: rgba(107 48 89 / 0.15);
+  --shadow-neon: 0 0 10px rgba(252 80 203 / 0.5);
+  --shadow-neon-primary: 0 0 15px rgba(248 146 105 / 0.57);
+  --glass-background: rgba(233 184 209 / 0.04);
+  --glass-border: rgba(244 123 10 / 0.098);
 }
 
 @theme inline {
@@ -147,6 +154,8 @@ a {
   --color-chart-1: var(--chart-1);
   --color-ring: var(--ring);
   --color-input: var(--input);
+  --color-input-background: var(--input-background);
+  --color-input-background-hover: var(--input-background-hover);
   --color-border: var(--border);
   --color-destructive: var(--destructive);
   --color-accent-foreground: var(--accent-foreground);
@@ -181,9 +190,9 @@ a {
 
 @layer utilities {
   .glass-super-agent {
-    background: color-mix(in srgb, var(--surface-variant) 60%, transparent);
-    -webkit-backdrop-filter: blur(112px) !important;
-    backdrop-filter: blur(122px) !important;
+    background: color-mix(in oklch, oklch(0.6 0.24 28.37 / 0.68) 60%, oklch(0 0 0));
+    -webkit-backdrop-filter: blur(2px) !important;
+    backdrop-filter: blur(2px) !important;
     padding: 40px !important;
   }
 
@@ -206,13 +215,14 @@ a {
   }
 
   .neon-glow {
-    text-shadow: 0 0 10px rgba(255, 172, 232, 0.5);
+    text-shadow: 0 0 10px #E88D63E8;
   }
 
   .glass-card {
     background: var(--glass-background);
-    backdrop-filter: blur(12px);
+    backdrop-filter: blur(11.2px);
     border: 1px solid var(--glass-border);
+    box-shadow: inset -1px -2px 1px 0px var(--glass-border), inset 0px 0px 1px 0px oklch(0.66 0.23 359.79 / 0.29);
   }
 
   .grid-overlay {

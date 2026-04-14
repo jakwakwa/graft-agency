@@ -10,7 +10,7 @@ export default async function Home() {
   const platformClientId = await getPlatformClientId();
   let agentName = "GRAFT";
   let greetingMessage = "Hi! I'm Graft — how can I help you today?";
-  let primaryColour = "#7c3aed";
+  let primaryColour = "#ED993A";
 
   if (platformClientId) {
     try {

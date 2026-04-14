@@ -9,7 +9,7 @@ export function LandingBentoGrid() {
   return (
     <div className="grid gap-6 md:grid-cols-2">
       <Card variant="bento" className="group relative">
-        <div className="absolute top-0 left-0 h-1 w-full bg-linear-to-r from-transparent via-[#ffb0ac] to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+        <div className="absolute top-0 left-0 h-1 w-full bg-linear-to-r from-transparent via-[#fca6a2] to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
         <IconWrapper color="rose" className="mb-6">
           <CustomIcon path={svgPaths.p37c59700} viewBox="0 0 26 35" className="h-8 w-6 text-[#ffb0ac]" fill="#FFB0AC" />
         </IconWrapper>
