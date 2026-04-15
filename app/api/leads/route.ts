@@ -21,7 +21,17 @@ export async function GET(req: Request) {
       ...(status ? { status } : {}),
     },
     orderBy: { createdAt: "desc" },
+    include: {
+      productSpec: {
+        select: { stage: true },
+      },
+    },
   });
 
-  return Response.json(leads);
+  return Response.json(
+    leads.map(({ productSpec, ...lead }) => ({
+      ...lead,
+      engagementStage: productSpec?.stage ?? "NOT_STARTED",
+    })),
+  );
 }

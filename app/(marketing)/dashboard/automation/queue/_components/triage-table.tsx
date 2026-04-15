@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { PushToAttioButton } from "@/components/push-to-attio-button";
 import { Typography } from "@/components/ui/typography";
+import { formatStageLabel, getStageCategory } from "@/lib/utils/engagement-stages";
 
 interface TriageLead {
   id: string;
@@ -10,6 +11,7 @@ interface TriageLead {
   status: string;
   createdAt: string;
   attioRecordId: string | null;
+  engagementStage?: string;
   scrapedData: {
     websiteUrl?: string;
     draftSubject?: string;
@@ -33,6 +35,45 @@ const STATUS_LABELS: Record<string, string> = {
   CLOSED: "Closed",
   SCRAPED: "Scraped",
 };
+
+function AutomationStatusBadge({ stage }: { stage: string }) {
+  const category = getStageCategory(stage);
+
+  if (category === "not_started") {
+    return (
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-muted/50 text-muted-foreground border border-outline-ghost/20 text-[10px] font-data font-bold uppercase tracking-widest">
+        <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/50" />
+        Not Started
+      </span>
+    );
+  }
+
+  if (category === "in_progress") {
+    return (
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 text-[10px] font-data font-bold uppercase tracking-widest">
+        <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+        In Progress
+      </span>
+    );
+  }
+
+  if (category === "complete") {
+    return (
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-500/10 text-green-400 border border-green-500/20 text-[10px] font-data font-bold uppercase tracking-widest">
+        <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+        Complete
+      </span>
+    );
+  }
+
+  // failed
+  return (
+    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-destructive/10 text-destructive border border-destructive/20 text-[10px] font-data font-bold uppercase tracking-widest">
+      <span className="w-1.5 h-1.5 rounded-full bg-destructive" />
+      Failed
+    </span>
+  );
+}
 
 function StatusBadge({ status }: { status: string }) {
   return (
@@ -73,6 +114,9 @@ export function TriageTable({ leads }: { leads: TriageLead[] }) {
             </th>
             <th className="px-6 py-4 text-left font-data text-[10px] uppercase tracking-widest text-muted-foreground">
               Status
+            </th>
+            <th className="px-6 py-4 text-left font-data text-[10px] uppercase tracking-widest text-muted-foreground hidden sm:table-cell">
+              Automation
             </th>
             <th className="px-6 py-4 text-left font-data text-[10px] uppercase tracking-widest text-muted-foreground hidden md:table-cell">
               Date
@@ -127,6 +171,9 @@ export function TriageTable({ leads }: { leads: TriageLead[] }) {
               </td>
               <td className="px-6 py-4">
                 <StatusBadge status={lead.status} />
+              </td>
+              <td className="px-6 py-4 hidden sm:table-cell">
+                <AutomationStatusBadge stage={lead.engagementStage ?? "NOT_STARTED"} />
               </td>
               <td className="px-6 py-4 hidden md:table-cell text-muted-foreground whitespace-nowrap font-data text-[10px]">
                 {new Date(lead.createdAt)

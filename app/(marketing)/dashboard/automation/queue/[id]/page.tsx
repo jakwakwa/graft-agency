@@ -9,6 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Typography } from "@/components/ui/typography";
+import { EngagementPanel } from "./_components/engagement-panel";
+import { isTerminalStage } from "@/lib/utils/engagement-stages";
 
 interface ScrapedData {
   websiteUrl?: string;
@@ -30,6 +32,16 @@ interface Lead {
   attioRecordId: string | null;
 }
 
+interface EngagementStatus {
+  stage: string;
+  githubRepo?: string | null;
+  githubIssueUrl?: string | null;
+  deploymentUrl?: string | null;
+  offerSentAt?: string | null;
+  errorMessage?: string | null;
+  updatedAt?: string | null;
+}
+
 export default function QueueDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
@@ -41,27 +53,60 @@ export default function QueueDetailPage() {
   const [saving, setSaving] = useState(false);
   const [approving, setApproving] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [engagementStatus, setEngagementStatus] = useState<EngagementStatus | null>(null);
+  const [engagementLoading, setEngagementLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchLead() {
+    async function fetchAll() {
       try {
-        const res = await fetch(`/api/leads/${id}`);
-        if (!res.ok) {
+        const [leadRes, statusRes] = await Promise.all([
+          fetch(`/api/leads/${id}`),
+          fetch(`/api/engagement/status/${id}`),
+        ]);
+
+        if (!leadRes.ok) {
           setMessage({ type: "error", text: "Prospect not found." });
           return;
         }
-        const data: Lead = await res.json();
+
+        const data: Lead = await leadRes.json();
         setLead(data);
         setSubject(data.scrapedData?.draftSubject ?? "");
         setBody(data.scrapedData?.draftBody ?? "");
+
+        if (statusRes.ok) {
+          const statusData: EngagementStatus = await statusRes.json();
+          setEngagementStatus(statusData);
+        }
       } catch {
         setMessage({ type: "error", text: "Failed to load prospect." });
       } finally {
         setLoading(false);
+        setEngagementLoading(false);
       }
     }
-    fetchLead();
+    fetchAll();
   }, [id]);
+
+  useEffect(() => {
+    if (engagementLoading) return;
+    if (engagementStatus && isTerminalStage(engagementStatus.stage)) return;
+
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/engagement/status/${id}`);
+        if (res.ok) {
+          const data: EngagementStatus = await res.json();
+          setEngagementStatus(data);
+          if (isTerminalStage(data.stage)) clearInterval(interval);
+        }
+      } catch {
+        // silently ignore polling errors
+      }
+    }, 15000); // poll every 15 seconds
+
+    return () => clearInterval(interval);
+  }, [id, engagementLoading, engagementStatus?.stage]);
 
   async function handleSave() {
     if (!lead) return;
@@ -181,6 +226,11 @@ export default function QueueDetailPage() {
           <Typography.Small>{message.text}</Typography.Small>
         </div>
       )}
+
+      {/* Engagement pipeline — above outreach draft */}
+      <div className="mt-8">
+        <EngagementPanel status={engagementLoading ? null : engagementStatus} />
+      </div>
 
       <div className="mt-8 grid gap-6 md:grid-cols-2">
         {/* Audit panel */}
