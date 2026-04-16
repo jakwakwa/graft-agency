@@ -108,6 +108,11 @@ export const attioProspectQueueSyncService = {
             throw new Error(companyResult.error);
           }
           companyRecordId = companyResult.data.recordId;
+
+          const listResult = await attioService.addToList({ recordId: companyRecordId });
+          if ("error" in listResult) {
+            throw new Error(listResult.error);
+          }
         }
 
         let personRecordId: string | undefined;

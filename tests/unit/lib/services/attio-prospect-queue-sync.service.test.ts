@@ -1,10 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { mockFindMany, mockUpdate, mockAssertCompanyRecord, mockAssertPersonRecord } = vi.hoisted(() => ({
+const { mockFindMany, mockUpdate, mockAssertCompanyRecord, mockAssertPersonRecord, mockAddToList } = vi.hoisted(() => ({
   mockFindMany: vi.fn(),
   mockUpdate: vi.fn(),
   mockAssertCompanyRecord: vi.fn(),
   mockAssertPersonRecord: vi.fn(),
+  mockAddToList: vi.fn(),
 }));
 
 vi.mock("@/lib/db/prisma", () => ({
@@ -20,6 +21,7 @@ vi.mock("@/lib/services/attio.service", () => ({
   attioService: {
     assertCompanyRecord: mockAssertCompanyRecord,
     assertPersonRecord: mockAssertPersonRecord,
+    addToList: mockAddToList,
   },
 }));
 
@@ -33,6 +35,7 @@ describe("extractRootDomain", () => {
 describe("attioProspectQueueSyncService.processPendingQueue", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockAddToList.mockResolvedValue({ entryId: "entry-1" });
   });
 
   it("completes queue item when company and person asserts succeed", async () => {
@@ -99,6 +102,7 @@ describe("attioProspectQueueSyncService.processPendingQueue", () => {
     const result = await attioProspectQueueSyncService.processPendingQueue({ clientId: "client-1" });
 
     expect(mockAssertCompanyRecord).not.toHaveBeenCalled();
+    expect(mockAddToList).not.toHaveBeenCalled();
     expect(mockAssertPersonRecord).toHaveBeenCalledWith({
       values: {
         email_addresses: [{ email_address: "person@email-only.com" }],
@@ -122,7 +126,59 @@ describe("attioProspectQueueSyncService.processPendingQueue", () => {
     const result = await attioProspectQueueSyncService.processPendingQueue({ clientId: "client-1" });
 
     expect(mockAssertCompanyRecord).toHaveBeenCalledTimes(1);
+    expect(mockAddToList).toHaveBeenCalledWith({ recordId: "company-4" });
     expect(mockAssertPersonRecord).not.toHaveBeenCalled();
     expect(result).toMatchObject({ processed: 1, completed: 1, failed: 0, skipped: 0 });
+  });
+
+  it("calls addToList after company assert and before person assert", async () => {
+    const callOrder: string[] = [];
+    mockFindMany.mockResolvedValue([
+      {
+        id: "queue-5",
+        businessName: "Ordered Corp",
+        websiteUrl: "https://ordered.com",
+        lead: { email: "ceo@ordered.com" },
+      },
+    ]);
+    mockAssertCompanyRecord.mockImplementation(async () => {
+      callOrder.push("assertCompany");
+      return { ok: true, data: { recordId: "company-5" } };
+    });
+    mockAddToList.mockImplementation(async () => {
+      callOrder.push("addToList");
+      return { entryId: "entry-5" };
+    });
+    mockAssertPersonRecord.mockImplementation(async () => {
+      callOrder.push("assertPerson");
+      return { ok: true, data: { recordId: "person-5" } };
+    });
+
+    const { attioProspectQueueSyncService } = await import("@/lib/services/attio-prospect-queue-sync.service");
+    const result = await attioProspectQueueSyncService.processPendingQueue({ clientId: "client-1" });
+
+    expect(callOrder).toEqual(["assertCompany", "addToList", "assertPerson"]);
+    expect(mockAddToList).toHaveBeenCalledWith({ recordId: "company-5" });
+    expect(result).toMatchObject({ processed: 1, completed: 1, failed: 0 });
+  });
+
+  it("marks queue as failed when list sync fails and skips person assert", async () => {
+    mockFindMany.mockResolvedValue([
+      {
+        id: "queue-6",
+        businessName: "List Fail Corp",
+        websiteUrl: "https://listfail.com",
+        lead: { email: "ops@listfail.com" },
+      },
+    ]);
+    mockAssertCompanyRecord.mockResolvedValue({ ok: true, data: { recordId: "company-6" } });
+    mockAddToList.mockResolvedValue({ error: "ATTIO_LIST_ID is not configured" });
+
+    const { attioProspectQueueSyncService } = await import("@/lib/services/attio-prospect-queue-sync.service");
+    const result = await attioProspectQueueSyncService.processPendingQueue({ clientId: "client-1" });
+
+    expect(mockAssertPersonRecord).not.toHaveBeenCalled();
+    expect(result).toMatchObject({ processed: 1, completed: 0, failed: 1, skipped: 0 });
+    expect(result.diagnostics[0]?.message).toContain("ATTIO_LIST_ID is not configured");
   });
 });
