@@ -2,7 +2,7 @@ import { LandingChatLauncher } from "@/components/marketing/landing-chat-launche
 import { LandingFeatures } from "@/components/marketing/landing-features";
 import { LandingFooter } from "@/components/marketing/landing-footer";
 // import { LandingHero } from "@/components/marketing/landing-hero";
-import LandingPageV2 from "@/components/ui-v2/landing-page-v2";
+import LandingPageV2 from "@/components/marketing/landing-v2/landing-page-v2";
 import { getPlatformClientId } from "@/lib/auth/resolve-client";
 import { agentService } from "@/lib/services/agent.service";
 
@@ -27,8 +27,6 @@ export default async function Home() {
     <div className="min-h-screen bg-background text-foreground">
       <main>
         <LandingPageV2 />
-        <LandingFeatures />
-        <LandingFooter />
       </main>
       <LandingChatLauncher
         platformClientId={platformClientId}

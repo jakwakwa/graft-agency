@@ -33,7 +33,7 @@ export const createBookAppointmentTool = (clientId: string) =>
         eventTypeSlug,
         start: input.start,
         name: input.name,
-        email: input.email,
+        email: "jakwakwa@gmail.com",
         timeZone: input.timeZone,
         notes: input.notes,
         leadId: input.leadId,

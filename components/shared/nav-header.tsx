@@ -41,7 +41,7 @@ export function NavHeader() {
           </>
         ) : (
           <>
-            {hasPlatformAccess && (
+            {hasPlatformAccess && !pathname?.startsWith("/portal") && (
               <>
                 <Link
                   href="/dashboard/automation"
@@ -64,7 +64,36 @@ export function NavHeader() {
               </>
             )}
 
-            {!hasPlatformAccess && (
+            {pathname?.startsWith("/portal") && (
+              <>
+                <Link
+                  href="/portal"
+                  className="text-sm font-medium text-secondary transition-colors hover:text-secondary/80"
+                >
+                  Dashboard
+                </Link>
+                <Link
+                  href="/portal/embed"
+                  className="text-sm font-medium text-secondary transition-colors hover:text-secondary/80"
+                >
+                  Embed
+                </Link>
+                <Link
+                  href="/portal/billing"
+                  className="text-sm font-medium text-secondary transition-colors hover:text-secondary/80"
+                >
+                  Billing
+                </Link>
+                <Link
+                  href="/portal/settings"
+                  className="text-sm font-medium text-secondary transition-colors hover:text-secondary/80"
+                >
+                  Settings
+                </Link>
+              </>
+            )}
+
+            {!pathname?.startsWith("/portal") && (
               <Link href="/portal" className="text-sm font-medium text-secondary transition-colors hover:text-secondary/80">
                 My Portal
               </Link>

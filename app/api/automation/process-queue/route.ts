@@ -1,10 +1,9 @@
 import { requirePlatformAccess } from "@/lib/auth/resolve-client";
-import prisma from "@/lib/db/prisma";
-import { geminiProspectingService } from "@/lib/services/gemini-prospecting.service";
+import { attioProspectQueueSyncService } from "@/lib/services/attio-prospect-queue-sync.service";
 
 /**
- * Manual trigger for the prospecting pipeline (Gemini-powered).
- * Platform-owner or org:admin only. Same logic as the cron job.
+ * Manual trigger for Attio prospect queue processing.
+ * Platform-owner or org:admin only.
  */
 export async function POST() {
   const result = await requirePlatformAccess();
@@ -13,32 +12,25 @@ export async function POST() {
   }
   const { clientId } = result;
 
-  const config = await prisma.prospectingConfig.findUnique({
-    where: { clientId },
-  });
-
-  if (!config?.searchCriteria) {
-    return Response.json(
-      { error: "No search criteria configured. Set up your prospecting config first." },
-      { status: 400 },
-    );
-  }
-
-  const criteria = config.searchCriteria as {
-    industries?: string[];
-    locations?: string[];
-    keywords?: string[];
-  };
-
   try {
-    const data = await geminiProspectingService.findAndAuditProspects({
+    const data = await attioProspectQueueSyncService.processPendingQueue({
       clientId,
-      searchCriteria: criteria,
-      valueProposition: config.valueProposition,
+      take: 50,
     });
-    return Response.json({ ...data, message: `Created ${data.created} prospect(s).` });
+
+    return Response.json({
+      processed: data.processed,
+      completed: data.completed,
+      failed: data.failed,
+      skipped: data.skipped,
+      failureReasons: data.diagnostics
+        .filter((entry) => entry.status === "FAILED")
+        .map((entry) => entry.message)
+        .filter((message): message is string => typeof message === "string"),
+      diagnostics: data.diagnostics,
+    });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Prospecting failed";
+    const message = err instanceof Error ? err.message : "Attio queue processing failed";
     return Response.json({ error: message }, { status: 500 });
   }
 }

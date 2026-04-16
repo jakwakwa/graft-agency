@@ -1,8 +1,8 @@
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui-v2/button";
-import { BodyText, H2, TextGradient } from "@/components/ui-v2/Typography";
 import { LANDING_ROUTES, landingContainerClassName } from "./constants";
+import { Typography } from "@/components/ui/typography";
 
 export function LandingCtaSection() {
   return (
@@ -15,15 +15,15 @@ export function LandingCtaSection() {
         aria-hidden
       />
       <div className={`${landingContainerClassName} relative z-10 max-w-4xl`}>
-        <H2 className="mb-4 text-5xl leading-tight sm:text-6xl">
+        <Typography.H2 className="mb-4 text-5xl leading-tight sm:text-6xl">
           Ready to Scale Your
           <br />
-          <TextGradient gradient="accent">Unfair Advantage?</TextGradient>
-        </H2>
-        <BodyText className="mx-auto mb-10 max-w-2xl text-lg">
+          <Typography.H4>Unfair Advantage?</Typography.H4>
+        </Typography.H2>
+        <Typography.P className="mx-auto mb-10 max-w-2xl text-lg">
           Stop letting revenue slip through the cracks after 5 PM. Deploy your elite AI receptionist in less than 30
           minutes.
-        </BodyText>
+        </Typography.P>
         <div className="flex flex-col items-center justify-center gap-6 sm:flex-row">
           <Button
             variant="link"

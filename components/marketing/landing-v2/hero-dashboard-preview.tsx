@@ -2,7 +2,8 @@ import { Calendar, MoreHorizontal } from "lucide-react";
 import { Badge } from "@/components/ui-v2/badge";
 import { Button } from "@/components/ui-v2/button";
 import { Card } from "@/components/ui-v2/card";
-import { BodyText, EyebrowText, H4 } from "@/components/ui-v2/Typography";
+import { Typography } from "@/components/ui/typography";
+
 
 export function HeroDashboardPreview() {
   return (
@@ -14,8 +15,8 @@ export function HeroDashboardPreview() {
               G
             </div>
             <div>
-              <H4 className="text-base">Graft AI Agent</H4>
-              <EyebrowText color="accent">STATUS: OPERATIONAL</EyebrowText>
+              <Typography.H4 className="text-base">Graft AI Agent</Typography.H4>
+              <Typography.Small color="accent">STATUS: OPERATIONAL</Typography.Small>
             </div>
           </div>
           <Button variant="ghost" className="text-white/50 transition-colors hover:text-white">
@@ -25,12 +26,12 @@ export function HeroDashboardPreview() {
 
         <Card variant="inner" className="relative mb-4 border-border/20 p-4">
           <div className="absolute top-0 right-0 p-4 text-[10px] font-medium text-white/40">2m ago</div>
-          <EyebrowText color="warning" className="mb-2 flex items-center gap-2">
+          <Typography.Small color="warning" className="mb-2 flex items-center gap-2">
             <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#ffc07e]" />
             NEW EVENT CAPTURED
-          </EyebrowText>
-          <H4 className="mb-1">Lead Captured: Consultation</H4>
-          <BodyText className="mb-4 text-sm">Client: Johann vd Merwe (Cape Town)</BodyText>
+          </Typography.Small>
+          <Typography.H4 className="mb-1">Lead Captured: Consultation</Typography.H4>
+          <Typography.P className="mb-4 text-sm">Client: Johann vd Merwe (Cape Town)</Typography.P>
           <Badge variant="secondary" className="rounded-lg px-3 py-2 text-xs font-normal tracking-normal normal-case">
             <Calendar className="h-3 w-3" />
             Booked for Friday @ 14:30
@@ -39,16 +40,16 @@ export function HeroDashboardPreview() {
 
         <div className="grid grid-cols-2 gap-4">
           <Card variant="inner">
-            <EyebrowText color="secondary" className="mb-1">
+            <Typography.Small color="secondary" className="mb-1">
               Missed Leads
-            </EyebrowText>
+            </Typography.Small>
             <p className="text-3xl font-bold text-white">0</p>
           </Card>
           <Card variant="inner" className="relative overflow-hidden">
             <div className="pointer-events-none absolute inset-0 bg-linear-to-br from-[#7bf7c8]/5 to-transparent" />
-            <EyebrowText color="secondary" className="relative mb-1">
+            <Typography.Small color="secondary" className="relative mb-1">
               Grid Resilience
-            </EyebrowText>
+            </Typography.Small>
             <p className="relative text-3xl font-bold text-white">100%</p>
           </Card>
         </div>

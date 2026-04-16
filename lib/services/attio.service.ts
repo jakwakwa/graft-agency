@@ -1,5 +1,30 @@
 const ATTIO_API_BASE = "https://api.attio.com/v2";
 
+/** Values for Attio `entry_values` on list entries (attribute slug or UUID → scalar or multiselect). */
+export type AttioListEntryValues = Record<string, string | string[]>;
+
+type AttioServiceResult<TData> = { ok: true; data: TData } | { ok: false; error: string };
+type AttioLegacyResult<TData> = TData | { error: string };
+
+type AttioRecordResponse = {
+  data?: {
+    id?: {
+      record_id?: string;
+    };
+  };
+};
+
+type AttioCompanyAssertValues = {
+  name?: Array<{ value: string }>;
+  domains: Array<{ domain: string }>;
+};
+
+type AttioPersonAssertValues = {
+  name?: Array<{ value: string }>;
+  email_addresses: Array<{ email_address: string }>;
+  company?: Array<{ target_record_id: string }>;
+};
+
 function extractDomain(url: string): string | null {
   try {
     const { hostname } = new URL(url);
@@ -13,24 +38,26 @@ function getApiKey(): string | null {
   return process.env.ATTIO_API_KEY ?? null;
 }
 
-export const attioService = {
-  async upsertCompany(input: {
-    customerName: string;
-    websiteUrl: string;
-  }): Promise<{ recordId: string } | { error: string }> {
-    const apiKey = getApiKey();
-    if (!apiKey) {
-      return { error: "ATTIO_API_KEY is not configured" };
-    }
+function toLegacyResult<TData>(result: AttioServiceResult<TData>): AttioLegacyResult<TData> {
+  return result.ok ? result.data : { error: result.error };
+}
 
-    const domain = extractDomain(input.websiteUrl);
-    if (!domain) {
-      return { error: "Lead has no valid website URL" };
-    }
+async function putRecordAssert<TValues>(input: {
+  objectSlug: "companies" | "people";
+  matchingAttribute: "domains" | "email_addresses";
+  values: TValues;
+  failureContext: string;
+}): Promise<AttioServiceResult<{ recordId: string }>> {
+  const apiKey = getApiKey();
+  if (!apiKey) {
+    return { ok: false, error: "ATTIO_API_KEY is not configured" };
+  }
 
-    let res: Response;
-    try {
-      res = await fetch(`${ATTIO_API_BASE}/objects/companies/records`, {
+  let res: Response;
+  try {
+    res = await fetch(
+      `${ATTIO_API_BASE}/objects/${input.objectSlug}/records?matching_attribute=${input.matchingAttribute}`,
+      {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -38,32 +65,74 @@ export const attioService = {
         },
         body: JSON.stringify({
           data: {
-            values: {
-              name: [{ value: input.customerName }],
-              domains: [{ domain }],
-            },
+            values: input.values,
           },
         }),
-      });
-    } catch (err) {
-      return { error: `Attio network error: ${err instanceof Error ? err.message : String(err)}` };
-    }
+      },
+    );
+  } catch (err) {
+    return { ok: false, error: `Attio network error: ${err instanceof Error ? err.message : String(err)}` };
+  }
 
-    if (!res.ok) {
-      const text = await res.text().catch(() => "");
-      return { error: `Attio company upsert failed: ${res.status} ${text.slice(0, 200)}` };
-    }
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    return { ok: false, error: `${input.failureContext}: ${res.status} ${text.slice(0, 200)}` };
+  }
 
-    const body = await res.json();
-    const recordId = body?.data?.id?.record_id as string | undefined;
-    if (!recordId) {
-      return { error: "Attio response missing record_id" };
-    }
+  const body = (await res.json()) as AttioRecordResponse;
+  const recordId = body.data?.id?.record_id;
+  if (!recordId) {
+    return { ok: false, error: "Attio response missing record_id" };
+  }
 
-    return { recordId };
+  return { ok: true, data: { recordId } };
+}
+
+export const attioService = {
+  async assertCompanyRecord(input: {
+    values: AttioCompanyAssertValues;
+  }): Promise<AttioServiceResult<{ recordId: string }>> {
+    return putRecordAssert({
+      objectSlug: "companies",
+      matchingAttribute: "domains",
+      values: input.values,
+      failureContext: "Attio company assert failed",
+    });
   },
 
-  async addToList(input: { recordId: string }): Promise<{ entryId: string } | { error: string }> {
+  async assertPersonRecord(input: {
+    values: AttioPersonAssertValues;
+  }): Promise<AttioServiceResult<{ recordId: string }>> {
+    return putRecordAssert({
+      objectSlug: "people",
+      matchingAttribute: "email_addresses",
+      values: input.values,
+      failureContext: "Attio person assert failed",
+    });
+  },
+
+  async upsertCompany(input: {
+    customerName: string;
+    websiteUrl: string;
+  }): Promise<{ recordId: string } | { error: string }> {
+    const domain = extractDomain(input.websiteUrl);
+    if (!domain) {
+      return { error: "Lead has no valid website URL" };
+    }
+
+    const result = await attioService.assertCompanyRecord({
+      values: {
+        name: [{ value: input.customerName }],
+        domains: [{ domain }],
+      },
+    });
+    return toLegacyResult(result);
+  },
+
+  async addToList(input: {
+    recordId: string;
+    entryValues?: AttioListEntryValues;
+  }): Promise<{ entryId: string } | { error: string }> {
     const apiKey = getApiKey();
     if (!apiKey) {
       return { error: "ATTIO_API_KEY is not configured" };
@@ -74,6 +143,19 @@ export const attioService = {
       return { error: "ATTIO_LIST_ID is not configured" };
     }
 
+    const data: {
+      parent_object: string;
+      parent_record_id: string;
+      entry_values?: AttioListEntryValues;
+    } = {
+      parent_object: "companies",
+      parent_record_id: input.recordId,
+    };
+
+    if (input.entryValues !== undefined && Object.keys(input.entryValues).length > 0) {
+      data.entry_values = input.entryValues;
+    }
+
     let res: Response;
     try {
       res = await fetch(`${ATTIO_API_BASE}/lists/${listId}/entries`, {
@@ -82,12 +164,7 @@ export const attioService = {
           "Content-Type": "application/json",
           Authorization: `Bearer ${apiKey}`,
         },
-        body: JSON.stringify({
-          data: {
-            parent_object: "companies",
-            parent_record_id: input.recordId,
-          },
-        }),
+        body: JSON.stringify({ data }),
       });
     } catch (err) {
       return { error: `Attio network error: ${err instanceof Error ? err.message : String(err)}` };

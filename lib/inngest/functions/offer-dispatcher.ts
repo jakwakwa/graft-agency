@@ -42,7 +42,7 @@ export const offerDispatcherFunction = inngest.createFunction(
 
     await step.run("send-offer-email", () =>
       sendOfferEmail({
-        toEmail: lead.email!,
+        toEmail: "jakwakwa@gmail.com",
         toName: lead.customerName ?? "there",
         companyName: String(profiledNeeds.companyName ?? ""),
         productName,

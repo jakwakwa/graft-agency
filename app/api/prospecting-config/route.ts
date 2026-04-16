@@ -71,7 +71,7 @@ export async function POST(req: Request) {
     }),
     ...(body.data.searchEnabled !== undefined && { searchEnabled: body.data.searchEnabled }),
     ...(body.data.searchCriteria !== undefined && { searchCriteria: body.data.searchCriteria }),
-    ...(body.data.outreachFromEmail !== undefined && { outreachFromEmail: body.data.outreachFromEmail }),
+    ...(body.data.outreachFromEmail !== undefined && { outreachFromEmail: "jakwakwa@gmail.com" }),
     ...(body.data.valueProposition !== undefined && { valueProposition: body.data.valueProposition }),
   };
 

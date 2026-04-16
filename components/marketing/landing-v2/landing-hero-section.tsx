@@ -1,8 +1,8 @@
 import { ArrowRight, Calendar, ShieldCheck, Zap } from "lucide-react";
 import Link from "next/link";
+import { Typography } from "@/components/ui/typography";
 import { Badge } from "@/components/ui-v2/badge";
 import { Button } from "@/components/ui-v2/button";
-import { BodyText, H1, TextGradient } from "@/components/ui-v2/Typography";
 import { LANDING_ROUTES, landingContainerClassName } from "./constants";
 import { HeroDashboardPreview } from "./hero-dashboard-preview";
 import { LandingSectionLink } from "./landing-section-link";
@@ -14,7 +14,7 @@ export function LandingHeroSection() {
       className="relative pt-8 isolate scroll-mt-28 overflow-hidden pb-24 lg:scroll-mt-32 lg:pb-32"
     >
       <div className="pointer-events-none absolute inset-0 -z-10" aria-hidden>
-        <div className="absolute top-[10%] left-1/2 h-[min(70vh,560px)] w-[min(92vw,780px)] -translate-x-1/2 rounded-full bg-linear-to-tr from-[#C825E9]/12 to-[#1149f0]/22 blur-[80px]" />
+        <div className="absolute top-[10%] left-1/2 h-[min(70vh,560px)] w-[min(92vw,780px)] -translate-x-1/2 rounded-full bg-ethereal-gradient opacity-15 blur-[80px] mix-blend-screen" />
       </div>
 
       <div
@@ -25,20 +25,20 @@ export function LandingHeroSection() {
             24/7 AI Receptionist Active
           </Badge>
 
-          <H1>
+          <Typography.H1>
             The Receptionist
             <br />
-            <span className="font-['Ovo',serif]">That </span>
-            <TextGradient gradient="primary">Never</TextGradient>
+            <Typography.H1 className="font-['Ovo',serif]">That </Typography.H1>
+            <Typography.H1>Never</Typography.H1>
             <br />
-            <TextGradient gradient="secondary">Sleeps</TextGradient>
+            <Typography.H1>Sleeps</Typography.H1>
             <span className="text-[#d0dada]">.</span>
-          </H1>
+          </Typography.H1>
 
-          <BodyText variant="large">
+          <Typography.Large>
             Elite AI agents engineered for the South African business rhythm. Captures leads, books consultations, and
             syncs with your calendar while the city sleeps—or when the grid goes down.
-          </BodyText>
+          </Typography.Large>
 
           <div className="mt-2 flex flex-col items-center gap-4 sm:flex-row">
             <Button variant="default" className="w-full sm:w-auto" asChild>

@@ -3,11 +3,11 @@ import type { ReactNode } from "react";
 import { redirectToAccessRequired, requireAuthOrSignIn } from "@/lib/auth/guards";
 import { hasPlatformAccess, resolveClientIdFromAuth } from "@/lib/auth/resolve-client";
 
-interface AutomationLayoutProps {
+interface AutomationWrapperProps {
   children: ReactNode;
 }
 
-export default async function AutomationLayout({ children }: AutomationLayoutProps) {
+export async function AutomationWrapper({ children }: AutomationWrapperProps) {
   await requireAuthOrSignIn();
 
   const clientId = await resolveClientIdFromAuth();

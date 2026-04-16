@@ -78,6 +78,7 @@ function ActionButton({ href, label, ariaLabel, disabledAriaLabel }: ActionButto
         variant="outline"
         size="sm"
         render={<a href={href} target="_blank" rel="noopener noreferrer" aria-label={ariaLabel} />}
+        nativeButton={false}
       >
         <ExternalLink className="h-3.5 w-3.5 mr-1.5" />
         {label}

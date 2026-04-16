@@ -1,25 +1,26 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
-import { Inter, Plus_Jakarta_Sans, Space_Grotesk } from "next/font/google";
+import { Work_Sans, Be_Vietnam_Pro, Lexend } from "next/font/google";
 import NextTopLoader from "nextjs-toploader";
 import { NavHeader } from "@/components/shared/nav-header";
 import { ThemeProvider } from "@/components/theme-provider";
 import { cn } from "@/lib/utils";
 
-const inter = Inter({
+const workSans = Work_Sans({
   subsets: ["latin"],
   variable: "--font-sans",
   display: "swap",
 });
 
-const plusJakarta = Plus_Jakarta_Sans({
+const beVietnamPro = Be_Vietnam_Pro({
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
   variable: "--font-display",
   display: "swap",
 });
 
-const spaceGrotesk = Space_Grotesk({
+const lexend = Lexend({
   subsets: ["latin"],
   variable: "--font-data",
   display: "swap",
@@ -40,15 +41,15 @@ export default function RootLayout({
       lang="en"
       suppressHydrationWarning
       className={cn(
-        inter.variable,
-        plusJakarta.variable,
-        spaceGrotesk.variable,
+        workSans.variable,
+        beVietnamPro.variable,
+        lexend.variable,
         "font-sans selection:bg-primary-container selection:text-white",
       )}
     >
       <body className="grid-overlay min-h-screen">
         <NextTopLoader
-          color="#ff24e4"
+          color="#5737f0"
           initialPosition={0.08}
           crawlSpeed={200}
           height={3}
@@ -56,7 +57,7 @@ export default function RootLayout({
           showSpinner={false}
           easing="ease"
           speed={200}
-          shadow="0 0 10px #ff24e4,0 0 5px #ff24e4"
+          shadow="0 0 10px #5737f0,0 0 5px #5737f0"
         />
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           <ClerkProvider>

@@ -1,12 +1,12 @@
 import { DashboardWrapper } from "@/components/layout/dashboard-wrapper";
 import { AutomationWrapper } from "@/components/layout/automation-wrapper";
-import QueuePageClient from "./page-client";
+import PreviewPageClient from "./page-client";
 
-export default function QueuePage() {
+export default function PreviewPage() {
   return (
     <DashboardWrapper>
       <AutomationWrapper>
-        <QueuePageClient />
+        <PreviewPageClient />
       </AutomationWrapper>
     </DashboardWrapper>
   );

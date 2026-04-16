@@ -5,7 +5,7 @@ const displayTracking = "tracking-[-0.04em]";
 
 const TypographyH1 = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadingElement>>(
   ({ className, ...props }, ref) => (
-    <h1
+    <span
       ref={ref}
       className={cn(
         "scroll-m-20 font-display text-[3.5rem] leading-none font-bold text-balance",
@@ -20,10 +20,10 @@ TypographyH1.displayName = "TypographyH1";
 
 const TypographyH2 = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadingElement>>(
   ({ className, ...props }, ref) => (
-    <h2
+    <span
       ref={ref}
       className={cn(
-        "scroll-m-20 font-display pb-4 text-3xl font-semibold tracking-tight text-balance first:mt-0",
+        "scroll-m-20 font-display pb-4 text-4xl font-semibold tracking-tight text-balance first:mt-0",
         className,
       )}
       {...props}
@@ -34,7 +34,7 @@ TypographyH2.displayName = "TypographyH2";
 
 const TypographyH3 = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadingElement>>(
   ({ className, ...props }, ref) => (
-    <h3
+    <span
       ref={ref}
       className={cn("scroll-m-20 font-display mt-6 mb-8 text-2xl font-semibold tracking-tight text-balance", className)}
       {...props}

@@ -3,7 +3,7 @@
 import { Show, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { Button } from "@/components/ui-v2/button";
-import { LANDING_ROUTES } from "@/components/ui-v2/landing/constants";
+import { LANDING_ROUTES } from "./constants";
 
 export function LandingHeaderAuth() {
   return (
@@ -14,7 +14,7 @@ export function LandingHeaderAuth() {
             type="button"
             variant="ghost"
             size="sm"
-            className="hidden text-[#acb1d6] hover:bg-white/5 hover:text-white sm:inline-flex"
+            className="hidden text-[#acb1d6] hover:text-white sm:inline-flex"
           >
             Login
           </Button>

@@ -59,7 +59,7 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
-  --background: oklch(1 0 0);
+  --background: oklch(0.18 0.01 17.64);
   --foreground: oklch(0.145 0 0);
   --shadow-ambient: 0 24px 48px -12px rgb(255 172 232 / 0.08);
 }
@@ -76,7 +76,7 @@ body {
 body {
   margin: 0;
   color: var(--foreground, #111827);
-  background: var(--background, #171515);
+  background: #000 !important;
   font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
 }
 
@@ -86,51 +86,86 @@ a {
 }
 
 .dark {
-  --background: rgb(27 22 21);
-  --foreground: #f2f2f4;
-  --card: rgba(174 118 188 / 0.04);
-  --card-foreground: #f2f2f4;
-  --popover: #0B0A0C1B;
-  --popover-foreground: #f2f2f4;
-  --primary: hsla(7.16 98.53% 73.33% / 0.98);
-  --primary-kinetic: #3C5EE9;
-  --primary-foreground: #D3D3EC;
-  --secondary: #c9bfff;
-  --secondary-foreground: #13121b;
-  --muted: #D6809E20;
-  --muted-foreground: #AB8F6E;
-  --accent: #FD929A;
-  --accent-foreground: #322A6E;
-  --destructive: oklch(0.65 0.2 25);
+  /* ─── Ethereal Agent — dark-first design system ─────────────────────────
+     Surfaces: deep slate void → glass layers
+     Primary:  electric indigo #401FE1
+     Kinetic:  sunset peach   #EF9772 (glows, active states)
+     Secondary: soft blossom  #ffaeda
+     Accent:   tangerine      #ff8d58
+  ──────────────────────────────────────────────────────────────────────── */
+
+  /* Base */
+  --background: #141516E2;
+  --foreground: #e1e1f6;
+
+  /* Surfaces — tonal depth, no hard borders */
+  --card: #0E0D1362;
+  --card-foreground: #e1e1f6;
+  --popover: #0E0F19;
+  --popover-foreground: #e1e1f6;
+  --muted: #9793F95B;
+  --muted-foreground: #9191b4;
+
+  /* Primary — electric indigo */
+  --primary: #5737f0;
+  --primary-container: #7c5ff5;
+  --primary-kinetic: #444444;
+  --primary-foreground: #e8e2ff;
+
+  /* Secondary — soft blossom */
+  --secondary: #ffaeda;
+  --secondary-container: #990072;
+  --secondary-foreground: #111221;
+
+  /* Accent — tangerine */
+  --accent: #EB8C5F;
+  --accent-foreground: #1a0e00;
+
+  /* Semantic */
+  --destructive: #ffb4ab;
+  --destructive-foreground: #690005;
+
+  /* Input / form fields */
   --border: transparent;
-  /* Border tint: mix with a solid stop so edges stay visible (transparent + Tailwind /opacity utilities wipe it out). */
-  --input: color-mix(in srgb, #6a6ae4 42%, #2a2933);
-  /* Field fill: mix accent into muted base — visible tint without a second opacity pass. */
-  --input-background: color-mix(in srgb, #EA9DBB78 16%, #273B7C0B);
-  --input-background-hover: color-mix(in srgb, #DB2178 24%, #30266C);
-  --ring: #7EFDD1;
-  --outline-ghost: color-mix(in srgb, #BB7DA8 15%, transparent);
-  --surface-container-high: #E2843D18;
-  --surface-highest: #B5D0F837;
-  --surface-variant: #9711911B;
-  --chart-1: #63DB93;
-  --chart-2: #2195B5;
-  --chart-3: #B94BD2;
-  --chart-4: #C9785A;
-  --chart-5: #5DE9AF;
-  --sidebar: #2C2E38;
-  --sidebar-foreground: #f2f2f4;
-  --sidebar-primary: #ff24e4;
-  --sidebar-primary-foreground: #632775;
-  --sidebar-accent: #222228;
-  --sidebar-accent-foreground: #f2f2f4;
-  --sidebar-border: color-mix(in srgb, #f2f2f4 8%, transparent);
-  --sidebar-ring: #fface8;
-  --shadow-ambient: 0 24px 48px -12px rgb(255 172 232 / 0.08);
-  --shadow-neon: 0 0 10px rgba(252 80 203 / 0.5);
-  --shadow-neon-primary: 0 0 15px rgba(248 146 105 / 0.57);
-  --glass-background: rgba(233 184 209 / 0.04);
-  --glass-border: rgba(244 123 10 / 0.098);
+  --input: color-mix(in srgb, #F037C581 30%, #1d1e2e);
+  --input-background: color-mix(in srgb, #5737f0 10%, #1d1e2e);
+  --input-background-hover: color-mix(in srgb, #5737f0 20%, #282939);
+  --ring: #7c5ff5;
+
+  /* Ghost outline — outline-variant at 15% */
+  --outline-ghost: color-mix(in srgb, #131344 15%, transparent);
+
+  /* Surface tiers for cards/chips */
+  --surface-container-high: color-mix(in srgb, #5737f0 8%, #282939);
+  --surface-highest: color-mix(in srgb, #ffb697 12%, #3E499D);
+  --surface-variant: color-mix(in srgb, #5737f0 15%, #1d1e2e);
+
+  /* Charts */
+  --chart-1: #5737f0;
+  --chart-2: #ffaeda;
+  --chart-3: #ff8d58;
+  --chart-4: #7c5ff5;
+  --chart-5: #ffb697;
+
+  /* Sidebar */
+  --sidebar: #191a2a;
+  --sidebar-foreground: #e1e1f6;
+  --sidebar-primary: #5737f0;
+  --sidebar-primary-foreground: #e8e2ff;
+  --sidebar-accent: #1d1e2e;
+  --sidebar-accent-foreground: #e1e1f6;
+  --sidebar-border: color-mix(in srgb, #e1e1f6 8%, transparent);
+  --sidebar-ring: #7c5ff5;
+
+  /* Shadows & glow */
+  --shadow-ambient: 0 24px 48px -12px rgb(87 55 240 / 0.12);
+  --shadow-neon: 0 0 16px rgba(98 69 246 / 0.55);
+  --shadow-neon-primary: 0 0 20px rgba(20 115 230 / 0.45);
+  --shadow-neon-secondary: 0 0 16px rgba(43 78 220 / 0.4);
+
+  /* Glass surfaces */
+  --glass-background: rgba(4 31 63 / 0.48);
+  --glass-border: #5892E339;
 }
 
 @theme inline {
@@ -190,16 +225,19 @@ a {
 
 @layer utilities {
   .glass-super-agent {
-    background: color-mix(in oklch, oklch(0.6 0.24 28.37 / 0.68) 60%, oklch(0 0 0));
-    -webkit-backdrop-filter: blur(2px) !important;
-    backdrop-filter: blur(2px) !important;
+    position: relative !important;
+    background: linear-gradient( 325deg, oklch(0.56 0.24 261.5 / 0.039) 20%, oklch(0.68 0.17 37.58 / 0.17) 120%) !important;
+        -webkit-backdrop-filter: blur(10px) !important;
+    backdrop-filter: blur(20px) !important;
     padding: 40px !important;
+    z-index: 99999 !important;
   }
 
   .backdrop-modal {
-    -webkit-backdrop-filter: blur(140px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
     backdrop-filter: blur(140px) !important;
     padding: 40px !important;
+
   }
 
   .shadow-ambient {
@@ -215,18 +253,25 @@ a {
   }
 
   .neon-glow {
-    text-shadow: 0 0 10px #E88D63E8;
+    text-shadow: 0 0 10px #201CE7E8;
   }
 
   .glass-card {
     background: var(--glass-background);
-    backdrop-filter: blur(11.2px);
+        -webkit-backdrop-filter: blur(1.2px) !important;
+
+    backdrop-filter: blur(1.2px);
+            background: linear-gradient( 345deg, oklch(0.48 0.26 271.52 / 0.09) 0%, rgba(241 131 234 / 0.08) 80%, oklch(0.78 0.13 55.06 / 0.4) 127%) !important;
     border: 1px solid var(--glass-border);
     box-shadow: inset -1px -2px 1px 0px var(--glass-border), inset 0px 0px 1px 0px oklch(0.66 0.23 359.79 / 0.29);
   }
 
+  .bg-ethereal-gradient {
+    background-image: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  }
+
   .grid-overlay {
-    background-image: radial-gradient(rgba(255, 172, 232, 0.05) 1px, transparent 1px);
+    background-image: radial-gradient(rgba(224 81 183 / 0.99) 1px, transparent 1px);
     background-size: 32px 32px;
   }
 
@@ -269,6 +314,21 @@ a {
   }
 }
 
+@keyframes pulse-ring-primary {
+  0% {
+    box-shadow: 0 0 0 0 rgb(248 146 105 / 0.7);
+    transform: scale(0.95);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgb(248 146 105 / 0);
+    transform: scale(1);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgb(248 146 105 / 0);
+    transform: scale(0.95);
+  }
+}
+
 @keyframes progress {
   0% {
     transform: scaleX(0);
@@ -306,6 +366,7 @@ a {
 
   html {
     @apply font-sans;
+    background: #000 !important;
   }
 
   @media (prefers-reduced-motion: no-preference) {

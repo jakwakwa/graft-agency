@@ -24,7 +24,7 @@ function Card({
   return (
     <div
       data-slot="card"
-      className={cn("bg-card text-card-foreground flex flex-col gap-6 rounded-xl border", className)}
+      className={cn("glass-super-agent text-card-foreground flex flex-col p-8 gap-6 rounded-xl border", className)}
       {...props}
     />
   );

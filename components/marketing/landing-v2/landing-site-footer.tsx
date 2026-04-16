@@ -1,8 +1,8 @@
 import { Asterisk, AtSign, Globe } from "lucide-react";
 import Link from "next/link";
-import { BodyText, H4 } from "@/components/ui-v2/Typography";
 import { LANDING_HEADER_SECTIONS, LANDING_ROUTES, landingContainerClassName } from "./constants";
 import { LandingSectionLink } from "./landing-section-link";
+import { Typography } from "@/components/ui/typography";
 
 const footerLinkClass = "text-sm text-[#a5a9c4] transition-colors hover:text-white";
 
@@ -13,14 +13,14 @@ export function LandingSiteFooter() {
         <div className="mb-16 grid grid-cols-1 gap-12 md:grid-cols-4 lg:gap-24">
           <div className="md:col-span-1">
             <span className="mb-4 block text-lg font-bold tracking-wider text-white">GRAFT.TODAY</span>
-            <BodyText className="max-w-[250px] text-sm leading-relaxed">
+            <Typography.P className="max-w-[250px] text-sm leading-relaxed">
               High-performance AI orchestration for elite sales teams. Engineered for the South African business
               landscape.
-            </BodyText>
+            </Typography.P>
           </div>
 
           <div>
-            <H4 className="mb-6 text-xs font-bold tracking-wider text-white uppercase">Solutions</H4>
+            <Typography.H4 className="mb-6 text-xs font-bold tracking-wider text-white uppercase">Solutions</Typography.H4>
             <ul className="space-y-4">
               {LANDING_HEADER_SECTIONS.map((item) => (
                 <li key={item.id}>
@@ -33,7 +33,7 @@ export function LandingSiteFooter() {
           </div>
 
           <div>
-            <H4 className="mb-6 text-xs font-bold tracking-wider text-white uppercase">Company</H4>
+            <Typography.H4 className="mb-6 text-xs font-bold tracking-wider text-white uppercase">Company</Typography.H4>
             <ul className="space-y-4">
               <li>
                 <LandingSectionLink sectionId="lead-capture" className={footerLinkClass}>
@@ -54,7 +54,7 @@ export function LandingSiteFooter() {
           </div>
 
           <div>
-            <H4 className="mb-6 text-xs font-bold tracking-wider text-white uppercase">Legal</H4>
+            <Typography.H4 className="mb-6 text-xs font-bold tracking-wider text-white uppercase">Legal</Typography.H4>
             <ul className="space-y-4">
               <li>
                 <Link href={LANDING_ROUTES.privacy} className={footerLinkClass}>
