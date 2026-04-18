@@ -1,5 +1,6 @@
 "use client";
 
+import { Bolt } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Typography } from "@/components/ui/typography";
@@ -39,8 +40,8 @@ export function AutomationHubClient() {
       )}
 
       <div className="glass-card rounded-2xl p-8 relative overflow-hidden">
-        <div className="absolute top-0 right-0 p-4">
-          <span className="text-[10px] font-data uppercase tracking-widest text-primary/40">Configuration Node 01</span>
+        <div className="relative w-8 top-0 right-0 p-4">
+          <Bolt />
         </div>
         <div className="flex items-center justify-between mb-8">
           <Typography.H3 className="mt-0 mb-0">Agent Performance Tuning</Typography.H3>

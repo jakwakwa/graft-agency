@@ -1,45 +1,29 @@
-import { ArrowRight } from "lucide-react";
-import Link from "next/link";
-import { Button } from "@/components/ui-v2/button";
-import { LANDING_ROUTES, landingContainerClassName } from "./constants";
-import { Typography } from "@/components/ui/typography";
-
 export function LandingCtaSection() {
   return (
-    <section
-      id="white-label"
-      className="landing-scroll-reveal relative scroll-mt-28 overflow-hidden py-32 text-center lg:scroll-mt-32"
-    >
-      <div
-        className="pointer-events-none absolute inset-0 bg-linear-to-b from-transparent via-[#2f2b5a]/10 to-[#13121b]"
-        aria-hidden
-      />
-      <div className={`${landingContainerClassName} relative z-10 max-w-4xl`}>
-        <Typography.H2 className="mb-4 text-5xl leading-tight sm:text-6xl">
-          Ready to Scale Your
-          <br />
-          <Typography.H4>Unfair Advantage?</Typography.H4>
-        </Typography.H2>
-        <Typography.P className="mx-auto mb-10 max-w-2xl text-lg">
-          Stop letting revenue slip through the cracks after 5 PM. Deploy your elite AI receptionist in less than 30
-          minutes.
-        </Typography.P>
-        <div className="flex flex-col items-center justify-center gap-6 sm:flex-row">
-          <Button
-            variant="link"
-            className="flex items-center gap-2 font-medium text-white transition-colors hover:text-[#fface8]"
-            asChild
+    <section className="py-32 px-10 relative overflow-hidden">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-primary/20 blur-[120px] rounded-full pointer-events-none"></div>
+      <div className="max-w-4xl mx-auto text-center space-y-10 relative z-10">
+        <h2 className="text-5xl md:text-6xl font-headline font-black tracking-tighter text-on-surface leading-none">
+          STOP MISSING <span className="text-primary italic">OPPORTUNITIES.</span>
+        </h2>
+        <p className="text-on-surface-variant text-xl max-w-2xl mx-auto">
+          Join the 500+ elite agencies leveraging GRAFT to maintain a 24/7 technical presence.
+        </p>
+        <div className="flex flex-col md:flex-row justify-center items-center gap-6">
+          <input
+            className="bg-surface-container-lowest border border-outline-variant/30 text-on-surface px-6 py-4 rounded-lg w-full md:w-80 focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none tracking-widest text-xs font-bold transition-all"
+            placeholder="ENTER YOUR DOMAIN"
+            type="email"
+          />
+          <button
+            type="button"
+            className="w-full md:w-auto px-10 py-4 bg-primary text-on-primary-container font-black rounded-lg uppercase tracking-[0.2em] hover:scale-105 transition-transform shadow-2xl shadow-primary/40"
           >
-            <Link href={LANDING_ROUTES.portalBilling}>
-              View pricing plans <ArrowRight className="h-4 w-4 -rotate-45" />
-            </Link>
-          </Button>
-          <Button variant="default" className="w-full sm:w-auto" asChild>
-            <Link href={LANDING_ROUTES.dashboard}>
-              Hire Your AI Receptionist
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </Button>
+            Initialize Deployment
+          </button>
+        </div>
+        <div className="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold opacity-60">
+          No credit card required. 14-day free trial.
         </div>
       </div>
     </section>

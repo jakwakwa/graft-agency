@@ -1,6 +1,35 @@
 import prisma from "@/lib/db/prisma";
 import type { Prisma } from "../../generated/prisma/client";
 
+/** Stable id for synthetic configs (no DB row). Not persisted. */
+const FALLBACK_AGENT_CONFIG_ID = "00000000-0000-4000-8000-000000000001";
+
+/** Public site / `clientId=platform` launcher when no `agent_configs` row exists yet. */
+export const PLATFORM_LANDING_WIDGET_DEFAULTS = {
+  agentName: "GRAFT",
+  greetingMessage: "Hi! I'm GraftBot — how can I help you today?",
+  widgetPrimaryColour: "#E49B57",
+} as const;
+
+type AgentConfigRow = NonNullable<Awaited<ReturnType<typeof prisma.agentConfig.findUnique>>>;
+
+function createFallbackAgentConfig(clientId: string): AgentConfigRow {
+  const now = new Date();
+  return {
+    id: FALLBACK_AGENT_CONFIG_ID,
+    clientId,
+    systemPrompt: "You are a helpful assistant. Help visitors and capture their contact details.",
+    knowledgeBase: null,
+    agentName: "AI Assistant",
+    greetingMessage: "Hello! How can I help you today?",
+    calComUsername: null,
+    defaultEventSlug: null,
+    widgetPrimaryColour: "#7c3aed",
+    createdAt: now,
+    updatedAt: now,
+  };
+}
+
 interface SearchKnowledgeResult {
   answer: string;
   sources?: string[];
@@ -25,15 +54,17 @@ const isKnowledgeBaseEntry = (value: Prisma.JsonValue): value is Prisma.JsonObje
   return typeof record.question === "string" && typeof record.answer === "string";
 };
 
+/** True when `getConfig` returned an in-memory default (no `agent_configs` row for this client). */
+export function isSyntheticAgentConfig(config: AgentConfigRow): boolean {
+  return config.id === FALLBACK_AGENT_CONFIG_ID;
+}
+
 export const agentService = {
-  async getConfig(clientId: string) {
+  async getConfig(clientId: string): Promise<AgentConfigRow> {
     const config = await prisma.agentConfig.findUnique({
       where: { clientId },
     });
-    if (!config) {
-      throw new Error(`AgentConfig not found for client: ${clientId}`);
-    }
-    return config;
+    return config ?? createFallbackAgentConfig(clientId);
   },
 
   async searchKnowledge({ clientId, query }: SearchKnowledgeInput): Promise<SearchKnowledgeResult> {

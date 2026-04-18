@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
-import { Work_Sans, Be_Vietnam_Pro, Lexend } from "next/font/google";
+import { Be_Vietnam_Pro, Lexend, Work_Sans } from "next/font/google";
 import NextTopLoader from "nextjs-toploader";
 import { NavHeader } from "@/components/shared/nav-header";
 import { ThemeProvider } from "@/components/theme-provider";

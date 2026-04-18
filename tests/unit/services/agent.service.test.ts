@@ -37,11 +37,15 @@ describe("agentService", () => {
       );
     });
 
-    it("throws when clientId not found", async () => {
+    it("returns fallback AgentConfig when clientId not found", async () => {
       const { default: prisma } = await import("@/lib/db/prisma");
       vi.mocked(prisma.agentConfig.findUnique).mockResolvedValue(null);
 
-      await expect(agentService.getConfig("nonexistent")).rejects.toThrow();
+      const result = await agentService.getConfig("nonexistent");
+      expect(result.clientId).toBe("nonexistent");
+      expect(result.systemPrompt.length).toBeGreaterThan(0);
+      expect(result.agentName).toBe("AI Assistant");
+      expect(result.id).toBe("00000000-0000-4000-8000-000000000001");
     });
   });
 

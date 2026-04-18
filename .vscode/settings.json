@@ -54,5 +54,8 @@
   "biome.configurationPath": "biome.json",
   "[json]": {
     "editor.defaultFormatter": "vscode.json-language-features"
+  },
+  "[biome_syntax_tree]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   }
 }

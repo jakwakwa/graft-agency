@@ -16,7 +16,7 @@ GRAFT.TODAY is a SaaS platform that helps small businesses and freelancers get m
 - AI Presence,
 - Pain Points,
 
-4. After Audit Summary, Graft Bot will write draft email for you to review and approve before dispatch. The user has an option to push to ATTIO CRM. With more integrations to come.
+4. After Audit Summary, Graft Bot will write draft email for you to review and approve before dispatch.
 
 5. Prospecting Pipeline
 

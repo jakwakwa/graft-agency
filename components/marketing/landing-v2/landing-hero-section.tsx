@@ -1,78 +1,74 @@
-import { ArrowRight, Calendar, ShieldCheck, Zap } from "lucide-react";
-import Link from "next/link";
-import { Typography } from "@/components/ui/typography";
-import { Badge } from "@/components/ui-v2/badge";
-import { Button } from "@/components/ui-v2/button";
-import { LANDING_ROUTES, landingContainerClassName } from "./constants";
-import { HeroDashboardPreview } from "./hero-dashboard-preview";
-import { LandingSectionLink } from "./landing-section-link";
+import { Zap } from "lucide-react";
+import Image from "next/image";
 
 export function LandingHeroSection() {
   return (
-    <section
-      id="lead-capture"
-      className="relative pt-8 isolate scroll-mt-28 overflow-hidden pb-24 lg:scroll-mt-32 lg:pb-32"
-    >
-      <div className="pointer-events-none absolute inset-0 -z-10" aria-hidden>
-        <div className="absolute top-[10%] left-1/2 h-[min(70vh,560px)] w-[min(92vw,780px)] -translate-x-1/2 rounded-full bg-ethereal-gradient opacity-15 blur-[80px] mix-blend-screen" />
-      </div>
-
-      <div
-        className={`${landingContainerClassName} grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-16 lg:gap-x-20`}
-      >
-        <div className="flex flex-col items-start gap-8">
-          <Badge variant="default" pulseColor="#71a9f1">
-            24/7 AI Receptionist Active
-          </Badge>
-
-          <Typography.H1>
-            The Receptionist
-            <br />
-            <Typography.H1 className="font-['Ovo',serif]">That </Typography.H1>
-            <Typography.H1>Never</Typography.H1>
-            <br />
-            <Typography.H1>Sleeps</Typography.H1>
-            <span className="text-[#d0dada]">.</span>
-          </Typography.H1>
-
-          <Typography.Large>
-            Elite AI agents engineered for the South African business rhythm. Captures leads, books consultations, and
-            syncs with your calendar while the city sleeps—or when the grid goes down.
-          </Typography.Large>
-
-          <div className="mt-2 flex flex-col items-center gap-4 sm:flex-row">
-            <Button variant="default" className="w-full sm:w-auto" asChild>
-              <Link href={LANDING_ROUTES.dashboard}>
-                Hire Your AI Receptionist
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-              </Link>
-            </Button>
-            <Button variant="outline" className="w-full sm:w-auto" asChild>
-              <LandingSectionLink sectionId="midnight-prospector">
-                <ShieldCheck className="h-4 w-4 text-[#7bf7c8]" />
-                <span className="text-left text-xs tracking-wider uppercase">
-                  Security Standard
-                  <br />
-                  <span className="font-bold text-white">SHA-256 Encrypted</span>
-                </span>
-              </LandingSectionLink>
-            </Button>
+    <section className="relative min-h-screen flex flex-col items-center justify-center pt-32 pb-20 px-10 overflow-hidden">
+      <div className="absolute inset-0 mesh-bg-hero pointer-events-none"></div>
+      <div className="relative z-10 max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div className="space-y-8">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-container-highest border border-outline-variant/30 text-[10px] tracking-[0.2em] uppercase font-bold text-primary">
+            <Zap />
+            Hyper-Performance AI Engine
           </div>
-
-          <div className="mt-4 flex flex-wrap items-center gap-6 text-xs font-semibold tracking-wider text-[#8b8eab]">
-            <div className="flex items-center gap-2">
-              <Zap className="h-3 w-3 text-[#71a9f1]" /> ZERO LATENCY
+          <h1 className="text-5xl md:text-7xl font-headline font-black tracking-tighter leading-[0.9] text-on-surface">
+            THE RECEPTIONIST <br /> THAT{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">
+              NEVER SLEEPS.
+            </span>
+          </h1>
+          <p className="text-on-surface-variant text-lg max-w-lg leading-relaxed">
+            While your competitors close for the night, GRAFT continues to capture leads, qualify prospects, and scale
+            your brand with zero-latency precision.
+          </p>
+          <div className="flex flex-wrap gap-4">
+            <button
+              type="button"
+              className="px-8 py-4 bg-primary text-on-primary-container font-bold rounded-lg text-sm uppercase tracking-widest hover:scale-105 transition-transform shadow-xl shadow-primary/20"
+            >
+              Initialize Graft
+            </button>
+            <button
+              type="button"
+              className="px-8 py-4 bg-surface-container-highest text-on-surface font-bold rounded-lg text-sm uppercase tracking-widest border border-outline-variant hover:bg-surface-variant transition-colors"
+            >
+              View Schematics
+            </button>
+          </div>
+          <div className="flex gap-8 pt-6">
+            <div>
+              <div className="text-3xl font-black text-on-surface">0ms</div>
+              <div className="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">Latency</div>
             </div>
-            <div className="flex items-center gap-2">
-              <Calendar className="h-3 w-3 text-[#fface8]" /> CALENDLY INTEGRATED
+            <div>
+              <div className="text-3xl font-black text-on-surface">99.9%</div>
+              <div className="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">Reliance</div>
             </div>
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="h-3 w-3 text-[#7bf7c8]" /> MILITARY GRADE
+            <div>
+              <div className="text-3xl font-black text-on-surface">24/7</div>
+              <div className="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">Up-Time</div>
             </div>
           </div>
         </div>
-
-        <HeroDashboardPreview />
+        <div className="relative">
+          <div className="absolute -inset-10 bg-primary/10 blur-[100px] rounded-full"></div>
+          <div className="relative glass-panel rounded-full p-4 overflow-hidden border-2 border-primary/20">
+            <Image
+              alt="3D Cybernetic Sentinel"
+              className="w-full aspect-square object-cover rounded-full mix-blend-lighten grayscale hover:grayscale-0 transition-all duration-700"
+              data-alt="Close-up of a high-fidelity metallic 3D robot head with intricate wiring, glowing pink internal lights, and polished chrome surface against deep black background"
+              height={800}
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuBdA7-SfusOWHPxCDiwk_lmnlwYt5Z8-XaCtvp4s5ytoEEsyz6hFxACJqIKId7JEXX7o7_7WvuJn0F2nL6HfDejMcchcfht3bLLyZaq1Gj26h-kxcWNUW2jYIx22qlMXhx3hfJMly2UAZ9JVGIUPZ-7glhYRekeWiUCeP5OJ5wbAY1xNJp3xgOfsUFTlfHpK0wSQOMNIhxjS4fWEFfwyVtbRzWrCUiZ8KwFD_9x6B6x7owmob03kyLiopndRCOay4kOopBsji-GayWL"
+              width={800}
+            />
+          </div>
+          <div className="absolute -top-10 -right-10 glass-panel p-4 rounded-xl text-[10px] font-mono text-secondary/80 border-l-2 border-secondary space-y-1">
+            <div>[SYSTEM]: INITIALIZING...</div>
+            <div>[LINK]: SECURE_AES256</div>
+            <div>[STATUS]: ACTIVE_SENTRY</div>
+          </div>
+        </div>
       </div>
     </section>
   );

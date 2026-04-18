@@ -1,25 +1,22 @@
 import { LandingChatLauncher } from "@/components/marketing/landing-chat-launcher";
-import { LandingFeatures } from "@/components/marketing/landing-features";
-import { LandingFooter } from "@/components/marketing/landing-footer";
-// import { LandingHero } from "@/components/marketing/landing-hero";
 import LandingPageV2 from "@/components/marketing/landing-v2/landing-page-v2";
 import { getPlatformClientId } from "@/lib/auth/resolve-client";
-import { agentService } from "@/lib/services/agent.service";
+import { agentService, isSyntheticAgentConfig, PLATFORM_LANDING_WIDGET_DEFAULTS } from "@/lib/services/agent.service";
 
 export default async function Home() {
   const platformClientId = await getPlatformClientId();
-  let agentName = "GRAFT";
-  let greetingMessage = "Hi! I'm Graft — how can I help you today?";
-  let primaryColour = "#ED993A";
+  let agentName: string = PLATFORM_LANDING_WIDGET_DEFAULTS.agentName;
+  let greetingMessage: string = PLATFORM_LANDING_WIDGET_DEFAULTS.greetingMessage;
+  let primaryColour: string = PLATFORM_LANDING_WIDGET_DEFAULTS.widgetPrimaryColour;
 
   if (platformClientId) {
-    try {
-      const config = await agentService.getConfig(platformClientId);
+    const config = await agentService.getConfig(platformClientId);
+    if (isSyntheticAgentConfig(config)) {
+      // No DB row yet — keep marketing defaults (same as previous try/catch path).
+    } else {
       agentName = config.agentName ?? agentName;
       greetingMessage = config.greetingMessage ?? greetingMessage;
       primaryColour = config.widgetPrimaryColour ?? primaryColour;
-    } catch {
-      // Use defaults
     }
   }
 

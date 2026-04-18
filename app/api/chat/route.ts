@@ -11,7 +11,7 @@ import { selectModel } from "@/lib/ai/model-router";
 import { buildSystemPrompt } from "@/lib/ai/system-prompt";
 import { createTools } from "@/lib/ai/tools";
 import { getPlatformClientId } from "@/lib/auth/resolve-client";
-import { agentService } from "@/lib/services/agent.service";
+import { agentService, isSyntheticAgentConfig, PLATFORM_LANDING_WIDGET_DEFAULTS } from "@/lib/services/agent.service";
 import { conversationService } from "@/lib/services/conversation.service";
 import type { Prisma } from "../../../generated/prisma/client";
 
@@ -30,6 +30,7 @@ export async function POST(req: Request) {
     return Response.json({ error: "Invalid request body" }, { status: 400 });
   }
 
+  const requestedClientId = body.data.clientId;
   let { clientId, messages, sessionId } = body.data;
   if (clientId === "platform") {
     const platformId = await getPlatformClientId();
@@ -39,7 +40,14 @@ export async function POST(req: Request) {
     clientId = platformId;
   }
 
-  const config = await agentService.getConfig(clientId);
+  let config = await agentService.getConfig(clientId);
+  if (requestedClientId === "platform" && isSyntheticAgentConfig(config)) {
+    config = {
+      ...config,
+      agentName: PLATFORM_LANDING_WIDGET_DEFAULTS.agentName,
+      greetingMessage: PLATFORM_LANDING_WIDGET_DEFAULTS.greetingMessage,
+    };
+  }
   const systemPrompt = buildSystemPrompt(config);
   const tools = createTools(clientId);
 

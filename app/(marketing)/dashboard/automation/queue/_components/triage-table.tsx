@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { PushToAttioButton } from "@/components/push-to-attio-button";
 import { Typography } from "@/components/ui/typography";
 import { formatStageLabel, getStageCategory } from "@/lib/utils/engagement-stages";
 
@@ -10,7 +9,6 @@ interface TriageLead {
   customerName: string | null;
   status: string;
   createdAt: string;
-  attioRecordId: string | null;
   engagementStage?: string;
   scrapedData: {
     websiteUrl?: string;
@@ -121,9 +119,6 @@ export function TriageTable({ leads }: { leads: TriageLead[] }) {
             <th className="px-6 py-4 text-left font-data text-[10px] uppercase tracking-widest text-muted-foreground hidden md:table-cell">
               Date
             </th>
-            <th className="px-6 py-4 text-left font-data text-[10px] uppercase tracking-widest text-muted-foreground hidden sm:table-cell">
-              CRM
-            </th>
           </tr>
         </thead>
         <tbody className="font-sans">
@@ -183,9 +178,6 @@ export function TriageTable({ leads }: { leads: TriageLead[] }) {
                     year: "numeric",
                   })
                   .toUpperCase()}
-              </td>
-              <td className="px-6 py-4 hidden sm:table-cell">
-                <PushToAttioButton leadId={lead.id} initialSynced={!!lead.attioRecordId} />
               </td>
             </tr>
           ))}

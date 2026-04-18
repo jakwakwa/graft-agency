@@ -19,7 +19,6 @@ interface TriageLead {
   customerName: string | null;
   status: string;
   createdAt: string;
-  attioRecordId: string | null;
   engagementStage?: string;
   scrapedData: {
     websiteUrl?: string;

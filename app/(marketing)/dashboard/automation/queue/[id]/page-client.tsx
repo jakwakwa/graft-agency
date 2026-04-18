@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { PushToAttioButton } from "@/components/push-to-attio-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -29,7 +28,6 @@ interface Lead {
   customerName: string | null;
   scrapedData: ScrapedData | null;
   createdAt: string;
-  attioRecordId: string | null;
 }
 
 interface EngagementStatus {
@@ -207,7 +205,6 @@ export default function QueueDetailPage() {
           )}
         </div>
         <div className="flex gap-2 shrink-0 flex-wrap">
-          <PushToAttioButton leadId={lead.id} initialSynced={!!lead.attioRecordId} />
           <Button variant="outline" size="sm" onClick={handleDiscard}>
             Discard
           </Button>
