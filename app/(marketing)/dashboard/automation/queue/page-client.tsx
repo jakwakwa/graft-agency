@@ -1,18 +1,9 @@
 "use client";
 
-import { ArrowLeft, Clock, Cpu, List, Settings } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
-import { Typography } from "@/components/ui/typography";
-import { TriageTable } from "./_components/triage-table";
+import { MarketingShell } from "@/components/layout/marketing-shell";
 
 interface TriageLead {
   id: string;
@@ -38,91 +29,42 @@ interface ProspectingConfig {
   outreachFromEmail: string | null;
 }
 
-const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const LIVE_LOG = [
+  {
+    t: "03:12:04",
+    tag: "[SCANNER]",
+    tone: "text-chart-4",
+    msg: 'Target Found: "Nexus Logic Corp" - Analyzing Tech Stack...',
+  },
+  { t: "03:12:45", tag: "[ANALYSIS]", tone: "text-chart-4", msg: "Fit Score: 94%. ICP Match confirmed." },
+  {
+    t: "03:13:12",
+    tag: "[GRAFT]",
+    tone: "text-chart-3",
+    msg: "Personalized Pitch Generated for CEO @ Nexus.",
+    bold: true,
+  },
+  {
+    t: "03:14:02",
+    tag: "[SCANNER]",
+    tone: "text-chart-4",
+    msg: "Filtering LinkedIn Data for 500+ employee firms in SF...",
+  },
+  {
+    t: "03:14:58",
+    tag: "[SYSTEM]",
+    tone: "text-destructive",
+    msg: 'Target "Vertex" skipped. Reason: Low Growth Signal.',
+  },
+  { t: "03:15:30", tag: "[GRAFT]", tone: "text-chart-3", msg: 'Dispatching agent to prospect "Synthetix AI".' },
+  { t: "03:16:15", tag: "[ANALYSIS]", tone: "text-chart-4", msg: "Synthetix AI: 5 decision makers identified." },
+];
 
-function utcToSast(utcTime: string | null | undefined): string {
-  if (!utcTime || !/^\d{2}:\d{2}$/.test(utcTime)) {
-    return "--:--";
-  }
-  const [h = 0, m = 0] = utcTime.split(":").map(Number);
-  const sast = (h + 2) % 24;
-  return `${String(sast).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
-}
-
-function ScheduledJobCard({ config }: { config: ProspectingConfig }) {
-  const scheduleLabel =
-    config.cronFrequency === "weekly" && config.cronDay !== null
-      ? `Weekly on ${DAYS[config.cronDay]} at ${utcToSast(config.cronTime)} SAST`
-      : `Daily at ${utcToSast(config.cronTime)} SAST`;
-
-  const criteria = config.searchCriteria;
-  const targetParts = [...(criteria?.industries ?? []), ...(criteria?.locations ?? []), ...(criteria?.keywords ?? [])];
-
-  return (
-    <div className="glass-card p-8 rounded-2xl border-l-4 border-primary relative overflow-hidden">
-      <div className="absolute top-0 right-0 p-4">
-        <div className="flex items-center gap-2">
-          <span
-            className={`inline-flex h-2 w-2 rounded-full ${
-              config.cronEnabled ? "bg-green-500 shadow-neon" : "bg-muted-foreground"
-            }`}
-          />
-          <Typography.Small className="font-data uppercase tracking-widest text-[10px]">
-            {config.cronEnabled ? "Active" : "Paused"}
-          </Typography.Small>
-        </div>
-      </div>
-
-      <div className="grid gap-8 sm:grid-cols-3">
-        <div className="space-y-1">
-          <Typography.Small className="text-muted-foreground uppercase tracking-widest text-[10px] font-data">
-            Schedule
-          </Typography.Small>
-          <p className="font-bold text-foreground">{scheduleLabel}</p>
-          {config.cronStartDate && (
-            <p className="text-[10px] text-muted-foreground font-data">
-              FROM{" "}
-              {new Date(config.cronStartDate)
-                .toLocaleDateString("en-ZA", {
-                  day: "numeric",
-                  month: "short",
-                  year: "numeric",
-                })
-                .toUpperCase()}
-            </p>
-          )}
-        </div>
-
-        <div className="space-y-1">
-          <Typography.Small className="text-muted-foreground uppercase tracking-widest text-[10px] font-data">
-            Targeting
-          </Typography.Small>
-          <p className="font-bold text-foreground">
-            {targetParts.length > 0 ? targetParts.join(", ") : "Not configured"}
-          </p>
-        </div>
-
-        <div className="space-y-1">
-          <Typography.Small className="text-muted-foreground uppercase tracking-widest text-[10px] font-data">
-            Value Proposition
-          </Typography.Small>
-          <p className="font-bold text-foreground line-clamp-2 italic">
-            &quot;{config.valueProposition ?? "Not set"}&quot;
-          </p>
-        </div>
-      </div>
-
-      <div className="mt-6 pt-6 border-t border-outline-ghost/10 flex justify-end">
-        <Link
-          href="/dashboard/automation"
-          className="text-xs font-data uppercase tracking-widest text-primary hover:text-primary-kinetic transition-colors flex items-center gap-1"
-        >
-          Edit Configuration
-          <Settings className="h-3 w-3" />
-        </Link>
-      </div>
-    </div>
-  );
+function initialsFromName(name: string | null): string {
+  if (!name) return "NA";
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0]?.slice(0, 2).toUpperCase() ?? "NA";
+  return `${parts[0]?.[0] ?? ""}${parts[1]?.[0] ?? ""}`.toUpperCase();
 }
 
 export default function QueuePage() {
@@ -130,10 +72,6 @@ export default function QueuePage() {
   const [config, setConfig] = useState<ProspectingConfig | null>(null);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
-
-  // Pagination state
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
 
   useEffect(() => {
     async function fetchAll() {
@@ -160,139 +98,187 @@ export default function QueuePage() {
 
   if (loading) {
     return (
-      <div className="container max-w-6xl py-8 space-y-12">
-        <div className="flex flex-col gap-4">
-          <div className="h-4 w-32 animate-pulse rounded bg-muted" />
-          <div className="h-12 w-64 animate-pulse rounded bg-muted" />
-          <div className="h-6 w-full animate-pulse rounded bg-muted" />
+      <div className="min-h-screen bg-background p-8">
+        <div className="mx-auto max-w-7xl space-y-6">
+          <div className="h-16 animate-pulse rounded-xl bg-muted" />
+          <div className="grid grid-cols-12 gap-6">
+            <div className="col-span-12 h-72 animate-pulse rounded-xl bg-muted lg:col-span-8" />
+            <div className="col-span-12 space-y-6 lg:col-span-4">
+              <div className="h-32 animate-pulse rounded-xl bg-muted" />
+              <div className="h-32 animate-pulse rounded-xl bg-muted" />
+            </div>
+          </div>
+          <div className="grid grid-cols-12 gap-8">
+            <div className="col-span-12 h-[500px] animate-pulse rounded-xl bg-card lg:col-span-5" />
+            <div className="col-span-12 h-[500px] animate-pulse rounded-xl bg-muted lg:col-span-7" />
+          </div>
         </div>
-        <div className="grid gap-6 sm:grid-cols-3">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="h-32 animate-pulse rounded-2xl bg-muted/50" />
-          ))}
-        </div>
-        <div className="h-96 animate-pulse rounded-2xl bg-muted/30" />
       </div>
     );
   }
 
-  const totalPages = Math.ceil(leads.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentLeads = leads.slice(startIndex, startIndex + itemsPerPage);
+  const qualifiedProspects = leads.filter((lead) => lead.status !== "CLOSED");
+  const highlightedLeads = qualifiedProspects.slice(0, 3);
+  const foundToday = qualifiedProspects.length;
+  const pitchProgress = config?.cronEnabled ? 84 : 52;
 
   return (
-    <div className="container max-w-6xl py-8 space-y-12">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div>
-          <Link
-            href="/dashboard/automation"
-            className="text-muted-foreground hover:text-primary text-xs uppercase tracking-widest font-data flex items-center gap-1 transition-colors"
-          >
-            <ArrowLeft className="h-3 w-3" />
-            Automation Hub
-          </Link>
-          <Typography.H1 className="mt-4 mb-0">Prospect Queue</Typography.H1>
-          <Typography.Lead className="mt-2">
-            Scheduled prospecting job and all results generated by the pipeline.
-          </Typography.Lead>
-        </div>
-        <div className="flex items-center gap-3 glass-card p-3 rounded-xl">
-          <div className="w-10 h-10 rounded-lg bg-primary-kinetic/20 flex items-center justify-center">
-            <Cpu className="h-5 w-5 text-primary-kinetic" />
-          </div>
-          <div>
-            <p className="text-xs font-data uppercase tracking-widest text-primary font-bold">Super Agent</p>
-            <p className="text-[10px] text-muted-foreground uppercase tracking-tighter">High-Performance Active</p>
-          </div>
-        </div>
-      </div>
-
-      {message && (
-        <div className="rounded-lg p-4 bg-destructive/10 text-destructive border border-destructive/20">
-          <Typography.Small>{message.text}</Typography.Small>
-        </div>
-      )}
-
-      {/* Scheduled job */}
-      <div className="space-y-4">
-        <div className="flex items-center gap-2">
-          <Clock className="h-4 w-4 text-primary" />
-          <Typography.H4 className="mb-0">Scheduled Job</Typography.H4>
-        </div>
-        {config ? (
-          <ScheduledJobCard config={config} />
-        ) : (
-          <div className="rounded-2xl border border-dashed border-outline-ghost/30 p-12 text-center glass-card">
-            <Typography.Small className="text-muted-foreground">
-              No job configured.{" "}
-              <Link href="/dashboard/automation" className="text-primary hover:underline">
-                Set up your prospecting config
-              </Link>{" "}
-              to get started.
-            </Typography.Small>
+    <MarketingShell>
+      <div className="mx-auto max-w-7xl space-y-8 p-8">
+        {message && (
+          <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive-foreground">
+            {message.text}
           </div>
         )}
-      </div>
 
-      {/* Results */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <List className="h-4 w-4 text-secondary" />
-            <Typography.H4 className="mb-0">Queue Results</Typography.H4>
+        <section className="grid grid-cols-12 gap-6">
+          <div className="relative col-span-12 flex min-h-[320px] flex-col justify-between overflow-hidden rounded-xl border-l-2 border-chart-3 bg-card p-8 shadow-ambient lg:col-span-8">
+            <div className="relative z-10">
+              <span className="font-data text-xs font-bold uppercase tracking-[0.2em] text-secondary-foreground">
+                Autonomous Engine Status
+              </span>
+              <h1 className="mt-2 max-w-2xl font-headline text-5xl font-extrabold leading-none tracking-tighter text-foreground">
+                {foundToday} New Qualified Prospects <span className="text-chart-3">Found Today</span>
+              </h1>
+              <p className="mt-4 max-w-lg text-muted-foreground">
+                The Midnight Protocol is operating at {config?.cronEnabled ? "100%" : "67%"} efficiency. Targets are
+                continuously vetted for intent and fit score.
+              </p>
+            </div>
+            <div className="z-10 mt-8">
+              <div className="mb-2 flex items-end justify-between">
+                <span className="text-xs uppercase tracking-widest text-muted-foreground">
+                  Pitching Status Progress
+                </span>
+                <span className="text-lg font-bold text-secondary-foreground">{pitchProgress}%</span>
+              </div>
+              <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                <div className="h-full bg-chart-3" style={{ width: `${pitchProgress}%` }} />
+              </div>
+            </div>
+            <div className="pointer-events-none absolute right-0 top-0 h-full w-1/2 opacity-20">
+              <div className="absolute inset-0 bg-linear-to-l from-chart-3/20 to-transparent" />
+            </div>
           </div>
-          <Typography.Small className="text-muted-foreground font-data uppercase tracking-widest text-[10px]">
-            {leads.length} prospect{leads.length !== 1 ? "s" : ""} total
-          </Typography.Small>
-        </div>
-        <TriageTable leads={currentLeads} />
 
-        {totalPages > 1 && (
-          <div className="mt-8">
-            <Pagination>
-              <PaginationContent>
-                <PaginationItem>
-                  <PaginationPrevious
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      if (currentPage > 1) setCurrentPage(currentPage - 1);
-                    }}
-                    className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                  />
-                </PaginationItem>
-
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                  <PaginationItem key={page}>
-                    <PaginationLink
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setCurrentPage(page);
-                      }}
-                      isActive={currentPage === page}
-                      className="cursor-pointer"
-                    >
-                      {page}
-                    </PaginationLink>
-                  </PaginationItem>
-                ))}
-
-                <PaginationItem>
-                  <PaginationNext
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      if (currentPage < totalPages) setCurrentPage(currentPage + 1);
-                    }}
-                    className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                  />
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
+          <div className="col-span-12 grid gap-6 lg:col-span-4">
+            <div className="flex flex-col justify-center rounded-lg border-l-2 border-secondary/40 bg-muted/60 p-6">
+              <span className="font-data text-[10px] uppercase tracking-widest text-muted-foreground">
+                Global Scan Depth
+              </span>
+              <span className="mt-1 font-headline text-4xl font-bold text-foreground">
+                {Math.max(leads.length * 240, 1200).toLocaleString()}{" "}
+                <span className="text-xs text-secondary-foreground/70">Nodes</span>
+              </span>
+              <div className="mt-4 font-data text-[10px] text-secondary-foreground">+12% FROM PREVIOUS CYCLE</div>
+            </div>
+            <div className="flex flex-col justify-center rounded-lg border-l-2 border-secondary/40 bg-muted/60 p-6">
+              <span className="font-data text-[10px] uppercase tracking-widest text-muted-foreground">
+                Avg Response Latency
+              </span>
+              <span className="mt-1 font-headline text-4xl font-bold text-foreground">
+                {config?.cronEnabled ? "18.4" : "28.7"} <span className="text-xs text-secondary-foreground/70">MS</span>
+              </span>
+              <div className="mt-4 font-data text-[10px] text-chart-1">OPTIMIZED TACTICAL ROUTING</div>
+            </div>
           </div>
-        )}
+        </section>
+
+        <section className="grid grid-cols-12 gap-8">
+          <div className="col-span-12 flex h-[500px] flex-col overflow-hidden rounded-xl border border-outline-ghost bg-card lg:col-span-5">
+            <div className="flex items-center justify-between border-b border-outline-ghost bg-muted/40 p-5">
+              <div className="flex items-center gap-3">
+                <span className="h-2 w-2 animate-pulse rounded-full bg-primary-kinetic" />
+                <h3 className="font-display text-sm font-bold uppercase tracking-widest text-foreground">
+                  Live Hunt Log
+                </h3>
+              </div>
+              <span className="font-data text-[10px] text-muted-foreground">REAL-TIME DATA STREAM</span>
+            </div>
+            <div className="flex-1 space-y-4 overflow-y-auto p-6 text-xs">
+              {LIVE_LOG.map((line) => (
+                <div key={`${line.t}-${line.tag}`} className="flex gap-4">
+                  <span className="text-muted-foreground">{line.t}</span>
+                  <span className={line.tone}>{line.tag}</span>
+                  <span className={line.bold ? "font-bold text-foreground" : "text-foreground"}>{line.msg}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="col-span-12 space-y-4 lg:col-span-7">
+            <div className="mb-2 flex items-end justify-between">
+              <h3 className="font-display text-lg font-bold text-foreground">High-Intent Targets</h3>
+              <span className="font-data text-xs text-secondary-foreground">VIEW ALL PROSPECTS</span>
+            </div>
+
+            {(highlightedLeads.length > 0 ? highlightedLeads : leads.slice(0, 3)).map((lead, index) => {
+              const fit = Math.max(82, 98 - index * 4);
+              const statusLabel = index === 0 ? "Pitched 2m ago" : index === 1 ? "Sourcing now" : "Queued";
+              return (
+                <Link
+                  key={lead.id}
+                  href={`/dashboard/automation/queue/${lead.id}`}
+                  className="group relative flex items-center gap-6 overflow-hidden border-l-2 border-chart-5/40 bg-card p-5 transition-all duration-200 hover:bg-muted/80"
+                >
+                  <div className="absolute right-0 top-0 h-full w-1/4 bg-linear-to-l from-chart-3/10 to-transparent" />
+                  <div className="flex h-12 w-12 items-center justify-center rounded-sm bg-muted text-xl font-black text-secondary-foreground">
+                    {initialsFromName(lead.customerName)}
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-bold text-foreground">{lead.customerName ?? "Unknown Prospect"}</h4>
+                    <p className="text-xs text-muted-foreground">
+                      {lead.scrapedData?.websiteUrl ? lead.scrapedData.websiteUrl : "Prospect in enrichment pipeline"}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-xs font-bold text-secondary-foreground">{fit}% FIT</div>
+                    <div className="mt-1 text-[10px] uppercase text-muted-foreground">{statusLabel}</div>
+                  </div>
+                  <span className="rounded-sm bg-card p-2 text-foreground transition-colors group-hover:bg-chart-3 group-hover:text-primary-foreground">
+                    <ChevronRight className="h-[18px] w-[18px]" />
+                  </span>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+
+        <section className="flex flex-wrap items-center justify-between gap-8 rounded-xl border border-outline-ghost bg-muted/50 p-6">
+          <div className="flex items-center gap-6">
+            <div className="flex flex-col">
+              <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Active Engines</span>
+              <span className="text-lg font-bold text-foreground">1,024</span>
+            </div>
+            <div className="h-8 w-px bg-outline-ghost" />
+            <div className="flex flex-col">
+              <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Compute Load</span>
+              <span className="text-lg font-bold text-foreground">24.2%</span>
+            </div>
+            <div className="h-8 w-px bg-outline-ghost" />
+            <div className="flex flex-col">
+              <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Memory Integrity</span>
+              <span className="text-lg font-bold text-secondary-foreground">Optimal</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="flex -space-x-2">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-background bg-muted text-[10px] font-bold">
+                A1
+              </div>
+              <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-background bg-muted text-[10px] font-bold">
+                B4
+              </div>
+              <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-background bg-chart-3 text-[10px] font-bold text-primary-foreground">
+                Z9
+              </div>
+            </div>
+            <span className="text-[10px] uppercase tracking-tight text-muted-foreground">
+              Assigned Agents in Sector-9
+            </span>
+          </div>
+        </section>
       </div>
-    </div>
+    </MarketingShell>
   );
 }

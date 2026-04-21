@@ -88,87 +88,88 @@ a {
 .dark {
   /* ─── Ethereal Agent — dark-first design system ─────────────────────────
      Surfaces: deep slate void → glass layers
-     Primary:  electric indigo #401FE1
+     Primary:  electric indigo #79798E
      Kinetic:  sunset peach   #EF9772 (glows, active states)
      Secondary: soft blossom  #ffaeda
      Accent:   tangerine      #ff8d58
   ──────────────────────────────────────────────────────────────────────── */
 
   /* Base */
-  --background: #0e1318e2;
-  --foreground: #ead9c9;
+  --background: #121b2ae2;
+  --foreground: #c9eaea;
 
   /* Surfaces — tonal depth, no hard borders */
-  --card: #d0854c0e;
-  --card-foreground: #e1e1f6;
-  --popover: #0e0f19;
-  --popover-foreground: #e1e1f6;
-  --muted: #9793f95b;
-  --muted-foreground: #9191b4;
+  --card: #736ed82c;
+  --card-foreground: #fcdad3;
+  --popover: #3045ea;
+  --popover-foreground: #e1c8ba;
+  --muted: #59b4fa2e;
+  --muted-foreground: #89bafa;
 
-  --primary: #f48369;
-  --primary-container: #f55faf;
-  --primary-kinetic: #d16ae6;
-  --primary-foreground: #e8e2ff;
+  --primary: #fa715ce9;
+  --primary-container: #d13c5f;
+  --primary-kinetic: hsl(248.17 92.27% 59.41%);
+  --primary-foreground: #ebdae2;
 
   /* Secondary — soft blossom */
-  --secondary: #ffaeda;
-  --secondary-container: #990072;
-  --secondary-foreground: #111221;
+  --secondary: #7769f4;
+  --secondary-container: #a0f9da;
+  --secondary-foreground: #7eddde;
 
   /* Accent — tangerine */
-  --accent: #eb8c5f;
-  --accent-foreground: #1a0e00;
+  --accent: #e68d873b;
+  --accent-foreground: #11f48a;
 
   /* Semantic */
-  --destructive: #ffb4ab;
-  --destructive-foreground: #690005;
+  --destructive: #e8190e;
+  --destructive-foreground: #faa3a7;
 
   --border: transparent;
-  --input: color-mix(in srgb, #e74cc281 30%, #d2884b);
-  --input-background: color-mix(in srgb, #913aa9 10%, #1e2142);
-  --input-background-hover: color-mix(in srgb, #9b5a52 20%, #282939);
+  --input: color-mix(in srgb, #12e8d2c2 30%, #f47b18);
+  --input-background: color-mix(in srgb, #5297f7 10%, #1e2142);
+  --input-background-hover: color-mix(in srgb, #f3c920 20%, #282939);
   --ring: #f3b37b;
 
   /* Ghost outline — outline-variant at 15% */
-  --outline-ghost: color-mix(in srgb, #6f6fea 15%, transparent);
+  --outline-ghost: color-mix(in srgb, #eac56f 15%, transparent);
 
   /* Surface tiers for cards/chips */
-  --surface-container-high: color-mix(in srgb, #6c55de 8%, #282939);
-  --surface-highest: color-mix(in srgb, #ffb697 12%, #3e499d);
-  --surface-variant: color-mix(in srgb, #5737f0 15%, #6f75c8);
+  --surface-container-high: color-mix(in srgb, #8ae2d3 8%, #5c98d0);
+  --surface-highest: color-mix(in srgb, #f4fa44 12%, #e4de69);
+  --surface-variant: color-mix(in srgb, #e4bf5a 15%, #c8ad6f);
 
   /* Charts */
-  --chart-1: #5737f0;
+  --chart-1: #7bbdfa;
   --chart-2: #ffaeda;
   --chart-3: #ff8d58;
-  --chart-4: #7c5ff5;
+  --chart-4: #5fb4f5;
   --chart-5: #ffb697;
 
   /* Sidebar */
-  --sidebar: #191a2a;
+  --sidebar: #eadc5b;
   --sidebar-foreground: #e1e1f6;
-  --sidebar-primary: #5737f0;
-  --sidebar-primary-foreground: #e8e2ff;
-  --sidebar-accent: #1d1e2e;
-  --sidebar-accent-foreground: #e1e1f6;
-  --sidebar-border: color-mix(in srgb, #e1e1f6 8%, transparent);
-  --sidebar-ring: #7c5ff5;
+  --sidebar-primary: #f08c52;
+  --sidebar-primary-foreground: #e2f7ff;
+  --sidebar-accent: #9168e419;
+  --sidebar-accent-foreground: #b0b0f5;
+  --sidebar-border: color-mix(in srgb, #e1eef6 8%, transparent);
+  --sidebar-ring: #f5b75f;
 
   /* Shadows & glow */
-  --shadow-ambient: 0 24px 48px -12px rgb(87 55 240 / 0.12);
-  --shadow-neon: 0 0 16px rgba(98 69 246 / 0.55);
-  --shadow-neon-primary: 0 0 20px rgba(20 115 230 / 0.45);
-  --shadow-neon-secondary: 0 0 16px rgba(43 78 220 / 0.4);
+  --shadow-ambient: 0 24px 48px -12px rgba(33 99 184 / 0.17);
+  --shadow-neon: 0 0 16px rgba(68 236 188 / 0.55);
+  --shadow-neon-primary: 0 0 20px #2f75c0d9;
+  --shadow-neon-secondary: 0 0 16px rgba(248 18 110 / 0.81);
 
   /* Glass surfaces */
-  --glass-background: rgba(4 31 63 / 0.48);
-  --glass-border: #5892e339;
+  --glass-background: rgba(241 21 131 / 0.88);
+  --glass-border: #3676f867;
 }
 
 @theme inline {
-  /* Marketing `font-serif` maps to editorial display (Plus Jakarta Sans). */
+  /* Display / headline: Be Vietnam Pro (`next/font` → --font-display). Matches landing-v2 `font-headline`. */
   --font-serif: var(--font-display);
+  --font-headline: var(--font-display), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-data);
   --font-display: var(--font-display);
   --font-data: var(--font-data);
@@ -219,6 +220,8 @@ a {
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
   --font-sans: var(--font-sans);
+  /* Body / UI: Work Sans (`next/font` → --font-sans). */
+  --font-body: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
 }
 
 @layer utilities {
@@ -226,8 +229,8 @@ a {
     position: relative !important;
     background: linear-gradient(
       325deg,
-      oklch(0.56 0.24 261.5 / 0.039) 20%,
-      oklch(0.68 0.17 37.58 / 0.17) 120%
+      oklch(0.63 0.3 322.84 / 0.76) 20%,
+      oklch(0.86 0.15 196.43 / 0.95) 120%
     ) !important;
     -webkit-backdrop-filter: blur(10px) !important;
     backdrop-filter: blur(20px) !important;
@@ -242,21 +245,21 @@ a {
   }
 
   .glass-panel {
-    background: rgba(25, 25, 31, 0.6);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
+    background: rgba(13 118 247 / 0.11);
+    backdrop-filter: blur(110px) !important;
+    border: 1px solid rgba(248 53 199 / 0.49);
+    box-shadow: inset 0 1px 1px rgba(21 177 255 / 0.64);
   }
 
   .neon-glow-primary {
-    filter: drop-shadow(0 0 12px rgba(255, 128, 227, 0.4));
+    filter: drop-shadow(0 0 12px rgba(12 238 186 / 0.28));
   }
 
   .mesh-bg-hero {
     background: radial-gradient(
       circle at 50% 50%,
-      rgba(255, 128, 227, 0.1) 0%,
-      rgba(14, 14, 19, 0) 70%
+      rgba(226 13 95 / 0.24) 0%,
+      rgba(20 88 213 / 0.13) 70%
     );
   }
 
@@ -272,29 +275,37 @@ a {
     box-shadow: var(--shadow-neon);
   }
 
+  input,
+  textarea {
+    border-radius: 10px !important;
+    border: 1px solid #20e09d65 !important;
+  }
+
   .shadow-neon-primary {
     box-shadow: var(--shadow-neon-primary);
   }
 
   .neon-glow {
-    text-shadow: 0 0 10px #201ce7e8;
+    text-shadow: 0 0 10px #fd05bf2b;
   }
 
   .glass-card {
     background: var(--glass-background);
     -webkit-backdrop-filter: blur(1.2px) !important;
 
-    backdrop-filter: blur(1.2px);
+    backdrop-filter: blur(5px);
+    padding: 30px !important;
     background: linear-gradient(
       345deg,
-      oklch(0.48 0.26 271.52 / 0.09) 0%,
-      rgba(241 131 234 / 0.08) 80%,
-      oklch(0.78 0.13 55.06 / 0.4) 127%
+      oklch(0.43 0.12 260.65 / 0.24) 20%,
+      rgba(23 34 64 / 0.61) 70%,
+      oklch(0.5 0.14 31.93 / 0.5) 137%
     ) !important;
-    border: 1px solid var(--glass-border);
+    border-radius: 30px !important;
+    border: 1px solid oklch(0.53 0.15 290.21 / 0.55);
     box-shadow:
       inset -1px -2px 1px 0px var(--glass-border),
-      inset 0px 0px 1px 0px oklch(0.66 0.23 359.79 / 0.29);
+      inset 0px 0px 1px 0px oklch(0.82 0.14 189.04 / 0.55);
   }
 
   .bg-ethereal-gradient {
@@ -307,7 +318,7 @@ a {
 
   .grid-overlay {
     background-image: radial-gradient(
-      rgba(224 81 183 / 0.99) 1px,
+      rgba(81 224 162 / 0.99) 1px,
       transparent 1px
     );
     background-size: 32px 32px;
@@ -345,16 +356,16 @@ a {
 @keyframes status-pulse-glow {
   0%,
   100% {
-    box-shadow: 0 0 0 0 rgb(255 172 232 / 0.35);
+    box-shadow: 0 0 0 0 rgba(39 230 210 / 0.35);
   }
   50% {
-    box-shadow: 0 0 20px 6px rgb(255 172 232 / 0.18);
+    box-shadow: 0 0 20px 6px rgba(170 20 215 / 0.68);
   }
 }
 
 @keyframes pulse-ring-primary {
   0% {
-    box-shadow: 0 0 0 0 rgb(248 146 105 / 0.7);
+    box-shadow: 0 0 0 0 rgba(105 248 227 / 0.12);
     transform: scale(0.95);
   }
   70% {
@@ -362,7 +373,7 @@ a {
     transform: scale(1);
   }
   100% {
-    box-shadow: 0 0 0 0 rgb(248 146 105 / 0);
+    box-shadow: 0 0 0 0 rgba(181 14 247 / 0.36);
     transform: scale(0.95);
   }
 }
@@ -404,7 +415,7 @@ a {
 
   html {
     @apply font-sans;
-    background: #000 !important;
+    background: #010f13 !important;
   }
 
   @media (prefers-reduced-motion: no-preference) {

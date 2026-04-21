@@ -13,7 +13,7 @@ const InputRoot = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivE
         <div
           ref={ref}
           className={cn(
-            "flex h-11.5 w-full min-w-0 items-center rounded-[var(--radius)] border border-input bg-transparent px-2.5 transition-colors focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/50 dark:bg-input-background dark:focus-within:border-primary",
+            "flex h-11.5 w-full min-w-0 items-center rounded-xl border border-input bg-transparent px-2.5 transition-colors focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/50 dark:bg-input-background dark:focus-within:border-secondary",
             className
           )}
           {...props}

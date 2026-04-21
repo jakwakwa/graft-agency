@@ -13,7 +13,7 @@ export function LandingHeroSection() {
           </div>
           <h1 className="text-5xl md:text-7xl font-headline font-black tracking-tighter leading-[0.9] text-on-surface">
             THE RECEPTIONIST <br /> THAT{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">
+            <span className="text-transparent bg-clip-text bg-linear-to-r from-primary to-secondary">
               NEVER SLEEPS.
             </span>
           </h1>

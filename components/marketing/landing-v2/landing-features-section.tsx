@@ -1,4 +1,3 @@
-import { Brain, Brain01Icon } from "@hugeicons/core-free-icons";
 import { BrainCircuit, IdCard, Radar } from "lucide-react";
 import Image from "next/image";
 
@@ -38,7 +37,7 @@ export function LandingFeaturesSection() {
             </div>
             <div className="mt-8">
               <div className="flex gap-4 items-center">
-                <div className="h-[1px] flex-grow bg-outline-variant"></div>
+                <div className="h-px grow bg-outline-variant"></div>
                 <span className="text-[10px] tracking-widest uppercase font-bold text-primary">
                   Live Qualifiers: 1,248
                 </span>
@@ -85,7 +84,7 @@ export function LandingFeaturesSection() {
         </div>
         <div className="md:col-span-8 glass-panel rounded-xl p-8 relative overflow-hidden flex flex-col items-center justify-center text-center">
           <div className="absolute inset-0 opacity-5">
-            <div className="w-full h-full bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:20px_20px]"></div>
+            <div className="w-full h-full bg-[radial-gradient(#fff_1px,transparent_1px)] bg-size-[20px_20px]"></div>
           </div>
           <div className="relative z-10">
             <h3 className="text-xl font-bold text-on-surface mb-6 uppercase tracking-widest">Built for Resilience</h3>

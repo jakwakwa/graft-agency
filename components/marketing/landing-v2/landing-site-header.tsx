@@ -10,7 +10,7 @@ export function LandingSiteHeader() {
         <div className="flex items-center gap-2">
           <Link
             href={LANDING_ROUTES.home}
-            className="text-lg font-bold tracking-wider text-white transition-opacity hover:opacity-90"
+            className="font-headline text-lg font-bold tracking-wider text-white transition-opacity hover:opacity-90"
           >
             GRAFT.TODAY
           </Link>
