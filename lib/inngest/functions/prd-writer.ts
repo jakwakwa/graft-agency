@@ -26,7 +26,7 @@ Write a PRD in Markdown. It must include:
 4. **Tech Stack** — Next.js 15 App Router, Tailwind CSS, shadcn/ui, Vercel. Do NOT deviate from this stack.
 5. **User Stories** — 3-5 stories in "As a [role], I can [action]" format
 6. **Success Metrics** — 2 measurable outcomes
-7. **Design Direction** — 1 paragraph describing visual style (colours, tone, vibe)
+7. **Design Direction** — 1 paragraph describing visual style (colours, tone, vibe). Use exactly this Markdown heading (level 2) so downstream tools can parse it: \`## Design Direction\`
 
 Keep the MVP ruthlessly scoped. An AI agent must be able to implement this in 24 hours.`;
 

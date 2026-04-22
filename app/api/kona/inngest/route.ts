@@ -6,6 +6,7 @@ import {
   prdWriterFunction,
   stitchDesignerFunction,
   julesBuilderFunction,
+  julesPollerFunction,
   offerDispatcherFunction,
 } from "@/lib/inngest";
 
@@ -17,6 +18,7 @@ export const { GET, POST, PUT } = serve({
     prdWriterFunction,
     stitchDesignerFunction,
     julesBuilderFunction,
+    julesPollerFunction,
     offerDispatcherFunction,
   ],
 });

@@ -1,4 +1,5 @@
 import prisma from "@/lib/db/prisma";
+import { isEngagementDryRun } from "@/lib/engagement/dry-run";
 import { inngest } from "@/lib/inngest/client";
 import { createProductOffer, sendOfferEmail } from "@/lib/services/offer.service";
 
@@ -11,11 +12,15 @@ export const offerDispatcherFunction = inngest.createFunction(
     triggers: [{ event: "engagement/deployment.ready" }],
   },
   async ({ event, step }) => {
-    const { leadId, clientId, deploymentUrl } = event.data as {
+    const { leadId, deploymentUrl } = event.data as {
       leadId: string;
       clientId: string;
       deploymentUrl: string;
     };
+
+    if (isEngagementDryRun()) {
+      return { leadId, stage: "SKIPPED_DRY_RUN", reason: "ENGAGEMENT_DRY_RUN" as const, deploymentUrl };
+    }
 
     const lead = await step.run("load-lead", () =>
       prisma.lead.findUniqueOrThrow({
@@ -29,8 +34,8 @@ export const offerDispatcherFunction = inngest.createFunction(
     const spec = lead.productSpec;
     if (!spec) throw new Error(`No ProductSpec found for lead ${leadId}`);
 
-    const profiledNeeds = spec.profiledNeeds as Record<string, any>;
-    const productName = `${profiledNeeds.companyName} ${profiledNeeds.productType ?? "Portal"}`;
+    const profiledNeeds = spec.profiledNeeds as Record<string, unknown>;
+    const productName = `${String(profiledNeeds.companyName ?? "Product")} ${String(profiledNeeds.productType ?? "Portal")}`;
 
     const offer = await step.run("create-paddle-product", () =>
       createProductOffer({
@@ -49,7 +54,7 @@ export const offerDispatcherFunction = inngest.createFunction(
         deploymentUrl,
         checkoutUrl: offer.checkoutUrl,
         priceGBP: BASE_PRICE_GBP,
-        painPoints: (profiledNeeds.painPoints as string[]) ?? [],
+        painPoints: (Array.isArray(profiledNeeds.painPoints) ? profiledNeeds.painPoints : []).map(String),
       }),
     );
 

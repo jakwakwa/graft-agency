@@ -20,6 +20,10 @@ export interface DesignConcept {
   colorScheme: { primary: string; background: string; text: string };
   components: string[];
   styleKeywords: string[];
+  screenId: string;
+  projectId: string;
+  screenshotUrl?: string;
+  htmlUrl?: string;
 }
 
 export interface LeadPipelineEvent {

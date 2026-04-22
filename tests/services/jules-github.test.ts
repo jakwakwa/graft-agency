@@ -1,37 +1,73 @@
-import { describe, it, expect, vi } from "vitest";
-import { createBuildRepo, createJulesIssue, type BuildRepoResult } from "@/lib/services/jules-github.service";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { createJulesSession, getJulesSession } from "@/lib/services/jules-github.service";
 
-vi.mock("@octokit/rest", () => ({
-  Octokit: vi.fn().mockImplementation(() => ({
-    repos: {
-      createUsingTemplate: vi.fn().mockResolvedValue({
-        data: { full_name: "graft-today-builds/acme-plumbing-abc123", html_url: "https://github.com/graft-today-builds/acme-plumbing-abc123", clone_url: "https://github.com/graft-today-builds/acme-plumbing-abc123.git" },
-      }),
-    },
-    issues: {
-      create: vi.fn().mockResolvedValue({
-        data: { html_url: "https://github.com/graft-today-builds/acme-plumbing-abc123/issues/1", number: 1 },
-      }),
-    },
-  })),
-}));
+const mockFetch = vi.fn();
+
+beforeEach(() => {
+  process.env.JULES_API_KEY = "test-key";
+  mockFetch.mockReset();
+  global.fetch = mockFetch as unknown as typeof fetch;
+});
 
 describe("jules-github service", () => {
-  it("createBuildRepo returns repo details", async () => {
-    process.env.GITHUB_TOKEN = "test-token";
-    const result = await createBuildRepo({ companySlug: "acme-plumbing", buildId: "abc123" });
-    expect(result.repoFullName).toBe("graft-today-builds/acme-plumbing-abc123");
-    expect(result.htmlUrl).toContain("github.com");
+  it("createJulesSession returns session details", async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        id: "12345",
+        name: "sessions/12345",
+        url: "https://jules.google.com/session/12345",
+        state: "QUEUED",
+      }),
+    });
+
+    const result = await createJulesSession({
+      repoSource: "sources/github/jakwakwa/graft-today-jules",
+      startingBranch: "main",
+      title: "Build prototype: Acme Corp",
+      prompt: "Build a landing page",
+    });
+
+    expect(result.sessionId).toBe("12345");
+    expect(result.sessionUrl).toContain("jules.google.com");
+    expect(result.state).toBe("QUEUED");
+
+    const call = mockFetch.mock.calls[0]!;
+    expect(call[0]).toContain("/sessions");
+    const body = JSON.parse(call[1].body);
+    expect(body.sourceContext.source).toBe("sources/github/jakwakwa/graft-today-jules");
+    expect(body.sourceContext.githubRepoContext.startingBranch).toBe("main");
   });
 
-  it("createJulesIssue returns issue URL", async () => {
-    process.env.GITHUB_TOKEN = "test-token";
-    const issueUrl = await createJulesIssue({
-      repoFullName: "graft-today-builds/acme-plumbing-abc123",
-      prdContent: "# PRD: Acme Booking Portal\n\n...",
-      designDescription: "Clean Professional — white background, blue accents",
+  it("getJulesSession returns current state", async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        id: "12345",
+        url: "https://jules.google.com/session/12345",
+        state: "IN_PROGRESS",
+      }),
     });
-    expect(issueUrl).toContain("github.com");
-    expect(issueUrl).toContain("issues");
+
+    const result = await getJulesSession("12345");
+    expect(result.state).toBe("IN_PROGRESS");
+    expect(result.sessionId).toBe("12345");
+  });
+
+  it("createJulesSession throws on API error", async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: false,
+      status: 400,
+      json: async () => ({ error: { message: "Invalid argument" } }),
+    });
+
+    await expect(
+      createJulesSession({
+        repoSource: "sources/github/jakwakwa/bad-repo",
+        startingBranch: "main",
+        title: "Test",
+        prompt: "Test prompt",
+      }),
+    ).rejects.toThrow("Jules session creation failed");
   });
 });

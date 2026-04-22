@@ -1,91 +1,163 @@
-import { Octokit } from "@octokit/rest";
+const JULES_API_BASE = "https://jules.googleapis.com/v1alpha";
 
-export interface BuildRepoResult {
-  repoFullName: string;
-  htmlUrl: string;
-  cloneUrl: string;
+function getJulesKey(): string {
+  const key = process.env.JULES_API_KEY?.trim();
+  if (!key) throw new Error("JULES_API_KEY is not set");
+  return key;
 }
 
-function getOctokit(): Octokit {
-  const token = process.env.GITHUB_TOKEN;
-  if (!token) throw new Error("GITHUB_TOKEN not configured");
-  return new Octokit({ auth: token });
+function julesHeaders() {
+  return { "x-goog-api-key": getJulesKey(), "Content-Type": "application/json" };
 }
 
-function getTemplateRepo(): { owner: string; repo: string } {
-  const templateRepo = process.env.GITHUB_TEMPLATE_REPO ?? "graft-today-agency/prototype-template";
-  const [owner, repo] = templateRepo.split("/");
-  if (!owner || !repo) throw new Error("Invalid GITHUB_TEMPLATE_REPO format — expected 'owner/repo'");
-  return { owner, repo };
+export interface JulesSession {
+  sessionId: string;
+  sessionUrl: string;
+  state: string;
 }
 
-function getBuildsOrg(): string {
-  return process.env.GITHUB_BUILDS_ORG ?? "graft-today-builds";
-}
+export async function createJulesSession(params: {
+  repoSource: string;
+  startingBranch: string;
+  title: string;
+  prompt: string;
+  requirePlanApproval?: boolean;
+}): Promise<JulesSession> {
+  const body = {
+    title: params.title,
+    prompt: params.prompt,
+    sourceContext: {
+      source: params.repoSource,
+      githubRepoContext: { startingBranch: params.startingBranch },
+      environmentVariablesEnabled: true,
+    },
+    requirePlanApproval: params.requirePlanApproval ?? false,
+  };
 
-export async function createBuildRepo(params: {
-  companySlug: string;
-  buildId: string;
-}): Promise<BuildRepoResult> {
-  const octokit = getOctokit();
-  const template = getTemplateRepo();
-  const buildsOrg = getBuildsOrg();
-  const repoName = `${params.companySlug}-${params.buildId}`.slice(0, 100).replace(/[^a-z0-9-]/gi, "-");
-
-  const { data } = await octokit.repos.createUsingTemplate({
-    template_owner: template.owner,
-    template_repo: template.repo,
-    owner: buildsOrg,
-    name: repoName,
-    private: true,
-    description: `Prototype build for ${params.companySlug}`,
+  const r = await fetch(`${JULES_API_BASE}/sessions`, {
+    method: "POST",
+    headers: julesHeaders(),
+    body: JSON.stringify(body),
   });
 
-  return { repoFullName: data.full_name, htmlUrl: data.html_url, cloneUrl: data.clone_url };
+  if (!r.ok) {
+    const err = await r.json().catch(() => ({})) as Record<string, unknown>;
+    throw new Error(`Jules session creation failed (${r.status}): ${JSON.stringify(err)}`);
+  }
+
+  const sess = await r.json() as { id: string; url: string; state?: string; name: string };
+  return {
+    sessionId: sess.id,
+    sessionUrl: sess.url,
+    state: sess.state ?? "QUEUED",
+  };
 }
 
-export async function createJulesIssue(params: {
-  repoFullName: string;
-  prdContent: string;
-  designDescription: string;
-}): Promise<string> {
-  const octokit = getOctokit();
-  const parts = params.repoFullName.split("/");
-  const owner = parts[0];
-  const repo = parts[1];
-  if (!owner || !repo) throw new Error("Invalid repoFullName format — expected 'owner/repo'");
-
-  const issueBody = `## Build Request — GRAFT.TODAY Autonomous Pipeline
-
-${params.prdContent}
-
----
-
-## Design Specification
-
-${params.designDescription}
-
----
-
-## Build Instructions for Jules
-
-1. Implement all MVP features listed in the PRD above
-2. Use the design specification for all styling decisions
-3. Stack: Next.js 15 App Router, Tailwind CSS v4, shadcn/ui, TypeScript
-4. Deploy target: Vercel — ensure \`vercel.json\` is present with \`{ "buildCommand": "next build" }\`
-5. All pages must be responsive (mobile-first)
-6. No backend required — static data or localStorage is fine for the prototype
-7. Commit all changes to main branch in a single PR
-
-When done, open a PR titled: \`feat: prototype build\``;
-
-  const { data } = await octokit.issues.create({
-    owner,
-    repo,
-    title: "🤖 Build prototype — jules",
-    body: issueBody,
-    labels: ["jules"],
+export async function getJulesSession(sessionId: string): Promise<JulesSession & { raw: Record<string, unknown> }> {
+  const r = await fetch(`${JULES_API_BASE}/sessions/${sessionId}`, {
+    headers: { "x-goog-api-key": getJulesKey() },
   });
 
-  return data.html_url;
+  if (!r.ok) {
+    const err = await r.json().catch(() => ({})) as Record<string, unknown>;
+    throw new Error(`Jules session fetch failed (${r.status}): ${JSON.stringify(err)}`);
+  }
+
+  const sess = await r.json() as Record<string, unknown> & { id: string; url: string; state: string };
+  return { sessionId: sess.id, sessionUrl: sess.url, state: sess.state, raw: sess };
+}
+
+export const JULES_TERMINAL_STATES = new Set(["COMPLETED", "SUCCEEDED", "FAILED", "CANCELLED", "CANCELED", "ERROR"]);
+
+export function isJulesTerminalState(state: string | null | undefined): boolean {
+  if (!state) return false;
+  return JULES_TERMINAL_STATES.has(state.toUpperCase());
+}
+
+export function isJulesFailedState(state: string | null | undefined): boolean {
+  if (!state) return false;
+  const s = state.toUpperCase();
+  return s === "FAILED" || s === "ERROR" || s === "CANCELLED" || s === "CANCELED";
+}
+
+// ------------------------------------------------------------- GitHub helpers ---
+
+export function parseGithubRepoFromJulesSource(source: string): { owner: string; repo: string } | null {
+  const m = source.match(/^sources\/github\/([^/]+)\/([^/]+)$/);
+  if (!m) return null;
+  return { owner: m[1]!, repo: m[2]! };
+}
+
+/**
+ * Find the most likely PR for a Jules session by matching session id in PR body/branch,
+ * else falling back to the newest Jules-style PR.
+ */
+export async function findJulesPullRequest(params: {
+  owner: string;
+  repo: string;
+  sessionId: string;
+}): Promise<{ htmlUrl: string; number: number; headBranch: string; state: string; merged: boolean } | null> {
+  const token = process.env.GITHUB_TOKEN?.trim();
+  if (!token) return null;
+
+  const url = `https://api.github.com/repos/${params.owner}/${params.repo}/pulls?state=all&sort=created&direction=desc&per_page=30`;
+  const r = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: "application/vnd.github+json",
+      "X-GitHub-Api-Version": "2022-11-28",
+    },
+  });
+  if (!r.ok) return null;
+
+  const prs = await r.json() as Array<{
+    html_url: string;
+    number: number;
+    body: string | null;
+    state: string;
+    merged_at: string | null;
+    head: { ref: string };
+  }>;
+
+  const match =
+    prs.find((p) => (p.body ?? "").includes(params.sessionId) || p.head.ref.includes(params.sessionId)) ??
+    prs.find((p) => p.head.ref.startsWith("jules") || p.head.ref.startsWith("feat/"));
+
+  if (!match) return null;
+  return {
+    htmlUrl: match.html_url,
+    number: match.number,
+    headBranch: match.head.ref,
+    state: match.state,
+    merged: Boolean(match.merged_at),
+  };
+}
+
+/**
+ * Scan PR comments for a Render preview URL (Render posts them on PR open).
+ */
+export async function findRenderPreviewUrl(params: {
+  owner: string;
+  repo: string;
+  prNumber: number;
+}): Promise<string | null> {
+  const token = process.env.GITHUB_TOKEN?.trim();
+  if (!token) return null;
+
+  const url = `https://api.github.com/repos/${params.owner}/${params.repo}/issues/${params.prNumber}/comments?per_page=50`;
+  const r = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: "application/vnd.github+json",
+      "X-GitHub-Api-Version": "2022-11-28",
+    },
+  });
+  if (!r.ok) return null;
+
+  const comments = await r.json() as Array<{ body: string | null }>;
+  for (const c of comments) {
+    const m = (c.body ?? "").match(/https?:\/\/[a-z0-9-]+\.onrender\.com[^\s)]*/i);
+    if (m) return m[0];
+  }
+  return null;
 }

@@ -1,8 +1,13 @@
+import type { Prisma } from "@/generated/prisma/client";
 import prisma from "@/lib/db/prisma";
+import { generateDesignConcepts } from "@/lib/engagement/stitch-design-concepts";
 import { inngest } from "@/lib/inngest/client";
-import { generateDesignConcepts } from "@/lib/services/stitch-mcp.service";
 import type { ProfiledNeeds } from "@/lib/types/engagement";
 
+/**
+ * Inngest: PRD → Stitch (@google/stitch-sdk) → three design concept variants.
+ * @see https://stitch.withgoogle.com/docs/sdk/ai-sdk/
+ */
 export const stitchDesignerFunction = inngest.createFunction(
   {
     id: "stitch-designer",
@@ -21,7 +26,6 @@ export const stitchDesignerFunction = inngest.createFunction(
       prisma.productSpec.update({ where: { leadId }, data: { stage: "DESIGNING" } }),
     );
 
-    // Extract design direction from PRD (section after "Design Direction")
     const designSectionMatch = prdContent.match(/## Design Direction\n([\s\S]*?)(?=\n##|$)/);
     const styleHint = designSectionMatch?.[1]?.trim() ?? "professional, clean, modern";
 
@@ -39,8 +43,8 @@ export const stitchDesignerFunction = inngest.createFunction(
         where: { leadId },
         data: {
           stage: "DESIGN_COMPLETE",
-          designConcepts: designConcepts as any,
-          chosenDesign: 0, // Default to first concept; can be overridden via UI
+          designConcepts: designConcepts as unknown as Prisma.InputJsonValue,
+          chosenDesign: 0,
         },
       }),
     );

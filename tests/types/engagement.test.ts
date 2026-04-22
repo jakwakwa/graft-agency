@@ -26,6 +26,8 @@ describe("engagement types", () => {
       colorScheme: { primary: "#6366f1", background: "#0f172a", text: "#f8fafc" },
       components: ["BookingCalendar", "QuoteForm", "Dashboard"],
       styleKeywords: ["minimal", "professional", "dark"],
+      screenId: "abc123",
+      projectId: "proj456",
     };
     expect(concept.index).toBe(0);
   });

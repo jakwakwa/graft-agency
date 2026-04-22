@@ -33,6 +33,10 @@ const configSchema = z.object({
       industries: z.array(z.string()).default([]),
       locations: z.array(z.string()).default([]),
       keywords: z.array(z.string()).default([]),
+      headcountMin: z.number().int().min(1).optional().nullable(),
+      headcountMax: z.number().int().min(1).optional().nullable(),
+      prospectCap: z.number().int().min(1).max(200).optional().nullable(),
+      personaId: z.string().optional().nullable(),
     })
     .optional(),
   outreachFromEmail: z.string().email().optional().nullable(),

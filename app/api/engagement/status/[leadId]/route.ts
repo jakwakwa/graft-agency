@@ -1,9 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import { requirePlatformAccess } from "@/lib/auth/resolve-client";
 import prisma from "@/lib/db/prisma";
 
 export async function GET(
-  req: NextRequest,
+  _req: NextRequest,
   { params }: { params: Promise<{ leadId: string }> },
 ): Promise<NextResponse> {
   const authResult = await requirePlatformAccess();
@@ -14,8 +15,16 @@ export async function GET(
     where: { leadId },
     select: {
       stage: true,
+      profiledNeeds: true,
+      prdContent: true,
+      designConcepts: true,
+      chosenDesign: true,
       githubRepo: true,
       githubIssueUrl: true,
+      julesSessionId: true,
+      julesState: true,
+      julesLastPolledAt: true,
+      pullRequestUrl: true,
       deploymentUrl: true,
       offerSentAt: true,
       errorMessage: true,

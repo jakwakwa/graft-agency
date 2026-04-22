@@ -47,12 +47,45 @@ const MOCK_STATUSES = [
     },
   },
   {
-    label: "Building",
+    label: "Building (with artifacts)",
     status: {
       stage: "BUILDING",
-      githubRepo: "https://github.com/graft-today/demo-build",
+      githubRepo: "graft-today/demo-build",
       githubIssueUrl: "https://github.com/graft-today/demo-build/issues/1",
       updatedAt: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
+      profiledNeeds: {
+        companyName: "Acme Ltd",
+        websiteUrl: "https://example.com",
+        industry: "Professional services",
+        primaryNeed: "A client portal for booking and document sharing.",
+        productType: "web-app",
+        targetAudience: "SME operations leads",
+        estimatedComplexity: "medium",
+        painPoints: ["Email chains for scheduling", "No single view of status"],
+        signals: ["High traffic on /contact", "Asked for login area in chat"],
+      },
+      prdContent: "## Problem\nTeams lose time chasing status in email.\n\n## MVP\n- Dashboard with **next actions**\n- Upload + list documents",
+      designConcepts: [
+        {
+          index: 0,
+          name: "Trust & clarity",
+          description: "Neutral surface, strong hierarchy",
+          previewUrl: "https://placehold.co/400x225/e2e8f0/1e293b?text=A",
+        },
+        {
+          index: 1,
+          name: "Bold conversion",
+          description: "High contrast CTA",
+          previewUrl: "https://placehold.co/400x225/1e293b/f8fafc?text=B",
+        },
+        {
+          index: 2,
+          name: "Warm support",
+          description: "Soft tones, approachable",
+          previewUrl: "https://placehold.co/400x225/fef3c7/78350f?text=C",
+        },
+      ],
+      chosenDesign: 0,
     },
   },
   {
