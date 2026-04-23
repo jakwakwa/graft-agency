@@ -23,6 +23,7 @@ interface ScrapedData {
 interface Lead {
   id: string;
   customerName: string | null;
+  status: string;
   scrapedData: ScrapedData | null;
   createdAt: string;
 }
@@ -38,11 +39,18 @@ interface EngagementStatus {
   julesSessionId?: string | null;
   julesState?: string | null;
   julesLastPolledAt?: string | null;
+  renderServiceId?: string | null;
+  renderServiceName?: string | null;
   pullRequestUrl?: string | null;
   deploymentUrl?: string | null;
   offerSentAt?: string | null;
   errorMessage?: string | null;
   updatedAt?: string | null;
+  // durability fields
+  inngestRunStatus?: string | null;
+  lastReconciledAt?: string | null;
+  isStale?: boolean;
+  failure?: { stage: string; at: string; reason: string | null; source: string | null } | null;
 }
 
 export default function QueueDetailPage() {
@@ -55,40 +63,86 @@ export default function QueueDetailPage() {
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [engagementStatus, setEngagementStatus] = useState<EngagementStatus | null>(null);
   const [engagementLoading, setEngagementLoading] = useState(true);
+  const [statusUnavailable, setStatusUnavailable] = useState(false);
 
   useEffect(() => {
+    if (!id) return;
+
+    const leadAbort = new AbortController();
+    const statusAbort = new AbortController();
+    const leadTimeout = setTimeout(() => leadAbort.abort(), 12000);
+    const statusTimeout = setTimeout(() => statusAbort.abort(), 12000);
+
     async function fetchAll() {
       try {
-        const [leadRes, statusRes] = await Promise.all([
-          fetch(`/api/leads/${id}`),
-          fetch(`/api/engagement/status/${id}`),
+        const [leadResult, statusResult] = await Promise.allSettled([
+          fetch(`/api/leads/${id}`, { signal: leadAbort.signal }),
+          fetch(`/api/engagement/status/${id}`, { signal: statusAbort.signal }),
         ]);
 
-        if (!leadRes.ok) {
-          setMessage({ type: "error", text: "Prospect not found." });
-          return;
+        if (leadResult.status === "rejected") {
+          // Fallback for environments where the id endpoint stalls: resolve from list endpoint.
+          try {
+            const fallbackRes = await fetch("/api/leads");
+            if (fallbackRes.ok) {
+              const fallbackData = (await fallbackRes.json()) as Lead[];
+              const matched = fallbackData.find((l) => l.id === id);
+              if (matched) {
+                setLead(matched);
+              } else {
+                setMessage({ type: "error", text: "Prospect not found." });
+                return;
+              }
+            } else {
+              setMessage({ type: "error", text: "Lead request timed out. Please retry." });
+              return;
+            }
+          } catch {
+            setMessage({ type: "error", text: "Lead request timed out. Please retry." });
+            return;
+          }
+        } else {
+          const leadRes = leadResult.value;
+          if (!leadRes.ok) {
+            setMessage({ type: "error", text: "Prospect not found." });
+            return;
+          }
+
+          const data: Lead = await leadRes.json();
+          setLead(data);
         }
 
-        const data: Lead = await leadRes.json();
-        setLead(data);
-
-        if (statusRes.ok) {
-          const statusData: EngagementStatus = await statusRes.json();
+        if (statusResult.status === "fulfilled" && statusResult.value.ok) {
+          const statusData: EngagementStatus = await statusResult.value.json();
           setEngagementStatus(statusData);
+          setStatusUnavailable(false);
+        } else {
+          // Leave engagementStatus null so the panel shows a real loading/error state
+          // rather than lying "Not Started" while a pipeline may actually be running.
+          setStatusUnavailable(true);
         }
       } catch {
         setMessage({ type: "error", text: "Failed to load prospect." });
       } finally {
+        clearTimeout(leadTimeout);
+        clearTimeout(statusTimeout);
         setLoading(false);
         setEngagementLoading(false);
       }
     }
     fetchAll();
+
+    return () => {
+      clearTimeout(leadTimeout);
+      clearTimeout(statusTimeout);
+      leadAbort.abort();
+      statusAbort.abort();
+    };
   }, [id]);
 
   useEffect(() => {
     if (engagementLoading) return;
-    if (engagementStatus && isTerminalStage(engagementStatus.stage)) return;
+    if (!statusUnavailable && engagementStatus && isTerminalStage(engagementStatus.stage)) return;
 
     const interval = setInterval(async () => {
       try {
@@ -96,15 +150,18 @@ export default function QueueDetailPage() {
         if (res.ok) {
           const data: EngagementStatus = await res.json();
           setEngagementStatus(data);
+          setStatusUnavailable(false);
           if (isTerminalStage(data.stage)) clearInterval(interval);
+        } else {
+          setStatusUnavailable(true);
         }
       } catch {
-        // silently ignore polling errors
+        setStatusUnavailable(true);
       }
-    }, 15000); // poll every 15 seconds
+    }, 10000); // poll every 10 seconds
 
     return () => clearInterval(interval);
-  }, [id, engagementStatus, engagementLoading]);
+  }, [id, engagementStatus, engagementLoading, statusUnavailable]);
 
   async function handleApprove() {
     if (!lead) return;
@@ -113,8 +170,19 @@ export default function QueueDetailPage() {
       const res = await fetch(`/api/leads/${id}/approve`, { method: "POST" });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Approve failed");
-      setMessage({ type: "success", text: "Lead approved and email sent." });
-      setTimeout(() => router.push("/dashboard/automation/queue"), 1500);
+
+      if (data.pipelineStarted) {
+        setMessage({ type: "success", text: "Pipeline started — profiling prospect now." });
+        // Refetch status immediately so the panel transitions from PENDING → PROFILING.
+        const statusRes = await fetch(`/api/engagement/status/${id}`);
+        if (statusRes.ok) {
+          setEngagementStatus(await statusRes.json());
+          setStatusUnavailable(false);
+        }
+      } else {
+        const currentStage = data.stage ?? engagementStatus?.stage ?? "unknown";
+        setMessage({ type: "success", text: `Pipeline already running — stage: ${currentStage}.` });
+      }
     } catch (err) {
       setMessage({
         type: "error",
@@ -166,16 +234,27 @@ export default function QueueDetailPage() {
   }
 
   const stage = engagementStatus?.stage ?? "PENDING";
-  const canApprove = stage === "PENDING" || stage === "NOT_STARTED";
+
+  // The lead's own status is the primary gate — if it's not DRAFT_PENDING or CONTACTED there's
+  // nothing to approve regardless of pipeline state.
+  const leadIsApprovable = lead.status === "DRAFT_PENDING" || lead.status === "CONTACTED";
+
+  // The pipeline gate: only block if we have a confirmed running/complete stage from the server.
+  // While status is still loading (engagementStatus === null) or temporarily unavailable,
+  // show the button — the approve endpoint is idempotent and handles the "already running" case.
+  const pipelineIsKnownRunning =
+    engagementStatus !== null &&
+    !statusUnavailable &&
+    stage !== "PENDING" &&
+    stage !== "NOT_STARTED";
+
+  const canApprove = leadIsApprovable && !pipelineIsKnownRunning;
 
   return (
     <MarketingShell>
       <div className="mx-auto max-w-5xl p-8 space-y-6">
         <div className="flex items-center justify-between">
-          <Link
-            href="/dashboard/automation/queue"
-            className="text-sm text-muted-foreground hover:text-foreground"
-          >
+          <Link href="/dashboard/automation/queue" className="text-sm text-muted-foreground hover:text-foreground">
             ← Prospect Queue
           </Link>
           <div className="flex gap-2">
@@ -198,9 +277,7 @@ export default function QueueDetailPage() {
         </div>
 
         <header>
-          <h1 className="font-display text-3xl font-bold text-foreground">
-            {lead.customerName ?? "Unknown Prospect"}
-          </h1>
+          <h1 className="font-display text-3xl font-bold text-foreground">{lead.customerName ?? "Unknown Prospect"}</h1>
           <p className="text-sm text-muted-foreground">
             Lead <span className="font-mono">{lead.id}</span>
           </p>
@@ -214,7 +291,7 @@ export default function QueueDetailPage() {
           </div>
         )}
 
-        <EngagementPanel status={engagementStatus} />
+        <EngagementPanel status={engagementStatus} statusUnavailable={statusUnavailable} />
       </div>
     </MarketingShell>
   );

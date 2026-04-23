@@ -2,6 +2,7 @@ import prisma from "@/lib/db/prisma";
 import { isEngagementDryRun } from "@/lib/engagement/dry-run";
 import { inngest } from "@/lib/inngest/client";
 import { createProductOffer, sendOfferEmail } from "@/lib/services/offer.service";
+import { makeOnFailure } from "./_shared/on-failure";
 
 const BASE_PRICE_GBP = 497;
 
@@ -9,6 +10,9 @@ export const offerDispatcherFunction = inngest.createFunction(
   {
     id: "offer-dispatcher",
     name: "Offer Dispatcher",
+    retries: 2,
+    idempotency: "event.data.leadId",
+    onFailure: makeOnFailure("offer-dispatcher", "OFFER_SENT"),
     triggers: [{ event: "engagement/deployment.ready" }],
   },
   async ({ event, step }) => {

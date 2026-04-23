@@ -1,7 +1,9 @@
 import { GoogleGenAI, ThinkingLevel, Type } from "@google/genai";
 import prisma from "@/lib/db/prisma";
+import { transitionStage } from "@/lib/engagement/stage-machine";
 import { inngest } from "@/lib/inngest/client";
 import type { ProfiledNeeds } from "@/lib/types/engagement";
+import { makeOnFailure } from "./_shared/on-failure";
 
 export async function profileLead(leadId: string, clientId: string): Promise<ProfiledNeeds> {
   const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
@@ -24,29 +26,36 @@ Draft outreach context: ${scraped.draftBody ?? ""}
 Research their industry deeply. Identify the single most impactful product that could be built in 1-2 days as a prototype.
 Output your analysis as structured JSON matching the schema exactly.`;
 
-  const response = await ai.models.generateContent({
-    model: "gemini-3-flash-preview",
-    contents: prompt,
-    config: {
-      thinkingConfig: { thinkingLevel: ThinkingLevel.HIGH },
-      tools: [{ googleSearch: {} }],
-      responseMimeType: "application/json",
-      responseSchema: {
-        type: Type.OBJECT,
-        properties: {
-          companyName: { type: Type.STRING },
-          websiteUrl: { type: Type.STRING },
-          industry: { type: Type.STRING },
-          painPoints: { type: Type.ARRAY, items: { type: Type.STRING } },
-          primaryNeed: { type: Type.STRING },
-          productType: { type: Type.STRING, enum: ["web-app", "website", "dashboard", "saas"] },
-          targetAudience: { type: Type.STRING },
-          estimatedComplexity: { type: Type.STRING, enum: ["simple", "medium", "complex"] },
+  const ctrl = new AbortController();
+  const timeout = setTimeout(() => ctrl.abort(), 120_000); // 2 min cap for Gemini w/ thinking + search
+  let response: Awaited<ReturnType<typeof ai.models.generateContent>>;
+  try {
+    response = await ai.models.generateContent({
+      model: "gemini-3-flash-preview",
+      contents: prompt,
+      config: {
+        thinkingConfig: { thinkingLevel: ThinkingLevel.HIGH },
+        tools: [{ googleSearch: {} }],
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            companyName: { type: Type.STRING },
+            websiteUrl: { type: Type.STRING },
+            industry: { type: Type.STRING },
+            painPoints: { type: Type.ARRAY, items: { type: Type.STRING } },
+            primaryNeed: { type: Type.STRING },
+            productType: { type: Type.STRING, enum: ["web-app", "website", "dashboard", "saas"] },
+            targetAudience: { type: Type.STRING },
+            estimatedComplexity: { type: Type.STRING, enum: ["simple", "medium", "complex"] },
+          },
+          required: ["companyName", "websiteUrl", "industry", "painPoints", "primaryNeed", "productType", "targetAudience", "estimatedComplexity"],
         },
-        required: ["companyName", "websiteUrl", "industry", "painPoints", "primaryNeed", "productType", "targetAudience", "estimatedComplexity"],
       },
-    },
-  });
+    });
+  } finally {
+    clearTimeout(timeout);
+  }
 
   const needs = JSON.parse(response.text ?? "{}") as ProfiledNeeds;
   needs.leadId = leadId;
@@ -57,27 +66,33 @@ export const leadProfilerFunction = inngest.createFunction(
   {
     id: "lead-profiler-agent",
     name: "Lead Profiler Agent",
+    retries: 3,
+    idempotency: "event.data.leadId",
+    onFailure: makeOnFailure("profiler", "PROFILING"),
     triggers: [{ event: "engagement/lead.approved" }],
   },
   async ({ event, step }) => {
     const { leadId, clientId } = event.data as { leadId: string; clientId: string };
 
     await step.run("mark-profiling", async () => {
-      await prisma.productSpec.upsert({
-        where: { leadId },
-        create: { leadId, clientId: clientId, stage: "PROFILING" },
-        update: { stage: "PROFILING", errorMessage: null },
-      });
+      const existing = await prisma.productSpec.findUnique({ where: { leadId }, select: { stage: true } });
+      if (!existing) {
+        await prisma.productSpec.create({ data: { leadId, clientId, stage: "PROFILING", errorMessage: null } });
+      } else {
+        await transitionStage({ leadId, to: "PROFILING", source: "profiler", data: { errorMessage: null } });
+      }
     });
 
     const profiledNeeds = await step.run("profile-lead", () => profileLead(leadId, clientId));
 
-    await step.run("save-profiled-needs", async () => {
-      await prisma.productSpec.update({
-        where: { leadId },
-        data: { stage: "PROFILED", profiledNeeds: profiledNeeds as any },
-      });
-    });
+    await step.run("save-profiled-needs", () =>
+      transitionStage({
+        leadId,
+        to: "PROFILED",
+        source: "profiler",
+        data: { profiledNeeds: profiledNeeds as never },
+      }),
+    );
 
     await step.sendEvent("emit-profiled", {
       name: "engagement/lead.profiled",

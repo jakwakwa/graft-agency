@@ -1,7 +1,8 @@
-import prisma from "@/lib/db/prisma";
+import { transitionStage } from "@/lib/engagement/stage-machine";
+import { ensureJulesSession, ensureRenderService } from "@/lib/engagement/idempotency";
 import { inngest } from "@/lib/inngest/client";
-import { createJulesSession } from "@/lib/services/jules-github.service";
 import type { DesignConcept, ProfiledNeeds } from "@/lib/types/engagement";
+import { makeOnFailure } from "./_shared/on-failure";
 
 function getJulesRepoSource(): string {
   return process.env.JULES_SOURCE_REPO?.trim() ?? "sources/github/jakwakwa/graft-today-engagement-demo-builds";
@@ -11,6 +12,9 @@ export const julesBuilderFunction = inngest.createFunction(
   {
     id: "jules-builder",
     name: "Jules Builder",
+    retries: 1,
+    idempotency: "event.data.leadId",
+    onFailure: makeOnFailure("jules-builder", "BUILDING"),
     triggers: [{ event: "engagement/design.completed" }],
   },
   async ({ event, step }) => {
@@ -24,7 +28,7 @@ export const julesBuilderFunction = inngest.createFunction(
     };
 
     await step.run("mark-building", () =>
-      prisma.productSpec.update({ where: { leadId }, data: { stage: "BUILDING" } }),
+      transitionStage({ leadId, to: "BUILDING", source: "jules-builder" }),
     );
 
     const chosenDesign = designConcepts[chosenDesignIndex] ?? designConcepts[0];
@@ -49,28 +53,24 @@ Style keywords: ${chosenDesign.styleKeywords.join(", ")}${chosenDesign.htmlUrl ?
       .slice(0, 40);
 
     const repoSource = getJulesRepoSource();
+    const rootDir = `prospects/${companySlug}`;
 
-    const session = await step.run("create-jules-session", async () =>
-      createJulesSession({
+    // ensureJulesSession is idempotent: if a session was created in a prior attempt
+    // it reuses it instead of creating a second one (preventing duplicate Unbroken-style runs).
+    const { session } = await step.run("ensure-jules-session", () =>
+      ensureJulesSession({
+        leadId,
+        companyName: profiledNeeds.companyName,
+        companySlug,
+        makePrompt: () => buildJulesPrompt({ profiledNeeds, prdContent, designDescription, companySlug }),
         repoSource,
         startingBranch: "main",
-        title: `Prospect landing page: ${profiledNeeds.companyName}`,
-        prompt: buildJulesPrompt({ profiledNeeds, prdContent, designDescription, companySlug }),
-        requirePlanApproval: false,
       }),
     );
 
-    await step.run("save-build-info", () =>
-      prisma.productSpec.update({
-        where: { leadId },
-        data: {
-          githubRepo: repoSource,
-          githubIssueUrl: session.sessionUrl,
-          julesSessionId: session.sessionId,
-          julesState: session.state,
-          julesLastPolledAt: new Date(),
-        },
-      }),
+    // ensureRenderService is idempotent: reuses an existing service by deterministic name.
+    const { service: provisionedRender } = await step.run("ensure-render-service", () =>
+      ensureRenderService({ leadId, companySlug, repoSource, rootDir, branch: "main" }),
     );
 
     await step.sendEvent("emit-build-started", {
@@ -82,16 +82,18 @@ Style keywords: ${chosenDesign.styleKeywords.join(", ")}${chosenDesign.htmlUrl ?
         githubRepo: repoSource,
         issueUrl: session.sessionUrl,
         julesSessionId: session.sessionId,
+        renderServiceId: provisionedRender?.serviceId,
+        renderServiceUrl: provisionedRender?.serviceUrl,
       },
     });
 
-    // Stage stays BUILDING. `jules-poller` drives the transition to
-    // BUILDING_COMPLETE or FAILED based on the real Jules session state.
     return {
       leadId,
       stage: "BUILDING" as const,
       sessionId: session.sessionId,
       sessionUrl: session.sessionUrl,
+      renderServiceId: provisionedRender?.serviceId ?? null,
+      renderServiceUrl: provisionedRender?.serviceUrl ?? null,
     };
   },
 );
@@ -124,7 +126,7 @@ Write ALL files inside the directory \`${dir}/\` — do not modify anything outs
 3. Stack: Next.js 15 App Router, Tailwind CSS v4, TypeScript (or plain HTML/CSS if simpler)
 4. Must look polished and professional — this is a sales pitch page, not a prototype skeleton
 5. No backend needed — all content is static
-6. Include a \`${dir}/render.yaml\` for Render preview deployments (see AGENTS.md for format)
+6. Do not modify deployment infrastructure files outside \`${dir}/\` (Render service provisioning is handled by the pipeline)
 7. All pages must be responsive (mobile-first)
 8. Open a PR titled: \`feat: prospect landing page — ${params.profiledNeeds.companyName}\`
 

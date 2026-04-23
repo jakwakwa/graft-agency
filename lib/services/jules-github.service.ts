@@ -26,6 +26,7 @@ export async function createJulesSession(params: {
   const body = {
     title: params.title,
     prompt: params.prompt,
+    automationMode: "AUTO_CREATE_PR",
     sourceContext: {
       source: params.repoSource,
       githubRepoContext: { startingBranch: params.startingBranch },
@@ -41,15 +42,34 @@ export async function createJulesSession(params: {
   });
 
   if (!r.ok) {
-    const err = await r.json().catch(() => ({})) as Record<string, unknown>;
+    const err = (await r.json().catch(() => ({}))) as Record<string, unknown>;
     throw new Error(`Jules session creation failed (${r.status}): ${JSON.stringify(err)}`);
   }
 
-  const sess = await r.json() as { id: string; url: string; state?: string; name: string };
+  const sess = (await r.json()) as { id: string; url: string; state?: string; name: string };
   return {
     sessionId: sess.id,
     sessionUrl: sess.url,
     state: sess.state ?? "QUEUED",
+  };
+}
+
+// Find an existing Jules session whose title contains `[leadId]` sentinel.
+// Used by the idempotency layer to recover a session created in a prior attempt.
+export async function findJulesSessionByLeadTag(leadId: string): Promise<JulesSession | null> {
+  const r = await fetch(`${JULES_API_BASE}/sessions?pageSize=20`, {
+    headers: { "x-goog-api-key": getJulesKey() },
+  });
+  if (!r.ok) return null;
+  const body = (await r.json()) as { sessions?: Array<Record<string, unknown>> };
+  const sessions = body.sessions ?? [];
+  const tag = `[${leadId}]`;
+  const match = sessions.find((s) => typeof s.title === "string" && s.title.includes(tag));
+  if (!match) return null;
+  return {
+    sessionId: match.id as string,
+    sessionUrl: match.url as string,
+    state: (match.state as string) ?? "QUEUED",
   };
 }
 
@@ -59,12 +79,40 @@ export async function getJulesSession(sessionId: string): Promise<JulesSession &
   });
 
   if (!r.ok) {
-    const err = await r.json().catch(() => ({})) as Record<string, unknown>;
+    const err = (await r.json().catch(() => ({}))) as Record<string, unknown>;
     throw new Error(`Jules session fetch failed (${r.status}): ${JSON.stringify(err)}`);
   }
 
-  const sess = await r.json() as Record<string, unknown> & { id: string; url: string; state: string };
+  const sess = (await r.json()) as Record<string, unknown> & { id: string; url: string; state: string };
   return { sessionId: sess.id, sessionUrl: sess.url, state: sess.state, raw: sess };
+}
+
+export async function approveJulesPlan(sessionId: string): Promise<void> {
+  const r = await fetch(`${JULES_API_BASE}/sessions/${sessionId}:approvePlan`, {
+    method: "POST",
+    headers: julesHeaders(),
+    body: JSON.stringify({}),
+  });
+
+  if (!r.ok) {
+    const err = (await r.json().catch(() => ({}))) as Record<string, unknown>;
+    throw new Error(`Jules plan approval failed (${r.status}): ${JSON.stringify(err)}`);
+  }
+}
+
+export function extractPullRequestUrlFromSession(raw: Record<string, unknown>): string | null {
+  const outputs = raw.outputs;
+  if (!Array.isArray(outputs)) return null;
+
+  for (const output of outputs) {
+    if (typeof output !== "object" || output === null) continue;
+    const record = output as Record<string, unknown>;
+    const pullRequest = record.pullRequest;
+    if (typeof pullRequest !== "object" || pullRequest === null) continue;
+    const url = (pullRequest as Record<string, unknown>).url;
+    if (typeof url === "string" && url.startsWith("http")) return url;
+  }
+  return null;
 }
 
 export const JULES_TERMINAL_STATES = new Set(["COMPLETED", "SUCCEEDED", "FAILED", "CANCELLED", "CANCELED", "ERROR"]);
@@ -85,7 +133,10 @@ export function isJulesFailedState(state: string | null | undefined): boolean {
 export function parseGithubRepoFromJulesSource(source: string): { owner: string; repo: string } | null {
   const m = source.match(/^sources\/github\/([^/]+)\/([^/]+)$/);
   if (!m) return null;
-  return { owner: m[1]!, repo: m[2]! };
+  const owner = m[1];
+  const repo = m[2];
+  if (!owner || !repo) return null;
+  return { owner, repo };
 }
 
 /**
@@ -110,7 +161,7 @@ export async function findJulesPullRequest(params: {
   });
   if (!r.ok) return null;
 
-  const prs = await r.json() as Array<{
+  const prs = (await r.json()) as Array<{
     html_url: string;
     number: number;
     body: string | null;
@@ -154,7 +205,7 @@ export async function findRenderPreviewUrl(params: {
   });
   if (!r.ok) return null;
 
-  const comments = await r.json() as Array<{ body: string | null }>;
+  const comments = (await r.json()) as Array<{ body: string | null }>;
   for (const c of comments) {
     const m = (c.body ?? "").match(/https?:\/\/[a-z0-9-]+\.onrender\.com[^\s)]*/i);
     if (m) return m[0];

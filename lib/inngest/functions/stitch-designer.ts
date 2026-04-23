@@ -1,8 +1,10 @@
 import type { Prisma } from "@/generated/prisma/client";
 import prisma from "@/lib/db/prisma";
 import { generateDesignConcepts } from "@/lib/engagement/stitch-design-concepts";
+import { transitionStage } from "@/lib/engagement/stage-machine";
 import { inngest } from "@/lib/inngest/client";
 import type { ProfiledNeeds } from "@/lib/types/engagement";
+import { makeOnFailure } from "./_shared/on-failure";
 
 /**
  * Inngest: PRD → Stitch (@google/stitch-sdk) → three design concept variants.
@@ -12,6 +14,9 @@ export const stitchDesignerFunction = inngest.createFunction(
   {
     id: "stitch-designer",
     name: "Stitch Design Concept Generator",
+    retries: 2,
+    idempotency: "event.data.leadId",
+    onFailure: makeOnFailure("stitch-designer", "DESIGNING"),
     triggers: [{ event: "engagement/prd.written" }],
   },
   async ({ event, step }) => {
@@ -23,7 +28,7 @@ export const stitchDesignerFunction = inngest.createFunction(
     };
 
     await step.run("mark-designing", () =>
-      prisma.productSpec.update({ where: { leadId }, data: { stage: "DESIGNING" } }),
+      transitionStage({ leadId, to: "DESIGNING", source: "stitch-designer" }),
     );
 
     const designSectionMatch = prdContent.match(/## Design Direction\n([\s\S]*?)(?=\n##|$)/);
@@ -39,10 +44,11 @@ export const stitchDesignerFunction = inngest.createFunction(
     );
 
     await step.run("save-designs", () =>
-      prisma.productSpec.update({
-        where: { leadId },
+      transitionStage({
+        leadId,
+        to: "DESIGN_COMPLETE",
+        source: "stitch-designer",
         data: {
-          stage: "DESIGN_COMPLETE",
           designConcepts: designConcepts as unknown as Prisma.InputJsonValue,
           chosenDesign: 0,
         },

@@ -8,6 +8,7 @@ import {
   julesBuilderFunction,
   julesPollerFunction,
   offerDispatcherFunction,
+  engagementReconcilerFunction,
 } from "@/lib/inngest";
 
 export const { GET, POST, PUT } = serve({
@@ -20,5 +21,6 @@ export const { GET, POST, PUT } = serve({
     julesBuilderFunction,
     julesPollerFunction,
     offerDispatcherFunction,
+    engagementReconcilerFunction,
   ],
 });

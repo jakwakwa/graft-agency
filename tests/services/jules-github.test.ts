@@ -1,5 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { createJulesSession, getJulesSession } from "@/lib/services/jules-github.service";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  approveJulesPlan,
+  createJulesSession,
+  extractPullRequestUrlFromSession,
+  getJulesSession,
+} from "@/lib/services/jules-github.service";
 
 const mockFetch = vi.fn();
 
@@ -32,11 +37,14 @@ describe("jules-github service", () => {
     expect(result.sessionUrl).toContain("jules.google.com");
     expect(result.state).toBe("QUEUED");
 
-    const call = mockFetch.mock.calls[0]!;
+    const call = mockFetch.mock.calls[0];
+    expect(call).toBeDefined();
+    if (!call) throw new Error("Expected fetch call");
     expect(call[0]).toContain("/sessions");
     const body = JSON.parse(call[1].body);
     expect(body.sourceContext.source).toBe("sources/github/jakwakwa/graft-today-jules");
     expect(body.sourceContext.githubRepoContext.startingBranch).toBe("main");
+    expect(body.automationMode).toBe("AUTO_CREATE_PR");
   });
 
   it("getJulesSession returns current state", async () => {
@@ -69,5 +77,26 @@ describe("jules-github service", () => {
         prompt: "Test prompt",
       }),
     ).rejects.toThrow("Jules session creation failed");
+  });
+
+  it("approveJulesPlan posts to approve endpoint", async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({}),
+    });
+
+    await approveJulesPlan("session-123");
+    const call = mockFetch.mock.calls[0];
+    expect(call).toBeDefined();
+    if (!call) throw new Error("Expected fetch call");
+    expect(call[0]).toContain("/sessions/session-123:approvePlan");
+    expect(call[1].method).toBe("POST");
+  });
+
+  it("extractPullRequestUrlFromSession returns PR output URL", () => {
+    const url = extractPullRequestUrlFromSession({
+      outputs: [{ pullRequest: { url: "https://github.com/acme/repo/pull/42" } }],
+    });
+    expect(url).toBe("https://github.com/acme/repo/pull/42");
   });
 });

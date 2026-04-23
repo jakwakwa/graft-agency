@@ -5,3 +5,4 @@ export { stitchDesignerFunction } from "./functions/stitch-designer";
 export { julesBuilderFunction } from "./functions/jules-builder";
 export { julesPollerFunction } from "./functions/jules-poller";
 export { offerDispatcherFunction } from "./functions/offer-dispatcher";
+export { engagementReconcilerFunction } from "./functions/engagement-reconciler";

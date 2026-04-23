@@ -35,6 +35,8 @@ export interface LeadPipelineEvent {
   designConcepts?: DesignConcept[];
   chosenDesignIndex?: number;
   githubRepo?: string;
+  renderServiceId?: string;
+  renderServiceUrl?: string;
   deploymentUrl?: string;
   error?: string;
 }

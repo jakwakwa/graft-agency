@@ -1,6 +1,10 @@
 import prisma from "@/lib/db/prisma";
+import { transitionStage } from "@/lib/engagement/stage-machine";
 import { inngest } from "@/lib/inngest/client";
+import { makeOnFailure } from "./_shared/on-failure";
 import {
+  approveJulesPlan,
+  extractPullRequestUrlFromSession,
   findJulesPullRequest,
   findRenderPreviewUrl,
   getJulesSession,
@@ -8,6 +12,7 @@ import {
   isJulesTerminalState,
   parseGithubRepoFromJulesSource,
 } from "@/lib/services/jules-github.service";
+import { canProvisionRenderService, getRenderService } from "@/lib/services/render.service";
 
 /**
  * Polls the Jules session until it reaches a terminal state, then resolves the
@@ -15,25 +20,28 @@ import {
  * (or `FAILED`) transition based on *real* Jules state.
  *
  * Cadence: ~60s between polls (Jules builds run ~10 min, no need to be eager).
- * Max wall-clock: 30 min. If we still don't have a terminal state by then we
- * mark the run as FAILED with a timeout message — the session URL remains
- * visible in the dashboard for manual inspection.
+ * This function intentionally re-queues itself instead of imposing a max poll
+ * count so long-running Jules sessions do not get marked as FAILED just because
+ * they exceeded an arbitrary timeout window.
  */
 const POLL_INTERVAL_SECONDS = 60;
-const MAX_POLL_ATTEMPTS = 30; // 30 * 60s = 30 min
 
 export const julesPollerFunction = inngest.createFunction(
   {
     id: "jules-poller",
     name: "Jules Build Poller",
-    triggers: [{ event: "engagement/build.started" }],
+    retries: 5,
     concurrency: { limit: 20 },
+    onFailure: makeOnFailure("jules-poller", "BUILDING"),
+    triggers: [{ event: "engagement/build.started" }, { event: "engagement/build.poll.tick" }],
   },
   async ({ event, step }) => {
-    const { leadId, githubRepo, julesSessionId } = event.data as {
+    const { leadId, githubRepo, julesSessionId, pollCycle, renderServiceId } = event.data as {
       leadId: string;
       githubRepo: string;
       julesSessionId: string;
+      pollCycle?: number;
+      renderServiceId?: string;
     };
 
     if (!julesSessionId) {
@@ -42,50 +50,69 @@ export const julesPollerFunction = inngest.createFunction(
 
     const repo = parseGithubRepoFromJulesSource(githubRepo);
 
-    let finalState: string | null = null;
+    await step.sleep("wait-before-poll", `${POLL_INTERVAL_SECONDS}s`);
 
-    for (let attempt = 1; attempt <= MAX_POLL_ATTEMPTS; attempt++) {
-      await step.sleep(`wait-${attempt}`, `${POLL_INTERVAL_SECONDS}s`);
-
-      const session = await step.run(`poll-${attempt}`, async () => {
-        const result = await getJulesSession(julesSessionId);
-        await prisma.productSpec.update({
-          where: { leadId },
-          data: {
-            julesState: result.state,
-            julesLastPolledAt: new Date(),
-          },
-        });
-        return { state: result.state };
+    const session = await step.run("poll-jules-session", async () => {
+      const result = await getJulesSession(julesSessionId);
+      await prisma.productSpec.update({
+        where: { leadId },
+        data: {
+          julesState: result.state,
+          julesLastPolledAt: new Date(),
+        },
       });
+      return { state: result.state };
+    });
 
-      if (isJulesTerminalState(session.state)) {
-        finalState = session.state;
-        break;
-      }
+    if (session.state.toUpperCase() === "AWAITING_PLAN_APPROVAL") {
+      await step.run("approve-jules-plan", async () => {
+        await approveJulesPlan(julesSessionId);
+      });
+      await step.sendEvent("requeue-after-plan-approval", {
+        name: "engagement/build.poll.tick",
+        data: {
+          leadId,
+          githubRepo,
+          julesSessionId,
+          pollCycle: (pollCycle ?? 0) + 1,
+        },
+      });
+      return {
+        leadId,
+        outcome: "approved-plan" as const,
+        julesState: session.state,
+        pollCycle: (pollCycle ?? 0) + 1,
+      };
     }
 
-    if (!finalState) {
-      await step.run("mark-timeout", () =>
-        prisma.productSpec.update({
-          where: { leadId },
-          data: {
-            stage: "FAILED",
-            errorMessage: `Jules session did not reach a terminal state after ${MAX_POLL_ATTEMPTS * POLL_INTERVAL_SECONDS}s (last state: pending). Session: ${julesSessionId}`,
-          },
-        }),
-      );
-      return { leadId, outcome: "timeout" as const };
+    if (!isJulesTerminalState(session.state)) {
+      await step.sendEvent("requeue-poll", {
+        name: "engagement/build.poll.tick",
+        data: {
+          leadId,
+          githubRepo,
+          julesSessionId,
+          pollCycle: (pollCycle ?? 0) + 1,
+        },
+      });
+      return {
+        leadId,
+        outcome: "pending" as const,
+        julesState: session.state,
+        pollCycle: (pollCycle ?? 0) + 1,
+      };
     }
+
+    const finalState = session.state;
 
     if (isJulesFailedState(finalState)) {
       await step.run("mark-failed", () =>
-        prisma.productSpec.update({
-          where: { leadId },
-          data: {
-            stage: "FAILED",
-            errorMessage: `Jules build ${finalState}. Session: ${julesSessionId}`,
-          },
+        transitionStage({
+          leadId,
+          to: "FAILED",
+          source: "jules-poller",
+          reason: `Jules build ${finalState}. Session: ${julesSessionId}`,
+          data: { errorMessage: `Jules build ${finalState}. Session: ${julesSessionId}` },
         }),
       );
       return { leadId, outcome: "failed" as const, finalState };
@@ -95,6 +122,34 @@ export const julesPollerFunction = inngest.createFunction(
     let pullRequestUrl: string | null = null;
     let deploymentUrl: string | null = null;
 
+    const specRender = await step.run("load-render-service-info", () =>
+      prisma.productSpec.findUnique({
+        where: { leadId },
+        select: {
+          renderServiceId: true,
+          deploymentUrl: true,
+        },
+      }),
+    );
+    const effectiveRenderServiceId = renderServiceId ?? specRender?.renderServiceId ?? null;
+    deploymentUrl = specRender?.deploymentUrl ?? null;
+
+    if (!deploymentUrl && effectiveRenderServiceId && canProvisionRenderService()) {
+      const renderService = await step.run("fetch-render-service", () => getRenderService(effectiveRenderServiceId));
+      deploymentUrl = renderService.serviceUrl;
+      if (deploymentUrl) {
+        await step.run("persist-render-service-url", () =>
+          prisma.productSpec.update({
+            where: { leadId },
+            data: { deploymentUrl },
+          }),
+        );
+      }
+    }
+
+    const completedSession = await step.run("fetch-session-outputs", () => getJulesSession(julesSessionId));
+    pullRequestUrl = extractPullRequestUrlFromSession(completedSession.raw);
+
     if (repo) {
       const pr = await step.run("find-pr", () =>
         findJulesPullRequest({ owner: repo.owner, repo: repo.repo, sessionId: julesSessionId }),
@@ -103,28 +158,32 @@ export const julesPollerFunction = inngest.createFunction(
       if (pr) {
         pullRequestUrl = pr.htmlUrl;
 
-        // Render posts its preview URL as a PR comment shortly after the PR opens.
-        // Try a handful of times with short backoffs rather than bloating poll loops.
-        for (let i = 0; i < 5; i++) {
-          await step.sleep(`render-wait-${i}`, "30s");
-          const preview = await step.run(`find-render-${i}`, () =>
-            findRenderPreviewUrl({ owner: repo.owner, repo: repo.repo, prNumber: pr.number }),
-          );
-          if (preview) {
-            deploymentUrl = preview;
-            break;
+        if (!deploymentUrl) {
+          // Fallback for repos where Render preview URLs are only posted on PR comments.
+          for (let i = 0; i < 5; i++) {
+            await step.sleep(`render-wait-${i}`, "30s");
+            const preview = await step.run(`find-render-${i}`, () =>
+              findRenderPreviewUrl({ owner: repo.owner, repo: repo.repo, prNumber: pr.number }),
+            );
+            if (preview) {
+              deploymentUrl = preview;
+              break;
+            }
           }
         }
       }
     }
 
     await step.run("mark-complete", () =>
-      prisma.productSpec.update({
-        where: { leadId },
+      transitionStage({
+        leadId,
+        to: "BUILDING_COMPLETE",
+        source: "jules-poller",
         data: {
-          stage: "BUILDING_COMPLETE",
           pullRequestUrl: pullRequestUrl ?? undefined,
           deploymentUrl: deploymentUrl ?? undefined,
+          errorMessage: null,
+          inngestRunStatus: "Completed",
         },
       }),
     );

@@ -1,7 +1,9 @@
 import { GoogleGenAI } from "@google/genai";
 import prisma from "@/lib/db/prisma";
+import { transitionStage } from "@/lib/engagement/stage-machine";
 import { inngest } from "@/lib/inngest/client";
 import type { ProfiledNeeds } from "@/lib/types/engagement";
+import { makeOnFailure } from "./_shared/on-failure";
 
 export async function writePRD(needs: ProfiledNeeds): Promise<string> {
   const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
@@ -30,18 +32,26 @@ Write a PRD in Markdown. It must include:
 
 Keep the MVP ruthlessly scoped. An AI agent must be able to implement this in 24 hours.`;
 
-  const response = await ai.models.generateContent({
-    model: "gemini-3-flash-preview",
-    contents: prompt,
-  });
-
-  return response.text ?? "";
+  const ctrl = new AbortController();
+  const timeout = setTimeout(() => ctrl.abort(), 120_000);
+  try {
+    const response = await ai.models.generateContent({
+      model: "gemini-3-flash-preview",
+      contents: prompt,
+    });
+    return response.text ?? "";
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 
 export const prdWriterFunction = inngest.createFunction(
   {
     id: "prd-writer-agent",
     name: "PRD Writer Agent",
+    retries: 3,
+    idempotency: "event.data.leadId",
+    onFailure: makeOnFailure("prd-writer", "WRITING_PRD"),
     triggers: [{ event: "engagement/lead.profiled" }],
   },
   async ({ event, step }) => {
@@ -52,13 +62,13 @@ export const prdWriterFunction = inngest.createFunction(
     };
 
     await step.run("mark-writing-prd", () =>
-      prisma.productSpec.update({ where: { leadId }, data: { stage: "WRITING_PRD" } }),
+      transitionStage({ leadId, to: "WRITING_PRD", source: "prd-writer" }),
     );
 
     const prdContent = await step.run("write-prd", () => writePRD(profiledNeeds));
 
     await step.run("save-prd", () =>
-      prisma.productSpec.update({ where: { leadId }, data: { stage: "PRD_WRITTEN", prdContent } }),
+      transitionStage({ leadId, to: "PRD_WRITTEN", source: "prd-writer", data: { prdContent } }),
     );
 
     await step.sendEvent("emit-prd-written", {

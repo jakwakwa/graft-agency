@@ -22,7 +22,7 @@ function ghHeaders() {
 async function getFileSha(path: string): Promise<string | undefined> {
   const r = await fetch(`${BASE}/contents/${path}`, { headers: ghHeaders() });
   if (r.status === 404) return undefined;
-  const body = await r.json() as { sha: string };
+  const body = (await r.json()) as { sha: string };
   return body.sha;
 }
 
@@ -38,7 +38,7 @@ async function upsertFile(path: string, content: string, message: string) {
     }),
   });
   if (!r.ok) {
-    const err = await r.json() as { message?: string };
+    const err = (await r.json()) as { message?: string };
     throw new Error(`Failed to upsert ${path}: ${err.message}`);
   }
   console.log(`  ✓ ${path}`);
@@ -104,18 +104,8 @@ landing page that GRAFT.TODAY can send to that prospect as a sales pitch.
 Title: \`feat: prospect landing page — {Company Name}\`
 Branch: Jules will name it automatically.
 
-Include a \`render.yaml\` at the prospect root:
-\`\`\`yaml
-services:
-  - type: web
-    name: prospect-landing-page
-    runtime: node
-    buildCommand: npm install && npm run build
-    startCommand: npm start
-    envVars:
-      - key: PORT
-        value: 3000
-\`\`\`
+Do not modify deployment infrastructure files (Render provisioning is managed
+by the parent automation pipeline). Focus only on the prospect app directory.
 
 ## Quality bar
 
@@ -168,4 +158,7 @@ async function main() {
   console.log(`  5. Set JULES_SOURCE_REPO="sources/github/${REPO}" in .env (already done)`);
 }
 
-main().catch((e) => { console.error(e); process.exit(1); });
+main().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});

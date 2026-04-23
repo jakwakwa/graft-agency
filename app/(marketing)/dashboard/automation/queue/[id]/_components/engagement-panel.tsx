@@ -52,15 +52,22 @@ interface EngagementStatus {
   julesSessionId?: string | null;
   julesState?: string | null;
   julesLastPolledAt?: string | null;
+  renderServiceId?: string | null;
+  renderServiceName?: string | null;
   pullRequestUrl?: string | null;
   deploymentUrl?: string | null;
   offerSentAt?: string | null;
   errorMessage?: string | null;
   updatedAt?: string | null;
+  inngestRunStatus?: string | null;
+  lastReconciledAt?: string | null;
+  isStale?: boolean;
+  failure?: { stage: string; at: string; reason: string | null; source: string | null } | null;
 }
 
 interface EngagementPanelProps {
-  status: EngagementStatus | null; // null = loading
+  status: EngagementStatus | null; // null = loading or unavailable
+  statusUnavailable?: boolean;
 }
 
 // ------------------------------------------------------- step icon mapping ---
@@ -267,7 +274,7 @@ function ProfiledNeedsBody({ data }: { data: unknown }) {
 
 // ------------------------------------------------------- main component ---
 
-export function EngagementPanel({ status }: EngagementPanelProps) {
+export function EngagementPanel({ status, statusUnavailable = false }: EngagementPanelProps) {
   const [openProfile, setOpenProfile] = useState(true);
   const [openPrd, setOpenPrd] = useState(true);
   const [openDesigns, setOpenDesigns] = useState(true);
@@ -304,7 +311,11 @@ export function EngagementPanel({ status }: EngagementPanelProps) {
   const showJulesCard = Boolean(status?.julesSessionId) && (isBuilding || stage === "BUILDING_COMPLETE" || isFailed);
 
   const julesLastPolledLabel = status?.julesLastPolledAt
-    ? new Date(status.julesLastPolledAt).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit" })
+    ? new Date(status.julesLastPolledAt).toLocaleTimeString("en-GB", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      })
     : null;
 
   return (
@@ -316,27 +327,62 @@ export function EngagementPanel({ status }: EngagementPanelProps) {
               <Typography.H4 id="engagement-heading" className="mb-0">
                 Engagement Pipeline
               </Typography.H4>
-              {companyName && (
-                <p className="text-sm text-muted-foreground">{companyName}</p>
-              )}
+              {companyName && <p className="text-sm text-muted-foreground">{companyName}</p>}
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 flex-wrap justify-end">
               <Badge variant={stageBadgeVariant(isFailed, isRunning)}>{formatStageLabel(stage)}</Badge>
               {completionPct > 0 && !isFailed && (
                 <span className="text-xs text-muted-foreground font-mono uppercase tracking-widest">
-                  {completionPct}% complete
+                  {completionPct}%
+                </span>
+              )}
+              {status?.inngestRunStatus && (
+                <Badge
+                  variant={
+                    status.inngestRunStatus === "Failed"
+                      ? "destructive"
+                      : status.inngestRunStatus === "Completed"
+                        ? "secondary"
+                        : "outline"
+                  }
+                  className="font-mono text-[10px] uppercase tracking-wider"
+                >
+                  Inngest: {status.inngestRunStatus}
+                </Badge>
+              )}
+              {status?.lastReconciledAt && (
+                <span className="text-[10px] text-muted-foreground font-mono">
+                  reconciled{" "}
+                  {Math.round((Date.now() - new Date(status.lastReconciledAt).getTime()) / 1000)}s ago
                 </span>
               )}
             </div>
           </CardHeader>
 
-          {status === null && (
+          {status === null && statusUnavailable && (
+            <CardContent>
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  Pipeline status temporarily unavailable — retrying every 10s. The pipeline may still be running.
+                </AlertDescription>
+              </Alert>
+            </CardContent>
+          )}
+
+          {status === null && !statusUnavailable && (
             <CardContent className="flex items-center justify-center py-12">
               <Spinner className="h-6 w-6 text-muted-foreground" />
             </CardContent>
           )}
 
-          {status !== null && !isPipelineStarted && (
+          {status !== null && !isPipelineStarted && stage === "PENDING" && (
+            <CardContent>
+              <p className="text-sm text-muted-foreground">Queued — pipeline is initializing…</p>
+            </CardContent>
+          )}
+
+          {status !== null && !isPipelineStarted && stage === "NOT_STARTED" && (
             <CardContent>
               <p className="text-sm text-muted-foreground">Automation has not run yet. Run the pipeline to begin.</p>
             </CardContent>
@@ -607,19 +653,33 @@ export function EngagementPanel({ status }: EngagementPanelProps) {
                     <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1.5 text-xs">
                       {status?.julesSessionId && (
                         <div className="flex flex-col">
-                          <dt className="font-mono uppercase tracking-wide text-muted-foreground text-[10px]">Session</dt>
+                          <dt className="font-mono uppercase tracking-wide text-muted-foreground text-[10px]">
+                            Session
+                          </dt>
                           <dd className="truncate font-mono">{status.julesSessionId}</dd>
                         </div>
                       )}
                       {julesLastPolledLabel && (
                         <div className="flex flex-col">
-                          <dt className="font-mono uppercase tracking-wide text-muted-foreground text-[10px]">Last polled</dt>
+                          <dt className="font-mono uppercase tracking-wide text-muted-foreground text-[10px]">
+                            Last polled
+                          </dt>
                           <dd>{julesLastPolledLabel}</dd>
+                        </div>
+                      )}
+                      {status?.renderServiceName && (
+                        <div className="flex flex-col sm:col-span-2">
+                          <dt className="font-mono uppercase tracking-wide text-muted-foreground text-[10px]">
+                            Render service
+                          </dt>
+                          <dd className="truncate font-mono">{status.renderServiceName}</dd>
                         </div>
                       )}
                       {status?.pullRequestUrl && (
                         <div className="flex flex-col sm:col-span-2">
-                          <dt className="font-mono uppercase tracking-wide text-muted-foreground text-[10px]">Pull request</dt>
+                          <dt className="font-mono uppercase tracking-wide text-muted-foreground text-[10px]">
+                            Pull request
+                          </dt>
                           <dd className="truncate">
                             <a
                               href={status.pullRequestUrl}
@@ -634,7 +694,9 @@ export function EngagementPanel({ status }: EngagementPanelProps) {
                       )}
                       {status?.deploymentUrl && (
                         <div className="flex flex-col sm:col-span-2">
-                          <dt className="font-mono uppercase tracking-wide text-muted-foreground text-[10px]">Render preview</dt>
+                          <dt className="font-mono uppercase tracking-wide text-muted-foreground text-[10px]">
+                            Render preview
+                          </dt>
                           <dd className="truncate">
                             <a
                               href={status.deploymentUrl}
@@ -648,15 +710,31 @@ export function EngagementPanel({ status }: EngagementPanelProps) {
                         </div>
                       )}
                     </dl>
-                    {julesIsRunning && !status?.pullRequestUrl && (
+                    {julesIsRunning && status?.inngestRunStatus === "Failed" && (
+                      <Alert variant="destructive" className="py-2">
+                        <AlertCircle className="h-3.5 w-3.5" />
+                        <AlertDescription className="text-xs">
+                          Orchestrator crashed — Jules session is still building. Reconciler is tracking progress and
+                          will update this page automatically.
+                        </AlertDescription>
+                      </Alert>
+                    )}
+                    {julesIsRunning && status?.inngestRunStatus !== "Failed" && !status?.pullRequestUrl && (
                       <p className="text-xs text-muted-foreground">
-                        Jules builds run ~10 minutes. Poller checks every 60s and will surface the PR + Render preview URL once the session completes.
+                        Jules builds run ~10 minutes. Poller checks every 60s and will surface the PR + Render preview
+                        URL once the session completes.
+                      </p>
+                    )}
+                    {julesStateUpper === "AWAITING_PLAN_APPROVAL" && (
+                      <p className="text-xs text-muted-foreground">
+                        Jules is waiting on plan approval. The workflow auto-approves this state and continues polling.
                       </p>
                     )}
                     {julesIsDone && !status?.pullRequestUrl && (
                       <p className="text-xs text-muted-foreground">
                         Jules session completed but no PR was detected in{" "}
-                        <code className="font-mono">{status?.githubRepo ?? "the builds repo"}</code>. Check the session directly.
+                        <code className="font-mono">{status?.githubRepo ?? "the builds repo"}</code>. Check the session
+                        directly.
                       </p>
                     )}
                   </div>

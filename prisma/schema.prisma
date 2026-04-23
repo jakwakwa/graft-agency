@@ -179,29 +179,68 @@ model ProductSpec {
   leadId          String          @unique @map("lead_id")
   clientId        String          @map("client_id")
   stage           EngagementStage @default(PENDING)
+  stageVersion    Int             @default(0) @map("stage_version")
   profiledNeeds   Json?           @map("profiled_needs")
   prdContent      String?         @map("prd_content")
   designConcepts  Json?           @map("design_concepts")
   chosenDesign    Int?            @map("chosen_design")
   githubRepo      String?         @map("github_repo")
   githubIssueUrl  String?         @map("github_issue_url")
-  julesSessionId      String?   @map("jules_session_id")
-  julesState          String?   @map("jules_state")
-  julesLastPolledAt   DateTime? @map("jules_last_polled_at")
-  pullRequestUrl      String?   @map("pull_request_url")
-  deploymentUrl   String?         @map("deployment_url")
-  paddleProductId String?         @map("paddle_product_id")
-  paddlePriceId   String?         @map("paddle_price_id")
-  offerSentAt     DateTime?       @map("offer_sent_at")
-  errorMessage    String?         @map("error_message")
-  createdAt       DateTime        @default(now()) @map("created_at")
-  updatedAt       DateTime        @updatedAt @map("updated_at")
-  lead            Lead            @relation(fields: [leadId], references: [id], onDelete: Cascade)
-  client          Client          @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  julesSessionId        String?   @map("jules_session_id")
+  julesState            String?   @map("jules_state")
+  julesLastPolledAt     DateTime? @map("jules_last_polled_at")
+  renderServiceId       String?   @map("render_service_id")
+  renderServiceName     String?   @map("render_service_name")
+  pullRequestUrl        String?   @map("pull_request_url")
+  deploymentUrl         String?   @map("deployment_url")
+  paddleProductId       String?   @map("paddle_product_id")
+  paddlePriceId         String?   @map("paddle_price_id")
+  offerSentAt           DateTime? @map("offer_sent_at")
+  errorMessage          String?   @map("error_message")
+  // failure tracking
+  failedStage           EngagementStage? @map("failed_stage")
+  failedAt              DateTime?        @map("failed_at")
+  failureReason         String?          @map("failure_reason")
+  failureSource         String?          @map("failure_source")
+  // orchestrator health
+  inngestRunId          String?   @map("inngest_run_id")
+  inngestRunStatus      String?   @map("inngest_run_status")
+  // reconciliation
+  lastReconciledAt      DateTime? @map("last_reconciled_at")
+  lastReconciledBy      String?   @map("last_reconciled_by")
+  // idempotency sentinels — written BEFORE external call
+  stitchRunIntentKey    String?   @unique @map("stitch_run_intent_key")
+  julesSessionIntentKey String?   @unique @map("jules_session_intent_key")
+  renderServiceIntentKey String?  @unique @map("render_service_intent_key")
+  // external IDs for reconciliation lookups
+  stitchProjectId       String?   @map("stitch_project_id")
+  stitchRunId           String?   @map("stitch_run_id")
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+  lead                  Lead      @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  client                Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  stageTransitions      StageTransition[]
 
   @@index([clientId, stage])
   @@index([leadId])
+  @@index([stage, updatedAt])
   @@map("product_specs")
+}
+
+model StageTransition {
+  id            String           @id @default(uuid())
+  productSpecId String           @map("product_spec_id")
+  leadId        String           @map("lead_id")
+  fromStage     EngagementStage? @map("from_stage")
+  toStage       EngagementStage  @map("to_stage")
+  source        String
+  reason        String?
+  inngestRunId  String?          @map("inngest_run_id")
+  createdAt     DateTime         @default(now()) @map("created_at")
+  productSpec   ProductSpec      @relation(fields: [productSpecId], references: [id], onDelete: Cascade)
+
+  @@index([leadId, createdAt])
+  @@map("stage_transitions")
 }
 
 enum EngagementStage {
