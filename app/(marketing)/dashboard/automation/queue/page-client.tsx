@@ -212,15 +212,16 @@ export default function QueuePage() {
               <span className="font-data text-xs text-secondary-foreground">VIEW ALL PROSPECTS</span>
             </div>
 
-            {(highlightedLeads.length > 0 ? highlightedLeads : leads.slice(0, 3)).map((lead, index) => {
-              const fit = Math.max(82, 98 - index * 4);
-              const statusLabel = index === 0 ? "Pitched 2m ago" : index === 1 ? "Sourcing now" : "Queued";
+            {(highlightedLeads.length === 0 ? highlightedLeads : leads.slice(0, 100)).map((lead, index) => {
+              const fit = Math.max(90, 98 - index * 4);
+              const statusLabel = index === 0 ? "No Hits" : index === 1 ? "Sourcing now" : "Queued";
               return (
                 <Link
                   key={lead.id}
                   href={`/dashboard/automation/queue/${lead.id}`}
                   className="group relative flex items-center gap-6 overflow-hidden border-l-2 border-chart-5/40 bg-card p-5 transition-all duration-200 hover:bg-muted/80"
                 >
+                  d
                   <div className="absolute right-0 top-0 h-full w-1/4 bg-linear-to-l from-chart-3/10 to-transparent" />
                   <div className="flex h-12 w-12 items-center justify-center rounded-sm bg-muted text-xl font-black text-secondary-foreground">
                     {initialsFromName(lead.customerName)}

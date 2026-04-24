@@ -9,8 +9,8 @@
  */
 
 import Link from "next/link";
-import { EngagementPanel } from "../[id]/_components/engagement-panel";
 import { Typography } from "@/components/ui/typography";
+import { EngagementPanel } from "../[id]/_components/engagement-panel";
 
 const MOCK_STATUSES = [
   {
@@ -64,7 +64,8 @@ const MOCK_STATUSES = [
         painPoints: ["Email chains for scheduling", "No single view of status"],
         signals: ["High traffic on /contact", "Asked for login area in chat"],
       },
-      prdContent: "## Problem\nTeams lose time chasing status in email.\n\n## MVP\n- Dashboard with **next actions**\n- Upload + list documents",
+      prdContent:
+        "## Problem\nTeams lose time chasing status in email.\n\n## MVP\n- Dashboard with **next actions**\n- Upload + list documents",
       designConcepts: [
         {
           index: 0,
@@ -126,9 +127,7 @@ export default function EngagementPipelinePreview() {
       <div className="flex items-center justify-between">
         <div>
           <Typography.H1>Engagement Pipeline — UI States</Typography.H1>
-          <Typography.Muted className="mt-1">
-            Dev preview · all states rendered without real data
-          </Typography.Muted>
+          <Typography.Muted className="mt-1">Dev preview · all states rendered without real data</Typography.Muted>
         </div>
         <Link
           href="/dashboard/automation/queue"
@@ -142,9 +141,7 @@ export default function EngagementPipelinePreview() {
       <div className="space-y-8">
         {MOCK_STATUSES.map(({ label, status }) => (
           <div key={label} className="space-y-2">
-            <p className="text-xs font-data uppercase tracking-widest text-muted-foreground">
-              {label}
-            </p>
+            <p className="text-xs font-data uppercase tracking-widest text-muted-foreground">{label}</p>
             <EngagementPanel
               // biome-ignore lint: preview mock accepts readonly status shapes
               status={status as Parameters<typeof EngagementPanel>[0]["status"]}
