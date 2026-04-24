@@ -1,7 +1,7 @@
 // Synthetic lead harness for the engagement pipeline (Bun).
 // Start: bun scripts/dry-run-engagement.ts
 // Cleanup: bun scripts/dry-run-engagement.ts --cleanup <leadId>
-// Requires: DATABASE_URL, KONA_INNGEST_EVENT_KEY, platform client; INNGEST_DEV/ENGAGEMENT_DRY_RUN default in ./dry-run-engagement-env.ts
+// Requires: DATABASE_URL, INNGEST_EVENT_KEY, platform client; INNGEST_DEV/ENGAGEMENT_DRY_RUN default in ./dry-run-engagement-env.ts
 
 import "./dry-run-engagement-env";
 import { getPlatformClientId } from "@/lib/auth/platform-client";
@@ -21,8 +21,8 @@ function getBaseAppUrl(): string {
 }
 
 async function runHarness(): Promise<void> {
-  if (!process.env.KONA_INNGEST_EVENT_KEY) {
-    console.error("[dry-run-engagement] KONA_INNGEST_EVENT_KEY is required to send Inngest events.");
+  if (!process.env.INNGEST_EVENT_KEY) {
+    console.error("[dry-run-engagement] INNGEST_EVENT_KEY is required to send Inngest events.");
     process.exit(1);
   }
   if (!process.env.STITCH_API_KEY?.trim()) {

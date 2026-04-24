@@ -24,25 +24,16 @@ function resolveInngestEnvironmentName(): string | undefined {
     return undefined;
   }
   const e = process.env;
-  const n =
-    e.KONA_INNGEST_ENV?.trim() ||
-    e.INNGEST_ENV?.trim() ||
-    e.BRANCH_NAME?.trim() ||
-    e.VERCEL_GIT_COMMIT_REF?.trim() ||
-    e.CF_PAGES_BRANCH?.trim() ||
-    e.BRANCH?.trim() ||
-    e.RENDER_GIT_BRANCH?.trim() ||
-    e.RAILWAY_GIT_BRANCH?.trim() ||
-    "";
+  const n = e.INNGEST_EVENT_KEY?.trim() || e.INNGEST_ENV?.trim() || e.BRANCH_NAME?.trim() || "";
   return n || undefined;
 }
 
 const inngestEnv = resolveInngestEnvironmentName();
 
 export const inngest = new Inngest({
-  id: "kona-agency",
-  name: "GRAFT TODAY",
-  eventKey: process.env.KONA_INNGEST_EVENT_KEY,
-  signingKey: process.env.KONA_INNGEST_SIGNING_KEY,
+  id: "graft-agency",
+  name: "GRAFT TODAY PROSPECTOR",
+  eventKey: process.env.INNGEST_EVENT_KEY,
+  signingKey: process.env.INNGEST_SIGNING_KEY,
   ...(inngestEnv ? { env: inngestEnv } : {}),
 });

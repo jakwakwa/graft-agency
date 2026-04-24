@@ -12,7 +12,7 @@ if (!process.env.INNGEST_DEV?.trim()) {
   );
 }
 delete process.env.INNGEST_ENV;
-delete process.env.KONA_INNGEST_ENV;
+delete process.env.INNGEST_ENV;
 
 if (process.env.ENGAGEMENT_DRY_RUN === undefined) {
   process.env.ENGAGEMENT_DRY_RUN = "true";
