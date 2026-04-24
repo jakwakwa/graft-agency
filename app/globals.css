@@ -95,10 +95,10 @@ a {
   --card-foreground: #f8f0ee;
   --popover: #565252;
   --popover-foreground: #4e4e4e;
-  --muted: #1d1d1d2e;
+  --muted: #141313e6;
   --muted-foreground: #c8c8c8;
 
-  --primary: hsla(225 54.55% 52.55% / 0.91);
+  --primary: hsla(225 89.58% 62.35% / 0.91);
   --primary-container: #797070;
   --primary-kinetic: hsl(191.9 90.63% 25.1%);
   --primary-foreground: #d6edf0;
@@ -322,6 +322,11 @@ a {
 
   .animate-progress {
     animation: progress 2s ease-in-out infinite;
+  }
+
+  ::selection {
+    background: #1359d1;
+    color: #ffffff;
   }
 
   @media (prefers-reduced-motion: no-preference) {

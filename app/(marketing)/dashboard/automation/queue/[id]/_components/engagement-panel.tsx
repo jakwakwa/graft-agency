@@ -16,7 +16,6 @@ import {
   Palette,
   Rocket,
 } from "lucide-react";
-import Image from "next/image";
 import type React from "react";
 import { useState } from "react";
 import { Streamdown } from "streamdown";
@@ -52,6 +51,8 @@ interface EngagementStatus {
   julesSessionId?: string | null;
   julesState?: string | null;
   julesLastPolledAt?: string | null;
+  julesProgressTitle?: string | null;
+  julesProgressDescription?: string | null;
   renderServiceId?: string | null;
   renderServiceName?: string | null;
   pullRequestUrl?: string | null;
@@ -132,6 +133,21 @@ function conceptLink(c: Record<string, unknown>): string | undefined {
 function conceptImage(c: Record<string, unknown>): string | undefined {
   const img = c.screenshotUrl ?? c.previewImageUrl ?? c.imageUrl ?? c.image ?? c.thumbnailUrl;
   return typeof img === "string" && (img.startsWith("http://") || img.startsWith("https://")) ? img : undefined;
+}
+
+/** Google User Content often 429s direct browser loads; serve through authenticated same-origin proxy. */
+function designConceptPreviewSrc(url: string): string {
+  try {
+    const u = new URL(url);
+    if (u.protocol !== "https:") return url;
+    const h = u.hostname.toLowerCase();
+    if (h === "lh3.googleusercontent.com" || h.endsWith(".googleusercontent.com")) {
+      return `/api/engagement/proxy-image?url=${encodeURIComponent(url)}`;
+    }
+    return url;
+  } catch {
+    return url;
+  }
 }
 
 function githubBrowserUrl(repo: string | null | undefined): string | undefined {
@@ -352,8 +368,7 @@ export function EngagementPanel({ status, statusUnavailable = false }: Engagemen
               )}
               {status?.lastReconciledAt && (
                 <span className="text-[10px] text-muted-foreground font-mono">
-                  reconciled{" "}
-                  {Math.round((Date.now() - new Date(status.lastReconciledAt).getTime()) / 1000)}s ago
+                  reconciled {Math.round((Date.now() - new Date(status.lastReconciledAt).getTime()) / 1000)}s ago
                 </span>
               )}
             </div>
@@ -585,12 +600,15 @@ export function EngagementPanel({ status, statusUnavailable = false }: Engagemen
                                       className="relative block aspect-video overflow-hidden bg-muted/50"
                                     >
                                       <span className="sr-only">Open preview: {name}</span>
-                                      <Image
-                                        src={image}
+                                      {/* biome-ignore lint: Google User Content 429s next/image; src is same-origin proxy */}
+                                      <img
+                                        src={designConceptPreviewSrc(image)}
                                         alt=""
                                         width={400}
                                         height={225}
-                                        unoptimized
+                                        loading="lazy"
+                                        decoding="async"
+                                        referrerPolicy="no-referrer"
                                         className="h-full w-full object-cover"
                                       />
                                     </a>
@@ -710,6 +728,26 @@ export function EngagementPanel({ status, statusUnavailable = false }: Engagemen
                         </div>
                       )}
                     </dl>
+                    {(status?.julesProgressTitle?.trim() || status?.julesProgressDescription?.trim()) && (
+                      <div
+                        className="rounded-md border border-primary/20 bg-primary/5 px-3 py-2 space-y-1"
+                        aria-live="polite"
+                      >
+                        <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+                          Jules activity
+                        </p>
+                        {status.julesProgressTitle?.trim() && (
+                          <p className="text-sm font-medium text-foreground leading-snug">
+                            {status.julesProgressTitle}
+                          </p>
+                        )}
+                        {status.julesProgressDescription?.trim() && (
+                          <p className="text-xs text-muted-foreground leading-relaxed">
+                            {status.julesProgressDescription}
+                          </p>
+                        )}
+                      </div>
+                    )}
                     {julesIsRunning && status?.inngestRunStatus === "Failed" && (
                       <Alert variant="destructive" className="py-2">
                         <AlertCircle className="h-3.5 w-3.5" />
@@ -721,8 +759,17 @@ export function EngagementPanel({ status, statusUnavailable = false }: Engagemen
                     )}
                     {julesIsRunning && status?.inngestRunStatus !== "Failed" && !status?.pullRequestUrl && (
                       <p className="text-xs text-muted-foreground">
-                        Jules builds run ~10 minutes. Poller checks every 60s and will surface the PR + Render preview
-                        URL once the session completes.
+                        Jules often runs 20–40 minutes. Each poll refreshes session state and the latest{" "}
+                        <span className="whitespace-nowrap">progress-updated</span> line from the{" "}
+                        <a
+                          href="https://jules.google/docs/api/reference/activities#progress-updated"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary hover:underline"
+                        >
+                          Activities API
+                        </a>
+                        . The PR link appears once GitHub has the branch or PR.
                       </p>
                     )}
                     {julesStateUpper === "AWAITING_PLAN_APPROVAL" && (

@@ -189,6 +189,10 @@ model ProductSpec {
   julesSessionId        String?   @map("jules_session_id")
   julesState            String?   @map("jules_state")
   julesLastPolledAt     DateTime? @map("jules_last_polled_at")
+  /// Latest Jules activity `progressUpdated.title` (see Activities API).
+  julesProgressTitle       String? @map("jules_progress_title") @db.Text
+  /// Latest Jules activity `progressUpdated.description`.
+  julesProgressDescription String? @map("jules_progress_description") @db.Text
   renderServiceId       String?   @map("render_service_id")
   renderServiceName     String?   @map("render_service_name")
   pullRequestUrl        String?   @map("pull_request_url")

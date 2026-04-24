@@ -2,6 +2,7 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { requirePlatformAccess } from "@/lib/auth/resolve-client";
 import prisma from "@/lib/db/prisma";
+import { shouldSkipOnReadReconcileForBuilding } from "@/lib/engagement/reconcile-throttle";
 import { inngest } from "@/lib/inngest/client";
 
 const STALE_THRESHOLD_MS = 90_000; // 90s
@@ -30,6 +31,8 @@ export async function GET(
         julesSessionId: true,
         julesState: true,
         julesLastPolledAt: true,
+        julesProgressTitle: true,
+        julesProgressDescription: true,
         renderServiceId: true,
         renderServiceName: true,
         pullRequestUrl: true,
@@ -67,8 +70,17 @@ export async function GET(
   const isStale = isNonTerminal && staleMs > STALE_THRESHOLD_MS;
 
   // On-read reconciliation: fire-and-forget when the spec is stale and non-terminal.
+  // During BUILDING, skip if Jules was polled recently — jules-poller + dashboard polling
+  // otherwise spam Inngest and duplicate Jules session GETs.
   // Don't await — keep the GET response fast.
-  if (isStale) {
+  const deferOnReadReconcile =
+    isStale &&
+    shouldSkipOnReadReconcileForBuilding({
+      stage: spec.stage,
+      julesLastPolledAt: spec.julesLastPolledAt,
+    });
+
+  if (isStale && !deferOnReadReconcile) {
     inngest
       .send({
         name: "engagement/reconcile.requested",
@@ -99,6 +111,8 @@ export async function GET(
         ? {
             state: spec.julesState ?? null,
             lastPolledAt: spec.julesLastPolledAt?.toISOString() ?? null,
+            progressTitle: spec.julesProgressTitle ?? null,
+            progressDescription: spec.julesProgressDescription ?? null,
           }
         : undefined,
       render: spec.renderServiceId

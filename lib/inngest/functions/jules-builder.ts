@@ -1,12 +1,9 @@
-import { transitionStage } from "@/lib/engagement/stage-machine";
 import { ensureJulesSession, ensureRenderService } from "@/lib/engagement/idempotency";
+import { transitionStage } from "@/lib/engagement/stage-machine";
 import { inngest } from "@/lib/inngest/client";
+import { defaultJulesGithubSource } from "@/lib/services/jules-github.service";
 import type { DesignConcept, ProfiledNeeds } from "@/lib/types/engagement";
 import { makeOnFailure } from "./_shared/on-failure";
-
-function getJulesRepoSource(): string {
-  return process.env.JULES_SOURCE_REPO?.trim() ?? "sources/github/jakwakwa/graft-today-engagement-demo-builds";
-}
 
 export const julesBuilderFunction = inngest.createFunction(
   {
@@ -27,9 +24,7 @@ export const julesBuilderFunction = inngest.createFunction(
       chosenDesignIndex: number;
     };
 
-    await step.run("mark-building", () =>
-      transitionStage({ leadId, to: "BUILDING", source: "jules-builder" }),
-    );
+    await step.run("mark-building", () => transitionStage({ leadId, to: "BUILDING", source: "jules-builder" }));
 
     const chosenDesign = designConcepts[chosenDesignIndex] ?? designConcepts[0];
     if (!chosenDesign) throw new Error("No design concept found");
@@ -52,7 +47,7 @@ Style keywords: ${chosenDesign.styleKeywords.join(", ")}${chosenDesign.htmlUrl ?
       .replace(/^-|-$/g, "")
       .slice(0, 40);
 
-    const repoSource = getJulesRepoSource();
+    const repoSource = defaultJulesGithubSource();
     const rootDir = `prospects/${companySlug}`;
 
     // ensureJulesSession is idempotent: if a session was created in a prior attempt

@@ -2,8 +2,14 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   approveJulesPlan,
   createJulesSession,
+  extractPullRequestUrlFromActivities,
   extractPullRequestUrlFromSession,
+  fetchLatestJulesProgressUpdate,
   getJulesSession,
+  julesProgressToDbFields,
+  parseGithubPullRequestFromUrl,
+  pickLatestJulesProgressFromActivities,
+  resolveJulesPullRequestUrl,
 } from "@/lib/services/jules-github.service";
 
 const mockFetch = vi.fn();
@@ -98,5 +104,105 @@ describe("jules-github service", () => {
       outputs: [{ pullRequest: { url: "https://github.com/acme/repo/pull/42" } }],
     });
     expect(url).toBe("https://github.com/acme/repo/pull/42");
+  });
+
+  it("extractPullRequestUrlFromSession reads SessionOutput union output.pullRequest", () => {
+    const url = extractPullRequestUrlFromSession({
+      outputs: [{ output: { pullRequest: { url: "https://github.com/acme/repo/pull/9" } } }],
+    });
+    expect(url).toBe("https://github.com/acme/repo/pull/9");
+  });
+
+  it("parseGithubPullRequestFromUrl parses owner repo number", () => {
+    expect(parseGithubPullRequestFromUrl("https://github.com/jakwakwa/demo/pull/8")).toEqual({
+      owner: "jakwakwa",
+      repo: "demo",
+      number: 8,
+    });
+    expect(parseGithubPullRequestFromUrl("not-a-url")).toBeNull();
+  });
+
+  it("extractPullRequestUrlFromActivities finds URL in activity JSON", async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        activities: [
+          {
+            agentMessaged: {
+              agentMessage: "Opened https://github.com/acme/repo/pull/99 for review.",
+            },
+          },
+        ],
+      }),
+    });
+    const url = await extractPullRequestUrlFromActivities("sess-99");
+    expect(url).toBe("https://github.com/acme/repo/pull/99");
+  });
+
+  it("resolveJulesPullRequestUrl returns session output without calling GitHub when present", async () => {
+    delete process.env.GITHUB_TOKEN;
+    const url = await resolveJulesPullRequestUrl({
+      raw: {
+        outputs: [{ pullRequest: { url: "https://github.com/acme/repo/pull/1" } }],
+      },
+      sessionId: "ignored",
+      githubRepo: "sources/github/acme/repo",
+    });
+    expect(url).toBe("https://github.com/acme/repo/pull/1");
+    expect(mockFetch).not.toHaveBeenCalled();
+  });
+
+  it("pickLatestJulesProgressFromActivities returns null when empty", () => {
+    expect(pickLatestJulesProgressFromActivities([])).toBeNull();
+  });
+
+  it("pickLatestJulesProgressFromActivities picks newest by createTime", () => {
+    const activities: Record<string, unknown>[] = [
+      {
+        createTime: "2024-01-15T10:00:00Z",
+        progressUpdated: { title: "Older", description: "First" },
+      },
+      {
+        createTime: "2024-01-15T11:00:00Z",
+        progressUpdated: { title: "Newer", description: "Second" },
+      },
+    ];
+    const p = pickLatestJulesProgressFromActivities(activities);
+    expect(p?.title).toBe("Newer");
+    expect(p?.description).toBe("Second");
+  });
+
+  it("julesProgressToDbFields clears blank strings", () => {
+    expect(julesProgressToDbFields(null)).toEqual({
+      julesProgressTitle: null,
+      julesProgressDescription: null,
+    });
+    expect(
+      julesProgressToDbFields({
+        title: "  Hello  ",
+        description: "   ",
+      }),
+    ).toEqual({ julesProgressTitle: "Hello", julesProgressDescription: null });
+  });
+
+  it("fetchLatestJulesProgressUpdate parses activities list", async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        activities: [
+          {
+            createTime: "2024-01-15T12:00:00Z",
+            progressUpdated: { title: "Writing tests", description: "Adding coverage" },
+          },
+        ],
+      }),
+    });
+    const p = await fetchLatestJulesProgressUpdate("sess-1");
+    expect(p?.title).toBe("Writing tests");
+    expect(p?.description).toBe("Adding coverage");
+    const call = mockFetch.mock.calls[0];
+    expect(call).toBeDefined();
+    if (!call) throw new Error("Expected fetch call");
+    expect(String(call[0])).toContain("/sessions/sess-1/activities");
   });
 });

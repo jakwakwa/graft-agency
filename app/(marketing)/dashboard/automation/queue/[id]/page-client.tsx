@@ -39,6 +39,8 @@ interface EngagementStatus {
   julesSessionId?: string | null;
   julesState?: string | null;
   julesLastPolledAt?: string | null;
+  julesProgressTitle?: string | null;
+  julesProgressDescription?: string | null;
   renderServiceId?: string | null;
   renderServiceName?: string | null;
   pullRequestUrl?: string | null;

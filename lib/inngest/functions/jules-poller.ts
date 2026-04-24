@@ -1,18 +1,20 @@
 import prisma from "@/lib/db/prisma";
 import { transitionStage } from "@/lib/engagement/stage-machine";
 import { inngest } from "@/lib/inngest/client";
-import { makeOnFailure } from "./_shared/on-failure";
 import {
   approveJulesPlan,
-  extractPullRequestUrlFromSession,
-  findJulesPullRequest,
+  fetchLatestJulesProgressUpdate,
   findRenderPreviewUrl,
   getJulesSession,
   isJulesFailedState,
   isJulesTerminalState,
+  julesProgressToDbFields,
+  parseGithubPullRequestFromUrl,
   parseGithubRepoFromJulesSource,
+  resolveJulesPullRequestUrl,
 } from "@/lib/services/jules-github.service";
 import { canProvisionRenderService, getRenderService } from "@/lib/services/render.service";
+import { makeOnFailure } from "./_shared/on-failure";
 
 /**
  * Polls the Jules session until it reaches a terminal state, then resolves the
@@ -54,11 +56,14 @@ export const julesPollerFunction = inngest.createFunction(
 
     const session = await step.run("poll-jules-session", async () => {
       const result = await getJulesSession(julesSessionId);
+      const progress = await fetchLatestJulesProgressUpdate(julesSessionId);
+      const progressFields = julesProgressToDbFields(progress);
       await prisma.productSpec.update({
         where: { leadId },
         data: {
           julesState: result.state,
           julesLastPolledAt: new Date(),
+          ...progressFields,
         },
       });
       return { state: result.state };
@@ -148,28 +153,37 @@ export const julesPollerFunction = inngest.createFunction(
     }
 
     const completedSession = await step.run("fetch-session-outputs", () => getJulesSession(julesSessionId));
-    pullRequestUrl = extractPullRequestUrlFromSession(completedSession.raw);
+    pullRequestUrl = await step.run("resolve-pr-url", () =>
+      resolveJulesPullRequestUrl({
+        raw: completedSession.raw,
+        sessionId: julesSessionId,
+        githubRepo,
+      }),
+    );
 
-    if (repo) {
-      const pr = await step.run("find-pr", () =>
-        findJulesPullRequest({ owner: repo.owner, repo: repo.repo, sessionId: julesSessionId }),
-      );
+    const prParsed = pullRequestUrl ? parseGithubPullRequestFromUrl(pullRequestUrl) : null;
+    const prInBuildsRepo =
+      prParsed &&
+      repo &&
+      prParsed.owner.toLowerCase() === repo.owner.toLowerCase() &&
+      prParsed.repo.toLowerCase() === repo.repo.toLowerCase()
+        ? prParsed
+        : null;
 
-      if (pr) {
-        pullRequestUrl = pr.htmlUrl;
-
-        if (!deploymentUrl) {
-          // Fallback for repos where Render preview URLs are only posted on PR comments.
-          for (let i = 0; i < 5; i++) {
-            await step.sleep(`render-wait-${i}`, "30s");
-            const preview = await step.run(`find-render-${i}`, () =>
-              findRenderPreviewUrl({ owner: repo.owner, repo: repo.repo, prNumber: pr.number }),
-            );
-            if (preview) {
-              deploymentUrl = preview;
-              break;
-            }
-          }
+    if (prInBuildsRepo && !deploymentUrl) {
+      // Fallback for repos where Render preview URLs are only posted on PR comments.
+      for (let i = 0; i < 5; i++) {
+        await step.sleep(`render-wait-${i}`, "30s");
+        const preview = await step.run(`find-render-${i}`, () =>
+          findRenderPreviewUrl({
+            owner: prInBuildsRepo.owner,
+            repo: prInBuildsRepo.repo,
+            prNumber: prInBuildsRepo.number,
+          }),
+        );
+        if (preview) {
+          deploymentUrl = preview;
+          break;
         }
       }
     }
@@ -184,6 +198,8 @@ export const julesPollerFunction = inngest.createFunction(
           deploymentUrl: deploymentUrl ?? undefined,
           errorMessage: null,
           inngestRunStatus: "Completed",
+          julesProgressTitle: null,
+          julesProgressDescription: null,
         },
       }),
     );

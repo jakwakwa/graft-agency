@@ -1,7 +1,16 @@
 import prisma from "@/lib/db/prisma";
+import { RECONCILER_CRON_MIN_STALE_MS, shouldSkipJulesFetchInReconciler } from "@/lib/engagement/reconcile-throttle";
 import { transitionStage } from "@/lib/engagement/stage-machine";
 import { inngest } from "@/lib/inngest/client";
-import { getJulesSession, isJulesFailedState, isJulesTerminalState } from "@/lib/services/jules-github.service";
+import {
+  defaultJulesGithubSource,
+  fetchLatestJulesProgressUpdate,
+  getJulesSession,
+  isJulesFailedState,
+  isJulesTerminalState,
+  julesProgressToDbFields,
+  resolveJulesPullRequestUrl,
+} from "@/lib/services/jules-github.service";
 import { getRenderService } from "@/lib/services/render.service";
 
 const NON_TERMINAL_STAGES = [
@@ -16,7 +25,14 @@ const NON_TERMINAL_STAGES = [
   "BUILDING_COMPLETE",
 ] as const;
 
-const ORCHESTRATOR_ONLY_STAGES = ["PROFILING", "PROFILED", "WRITING_PRD", "PRD_WRITTEN", "DESIGNING", "DESIGN_COMPLETE"] as const;
+const ORCHESTRATOR_ONLY_STAGES = [
+  "PROFILING",
+  "PROFILED",
+  "WRITING_PRD",
+  "PRD_WRITTEN",
+  "DESIGNING",
+  "DESIGN_COMPLETE",
+] as const;
 const ORCHESTRATOR_STALE_MS = 5 * 60 * 1000; // 5 min
 
 export const engagementReconcilerFunction = inngest.createFunction(
@@ -25,7 +41,7 @@ export const engagementReconcilerFunction = inngest.createFunction(
     name: "Engagement Reconciler",
     retries: 2,
     concurrency: { limit: 10, key: "event.data.leadId" },
-    triggers: [{ cron: "*/2 * * * *" }, { event: "engagement/reconcile.requested" }],
+    triggers: [{ cron: "*/10 * * * *" }, { event: "engagement/reconcile.requested" }],
   },
   async ({ event, step }) => {
     // Scheduled cron mode: fan out per-lead reconcile events.
@@ -34,7 +50,7 @@ export const engagementReconcilerFunction = inngest.createFunction(
         prisma.productSpec.findMany({
           where: {
             stage: { in: [...NON_TERMINAL_STAGES] },
-            updatedAt: { lt: new Date(Date.now() - 60_000) },
+            updatedAt: { lt: new Date(Date.now() - RECONCILER_CRON_MIN_STALE_MS) },
           },
           select: { leadId: true },
           take: 50,
@@ -71,9 +87,11 @@ export const engagementReconcilerFunction = inngest.createFunction(
           updatedAt: true,
           julesSessionId: true,
           julesState: true,
+          julesLastPolledAt: true,
           renderServiceId: true,
           deploymentUrl: true,
           pullRequestUrl: true,
+          githubRepo: true,
         },
       }),
     );
@@ -128,35 +146,55 @@ export const engagementReconcilerFunction = inngest.createFunction(
         return { action: "no-op", stage: "BUILDING", reason: "no-jules-session-id" };
       }
 
-      const julesSession = await step.run("fetch-jules-session", () =>
-        getJulesSession(spec.julesSessionId!),
-      );
+      if (shouldSkipJulesFetchInReconciler(spec.julesLastPolledAt)) {
+        const lastPollIso = spec.julesLastPolledAt ? new Date(spec.julesLastPolledAt).toISOString() : null;
+        return {
+          action: "throttled-jules-fetch" as const,
+          reason: "jules-polled-recently",
+          julesLastPolledAt: lastPollIso,
+        };
+      }
 
-      if (!isJulesTerminalState(julesSession.state)) {
+      const julesSession = await step.run("fetch-jules-session", async () => {
+        const sid = spec.julesSessionId;
+        const session = await getJulesSession(sid);
+        const progress = await fetchLatestJulesProgressUpdate(sid);
+        return { session, progress };
+      });
+
+      const sessionState = julesSession.session.state;
+      const progressFields = julesProgressToDbFields(julesSession.progress);
+
+      if (!isJulesTerminalState(sessionState)) {
         // Still running — update Jules state metadata only.
         await step.run("update-jules-state", () =>
           prisma.productSpec.update({
             where: { leadId },
             data: {
-              julesState: julesSession.state,
+              julesState: sessionState,
               julesLastPolledAt: new Date(),
+              ...progressFields,
               lastReconciledAt: new Date(),
               lastReconciledBy: "reconciler",
             },
           }),
         );
-        return { action: "still-running", julesState: julesSession.state };
+        return { action: "still-running", julesState: sessionState };
       }
 
-      if (isJulesFailedState(julesSession.state)) {
+      if (isJulesFailedState(sessionState)) {
         const result = await step.run("mark-jules-failed", () =>
           transitionStage({
             leadId,
             to: "FAILED",
             source: "reconciler",
-            reason: `Jules session ${spec.julesSessionId} reached state ${julesSession.state}`,
+            reason: `Jules session ${spec.julesSessionId} reached state ${sessionState}`,
             expectedStageVersion: stageVersion,
-            data: { julesState: julesSession.state, julesLastPolledAt: new Date() },
+            data: {
+              julesState: sessionState,
+              julesLastPolledAt: new Date(),
+              ...progressFields,
+            },
           }),
         );
         await step.run("mark-reconciled", () =>
@@ -169,15 +207,20 @@ export const engagementReconcilerFunction = inngest.createFunction(
             },
           }),
         );
-        return { action: "marked-failed", julesState: julesSession.state, result };
+        return { action: "marked-failed", julesState: sessionState, result };
       }
 
       // Jules succeeded — promote to BUILDING_COMPLETE.
-      const raw = julesSession.raw ?? {};
+      const raw = julesSession.session.raw ?? {};
       const prUrl =
         spec.pullRequestUrl ??
-        (typeof raw.pullRequestUrl === "string" ? raw.pullRequestUrl : null) ??
-        null;
+        (await step.run("resolve-pr-url", () =>
+          resolveJulesPullRequestUrl({
+            raw,
+            sessionId: spec.julesSessionId,
+            githubRepo: spec.githubRepo ?? defaultJulesGithubSource(),
+          }),
+        ));
 
       const result = await step.run("mark-building-complete", () =>
         transitionStage({
@@ -187,11 +230,13 @@ export const engagementReconcilerFunction = inngest.createFunction(
           reason: `Jules session ${spec.julesSessionId} completed`,
           expectedStageVersion: stageVersion,
           data: {
-            julesState: julesSession.state,
+            julesState: sessionState,
             julesLastPolledAt: new Date(),
             pullRequestUrl: prUrl ?? undefined,
             errorMessage: null,
             inngestRunStatus: "Completed",
+            julesProgressTitle: null,
+            julesProgressDescription: null,
           },
         }),
       );
@@ -207,9 +252,7 @@ export const engagementReconcilerFunction = inngest.createFunction(
     // --- BUILDING_COMPLETE: resolve Render URL if missing ---
     if (stage === "BUILDING_COMPLETE") {
       if (spec.renderServiceId && !spec.deploymentUrl) {
-        const renderService = await step.run("fetch-render-service", () =>
-          getRenderService(spec.renderServiceId!),
-        );
+        const renderService = await step.run("fetch-render-service", () => getRenderService(spec.renderServiceId!));
         if (renderService.serviceUrl) {
           await step.run("save-render-url", () =>
             prisma.productSpec.update({
