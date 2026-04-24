@@ -1,17 +1,5 @@
 import { Inngest } from "inngest";
 
-/**
- * Optional explicit Inngest **branch / environment** name for cloud event sends
- * (`Inngest-Env` header). Must match an environment that exists in your Inngest
- * project — do not guess (a wrong name yields `404 Branch environment does not exist`).
- *
- * If unset, we do not pass `env` on the client; the SDK still infers from
- * `INNGEST_ENV`, `VERCEL_GIT_COMMIT_REF`, etc. via its own `getEnvironmentName()`.
- *
- * For local `inngest dev`, set `INNGEST_DEV` to the dev server URL (e.g.
- * `http://127.0.0.1:8288`) so events are sent to the dev server instead of cloud
- * (no cloud branch name required).
- */
 function isInngestDevMode(): boolean {
   const d = process.env.INNGEST_DEV?.trim();
   if (!d) return false;
