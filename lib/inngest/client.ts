@@ -20,7 +20,7 @@ const inngestEnv = resolveInngestEnvironmentName();
 
 export const inngest = new Inngest({
   id: "graft-agency",
-  name: "GRAFT TODAY PROSPECTOR",
+  name: "GRAFT_EVENT_PROD",
   eventKey: process.env.INNGEST_EVENT_KEY,
   signingKey: process.env.INNGEST_SIGNING_KEY,
   ...(inngestEnv ? { env: inngestEnv } : {}),
