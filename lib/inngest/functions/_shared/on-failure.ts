@@ -19,7 +19,16 @@ export function makeOnFailure(source: FailureSource, _stageOnEntry: EngagementSt
     error,
     runId,
   }: {
-    event: { data: Record<string, unknown> };
+    event: {
+      data: {
+        leadId?: string;
+        event?: {
+          data?: {
+            leadId?: string;
+          };
+        };
+      };
+    };
     error: { message: string };
     runId: string;
   }) => {
