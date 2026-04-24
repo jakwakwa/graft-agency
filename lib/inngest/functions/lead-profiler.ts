@@ -31,7 +31,7 @@ Output your analysis as structured JSON matching the schema exactly.`;
   let response: Awaited<ReturnType<typeof ai.models.generateContent>>;
   try {
     response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
+      model: "gemini-3.1-flash-lite-preview",
       contents: prompt,
       config: {
         thinkingConfig: { thinkingLevel: ThinkingLevel.HIGH },
@@ -49,7 +49,16 @@ Output your analysis as structured JSON matching the schema exactly.`;
             targetAudience: { type: Type.STRING },
             estimatedComplexity: { type: Type.STRING, enum: ["simple", "medium", "complex"] },
           },
-          required: ["companyName", "websiteUrl", "industry", "painPoints", "primaryNeed", "productType", "targetAudience", "estimatedComplexity"],
+          required: [
+            "companyName",
+            "websiteUrl",
+            "industry",
+            "painPoints",
+            "primaryNeed",
+            "productType",
+            "targetAudience",
+            "estimatedComplexity",
+          ],
         },
       },
     });
