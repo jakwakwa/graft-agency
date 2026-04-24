@@ -31,7 +31,7 @@ Output your analysis as structured JSON matching the schema exactly.`;
   let response: Awaited<ReturnType<typeof ai.models.generateContent>>;
   try {
     response = await ai.models.generateContent({
-      model: "gemini-3.1-flash-preview",
+      model: "gemini-3-flash-preview",
       contents: prompt,
       config: {
         thinkingConfig: { thinkingLevel: ThinkingLevel.HIGH },
