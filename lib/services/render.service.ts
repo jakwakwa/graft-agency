@@ -20,6 +20,56 @@ function renderHeaders(): Record<string, string> {
   };
 }
 
+/** Workspace (user or team) where Render resources are created — from GET /v1/owners, not arbitrary dashboard IDs. */
+export interface RenderOwner {
+  id: string;
+  name: string;
+  email?: string;
+  type?: string;
+}
+
+function normalizeOwnerEntry(item: unknown): RenderOwner[] {
+  if (!item || typeof item !== "object") return [];
+  const rec = item as Record<string, unknown>;
+  const wrapped = rec.owner;
+  const payload = typeof wrapped === "object" && wrapped !== null ? (wrapped as Record<string, unknown>) : rec;
+  const id = payload.id;
+  const name = payload.name;
+  if (typeof id !== "string" || typeof name !== "string") return [];
+  return [
+    {
+      id,
+      name,
+      email: typeof payload.email === "string" ? payload.email : undefined,
+      type: typeof payload.type === "string" ? payload.type : undefined,
+    },
+  ];
+}
+
+function parseOwnersResponse(json: unknown): RenderOwner[] {
+  if (Array.isArray(json)) {
+    return json.flatMap(normalizeOwnerEntry);
+  }
+  if (json && typeof json === "object") {
+    const owners = (json as Record<string, unknown>).owners;
+    if (Array.isArray(owners)) return owners.flatMap(normalizeOwnerEntry);
+  }
+  return [];
+}
+
+/** Lists workspaces your API key may manage. Use one of these `id` values for `RENDER_OWNER_ID` (see https://api-docs.render.com/reference/list-owners). */
+export async function listRenderOwners(): Promise<RenderOwner[]> {
+  const r = await fetch(`${RENDER_API_BASE}/owners?limit=100`, {
+    headers: renderHeaders(),
+  });
+  if (!r.ok) {
+    const err = (await r.json().catch(() => ({}))) as Record<string, unknown>;
+    throw new Error(`Render list owners failed (${r.status}): ${JSON.stringify(err)}`);
+  }
+  const json: unknown = await r.json();
+  return parseOwnersResponse(json);
+}
+
 function parseGithubRepoUrlFromJulesSource(source: string): string | null {
   const m = source.match(/^sources\/github\/([^/]+)\/([^/]+)$/);
   if (!m?.[1] || !m[2]) return null;
