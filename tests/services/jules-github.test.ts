@@ -4,6 +4,7 @@ import {
   createJulesSession,
   extractPullRequestUrlFromActivities,
   extractPullRequestUrlFromSession,
+  fetchGithubPullRequestHeadRef,
   fetchLatestJulesProgressUpdate,
   getJulesSession,
   julesProgressToDbFields,
@@ -204,5 +205,25 @@ describe("jules-github service", () => {
     expect(call).toBeDefined();
     if (!call) throw new Error("Expected fetch call");
     expect(String(call[0])).toContain("/sessions/sess-1/activities");
+  });
+
+  it("fetchGithubPullRequestHeadRef returns head.ref", async () => {
+    process.env.GITHUB_TOKEN = "ghp_test";
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ head: { ref: "feat/prospect-landing-page-123" } }),
+    });
+
+    const ref = await fetchGithubPullRequestHeadRef({
+      owner: "jakwakwa",
+      repo: "graft-today-engagement-demo-builds",
+      number: 42,
+    });
+
+    expect(ref).toBe("feat/prospect-landing-page-123");
+    const call = mockFetch.mock.calls[0];
+    expect(call).toBeDefined();
+    if (!call) throw new Error("Expected fetch call");
+    expect(String(call[0])).toBe("https://api.github.com/repos/jakwakwa/graft-today-engagement-demo-builds/pulls/42");
   });
 });

@@ -1,8 +1,11 @@
 import prisma from "@/lib/db/prisma";
+import { slugFromCompanyName } from "@/lib/engagement/company-slug";
+import { ensureRenderService } from "@/lib/engagement/idempotency";
 import { transitionStage } from "@/lib/engagement/stage-machine";
 import { inngest } from "@/lib/inngest/client";
 import {
   approveJulesPlan,
+  fetchGithubPullRequestHeadRef,
   fetchLatestJulesProgressUpdate,
   findRenderPreviewUrl,
   getJulesSession,
@@ -13,7 +16,8 @@ import {
   parseGithubRepoFromJulesSource,
   resolveJulesPullRequestUrl,
 } from "@/lib/services/jules-github.service";
-import { canProvisionRenderService, getRenderService } from "@/lib/services/render.service";
+import { canProvisionRenderService, getRenderService, updateRenderServiceBranch } from "@/lib/services/render.service";
+import type { ProfiledNeeds } from "@/lib/types/engagement";
 import { makeOnFailure } from "./_shared/on-failure";
 
 /**
@@ -123,9 +127,67 @@ export const julesPollerFunction = inngest.createFunction(
       return { leadId, outcome: "failed" as const, finalState };
     }
 
-    // Jules succeeded — try to resolve the PR and Render preview.
+    // Jules succeeded — resolve PR first, then provision Render on the PR head branch (code is not on `main` yet).
     let pullRequestUrl: string | null = null;
     let deploymentUrl: string | null = null;
+
+    const completedSession = await step.run("fetch-session-outputs", () => getJulesSession(julesSessionId));
+    pullRequestUrl = await step.run("resolve-pr-url", () =>
+      resolveJulesPullRequestUrl({
+        raw: completedSession.raw,
+        sessionId: julesSessionId,
+        githubRepo,
+      }),
+    );
+
+    const prParsed = pullRequestUrl ? parseGithubPullRequestFromUrl(pullRequestUrl) : null;
+    const prInBuildsRepo =
+      prParsed &&
+      repo &&
+      prParsed.owner.toLowerCase() === repo.owner.toLowerCase() &&
+      prParsed.repo.toLowerCase() === repo.repo.toLowerCase()
+        ? prParsed
+        : null;
+
+    const prHeadBranch = prInBuildsRepo
+      ? await step.run("fetch-pr-head-branch", () =>
+          fetchGithubPullRequestHeadRef({
+            owner: prInBuildsRepo.owner,
+            repo: prInBuildsRepo.repo,
+            number: prInBuildsRepo.number,
+          }),
+        )
+      : null;
+
+    if (prInBuildsRepo && prHeadBranch && canProvisionRenderService()) {
+      await step.run("ensure-render-service-on-pr-branch", async () => {
+        const before = await prisma.productSpec.findUnique({
+          where: { leadId },
+          select: { renderServiceId: true, profiledNeeds: true },
+        });
+        const hadServiceBefore = Boolean(before?.renderServiceId);
+        const profiled = before?.profiledNeeds as ProfiledNeeds | null | undefined;
+        const companyName = profiled?.companyName;
+        if (!companyName) return;
+        const companySlug = slugFromCompanyName(companyName);
+        await ensureRenderService({
+          leadId,
+          companySlug,
+          repoSource: githubRepo,
+          rootDir: `prospects/${companySlug}`,
+          branch: prHeadBranch,
+        });
+        if (hadServiceBefore) {
+          const after = await prisma.productSpec.findUnique({
+            where: { leadId },
+            select: { renderServiceId: true },
+          });
+          if (after?.renderServiceId) {
+            await updateRenderServiceBranch(after.renderServiceId, prHeadBranch);
+          }
+        }
+      });
+    }
 
     const specRender = await step.run("load-render-service-info", () =>
       prisma.productSpec.findUnique({
@@ -151,24 +213,6 @@ export const julesPollerFunction = inngest.createFunction(
         );
       }
     }
-
-    const completedSession = await step.run("fetch-session-outputs", () => getJulesSession(julesSessionId));
-    pullRequestUrl = await step.run("resolve-pr-url", () =>
-      resolveJulesPullRequestUrl({
-        raw: completedSession.raw,
-        sessionId: julesSessionId,
-        githubRepo,
-      }),
-    );
-
-    const prParsed = pullRequestUrl ? parseGithubPullRequestFromUrl(pullRequestUrl) : null;
-    const prInBuildsRepo =
-      prParsed &&
-      repo &&
-      prParsed.owner.toLowerCase() === repo.owner.toLowerCase() &&
-      prParsed.repo.toLowerCase() === repo.repo.toLowerCase()
-        ? prParsed
-        : null;
 
     if (prInBuildsRepo && !deploymentUrl) {
       // Fallback for repos where Render preview URLs are only posted on PR comments.

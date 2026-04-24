@@ -1,4 +1,5 @@
-import { ensureJulesSession, ensureRenderService } from "@/lib/engagement/idempotency";
+import { slugFromCompanyName } from "@/lib/engagement/company-slug";
+import { ensureJulesSession } from "@/lib/engagement/idempotency";
 import { transitionStage } from "@/lib/engagement/stage-machine";
 import { inngest } from "@/lib/inngest/client";
 import { defaultJulesGithubSource } from "@/lib/services/jules-github.service";
@@ -41,14 +42,9 @@ Colour scheme:
 Key components: ${chosenDesign.components.join(", ")}
 Style keywords: ${chosenDesign.styleKeywords.join(", ")}${chosenDesign.htmlUrl ? `\n\nStitch design HTML reference: ${chosenDesign.htmlUrl}` : ""}${chosenDesign.screenshotUrl ? `\nStitch design screenshot: ${chosenDesign.screenshotUrl}` : ""}`;
 
-    const companySlug = profiledNeeds.companyName
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-|-$/g, "")
-      .slice(0, 40);
+    const companySlug = slugFromCompanyName(profiledNeeds.companyName);
 
     const repoSource = defaultJulesGithubSource();
-    const rootDir = `prospects/${companySlug}`;
 
     // ensureJulesSession is idempotent: if a session was created in a prior attempt
     // it reuses it instead of creating a second one (preventing duplicate Unbroken-style runs).
@@ -63,10 +59,8 @@ Style keywords: ${chosenDesign.styleKeywords.join(", ")}${chosenDesign.htmlUrl ?
       }),
     );
 
-    // ensureRenderService is idempotent: reuses an existing service by deterministic name.
-    const { service: provisionedRender } = await step.run("ensure-render-service", () =>
-      ensureRenderService({ leadId, companySlug, repoSource, rootDir, branch: "main" }),
-    );
+    // Render service is provisioned in jules-poller after the PR exists, using the PR head branch
+    // so `rootDir` resolves on the branch Jules actually pushed to (not `main` until merge).
 
     await step.sendEvent("emit-build-started", {
       name: "engagement/build.started",
@@ -77,8 +71,6 @@ Style keywords: ${chosenDesign.styleKeywords.join(", ")}${chosenDesign.htmlUrl ?
         githubRepo: repoSource,
         issueUrl: session.sessionUrl,
         julesSessionId: session.sessionId,
-        renderServiceId: provisionedRender?.serviceId,
-        renderServiceUrl: provisionedRender?.serviceUrl,
       },
     });
 
@@ -87,8 +79,8 @@ Style keywords: ${chosenDesign.styleKeywords.join(", ")}${chosenDesign.htmlUrl ?
       stage: "BUILDING" as const,
       sessionId: session.sessionId,
       sessionUrl: session.sessionUrl,
-      renderServiceId: provisionedRender?.serviceId ?? null,
-      renderServiceUrl: provisionedRender?.serviceUrl ?? null,
+      renderServiceId: null,
+      renderServiceUrl: null,
     };
   },
 );
@@ -125,5 +117,5 @@ Write ALL files inside the directory \`${dir}/\` — do not modify anything outs
 7. All pages must be responsive (mobile-first)
 8. Open a PR titled: \`feat: prospect landing page — ${params.profiledNeeds.companyName}\`
 
-The output of this PR will be shown to the prospect as a Render preview URL to pitch GRAFT.TODAY's capabilities.`;
+The parent pipeline deploys this branch to Render for the prospect (live service URL and/or PR preview).`;
 }

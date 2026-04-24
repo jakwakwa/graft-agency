@@ -362,6 +362,29 @@ export async function findJulesPullRequest(params: {
 /**
  * Scan PR comments for a Render preview URL (Render posts them on PR open).
  */
+/** GitHub PR head ref for Render deploy branch (Jules lands on PR branch before merge). */
+export async function fetchGithubPullRequestHeadRef(params: {
+  owner: string;
+  repo: string;
+  number: number;
+}): Promise<string | null> {
+  const token = process.env.GITHUB_TOKEN?.trim();
+  if (!token) return null;
+
+  const url = `https://api.github.com/repos/${params.owner}/${params.repo}/pulls/${params.number}`;
+  const r = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: "application/vnd.github+json",
+      "X-GitHub-Api-Version": "2022-11-28",
+    },
+  });
+  if (!r.ok) return null;
+  const body = (await r.json()) as { head?: { ref?: string } };
+  const ref = body.head?.ref;
+  return typeof ref === "string" && ref.length > 0 ? ref : null;
+}
+
 export async function findRenderPreviewUrl(params: {
   owner: string;
   repo: string;

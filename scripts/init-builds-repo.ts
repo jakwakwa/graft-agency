@@ -62,17 +62,20 @@ prospects/
     vercel.json
 \`\`\`
 
-Each directory is fully independent. Render deploys each PR as a preview URL that
-is sent to the prospect as a sales pitch.
+Each directory is fully independent.
 
 ## How it works
 
 1. A prospect enters the GRAFT.TODAY pipeline (profiling → PRD → design)
-2. Jules receives a build task via the Jules API and writes the landing page into \`prospects/{slug}/\`
-3. Jules opens a PR — Render auto-generates a preview URL
-4. The preview URL is sent to the prospect
+2. Jules receives a build task via the Jules API and writes the landing page into \`prospects/{slug}/\` on a feature branch and opens a PR
+3. The parent app provisions Render (REST API) on the PR head branch and records the live URL
+4. The deployment URL is sent to the prospect
 
 **Do not merge PRs manually** — the pipeline manages lifecycle.
+
+## Deploys
+
+Render services are created by the parent app (not \`render.yaml\` in this repo). See the parent \`.env.example\` for \`RENDER_API_KEY\` / \`RENDER_OWNER_ID\`.
 `;
 
 const AGENTS_MD = `# Jules Project Instructions — GRAFT.TODAY Engagement Demo Builds

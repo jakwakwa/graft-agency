@@ -142,3 +142,16 @@ export async function getRenderService(serviceId: string): Promise<RenderProvisi
     raw,
   };
 }
+
+/** Point an existing web service at a Git branch (e.g. Jules PR head after code lands off `main`). */
+export async function updateRenderServiceBranch(serviceId: string, branch: string): Promise<void> {
+  const r = await fetch(`${RENDER_API_BASE}/services/${serviceId}`, {
+    method: "PATCH",
+    headers: renderHeaders(),
+    body: JSON.stringify({ branch }),
+  });
+  if (!r.ok) {
+    const err = (await r.json().catch(() => ({}))) as Record<string, unknown>;
+    throw new Error(`Render branch update failed (${r.status}): ${JSON.stringify(err)}`);
+  }
+}
