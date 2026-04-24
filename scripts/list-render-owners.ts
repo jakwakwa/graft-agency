@@ -21,6 +21,9 @@ async function main(): Promise<void> {
     const extra = [o.type, o.email].filter(Boolean).join(" · ");
     console.log(`${o.id}\t${o.name}${extra ? `\t(${extra})` : ""}`);
   }
+  console.log(
+    "\nOwner ids are scoped to the API key used above (and must match POST /v1/services payload — see lib/services/render.service.ts).",
+  );
 }
 
 main().catch((e: unknown) => {

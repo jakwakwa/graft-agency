@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { listRenderOwners } from "@/lib/services/render.service";
+import { listRenderOwners, provisionRenderService } from "@/lib/services/render.service";
 
 describe("listRenderOwners", () => {
   afterEach(() => {
@@ -41,5 +41,60 @@ describe("listRenderOwners", () => {
 
     const owners = await listRenderOwners();
     expect(owners).toEqual([{ id: "usr_xyz", name: "You", email: "a@b.co", type: undefined }]);
+  });
+
+  it("strips surrounding quotes from RENDER_OWNER_ID in provision body", async () => {
+    vi.stubEnv("RENDER_API_KEY", "rk_test");
+    vi.stubEnv("RENDER_OWNER_ID", '"tea-quoted"');
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ id: "srv_new" }),
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    await provisionRenderService({
+      companySlug: "acme",
+      julesRepoSource: "sources/github/org/repo",
+      rootDir: "prospects/acme",
+    });
+
+    const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    const parsed = JSON.parse(init.body as string) as Record<string, unknown>;
+    expect(parsed.ownerId).toBe("tea-quoted");
+    expect(parsed.serviceDetails).toEqual({
+      runtime: "node",
+      envSpecificDetails: {
+        buildCommand: "npm install && npm run build",
+        startCommand: "npm start",
+      },
+    });
+    expect(parsed).not.toHaveProperty("webServiceDetails");
+  });
+
+  it("on invalid ownerID 400, re-lists owners and appends diagnostic hint", async () => {
+    vi.stubEnv("RENDER_API_KEY", "rk_test");
+    vi.stubEnv("RENDER_OWNER_ID", "tea-bad");
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 400,
+        json: async () => ({ message: 'invalid ownerID: "tea-bad". use /v1/owners' }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => [{ owner: { id: "tea_ok", name: "Workspace", type: "team" } }],
+      });
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(
+      provisionRenderService({
+        companySlug: "acme",
+        julesRepoSource: "sources/github/org/repo",
+        rootDir: "prospects/acme",
+      }),
+    ).rejects.toThrow(/tea_ok/);
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 });

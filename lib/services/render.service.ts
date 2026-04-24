@@ -1,13 +1,26 @@
 const RENDER_API_BASE = "https://api.render.com/v1";
 
+/** Trim + strip one layer of surrounding quotes (common when pasting into host env UIs). */
+function normalizeRenderEnvValue(raw: string): string {
+  let s = raw.trim().replace(/[\u200B-\u200D\uFEFF]/g, "");
+  if (s.length >= 2) {
+    const a = s[0];
+    const b = s[s.length - 1];
+    if ((a === '"' && b === '"') || (a === "'" && b === "'")) {
+      s = s.slice(1, -1).trim();
+    }
+  }
+  return s;
+}
+
 function getRenderApiKey(): string {
-  const key = process.env.RENDER_API_KEY?.trim();
+  const key = process.env.RENDER_API_KEY ? normalizeRenderEnvValue(process.env.RENDER_API_KEY) : "";
   if (!key) throw new Error("RENDER_API_KEY is not set");
   return key;
 }
 
 function getRenderOwnerId(): string {
-  const ownerId = process.env.RENDER_OWNER_ID?.trim();
+  const ownerId = process.env.RENDER_OWNER_ID ? normalizeRenderEnvValue(process.env.RENDER_OWNER_ID) : "";
   if (!ownerId) throw new Error("RENDER_OWNER_ID is not set");
   return ownerId;
 }
@@ -97,7 +110,9 @@ export interface RenderProvisionedService {
 }
 
 export function canProvisionRenderService(): boolean {
-  return Boolean(process.env.RENDER_API_KEY?.trim() && process.env.RENDER_OWNER_ID?.trim());
+  const key = process.env.RENDER_API_KEY ? normalizeRenderEnvValue(process.env.RENDER_API_KEY) : "";
+  const owner = process.env.RENDER_OWNER_ID ? normalizeRenderEnvValue(process.env.RENDER_OWNER_ID) : "";
+  return Boolean(key && owner);
 }
 
 export async function provisionRenderService(params: {
@@ -112,6 +127,8 @@ export async function provisionRenderService(params: {
   }
 
   const serviceName = `prospect-${params.companySlug}`.slice(0, 63);
+  // Render OpenAPI: servicePOST uses `serviceDetails` (oneOf by type), not `webServiceDetails`.
+  // Native Node build/start commands live under serviceDetails.envSpecificDetails.
   const body: Record<string, unknown> = {
     type: "web_service",
     name: serviceName,
@@ -120,14 +137,17 @@ export async function provisionRenderService(params: {
     branch: params.branch ?? "main",
     rootDir: params.rootDir,
     autoDeploy: "yes",
-    webServiceDetails: {
+    serviceDetails: {
       runtime: "node",
-      buildCommand: "npm install && npm run build",
-      startCommand: "npm start",
+      envSpecificDetails: {
+        buildCommand: "npm install && npm run build",
+        startCommand: "npm start",
+      },
     },
   };
 
-  const environmentId = process.env.RENDER_ENVIRONMENT_ID?.trim();
+  const environmentIdRaw = process.env.RENDER_ENVIRONMENT_ID?.trim();
+  const environmentId = environmentIdRaw ? normalizeRenderEnvValue(environmentIdRaw) : "";
   if (environmentId) body.environmentId = environmentId;
 
   const r = await fetch(`${RENDER_API_BASE}/services`, {
@@ -138,6 +158,19 @@ export async function provisionRenderService(params: {
 
   if (!r.ok) {
     const err = (await r.json().catch(() => ({}))) as Record<string, unknown>;
+    const msg = typeof err.message === "string" ? err.message : "";
+    const isInvalidOwner = r.status === 400 && msg.toLowerCase().includes("invalid ownerid");
+    if (isInvalidOwner) {
+      let hint = "";
+      try {
+        const owners = await listRenderOwners();
+        const ids = owners.map((o) => o.id).join(", ");
+        hint = ` Owners visible to this RENDER_API_KEY: ${ids || "(none)"}. If your id appears here but creation still fails, check RENDER_ENVIRONMENT_ID belongs to that workspace, or compare env with where you ran \`bun run scripts/list-render-owners.ts\`.`;
+      } catch {
+        hint = " Could not call GET /v1/owners again for diagnostics.";
+      }
+      throw new Error(`Render service creation failed (${r.status}): ${JSON.stringify(err)}.${hint}`);
+    }
     throw new Error(`Render service creation failed (${r.status}): ${JSON.stringify(err)}`);
   }
 
