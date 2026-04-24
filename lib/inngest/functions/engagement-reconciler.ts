@@ -41,7 +41,7 @@ export const engagementReconcilerFunction = inngest.createFunction(
     name: "Engagement Reconciler",
     retries: 3,
     concurrency: { limit: 4, key: "event.data.leadId" },
-    triggers: [{ cron: "*/10 * * * *" }, { event: "engagement/reconcile.requested" }],
+    triggers: [{ cron: "*/15 * * * *" }, { event: "engagement/reconcile.requested" }],
   },
   async ({ event, step }) => {
     // Scheduled cron mode: fan out per-lead reconcile events.

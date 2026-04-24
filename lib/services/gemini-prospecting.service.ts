@@ -41,7 +41,7 @@ export const geminiProspectingService = {
 
     // Step 1: Find businesses using Google Search (grounded)
     const mapsResponse = await ai.models.generateContent({
-      model: "gemini-3.1-flash-lite-preview",
+      model: "gemini-2.5-flash-preview",
       contents: `Find 3 real businesses matching this target: "${targetAudience}". Return their names and any available website URLs or contact info.`,
       config: {
         tools: [{ googleSearch: {} }],
@@ -55,14 +55,14 @@ export const geminiProspectingService = {
 ${businessesFound}
 
 For each of these businesses:
-1. Use Google Search to find their actual website URL if not provided, and audit their online presence to determine if they are currently using visible AI technologies (like chatbots, AI agents).
+1. Use Google Search to find their actual website URL if not provided, and audit their online presence to determine if they are currently using visible AI technologies (like chatbots, AI agents, or voice agents).
 2. Identify 2-3 potential pain points based on their industry and online presence.
 3. Draft a highly personalised cold outreach email offering this value proposition: "${valueProposition}". The email should mention a specific pain point and how our solution helps. Keep it concise and professional.
 
 Return the results as a JSON array.`;
 
     const response = await ai.models.generateContent({
-      model: "gemini-3.1-flash-lite-preview",
+      model: "gemini-3.1-pro-preview",
       contents: prompt,
       config: {
         thinkingConfig: { thinkingLevel: ThinkingLevel.HIGH },

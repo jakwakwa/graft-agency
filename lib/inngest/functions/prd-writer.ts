@@ -36,7 +36,7 @@ Keep the MVP ruthlessly scoped. An AI agent must be able to implement this in 24
   const timeout = setTimeout(() => ctrl.abort(), 120_000);
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-3.1-flash-lite-preview",
+      model: "gemini-3.1-pro-preview",
       contents: prompt,
     });
     return response.text ?? "";
