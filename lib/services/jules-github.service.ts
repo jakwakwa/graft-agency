@@ -262,12 +262,16 @@ export async function resolveJulesPullRequestUrl(params: {
 }
 
 export function parseGithubPullRequestFromUrl(url: string): { owner: string; repo: string; number: number } | null {
-  const trimmed = url.split("?")[0];
+  const trimmed = url.split("?")[0] ?? url;
   const m = trimmed.match(/^https?:\/\/github\.com\/([^/]+)\/([^/]+)\/pull\/(\d+)/i);
   if (!m) return null;
-  const n = Number(m[3]);
+  const owner = m[1];
+  const repo = m[2];
+  const numStr = m[3];
+  if (owner === undefined || repo === undefined || numStr === undefined) return null;
+  const n = Number(numStr);
   if (!Number.isFinite(n)) return null;
-  return { owner: m[1], repo: m[2], number: n };
+  return { owner, repo, number: n };
 }
 
 export const JULES_TERMINAL_STATES = new Set(["COMPLETED", "SUCCEEDED", "FAILED", "CANCELLED", "CANCELED", "ERROR"]);

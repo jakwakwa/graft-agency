@@ -146,6 +146,8 @@ export const engagementReconcilerFunction = inngest.createFunction(
         return { action: "no-op", stage: "BUILDING", reason: "no-jules-session-id" };
       }
 
+      const julesSessionId = spec.julesSessionId;
+
       if (shouldSkipJulesFetchInReconciler(spec.julesLastPolledAt)) {
         const lastPollIso = spec.julesLastPolledAt ? new Date(spec.julesLastPolledAt).toISOString() : null;
         return {
@@ -156,9 +158,8 @@ export const engagementReconcilerFunction = inngest.createFunction(
       }
 
       const julesSession = await step.run("fetch-jules-session", async () => {
-        const sid = spec.julesSessionId;
-        const session = await getJulesSession(sid);
-        const progress = await fetchLatestJulesProgressUpdate(sid);
+        const session = await getJulesSession(julesSessionId);
+        const progress = await fetchLatestJulesProgressUpdate(julesSessionId);
         return { session, progress };
       });
 
@@ -188,7 +189,7 @@ export const engagementReconcilerFunction = inngest.createFunction(
             leadId,
             to: "FAILED",
             source: "reconciler",
-            reason: `Jules session ${spec.julesSessionId} reached state ${sessionState}`,
+            reason: `Jules session ${julesSessionId} reached state ${sessionState}`,
             expectedStageVersion: stageVersion,
             data: {
               julesState: sessionState,
@@ -217,7 +218,7 @@ export const engagementReconcilerFunction = inngest.createFunction(
         (await step.run("resolve-pr-url", () =>
           resolveJulesPullRequestUrl({
             raw,
-            sessionId: spec.julesSessionId,
+            sessionId: julesSessionId,
             githubRepo: spec.githubRepo ?? defaultJulesGithubSource(),
           }),
         ));
@@ -227,7 +228,7 @@ export const engagementReconcilerFunction = inngest.createFunction(
           leadId,
           to: "BUILDING_COMPLETE",
           source: "reconciler",
-          reason: `Jules session ${spec.julesSessionId} completed`,
+          reason: `Jules session ${julesSessionId} completed`,
           expectedStageVersion: stageVersion,
           data: {
             julesState: sessionState,
