@@ -37,7 +37,7 @@ export const julesPollerFunction = inngest.createFunction(
     id: "jules-poller",
     name: "Jules Build Poller",
     retries: 5,
-    concurrency: { limit: 20 },
+    concurrency: { limit: 5 },
     onFailure: makeOnFailure("jules-poller", "BUILDING"),
     triggers: [{ event: "engagement/build.started" }, { event: "engagement/build.poll.tick" }],
   },
