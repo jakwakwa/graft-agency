@@ -41,8 +41,8 @@ export const geminiProspectingService = {
 
     // Step 1: Find businesses using Google Search (grounded)
     const mapsResponse = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: `Find 3 real businesses matching this target: "${targetAudience}". Return their names and any available website URLs or contact info.`,
+      model: "gemini-3-flash-preview",
+      contents: `Find 5 real businesses matching this target: "${targetAudience}". Return their names and any available website URLs or contact info.`,
       config: {
         tools: [{ googleSearch: {} }],
       },
