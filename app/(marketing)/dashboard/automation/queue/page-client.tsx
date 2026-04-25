@@ -212,7 +212,7 @@ export default function QueuePage() {
               <span className="font-data text-xs text-secondary-foreground">VIEW ALL PROSPECTS</span>
             </div>
 
-            {(highlightedLeads.length === 0 ? highlightedLeads : leads.slice(0, 6)).map((lead, index) => {
+            {(highlightedLeads.length === 0 ? highlightedLeads : leads.slice(0, 15)).map((lead, index) => {
               const fit = Math.max(91, 99 - index * 4);
               const statusLabel = index > 0 ? "Queued" : index === 1 ? "Sourcing now" : "No Hits";
               return (
