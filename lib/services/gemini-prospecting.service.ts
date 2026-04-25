@@ -107,9 +107,11 @@ async function verifyProspects(
           redirect: "follow",
           signal: AbortSignal.timeout(6000),
         });
-        // 2xx/3xx are fine. 4xx is ambiguous but accepted (flagged as softFail in plan, but we'll just accept it).
-        // 5xx, timeouts, DNS errors will throw or return !ok.
-        return { prospect: p, passed: res.ok || (res.status >= 400 && res.status < 500) };
+        // 2xx/3xx are fine. Accept a small subset of 4xx statuses that can still
+        // indicate a reachable site that is blocking or rate-limiting requests.
+        // Reject other 4xx statuses such as 404/410, and reject 5xx responses.
+        const reachableButBlockedStatuses = new Set([401, 403, 429]);
+        return { prospect: p, passed: res.ok || reachableButBlockedStatuses.has(res.status) };
       } catch {
         return { prospect: p, passed: false };
       }

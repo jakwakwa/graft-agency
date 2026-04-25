@@ -18,8 +18,10 @@ export async function GET(req: Request) {
   const limitParam = searchParams.get("limit");
   const isPaginated = pageParam !== null || limitParam !== null;
 
-  const page = pageParam ? Math.max(1, parseInt(pageParam)) : 1;
-  const limit = limitParam ? Math.min(100, Math.max(1, parseInt(limitParam))) : 25;
+  const parsedPage = pageParam ? parseInt(pageParam, 10) : NaN;
+  const parsedLimit = limitParam ? parseInt(limitParam, 10) : NaN;
+  const page = Number.isFinite(parsedPage) ? Math.max(1, parsedPage) : 1;
+  const limit = Number.isFinite(parsedLimit) ? Math.min(100, Math.max(1, parsedLimit)) : 25;
 
   const where: Prisma.LeadWhereInput = {
     clientId,

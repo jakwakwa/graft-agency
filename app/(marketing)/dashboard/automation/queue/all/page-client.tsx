@@ -61,7 +61,8 @@ interface PaginatedLeads {
 export default function AllProspectsPageClient() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const page = parseInt(searchParams.get("page") ?? "1");
+  const parsedPage = Number.parseInt(searchParams.get("page") ?? "1", 10);
+  const page = Number.isFinite(parsedPage) && parsedPage >= 1 ? parsedPage : 1;
   const [data, setData] = useState<PaginatedLeads | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -263,7 +264,14 @@ export default function AllProspectsPageClient() {
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
                           <Button variant="ghost" size="icon" asChild>
-                            <Link href={`/dashboard/automation/queue/${lead.id}`}>
+                            <Link
+                              href={`/dashboard/automation/queue/${lead.id}`}
+                              aria-label={
+                                lead.customerName
+                                  ? `View details for ${lead.customerName}`
+                                  : "View prospect details"
+                              }
+                            >
                               <ChevronRight className="h-4 w-4" />
                             </Link>
                           </Button>
