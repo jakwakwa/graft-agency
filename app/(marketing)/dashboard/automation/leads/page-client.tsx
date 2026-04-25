@@ -238,6 +238,16 @@ export default function LeadsPage() {
           </Button>
         </div>
       </div>
+      {editingLead && (
+        <LeadDetailCard
+          id={editingLead.id}
+          customerName={editingLead.customerName}
+          scrapedData={editingLead.scrapedData}
+          onApprove={handleApprove}
+          onSave={handleSave}
+          onClose={() => setEditingLead(null)}
+        />
+      )}
     </MarketingShell>
   );
 }
