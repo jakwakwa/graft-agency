@@ -3,8 +3,8 @@ import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Be_Vietnam_Pro, Lexend, Work_Sans } from "next/font/google";
 import NextTopLoader from "nextjs-toploader";
-import { NavHeader } from "@/components/shared/nav-header";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/sonner";
 import { cn } from "@/lib/utils";
 
 const workSans = Work_Sans({
@@ -60,11 +60,8 @@ export default function RootLayout({
           shadow="0 0 10px #5737f0,0 0 5px #5737f0"
         />
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-          <ClerkProvider>
-            <NavHeader />
-
-            {children}
-          </ClerkProvider>
+          <ClerkProvider>{children}</ClerkProvider>
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>

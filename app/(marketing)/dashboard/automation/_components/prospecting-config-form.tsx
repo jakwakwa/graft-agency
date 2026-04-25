@@ -2,6 +2,7 @@
 
 import { Calendar, CalendarDays, Clock, Globe, RefreshCw, Timer, TrendingUp } from "lucide-react";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,6 +20,8 @@ function sastToUtc(sastTime: string): string {
   const utc = (h - 2 + 24) % 24;
   return `${String(utc).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
 }
+
+const AUTOMATION_TOAST = { duration: Infinity, closeButton: true } as const;
 
 const DAYS_OF_WEEK = [
   { value: 0, label: "Sunday" },
@@ -42,11 +45,7 @@ interface ProspectingConfig {
   valueProposition: string | null;
 }
 
-export function ProspectingConfigForm({
-  onMessage,
-}: {
-  onMessage: (msg: { type: "success" | "error"; text: string }) => void;
-}) {
+export function ProspectingConfigForm() {
   const [config, setConfig] = useState<ProspectingConfig>({
     cronEnabled: false,
     cronFrequency: "daily",
@@ -124,9 +123,9 @@ export function ProspectingConfigForm({
         }),
       });
       if (!res.ok) throw new Error("Save failed");
-      onMessage({ type: "success", text: "Prospecting config saved." });
+      toast.success("Prospecting config saved.", AUTOMATION_TOAST);
     } catch {
-      onMessage({ type: "error", text: "Failed to save config." });
+      toast.error("Failed to save config.", AUTOMATION_TOAST);
     } finally {
       setSaving(false);
     }
@@ -155,10 +154,10 @@ export function ProspectingConfigForm({
       <div className="space-y-12">
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <label className="text-xs font-data uppercase tracking-widest font-bold flex items-center gap-2">
+            <span className="text-xs font-data uppercase tracking-widest font-bold flex items-center gap-2">
               <TrendingUp className="h-3 w-3 text-primary" />
               Sales Aggression
-            </label>
+            </span>
             <span className="text-primary font-data font-bold">85%</span>
           </div>
           <input
@@ -176,10 +175,10 @@ export function ProspectingConfigForm({
 
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <label className="text-xs font-data uppercase tracking-widest font-bold flex items-center gap-2">
+            <span className="text-xs font-data uppercase tracking-widest font-bold flex items-center gap-2">
               <Globe className="h-3 w-3 text-secondary" />
               Local Nuance (Bakkie / Load Shedding)
-            </label>
+            </span>
             <span className="text-secondary font-data font-bold">Max (Resilient)</span>
           </div>
           <input
@@ -197,10 +196,10 @@ export function ProspectingConfigForm({
 
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <label className="text-xs font-data uppercase tracking-widest font-bold flex items-center gap-2">
+            <span className="text-xs font-data uppercase tracking-widest font-bold flex items-center gap-2">
               <Timer className="h-3 w-3 text-muted-foreground" />
               Response Delay
-            </label>
+            </span>
             <span className="text-muted-foreground font-data font-bold">Humanized (2-4m)</span>
           </div>
           <input

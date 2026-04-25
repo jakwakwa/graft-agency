@@ -56,7 +56,7 @@ describe("GET /api/cron/prospecting", () => {
     process.env.CRON_SECRET = "test-secret-123";
     runProspectingScheduledJob.mockResolvedValue({
       status: "ok",
-      result: { created: 3, errors: 0 },
+      result: { added: 3, duplicates: 0, errors: 0 },
     });
     const { GET } = await import("@/app/api/cron/prospecting/route");
     const response = await GET(
@@ -66,7 +66,7 @@ describe("GET /api/cron/prospecting", () => {
     );
     expect(response.status).toBe(200);
     const json = await response.json();
-    expect(json).toEqual({ created: 3, errors: 0 });
+    expect(json).toEqual({ added: 3, duplicates: 0, errors: 0 });
     expect(runProspectingScheduledJob).toHaveBeenCalledOnce();
   });
 

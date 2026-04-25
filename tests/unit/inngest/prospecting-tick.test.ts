@@ -28,11 +28,11 @@ describe("runProspectingInngestStep", () => {
     mockGetPlatformClientId.mockResolvedValue("cid-1");
     mockRunProspectingScheduledJob.mockResolvedValue({
       status: "ok",
-      result: { created: 2, errors: 0 },
+      result: { added: 2, duplicates: 0, errors: 0 },
     });
     const { runProspectingInngestStep } = await import("@/lib/inngest/functions/prospecting-tick");
     const out = await runProspectingInngestStep();
-    expect(out).toEqual({ ok: true, result: { created: 2, errors: 0 } });
+    expect(out).toEqual({ ok: true, result: { added: 2, duplicates: 0, errors: 0 } });
   });
 
   it("maps scheduler skipped outcome", async () => {

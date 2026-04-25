@@ -94,27 +94,27 @@ export default function LeadsPage() {
   return (
     <MarketingShell>
       <div className="grid grid-cols-12 gap-8 px-8">
-        <div className="col-span-7 flex flex-col">
-          <h3 className="flex items-center gap-2 font-display text-xl font-bold text-foreground">
+        <div className="col-span-12 mt-6 flex flex-col">
+          <h3 className="flex items-center gap-2 font-display text-3xl font-bold text-foreground my-4">
             Live Pulse
-            <div className="h-2 w-2 animate-pulse rounded-full bg-chart-3" />
+            <div className="h-2 w-2 animate-pulse rounded-full bg-chart-3 mb-2" />
           </h3>
-          <span className="font-data text-xs text-muted-foreground">{activeLeads.length} ACTIVE NOW</span>
+          <span className="font-data text-xs text-muted-foreground mb-8">{activeLeads.length} ACTIVE NOW</span>
 
           <div className="flex flex-col space-y-3 lg:col-span-6 overflow-hidden">
             {activeLeads.map((lead, i) => (
               <Button
                 key={lead.id}
                 onClick={() => setEditingLead(lead)}
-                className="mx-0 h-12 cursor-pointer border border-transparent bg-card transition-colors hover:border-outline-ghost hover:bg-muted/80"
+                className="mx-0 h-15 cursor-pointer border border-transparent bg-card transition-colors hover:border-outline-ghost hover:bg-muted"
               >
-                <div className="grid grid-cols-15 h-12 gap-3">
-                  <div className="mb-0 items-center justify-between col-span-7 flex  h-fit">
+                <div className="grid grid-cols-18 h-15 gap-2">
+                  <div className="mb-0 items-center justify-between col-span-11 flex  h-fit">
                     <div className="flex items-center gap-2 h-auto">
                       <div className="flex h-4 w-4 flex-col items-center justify-center rounded-sm bg-muted text-muted-foreground">
                         {lead.customerName?.slice(0, 1)?.toUpperCase() ?? "U"}
                       </div>
-                      <div className="flex flex-col items-start gap-0 justify-center h-12">
+                      <div className="flex flex-col items-start gap-0 justify-center h-15">
                         <h4 className="text-xs font-bold">{lead.customerName ?? `Unknown Visitor #${420 + i}`}</h4>
                         <p className="text-[10px] text-muted-foreground">
                           {lead.scrapedData?.websiteUrl ? "LIVE SOURCE" : "AI DETECTED"}
@@ -125,17 +125,13 @@ export default function LeadsPage() {
                       {lead.status === "DRAFT_PENDING" ? "Analyzing" : "Qualified"}
                     </span>
                   </div>
-                  <div className="col-span-7 flex h-11 flex-col justify-center bg-muted/60 p-3">
+                  <div className="col-span-7 flex h-15 flex-col justify-center bg-muted/60 p-3">
                     <p className="overflow-hidden text-[12px] italic text-foreground">
                       &quot;
                       {lead.scrapedData?.draftBody?.slice(0, 92) ??
                         "I'm looking for a white-label solution for my marketing agency..."}
                       &quot;
                     </p>
-                  </div>
-                  <div className=" flex flex-col col-span-1 justify-center">
-                    <span className="text-[8px] text-chart-5">LIVE LOG</span>
-                    <span className="text-xs text-secondary-foreground">→</span>
                   </div>
                 </div>
               </Button>
@@ -146,23 +142,25 @@ export default function LeadsPage() {
           </div>
         </div>
 
-        <div className="col-span-5">
-          <div className="flex flex-col items-center justify-between">
-            <h3 className="font-display text-xl font-bold uppercase tracking-tight text-foreground">
+        <div className="col-span-8">
+          <div className="flex flex-col items-end justify-between">
+            <h3 className="font-display text-xl font-bold uppercase tracking-tight text-foreground text-left w-full">
               Consultations Booked
             </h3>
-            <div className="flex gap-2 text-muted-foreground">
-              <Button className="p-1 hover:text-foreground">Calendar</Button>
-              <Button className="p-1 hover:text-foreground">List</Button>
+            <div className="flex gap-2 text-muted-foreground flex-end">
+              <Button className="p-1 hover:text-foreground rounded-xs min-w-24">Calendar</Button>
+              <Button className="p-1 hover:text-foreground rounded-xs min-w-24">List</Button>
             </div>
 
             <div className="w-full space-y-6 rounded-sm border border-outline-ghost bg-card p-6">
-              <div className="mb-6 grid grid-cols-7 overflow-hidden rounded-sm border border-outline-ghost bg-muted">
+              <div className="mb-6 grid grid-cols-7 overflow-hidden  h-42 border-border bg-muted/40 justify-center items-center rounded-md">
                 {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
                   <div
                     key={day}
-                    className={`bg-card p-2 text-center text-[10px] font-bold uppercase ${
-                      day === "Fri" ? "text-secondary-foreground" : "text-muted-foreground"
+                    className={` p-2 text-center text-[10px] font-bold bg-black/10 hover:bg-black/20 transition-all duration-300 border border-outline-ghost h-10 uppercase ${
+                      day === "Fri"
+                        ? "text-foreground bg-chart-5/70 border-chart-3"
+                        : "text-muted-foreground h-10 bg-black/50 border border-outline-ghost"
                     }`}
                   >
                     {day}
@@ -171,10 +169,10 @@ export default function LeadsPage() {
                 {[21, 22, 23, 24, 25, 26, 27].map((day) => (
                   <div
                     key={day}
-                    className={`h-24 p-2 text-xs ${
+                    className={`h-84 p-2 text-xs ${
                       day === 25
-                        ? "bg-sidebar-accent font-bold text-secondary-foreground"
-                        : "bg-card text-muted-foreground"
+                        ? "bg-black/20 font-bold text-secondary-foreground text-center"
+                        : "bg-card/20 text-muted-foreground text-center hover:bg-black/20 transition-all duration-300"
                     }`}
                   >
                     {day}
@@ -225,33 +223,21 @@ export default function LeadsPage() {
                 </div>
               </div>
             </div>
-
-            <div className="flex items-center gap-4 rounded-sm border border-outline-ghost bg-muted/50 p-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-chart-1 text-primary-foreground">
-                C
-              </div>
-              <div className="flex-1">
-                <h5 className="text-sm font-bold text-foreground">Calendly Integration Active</h5>
-                <p className="text-xs text-muted-foreground">Synchronizing 4 team calendars in real-time.</p>
-              </div>
-              <Button className="text-xs font-bold uppercase tracking-tighter text-secondary-foreground transition-colors hover:text-chart-5">
-                Manage Sync
-              </Button>
-            </div>
           </div>
         </div>
+        <div className="flex items-center gap-4 rounded-sm col-span-4 h-42 border border-outline-ghost bg-muted/50 p-4">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-chart-1 text-primary-foreground">
+            C
+          </div>
+          <div className="flex-1">
+            <h5 className="text-sm font-bold text-foreground">Calendly Integration Active</h5>
+            <p className="text-xs text-muted-foreground">Synchronizing 4 team calendars in real-time.</p>
+          </div>
+          <Button className="text-xs font-bold uppercase tracking-tighter text-secondary-foreground transition-colors bg-secondary hover:text-chart-5">
+            Manage Sync
+          </Button>
+        </div>
       </div>
-
-      {editingLead && (
-        <LeadDetailCard
-          id={editingLead.id}
-          customerName={editingLead.customerName}
-          scrapedData={editingLead.scrapedData}
-          onApprove={handleApprove}
-          onSave={handleSave}
-          onClose={() => setEditingLead(null)}
-        />
-      )}
     </MarketingShell>
   );
 }

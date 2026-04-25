@@ -1,5 +1,11 @@
 import { GoogleGenAI, ThinkingLevel, Type } from "@google/genai";
 import prisma from "@/lib/db/prisma";
+import {
+  normalizeProspectCompanyName,
+  normalizeProspectWebsiteUrl,
+  prospectIdentityKeys,
+  scrapedDataWebsiteUrl,
+} from "@/lib/utils/prospect-dedupe";
 
 interface ProspectResult {
   companyName: string;
@@ -11,14 +17,76 @@ interface ProspectResult {
   draftBody: string;
 }
 
+/** Cap CRM rows injected into prompts to stay within model context. */
+const MAX_EXCLUSIONS_IN_PROMPT = 120;
+
+export type ProspectingRunResult = {
+  added: number;
+  duplicates: number;
+  errors: number;
+};
+
+function formatCrmExclusionBlock(leads: { customerName: string | null; scrapedData: unknown }[]): string {
+  const lines: string[] = [];
+  let stoppedEarly = false;
+  for (let i = 0; i < leads.length; i++) {
+    const lead = leads[i];
+    if (!lead) continue;
+    const name = lead.customerName?.trim() ?? "";
+    const url = scrapedDataWebsiteUrl(lead.scrapedData) ?? "";
+    if (!name && !url) continue;
+    lines.push(`- ${name || "(unknown name)"}${url ? ` | ${url}` : ""}`);
+    if (lines.length >= MAX_EXCLUSIONS_IN_PROMPT) {
+      stoppedEarly = i < leads.length - 1;
+      break;
+    }
+  }
+  if (lines.length === 0) {
+    return "(No existing CRM records with names or websites yet.)";
+  }
+  const suffix = stoppedEarly ? `\n(Additional CRM records exist; duplicates are still filtered server-side.)` : "";
+  return `${lines.join("\n")}${suffix}`;
+}
+
+async function loadCrmExclusionSets(clientId: string): Promise<{
+  excludedNameKeys: Set<string>;
+  excludedUrlKeys: Set<string>;
+  leads: { customerName: string | null; scrapedData: unknown }[];
+}> {
+  const leads = await prisma.lead.findMany({
+    where: { clientId },
+    select: { customerName: true, scrapedData: true },
+  });
+
+  const excludedNameKeys = new Set<string>();
+  const excludedUrlKeys = new Set<string>();
+
+  for (const lead of leads) {
+    if (lead.customerName) {
+      const nk = normalizeProspectCompanyName(lead.customerName);
+      if (nk) excludedNameKeys.add(nk);
+    }
+    const url = scrapedDataWebsiteUrl(lead.scrapedData);
+    if (url) {
+      const uk = normalizeProspectWebsiteUrl(url);
+      if (uk) excludedUrlKeys.add(uk);
+    }
+  }
+
+  return { excludedNameKeys, excludedUrlKeys, leads };
+}
+
 export const geminiProspectingService = {
   async findAndAuditProspects(config: {
     clientId: string;
     searchCriteria: { industries?: string[]; locations?: string[]; keywords?: string[] } | null;
     valueProposition?: string | null;
-  }): Promise<{ created: number; errors: number }> {
+  }): Promise<ProspectingRunResult> {
     const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
     if (!apiKey) throw new Error("GOOGLE_GENERATIVE_AI_API_KEY not configured");
+
+    const { excludedNameKeys, excludedUrlKeys, leads } = await loadCrmExclusionSets(config.clientId);
+    const crmExclusionBlock = formatCrmExclusionBlock(leads);
 
     const ai = new GoogleGenAI({ apiKey });
 
@@ -39,10 +107,21 @@ export const geminiProspectingService = {
 
     const valueProposition = config.valueProposition ?? "AI automation solutions to save time and grow revenue";
 
+    const exclusionInstructions = `
+The following companies are already in our CRM. You must NOT suggest, return, or audit any of them — find different real businesses only.
+
+Already in CRM (company name and/or website):
+${crmExclusionBlock}
+`;
+
     // Step 1: Find businesses using Google Search (grounded)
     const mapsResponse = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
-      contents: `Find 5 real businesses matching this target: "${targetAudience}". Return their names and any available website URLs or contact info.`,
+      contents: `Find 5 real businesses matching this target: "${targetAudience}". Return their names and any available website URLs or contact info.
+
+${exclusionInstructions}
+
+Return only businesses that are clearly NOT in the CRM list above. If a match would overlap the list, pick a different company.`,
       config: {
         tools: [{ googleSearch: {} }],
       },
@@ -54,12 +133,14 @@ export const geminiProspectingService = {
     const prompt = `Here are some businesses found:
 ${businessesFound}
 
-For each of these businesses:
+${exclusionInstructions}
+
+For each of these businesses (only those not in the CRM list):
 1. Use Google Search to find their actual website URL if not provided, and audit their online presence to determine if they are currently using visible AI technologies (like chatbots, AI agents, or voice agents).
 2. Identify 2-3 potential pain points based on their industry and online presence.
 3. Draft a highly personalised cold outreach email offering this value proposition: "${valueProposition}". The email should mention a specific pain point and how our solution helps. Keep it concise and professional.
 
-Return the results as a JSON array.`;
+Omit any business that matches the CRM list by name or website. Return the results as a JSON array (may be fewer than 5 if some were excluded).`;
 
     const response = await ai.models.generateContent({
       model: "gemini-3.1-pro-preview",
@@ -105,12 +186,40 @@ Return the results as a JSON array.`;
     });
 
     const text = response.text ?? "[]";
-    const prospects: ProspectResult[] = JSON.parse(text);
+    let prospects: ProspectResult[];
+    try {
+      prospects = JSON.parse(text) as ProspectResult[];
+      if (!Array.isArray(prospects)) prospects = [];
+    } catch {
+      return { added: 0, duplicates: 0, errors: 1 };
+    }
 
-    let created = 0;
+    let added = 0;
+    let duplicates = 0;
     let errors = 0;
 
+    const seenInBatchNameKeys = new Set<string>();
+    const seenInBatchUrlKeys = new Set<string>();
+
     for (const prospect of prospects) {
+      const { nameKey, urlKey } = prospectIdentityKeys(prospect.companyName, prospect.websiteUrl);
+
+      const matchesCrm =
+        (nameKey.length > 0 && excludedNameKeys.has(nameKey)) || (urlKey.length > 0 && excludedUrlKeys.has(urlKey));
+      const matchesBatch =
+        (nameKey.length > 0 && seenInBatchNameKeys.has(nameKey)) ||
+        (urlKey.length > 0 && seenInBatchUrlKeys.has(urlKey));
+
+      if (matchesCrm || matchesBatch) {
+        duplicates++;
+        continue;
+      }
+
+      if (!nameKey.length && !urlKey.length) {
+        errors++;
+        continue;
+      }
+
       try {
         await prisma.lead.create({
           data: {
@@ -131,12 +240,20 @@ Return the results as a JSON array.`;
             },
           },
         });
-        created++;
+        added++;
+        if (nameKey.length > 0) {
+          seenInBatchNameKeys.add(nameKey);
+          excludedNameKeys.add(nameKey);
+        }
+        if (urlKey.length > 0) {
+          seenInBatchUrlKeys.add(urlKey);
+          excludedUrlKeys.add(urlKey);
+        }
       } catch {
         errors++;
       }
     }
 
-    return { created, errors };
+    return { added, duplicates, errors };
   },
 };

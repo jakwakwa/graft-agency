@@ -31,15 +31,17 @@
   --secondary: oklch(0.85 0.08 285);
   --secondary-foreground: oklch(0.21 0.006 285.885);
   --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
+  --muted-foreground: oklch(0.82 0.18 163.27);
   --accent: oklch(0.65 0.2 45);
   --accent-foreground: oklch(0.145 0 0);
+  --success: oklch(0.67 0.18 151.67 / 0.16);
+  --success-foreground: oklch(0.92 0.1 169.2);
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.9 0.02 17.57);
   --input: oklch(0.922 0 0);
   /* Field fill (opaque). Avoid Tailwind /opacity on translucent --input or the surface vanishes. */
-  --input-background: #f3f3f5;
-  --input-background-hover: #e9e9ed;
+  --input-background: #3c3c94;
+  --input-background-hover: #292971;
   --ring: oklch(0.708 0 0);
   --outline-ghost: color-mix(in srgb, #4b4a4b 15%, transparent);
   --surface-container-high: oklch(0.94 0.01 280);
@@ -87,58 +89,58 @@ a {
 
 .dark {
   /* Base */
-  --background: #1f2121;
+  --background: hsla(220 5.26% 11.18% / 0.9);
   --foreground: #f6f3f1;
 
   /* Surfaces — tonal depth, no hard borders */
-  --card: #07070762;
+  --card: #2c3b5134;
   --card-foreground: #f8f0ee;
-  --popover: #565252;
-  --popover-foreground: #4e4e4e;
-  --muted: #141313e6;
+  --popover: #f0b2b2;
+  --popover-foreground: #f49999;
+  --muted: #23272de6;
   --muted-foreground: #c8c8c8;
 
-  --primary: hsla(225 89.58% 62.35% / 0.91);
-  --primary-container: #797070;
-  --primary-kinetic: hsl(191.9 90.63% 25.1%);
-  --primary-foreground: #d6edf0;
+  --primary: #3c81e2e8;
+  --primary-container: #2c2e33;
+  --primary-kinetic: hsl(210 77.78% 61.18%);
+  --primary-foreground: #f1f5f6;
 
   /* Secondary — soft blossom */
-  --secondary: #1d1c25;
-  --secondary-container: #e4f3eb;
-  --secondary-foreground: #e2eded;
+  --secondary: #395dbf74;
+  --secondary-container: #161b22;
+  --secondary-foreground: #5a86de;
 
   /* Accent — tangerine */
-  --accent: #e68d873b;
-  --accent-foreground: #11f48a;
+  --accent: #1477f179;
+  --accent-foreground: #7fb9f7;
 
   /* Semantic */
   --destructive: #b04651;
   --destructive-foreground: #ffdee0;
 
   --border: transparent;
-  --input: color-mix(in srgb, #7b7e7ec2 30%, #4d4c4b);
-  --input-background: color-mix(in srgb, #565c63 10%, #262628);
+  --input: color-mix(in srgb, #2d2d8ac2 30%, #3b58e9);
+  --input-background: color-mix(in srgb, #07827354 10%, #283c5934);
   --input-background-hover: color-mix(in srgb, #a2a097 20%, #4f4f4f);
   --ring: #23d7e7;
 
   /* Ghost outline — outline-variant at 15% */
-  --outline-ghost: color-mix(in srgb, #6a59ed 15%, transparent);
+  --outline-ghost: color-mix(in srgb, #513ee2 15%, transparent);
 
   /* Surface tiers for cards/chips */
-  --surface-container-high: color-mix(in srgb, #075555 8%, #2487ea);
-  --surface-highest: color-mix(in srgb, #979796 12%, #a1a19c);
-  --surface-variant: color-mix(in srgb, #353534 15%, #262624);
+  --surface-container-high: color-mix(in srgb, #135c8d 58%, #0a1f34);
+  --surface-highest: color-mix(in srgb, #0a366f21 12%, #0c4cab);
+  --surface-variant: color-mix(in srgb, #23b9d0 15%, #1acac4);
 
   /* Charts */
-  --chart-1: #0b91f8;
-  --chart-2: #0c92ec;
-  --chart-3: #ff7882;
-  --chart-4: #d34ff8;
-  --chart-5: #01a6f2;
+  --chart-1: oklch(0.63 0.23 16.34);
+  --chart-2: #f44c19;
+  --chart-3: #ff5566b5;
+  --chart-4: #fb6757;
+  --chart-5: #484bfa;
 
   /* Sidebar */
-  --sidebar: #1a1a1a;
+  --sidebar: #1d2126;
   --sidebar-foreground: #c4c4c4;
   --sidebar-primary: #a7a7a7;
   --sidebar-primary-foreground: #bebebe;
@@ -148,14 +150,14 @@ a {
   --sidebar-ring: #1889fa;
 
   /* Shadows & glow */
-  --shadow-ambient: 0 24px 48px -12px rgba(11 12 14 / 0.17);
-  --shadow-neon: 0 0 16px rgba(186 203 198 / 0.55);
-  --shadow-neon-primary: 0 0 20px #81858ad9;
-  --shadow-neon-secondary: 0 0 16px rgba(170 160 164 / 0.81);
+  --shadow-ambient: 0 24px 48px -12px rgba(12 132 188 / 0.09);
+  --shadow-neon: 0 0 16px #3b64dedc;
+  --shadow-neon-primary: 0 0 20px #2e9fe084;
+  --shadow-neon-secondary: 0 0 16px rgba(95 179 247 / 0.81);
 
   /* Glass surfaces */
-  --glass-background: rgba(44 44 47 / 0.88);
-  --glass-border: #698fc767;
+  --glass-background: rgba(35 243 253 / 0.64);
+  --glass-border: #798ef75e;
 }
 
 @theme inline {
@@ -221,8 +223,8 @@ a {
     position: relative !important;
     background: linear-gradient(
       325deg,
-      oklch(0.52 0 0 / 0.76) 20%,
-      oklch(0.23 0 0 / 0.95) 120%
+      oklch(0.16 0 285.94 / 0.76) 20%,
+      oklch(0.16 0 285.94 / 0.95) 120%
     ) !important;
     -webkit-backdrop-filter: blur(10px) !important;
     backdrop-filter: blur(20px) !important;
@@ -241,6 +243,21 @@ a {
     backdrop-filter: blur(110px) !important;
     border: 1px solid rgba(153 148 148 / 0.49);
     box-shadow: inset 0 1px 1px rgba(69 77 79 / 0.64);
+  }
+
+  .cn-toast {
+    background: linear-gradient(
+      135deg,
+      oklch(0.88 0.2 159.59 / 0.46) 0%,
+      oklch(0.41 0.07 180.01 / 0.47) 100%
+    ) !important;
+    color: var(--success-foreground) !important;
+    text-shadow: 0 -4px 1px 1px rgba(4 45 39 / 0.93) !important;
+    border: 2px solid oklch(0.84 0.16 174.92 / 0.83) !important;
+    border-radius: var(--radius) !important;
+    padding: 18px 24px !important;
+    margin: 10px !important;
+    backdrop-filter: blur(5px) !important;
   }
 
   .neon-glow-primary {
@@ -266,11 +283,13 @@ a {
   .shadow-neon {
     box-shadow: var(--shadow-neon);
   }
-
+  select,
   input,
   textarea {
+    background: var(--input-background) !important;
+    color: #aaa9c1 !important;
     border-radius: 10px !important;
-    border: 1px solid #595a5a65 !important;
+    border: 1px solid #1959bf48 !important;
   }
 
   .shadow-neon-primary {
@@ -288,10 +307,10 @@ a {
     backdrop-filter: blur(5px);
     padding: 30px !important;
     background: linear-gradient(
-      345deg,
-      oklch(0.21 0 17.54 / 0.24) 20%,
-      rgba(87 160 208 / 0.07) 70%,
-      oklch(0.56 0.21 265.79 / 0.1) 137%
+      310deg,
+      #db707224 -20%,
+      rgba(67 83 108 / 0.17) 30%,
+      oklch(0.32 0.01 261.72 / 0.3) 117%
     ) !important;
     border-radius: 30px !important;
     border: 1px solid oklch(0.22 0 17.28 / 0.55);
