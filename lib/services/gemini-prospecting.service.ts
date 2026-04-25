@@ -24,6 +24,7 @@ export type ProspectingRunResult = {
   added: number;
   duplicates: number;
   errors: number;
+  rejected: number;
 };
 
 function formatCrmExclusionBlock(leads: { customerName: string | null; scrapedData: unknown }[]): string {
@@ -74,6 +75,112 @@ async function loadCrmExclusionSets(clientId: string): Promise<{
   }
 
   return { excludedNameKeys, excludedUrlKeys, leads };
+}
+
+async function verifyProspects(
+  prospects: ProspectResult[],
+  ai: GoogleGenAI
+): Promise<{ verified: ProspectResult[]; rejectedCount: number }> {
+  if (prospects.length === 0) return { verified: [], rejectedCount: 0 };
+
+  const tierAResults = await Promise.all(
+    prospects.map(async (p) => {
+      const url = normalizeProspectWebsiteUrl(p.websiteUrl);
+      if (!url) return { prospect: p, passed: false };
+
+      // Reject obvious junk
+      const junkPatterns = [
+        /\.test$/,
+        /\.example$/,
+        /\.invalid$/,
+        /\.local$/,
+        /localhost/,
+        /example\.com/,
+      ];
+      if (junkPatterns.some((reg) => reg.test(url))) {
+        return { prospect: p, passed: false };
+      }
+
+      try {
+        const res = await fetch(url, {
+          method: "GET",
+          redirect: "follow",
+          signal: AbortSignal.timeout(6000),
+        });
+        // 2xx/3xx are fine. Accept a small subset of 4xx statuses that can still
+        // indicate a reachable site that is blocking or rate-limiting requests.
+        // Reject other 4xx statuses such as 404/410, and reject 5xx responses.
+        const reachableButBlockedStatuses = new Set([401, 403, 429]);
+        return { prospect: p, passed: res.ok || reachableButBlockedStatuses.has(res.status) };
+      } catch {
+        return { prospect: p, passed: false };
+      }
+    })
+  );
+
+  const survivingTierA = tierAResults.filter((r) => r.passed).map((r) => r.prospect);
+  const tierARejectedCount = prospects.length - survivingTierA.length;
+
+  if (survivingTierA.length === 0) {
+    return { verified: [], rejectedCount: tierARejectedCount };
+  }
+
+  // Tier B - LLM Judge
+  try {
+    const listForGemini = survivingTierA.map((p) => ({
+      companyName: p.companyName,
+      websiteUrl: p.websiteUrl,
+    }));
+
+    const response = await ai.models.generateContent({
+      model: "gemini-3-flash-preview",
+      contents: `For each entry below, use Google Search to confirm (a) the company is a real, currently operating business and (b) the URL actually resolves to that company's official site. Return exists=false if you cannot find evidence; do NOT guess.
+
+List:
+${JSON.stringify(listForGemini, null, 2)}`,
+      config: {
+        tools: [{ googleSearch: {} }],
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.ARRAY,
+          items: {
+            type: Type.OBJECT,
+            properties: {
+              companyName: { type: Type.STRING },
+              websiteUrl: { type: Type.STRING },
+              exists: { type: Type.BOOLEAN },
+              websiteMatchesCompany: { type: Type.BOOLEAN },
+              reason: { type: Type.STRING },
+            },
+            required: ["companyName", "websiteUrl", "exists", "websiteMatchesCompany"],
+          },
+        },
+      },
+    });
+
+    const results = JSON.parse(response.text ?? "[]") as Array<{
+      companyName: string;
+      websiteUrl: string;
+      exists: boolean;
+      websiteMatchesCompany: boolean;
+    }>;
+
+    const verified = survivingTierA.filter((p) => {
+      const match = results.find(
+        (r) =>
+          normalizeProspectWebsiteUrl(r.websiteUrl) === normalizeProspectWebsiteUrl(p.websiteUrl)
+      );
+      return match?.exists && match?.websiteMatchesCompany;
+    });
+
+    return {
+      verified,
+      rejectedCount: tierARejectedCount + (survivingTierA.length - verified.length),
+    };
+  } catch (err) {
+    console.error("Tier B verification failed, falling back to Tier A results:", err);
+    return { verified: survivingTierA, rejectedCount: tierARejectedCount };
+  }
 }
 
 export const geminiProspectingService = {
@@ -191,8 +298,11 @@ Omit any business that matches the CRM list by name or website. Return the resul
       prospects = JSON.parse(text) as ProspectResult[];
       if (!Array.isArray(prospects)) prospects = [];
     } catch {
-      return { added: 0, duplicates: 0, errors: 1 };
+      return { added: 0, duplicates: 0, errors: 1, rejected: 0 };
     }
+
+    // Step 3: Verify prospects to filter hallucinations
+    const { verified: verifiedProspects, rejectedCount } = await verifyProspects(prospects, ai);
 
     let added = 0;
     let duplicates = 0;
@@ -201,7 +311,7 @@ Omit any business that matches the CRM list by name or website. Return the resul
     const seenInBatchNameKeys = new Set<string>();
     const seenInBatchUrlKeys = new Set<string>();
 
-    for (const prospect of prospects) {
+    for (const prospect of verifiedProspects) {
       const { nameKey, urlKey } = prospectIdentityKeys(prospect.companyName, prospect.websiteUrl);
 
       const matchesCrm =
@@ -254,6 +364,6 @@ Omit any business that matches the CRM list by name or website. Return the resul
       }
     }
 
-    return { added, duplicates, errors };
+    return { added, duplicates, errors, rejected: rejectedCount };
   },
 };
