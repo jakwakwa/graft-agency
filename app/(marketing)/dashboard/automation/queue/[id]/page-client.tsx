@@ -7,6 +7,17 @@ import { MarketingShell } from "@/components/layout/marketing-shell";
 import { Button } from "@/components/ui-v2/button";
 import { isTerminalStage } from "@/lib/utils/engagement-stages";
 import { EngagementPanel } from "./_components/engagement-panel";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface ScrapedData {
   websiteUrl?: string;
@@ -199,14 +210,18 @@ export default function QueueDetailPage() {
     if (!lead) return;
     try {
       const res = await fetch(`/api/leads/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: "CLOSED" }),
+        method: "DELETE",
       });
-      if (!res.ok) throw new Error("Discard failed");
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error ?? "Delete failed");
+      }
       router.push("/dashboard/automation/queue");
-    } catch {
-      setMessage({ type: "error", text: "Failed to discard." });
+    } catch (err) {
+      setMessage({
+        type: "error",
+        text: err instanceof Error ? err.message : "Failed to delete.",
+      });
     }
   }
 
@@ -269,12 +284,32 @@ export default function QueueDetailPage() {
                 {approving ? "Approving…" : "Approve & Send"}
               </Button>
             )}
-            <Button
-              onClick={handleDiscard}
-              className="rounded-lg bg-muted px-4 py-2 text-xs font-bold uppercase tracking-tighter text-muted-foreground hover:bg-muted/80"
-            >
-              Discard
-            </Button>
+            {!pipelineIsKnownRunning && (
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button className="rounded-lg bg-muted px-4 py-2 text-xs font-bold uppercase tracking-tighter text-muted-foreground hover:bg-muted/80">
+                    Discard
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Delete this prospect?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This permanently removes the prospect and all draft outreach. This cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={handleDiscard}
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    >
+                      Delete
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
           </div>
         </div>
 

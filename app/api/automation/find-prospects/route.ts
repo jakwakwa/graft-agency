@@ -33,13 +33,13 @@ export async function POST() {
   }
 
   try {
-    const { added, duplicates, errors } = await geminiProspectingService.findAndAuditProspects({
+    const { added, duplicates, errors, rejected } = await geminiProspectingService.findAndAuditProspects({
       clientId,
       searchCriteria: criteria,
       valueProposition: config.valueProposition,
     });
 
-    return Response.json({ added, duplicates, errors });
+    return Response.json({ added, duplicates, errors, rejected });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Prospecting failed";
     return Response.json({ error: message }, { status: 500 });

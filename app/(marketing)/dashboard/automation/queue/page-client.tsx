@@ -209,7 +209,12 @@ export default function QueuePage() {
           <div className="col-span-12 space-y-4 lg:col-span-7">
             <div className="mb-2 flex items-end justify-between">
               <h3 className="font-display text-lg font-bold text-foreground">High-Intent Targets</h3>
-              <span className="font-data text-xs text-secondary-foreground">VIEW ALL PROSPECTS</span>
+              <Link
+                href="/dashboard/automation/queue/all"
+                className="font-data text-xs text-secondary-foreground hover:underline"
+              >
+                VIEW ALL PROSPECTS
+              </Link>
             </div>
 
             {(highlightedLeads.length === 0 ? highlightedLeads : leads.slice(0, 15)).map((lead, index) => {
@@ -221,7 +226,6 @@ export default function QueuePage() {
                   href={`/dashboard/automation/queue/${lead.id}`}
                   className="group relative flex items-center gap-6 overflow-hidden border-l-2 border-chart-5/40 bg-card p-5 transition-all duration-200 hover:bg-muted/80"
                 >
-                  d
                   <div className="absolute right-0 top-0 h-full w-1/4 bg-linear-to-l from-chart-3/10 to-transparent" />
                   <div className="flex h-12 w-12 items-center justify-center rounded-sm bg-muted text-xl font-black text-secondary-foreground">
                     {initialsFromName(lead.customerName)}

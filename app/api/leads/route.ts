@@ -1,4 +1,4 @@
-import type { LeadStatus } from "@/generated/prisma/client";
+import type { LeadStatus, LeadSource, Prisma } from "@/generated/prisma/client";
 import { requirePlatformAccess } from "@/lib/auth/resolve-client";
 import prisma from "@/lib/db/prisma";
 
@@ -14,24 +14,61 @@ export async function GET(req: Request) {
   const status =
     statusParam && VALID_LEAD_STATUSES.includes(statusParam as LeadStatus) ? (statusParam as LeadStatus) : null;
 
-  const leads = await prisma.lead.findMany({
-    where: {
-      clientId,
-      source: "OUTBOUND_PROSPECT",
-      ...(status ? { status } : {}),
-    },
-    orderBy: { createdAt: "desc" },
-    include: {
-      productSpec: {
-        select: { stage: true },
-      },
-    },
-  });
+  const pageParam = searchParams.get("page");
+  const limitParam = searchParams.get("limit");
+  const isPaginated = pageParam !== null || limitParam !== null;
 
-  return Response.json(
-    leads.map(({ productSpec, ...lead }) => ({
+  const page = pageParam ? Math.max(1, parseInt(pageParam)) : 1;
+  const limit = limitParam ? Math.min(100, Math.max(1, parseInt(limitParam))) : 25;
+
+  const where: Prisma.LeadWhereInput = {
+    clientId,
+    source: "OUTBOUND_PROSPECT" as LeadSource,
+    ...(status ? { status } : {}),
+  };
+
+  if (!isPaginated) {
+    const leads = await prisma.lead.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      include: {
+        productSpec: {
+          select: { stage: true },
+        },
+      },
+    });
+
+    return Response.json(
+      leads.map(({ productSpec, ...lead }) => ({
+        ...lead,
+        engagementStage: productSpec?.stage ?? "NOT_STARTED",
+      })),
+    );
+  }
+
+  const [total, leads] = await Promise.all([
+    prisma.lead.count({ where }),
+    prisma.lead.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * limit,
+      take: limit,
+      include: {
+        productSpec: {
+          select: { stage: true },
+        },
+      },
+    }),
+  ]);
+
+  return Response.json({
+    data: leads.map(({ productSpec, ...lead }) => ({
       ...lead,
       engagementStage: productSpec?.stage ?? "NOT_STARTED",
     })),
-  );
+    total,
+    page,
+    limit,
+    pages: Math.ceil(total / limit),
+  });
 }

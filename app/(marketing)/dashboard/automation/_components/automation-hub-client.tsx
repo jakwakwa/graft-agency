@@ -16,12 +16,28 @@ export function AutomationHubClient() {
     setFinding(true);
     try {
       const res = await fetch("/api/automation/find-prospects", { method: "POST" });
-      const data: { error?: string; added?: number; duplicates?: number; errors?: number } = await res.json();
+      const data: {
+        error?: string;
+        added?: number;
+        duplicates?: number;
+        errors?: number;
+        rejected?: number;
+      } = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Find failed");
       const added = data.added ?? 0;
       const duplicates = data.duplicates ?? 0;
       const errors = data.errors ?? 0;
-      toast.success(`Found ${added} new prospects (${duplicates} duplicates skipped).`, {
+      const rejected = data.rejected ?? 0;
+
+      let msg = `Found ${added} new prospects.`;
+      if (duplicates > 0 || rejected > 0) {
+        const parts = [];
+        if (duplicates > 0) parts.push(`${duplicates} duplicates`);
+        if (rejected > 0) parts.push(`${rejected} hallucinations`);
+        msg += ` (${parts.join(", ")} skipped).`;
+      }
+
+      toast.success(msg, {
         ...AUTOMATION_TOAST,
         description: errors > 0 ? `${errors} row(s) failed to save.` : undefined,
       });
