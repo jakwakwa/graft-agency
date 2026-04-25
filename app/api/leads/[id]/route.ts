@@ -80,21 +80,9 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
     return Response.json({ error: "Not found" }, { status: 404 });
   }
 
-  const stage = lead.productSpec?.stage ?? "PENDING";
-  if (stage !== "PENDING") {
-    // If there is a product spec but it's not pending, we block deletion
-    return Response.json(
-      { error: "Cannot delete lead that has entered the pipeline" },
-      { status: 409 },
-    );
-  }
-
   await prisma.$transaction([
     prisma.conversation.deleteMany({ where: { leadId: id } }),
     prisma.prospectQueue.deleteMany({ where: { leadId: id } }),
-    // productSpec and stageTransitions are Cascade onDelete in the DB schema,
-    // but explicit delete is safer if we're not 100% sure the DB reflects the schema perfectly.
-    // However, Lead -> ProductSpec is cascade.
     prisma.lead.delete({ where: { id } }),
   ]);
 

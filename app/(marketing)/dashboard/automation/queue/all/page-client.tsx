@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronLeft, ChevronRight, Trash2, ExternalLink } from "lucide-react";
+import { ChevronLeft, ChevronRight, Trash2, ExternalLink, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -61,15 +61,19 @@ interface PaginatedLeads {
 export default function AllProspectsPageClient() {
   const searchParams = useSearchParams();
   const router = useRouter();
+
   const parsedPage = Number.parseInt(searchParams.get("page") ?? "1", 10);
   const page = Number.isFinite(parsedPage) && parsedPage >= 1 ? parsedPage : 1;
+  const sortBy = searchParams.get("sort") ?? "createdAt";
+  const sortOrder = searchParams.get("order") ?? "desc";
+
   const [data, setData] = useState<PaginatedLeads | null>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchLeads = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/leads?page=${page}&limit=25`);
+      const res = await fetch(`/api/leads?page=${page}&limit=25&sort=${sortBy}&order=${sortOrder}`);
       if (!res.ok) throw new Error("Failed to fetch leads");
       const json = await res.json();
       setData(json);
@@ -82,7 +86,28 @@ export default function AllProspectsPageClient() {
 
   useEffect(() => {
     fetchLeads();
-  }, [page]);
+  }, [page, sortBy, sortOrder]);
+
+  const toggleSort = (column: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (sortBy === column) {
+      params.set("order", sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      params.set("sort", column);
+      params.set("order", "asc");
+    }
+    params.set("page", "1"); // Reset to first page on sort
+    router.push(`?${params.toString()}`);
+  };
+
+  const getSortIcon = (column: string) => {
+    if (sortBy !== column) return <ArrowUpDown className="ml-2 h-4 w-4" />;
+    return sortOrder === "asc" ? (
+      <ArrowUp className="ml-2 h-4 w-4" />
+    ) : (
+      <ArrowDown className="ml-2 h-4 w-4" />
+    );
+  };
 
   const handleDelete = async (id: string) => {
     try {
@@ -181,8 +206,24 @@ export default function AllProspectsPageClient() {
                 <TableHead className="w-[250px]">Company</TableHead>
                 <TableHead>Website</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Engagement Stage</TableHead>
-                <TableHead>Created</TableHead>
+                <TableHead
+                  className="cursor-pointer hover:bg-muted/50 transition-colors"
+                  onClick={() => toggleSort("engagementStage")}
+                >
+                  <div className="flex items-center">
+                    Engagement Stage
+                    {getSortIcon("engagementStage")}
+                  </div>
+                </TableHead>
+                <TableHead
+                  className="cursor-pointer hover:bg-muted/50 transition-colors"
+                  onClick={() => toggleSort("createdAt")}
+                >
+                  <div className="flex items-center">
+                    Created
+                    {getSortIcon("createdAt")}
+                  </div>
+                </TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -206,7 +247,6 @@ export default function AllProspectsPageClient() {
               ) : (
                 data?.data.map((lead) => {
                   const category = getStageCategory(lead.engagementStage);
-                  const isDeletable = lead.engagementStage === "NOT_STARTED" || lead.engagementStage === "PENDING";
 
                   return (
                     <TableRow key={lead.id} className="group">
@@ -276,36 +316,34 @@ export default function AllProspectsPageClient() {
                             </Link>
                           </Button>
 
-                          {isDeletable && (
-                            <AlertDialog>
-                              <AlertDialogTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="text-muted-foreground hover:text-destructive"
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-muted-foreground hover:text-destructive"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Delete this prospect?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  This permanently removes the prospect and all draft outreach. This cannot be undone.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() => handleDelete(lead.id)}
+                                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                                 >
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </AlertDialogTrigger>
-                              <AlertDialogContent>
-                                <AlertDialogHeader>
-                                  <AlertDialogTitle>Delete this prospect?</AlertDialogTitle>
-                                  <AlertDialogDescription>
-                                    This permanently removes the prospect and all draft outreach. This cannot be undone.
-                                  </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                  <AlertDialogAction
-                                    onClick={() => handleDelete(lead.id)}
-                                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                                  >
-                                    Delete
-                                  </AlertDialogAction>
-                                </AlertDialogFooter>
-                              </AlertDialogContent>
-                            </AlertDialog>
-                          )}
+                                  Delete
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
                         </div>
                       </TableCell>
                     </TableRow>
