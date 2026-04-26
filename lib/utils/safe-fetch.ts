@@ -112,6 +112,19 @@ export function toAbsoluteUrl(raw: string): string | null {
  * - Rejects embedded credentials.
  * - Rejects IP literals and hostnames resolving to private/loopback/link-local ranges.
  * - Follows redirects manually, re-validating each hop (max 5).
+ *
+ * DNS-rebinding / TOCTOU note: resolveAndCheck() validates the hostname at call time,
+ * but the subsequent fetch() performs its own DNS resolution at connect time. An attacker
+ * with control over DNS and a very low TTL could flip the record between the two lookups.
+ * To fully close this window, replace the global fetch() call below with an undici Agent
+ * whose connect.lookup callback returns only the IP addresses already validated above:
+ *
+ *   import { fetch as undiciFetch, Agent } from "undici";
+ *   const agent = new Agent({ connect: { lookup: (_h, _o, cb) => cb(null, validatedIp, 4) } });
+ *   const res = await undiciFetch(u.toString(), { ..., dispatcher: agent });
+ *
+ * For the internal-admin use-case here, the existing pre-check still blocks the vast
+ * majority of SSRF vectors; rebinding attacks require DNS control + sub-second TTLs.
  */
 export async function safeFetch(
   rawUrl: string,

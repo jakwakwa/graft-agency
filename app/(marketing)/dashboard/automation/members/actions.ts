@@ -7,8 +7,7 @@ import { requirePlatformAccess } from "@/lib/auth/resolve-client";
 const AGENCY_CLERK_ORG_ID = process.env.AGENCY_CLERK_ORG_ID || process.env.PLATFORM_CLERK_ORG_ID;
 
 /**
- * Invites a new member to the agency organization.
- * Gates on platform access and Clerk's own permission check.
+ * Invites a new member to the agency organization. Gated on platform access.
  */
 export async function inviteMemberAction(formData: FormData) {
   const { userId } = await auth();
@@ -22,6 +21,11 @@ export async function inviteMemberAction(formData: FormData) {
     throw new Error("AGENCY_CLERK_ORG_ID is not configured");
   }
 
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+  if (!appUrl) {
+    throw new Error("NEXT_PUBLIC_APP_URL is not configured");
+  }
+
   const email = formData.get("email") as string;
   if (!email) throw new Error("Email is required");
 
@@ -32,7 +36,7 @@ export async function inviteMemberAction(formData: FormData) {
     inviterUserId: userId!,
     emailAddress: email,
     role: "org:member",
-    redirectUrl: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
+    redirectUrl: `${appUrl}/dashboard`,
   });
 
   revalidatePath("/dashboard/automation/members");

@@ -68,7 +68,7 @@ export function PortalShell({ children }: PortalShellProps) {
                 <span className="flex-1">{link.label}</span>
                 {link.comingSoon && (
                   <Badge variant="default" className="gap-1.5">
-                    Soons
+                    Soon
                   </Badge>
                 )}
               </Link>

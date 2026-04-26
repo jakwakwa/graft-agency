@@ -47,7 +47,7 @@ const TypographyH4 = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<H
   ({ className, ...props }, ref) => (
     <h4
       ref={ref}
-      className={cn("scroll-m-20 font-data text-base font-semibold uppercase leading-0 text-primary", className)}
+      className={cn("scroll-m-20 font-data text-base font-semibold uppercase leading-none text-primary", className)}
       {...props}
     />
   ),

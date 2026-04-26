@@ -8,11 +8,9 @@ describe("applyClerkOrganizationWebhook", () => {
 
   afterEach(async () => {
     await prisma.client.deleteMany({
-      where: {
-        OR: [{ clerkOrganizationId: orgId }, { clerkUserId: userId }, { businessName: "Graft Agency Test" }],
-      },
+      where: { OR: [{ clerkOrganizationId: orgId }, { clerkUserId: userId }] },
     });
-    delete process.env.CLERK_WEBHOOK_BOOTSTRAP_PLATFORM;
+    vi.unstubAllEnvs();
   });
 
   it("skips organization.created when bootstrap is disabled", async () => {
@@ -63,10 +61,15 @@ describe("applyClerkOrganizationWebhook", () => {
   it("sets isPlatformOwner when bootstrap is enabled and NO platform row exists", async () => {
     process.env.CLERK_WEBHOOK_BOOTSTRAP_PLATFORM = "true";
 
-    // Temporarily rename/mark other platform owners so count is 0
-    await prisma.client.updateMany({
+    // Record existing platform-owner IDs, then hide them so the bootstrap sees no owner.
+    const existingOwners = await prisma.client.findMany({
       where: { isPlatformOwner: true },
-      data: { isPlatformOwner: false, industry: "TEMP_HIDDEN_OWNER" },
+      select: { id: true },
+    });
+    const existingOwnerIds = existingOwners.map((r) => r.id);
+    await prisma.client.updateMany({
+      where: { id: { in: existingOwnerIds } },
+      data: { isPlatformOwner: false },
     });
 
     try {
@@ -80,11 +83,13 @@ describe("applyClerkOrganizationWebhook", () => {
       const client = await prisma.client.findUnique({ where: { clerkOrganizationId: orgId } });
       expect(client?.isPlatformOwner).toBe(true);
     } finally {
-      // Restore
-      await prisma.client.updateMany({
-        where: { industry: "TEMP_HIDDEN_OWNER" },
-        data: { isPlatformOwner: true, industry: null },
-      });
+      // Restore exactly the rows that were hidden, without touching any other fields.
+      if (existingOwnerIds.length > 0) {
+        await prisma.client.updateMany({
+          where: { id: { in: existingOwnerIds } },
+          data: { isPlatformOwner: true },
+        });
+      }
     }
   });
 });

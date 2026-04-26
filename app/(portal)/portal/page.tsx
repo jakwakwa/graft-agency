@@ -91,7 +91,7 @@ export default async function PortalDashboardPage() {
   return (
     <div className="w-full max-w-6xl space-y-8 mx-auto p-8">
       <div className="flex flex-col gap-2">
-        <Typography.H1>{businessName === "" ? businessName : "Your White label"} workspace</Typography.H1>
+        <Typography.H1>{businessName} workspace</Typography.H1>
         <Typography.Lead>A snapshot of your bot's recent conversations and bookings.</Typography.Lead>
       </div>
 

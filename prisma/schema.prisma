@@ -9,7 +9,7 @@ datasource db {
 
 model Client {
   id                   String             @id @default(uuid())
-  clerkOrganizationId  String?            @unique @map("clerk_organization_id")
+  clerkOrganizationId  String?            @map("clerk_organization_id")
   businessName         String             @map("business_name")
   industry             String?
   websiteUrl           String?            @map("website_url")
