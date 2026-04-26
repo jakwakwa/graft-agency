@@ -30,7 +30,7 @@ export async function getPlatformClientId(): Promise<string | null> {
 
   const orgId = process.env.PLATFORM_CLERK_ORG_ID;
   if (orgId) {
-    const client = await prisma.client.findUnique({
+    const client = await prisma.client.findFirst({
       where: { clerkOrganizationId: orgId },
       select: { id: true },
     });
