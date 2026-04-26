@@ -6,6 +6,7 @@ import {
   prospectIdentityKeys,
   scrapedDataWebsiteUrl,
 } from "@/lib/utils/prospect-dedupe";
+import { SsrfRejectedError, safeFetch, toAbsoluteUrl } from "@/lib/utils/safe-fetch";
 
 interface ProspectResult {
   companyName: string;
@@ -83,36 +84,28 @@ async function verifyProspects(
 ): Promise<{ verified: ProspectResult[]; rejectedCount: number }> {
   if (prospects.length === 0) return { verified: [], rejectedCount: 0 };
 
+  const reachableButBlockedStatuses = new Set([401, 403, 429]);
+
   const tierAResults = await Promise.all(
     prospects.map(async (p) => {
-      const url = normalizeProspectWebsiteUrl(p.websiteUrl);
-      if (!url) return { prospect: p, passed: false };
-
-      // Reject obvious junk
-      const junkPatterns = [
-        /\.test$/,
-        /\.example$/,
-        /\.invalid$/,
-        /\.local$/,
-        /localhost/,
-        /example\.com/,
-      ];
-      if (junkPatterns.some((reg) => reg.test(url))) {
-        return { prospect: p, passed: false };
-      }
+      // Build an absolute URL for network checks; normalizeProspectWebsiteUrl is
+      // for identity/dedupe only (it strips the scheme).
+      const absoluteUrl = toAbsoluteUrl(p.websiteUrl);
+      if (!absoluteUrl) return { prospect: p, passed: false };
 
       try {
-        const res = await fetch(url, {
+        const res = await safeFetch(absoluteUrl, {
           method: "GET",
-          redirect: "follow",
           signal: AbortSignal.timeout(6000),
         });
         // 2xx/3xx are fine. Accept a small subset of 4xx statuses that can still
         // indicate a reachable site that is blocking or rate-limiting requests.
         // Reject other 4xx statuses such as 404/410, and reject 5xx responses.
-        const reachableButBlockedStatuses = new Set([401, 403, 429]);
         return { prospect: p, passed: res.ok || reachableButBlockedStatuses.has(res.status) };
-      } catch {
+      } catch (err) {
+        if (err instanceof SsrfRejectedError) {
+          return { prospect: p, passed: false };
+        }
         return { prospect: p, passed: false };
       }
     })
