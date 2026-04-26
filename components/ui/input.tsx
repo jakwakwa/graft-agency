@@ -13,8 +13,8 @@ const InputRoot = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivE
         <div
           ref={ref}
           className={cn(
-            "flex h-11.5 w-full min-w-0 items-center rounded-xl border border-input bg-transparent px-2.5 transition-colors focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/50 dark:bg-input-background dark:focus-within:border-secondary",
-            className
+            "flex h-11.5 w-full min-w-0 items-center rounded-2xl overflow-hidden border border-input bg-transparent px-2.5 transition-colors focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/50 dark:bg-input-background dark:focus-within:border-secondary",
+            className,
           )}
           {...props}
         >
@@ -22,7 +22,7 @@ const InputRoot = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivE
         </div>
       </InputContext.Provider>
     );
-  }
+  },
 );
 InputRoot.displayName = "InputRoot";
 
@@ -31,11 +31,14 @@ const InputIcon = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivE
     return (
       <div
         ref={ref}
-        className={cn("flex flex-shrink-0 items-center justify-center text-muted-foreground mr-2", className)}
+        className={cn(
+          "flex flex-shrink-0   rounded-2xl overflow-hidden items-center justify-center text-muted-foreground mr-2",
+          className,
+        )}
         {...props}
       />
     );
-  }
+  },
 );
 InputIcon.displayName = "InputIcon";
 
@@ -52,13 +55,13 @@ const InputField = React.forwardRef<HTMLInputElement, React.ComponentProps<"inpu
         className={cn(
           isCompound
             ? "flex-1 bg-transparent px-0 py-1 text-base outline-none md:text-sm placeholder:text-muted-foreground file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:cursor-not-allowed disabled:opacity-50"
-            : "h-11.5 w-full min-w-0 rounded-[var(--radius)] border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input-background dark:disabled:bg-muted dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40",
-          className
+            : "h-11.5 w-full min-w-0 border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input-background dark:disabled:bg-muted dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40  rounded-2xl overflow-hidden",
+          className,
         )}
         {...props}
       />
     );
-  }
+  },
 );
 InputField.displayName = "InputField";
 

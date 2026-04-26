@@ -43,9 +43,6 @@ export function MarketingShell({ children }: MarketingShellProps) {
   } else if (pathname.includes("/dashboard/automation/members")) {
     sidebarTitle = "Platform master owners";
     sidebarLinks = [{ href: "/dashboard/automation/members", label: "members dashboard" }];
-  } else if (pathname.includes("/portal/embed")) {
-    sidebarTitle = "White Label Wonder";
-    sidebarLinks = [{ href: "/portal/embed", label: "embed dashboard" }];
   } else if (pathname.includes("/dashboard/automation")) {
     sidebarTitle = "Platform master owners";
     sidebarLinks = [{ href: "/dashboard/automation", label: "automation dashboard" }];

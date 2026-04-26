@@ -13,6 +13,7 @@ import { Button } from "@/components/ui-v2/button";
 import { saveBotSettingsAction } from "../actions";
 
 interface KnowledgeSnippet {
+  id: string;
   question: string;
   answer: string;
 }
@@ -25,7 +26,7 @@ interface BotSettingsFormProps {
     widgetPrimaryColour: string | null;
     calComUsername: string | null;
     defaultEventSlug: string | null;
-    knowledgeBase: any;
+    knowledgeBase: KnowledgeSnippet[] | null;
   };
 }
 
@@ -41,24 +42,32 @@ function SubmitButton() {
 
 export function BotSettingsForm({ initialData }: BotSettingsFormProps) {
   const [knowledgeBase, setKnowledgeBase] = useState<KnowledgeSnippet[]>(
-    Array.isArray(initialData.knowledgeBase) ? initialData.knowledgeBase : [],
+    Array.isArray(initialData.knowledgeBase)
+      ? initialData.knowledgeBase.map((s, i) => ({
+          id: s.id || `snippet-${i}`,
+          question: s.question || "",
+          answer: s.answer || "",
+        }))
+      : [],
   );
 
   const addSnippet = () => {
-    setKnowledgeBase([...knowledgeBase, { question: "", answer: "" }]);
+    setKnowledgeBase([...knowledgeBase, { id: crypto.randomUUID(), question: "", answer: "" }]);
   };
 
-  const removeSnippet = (index: number) => {
-    setKnowledgeBase(knowledgeBase.filter((_, i) => i !== index));
+  const removeSnippet = (id: string) => {
+    setKnowledgeBase(knowledgeBase.filter((s) => s.id !== id));
   };
 
-  const updateSnippet = (index: number, field: keyof KnowledgeSnippet, value: string) => {
-    const newKB = [...knowledgeBase];
-    const snippet = newKB[index];
-    if (snippet) {
-      snippet[field] = value;
-      setKnowledgeBase(newKB);
-    }
+  const updateSnippet = (id: string, field: keyof KnowledgeSnippet, value: string) => {
+    setKnowledgeBase(
+      knowledgeBase.map((s) => {
+        if (s.id === id) {
+          return { ...s, [field]: value };
+        }
+        return s;
+      }),
+    );
   };
 
   async function clientAction(formData: FormData) {
@@ -68,7 +77,7 @@ export function BotSettingsForm({ initialData }: BotSettingsFormProps) {
       if (result.success) {
         toast.success("Saved. Your bot will use these settings on the next conversation.");
       }
-    } catch (err) {
+    } catch {
       toast.error("Couldn't save. Try again, or refresh and check your connection.");
     }
   }
@@ -107,20 +116,20 @@ export function BotSettingsForm({ initialData }: BotSettingsFormProps) {
               <Typography.Muted>The first message your bot says when someone opens chat.</Typography.Muted>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-2 ">
               <Label htmlFor="widgetPrimaryColour">Brand colour</Label>
-              <div className="flex items-center gap-3">
+              <div className="flex justify-start items-center gap-1 rounded-full overflow-hidden h-fit p-0 m-0">
                 <Input
                   id="widgetPrimaryColour"
                   name="widgetPrimaryColour"
                   type="color"
                   defaultValue={initialData.widgetPrimaryColour ?? "#7c3aed"}
-                  className="w-12 p-1 h-10"
+                  className={`w-12 h-10 -inset-2 p-1 m-1 border-white/50 outline-1  outline-white overflow-hidden rounded-b-2xl`}
                 />
                 <Input
                   defaultValue={initialData.widgetPrimaryColour ?? "#7c3aed"}
                   placeholder="#7C3AED"
-                  className="font-mono uppercase"
+                  className="font-mono uppercase h-12"
                   disabled
                 />
               </div>
@@ -201,16 +210,16 @@ export function BotSettingsForm({ initialData }: BotSettingsFormProps) {
                 No snippets added yet. Add some to help your bot answer specific questions about your business.
               </div>
             )}
-            {knowledgeBase.map((snippet, index) => (
+            {knowledgeBase.map((snippet) => (
               <div
-                key={index}
+                key={snippet.id}
                 className="grid grid-cols-1 md:grid-cols-12 gap-4 p-4 bg-muted/30 rounded-lg relative group"
               >
                 <div className="md:col-span-5 space-y-2">
                   <Label>Question</Label>
                   <Input
                     value={snippet.question}
-                    onChange={(e) => updateSnippet(index, "question", e.target.value)}
+                    onChange={(e) => updateSnippet(snippet.id, "question", e.target.value)}
                     placeholder="e.g. What are your pricing plans?"
                   />
                 </div>
@@ -218,7 +227,7 @@ export function BotSettingsForm({ initialData }: BotSettingsFormProps) {
                   <Label>Answer</Label>
                   <Textarea
                     value={snippet.answer}
-                    onChange={(e) => updateSnippet(index, "answer", e.target.value)}
+                    onChange={(e) => updateSnippet(snippet.id, "answer", e.target.value)}
                     placeholder="e.g. We have three tiers: Basic ($29), Pro ($99), and Enterprise."
                   />
                 </div>
@@ -228,7 +237,7 @@ export function BotSettingsForm({ initialData }: BotSettingsFormProps) {
                     variant="ghost"
                     size="icon"
                     className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                    onClick={() => removeSnippet(index)}
+                    onClick={() => removeSnippet(snippet.id)}
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -239,7 +248,7 @@ export function BotSettingsForm({ initialData }: BotSettingsFormProps) {
         </Card>
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/80 backdrop-blur border-t z-10 flex justify-center md:pl-64">
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-surface-variant/10 md:ml-64 backdrop-blur border-t z-10 flex justify-center md:pl-64">
         <div className="w-full max-w-6xl px-8 flex justify-end">
           <SubmitButton />
         </div>

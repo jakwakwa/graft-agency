@@ -1,10 +1,11 @@
 "use client";
 
 import { UserButton } from "@clerk/nextjs";
-import { Code, CreditCard, LayoutDashboard, Settings } from "lucide-react";
+import { Code, CreditCard, LayoutDashboard, MessageSquare, Settings } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
+import { Badge } from "../ui/badge";
 
 interface PortalShellProps {
   children: ReactNode;
@@ -15,6 +16,7 @@ export function PortalShell({ children }: PortalShellProps) {
 
   const sidebarLinks = [
     { href: "/portal", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/portal/conversations", label: "Conversations", icon: MessageSquare },
     { href: "/portal/settings", label: "Bot Settings", icon: Settings },
     { href: "/portal/embed", label: "Embed Code", icon: Code },
     { href: "/portal/billing", label: "Billing", icon: CreditCard, comingSoon: true },
@@ -65,9 +67,9 @@ export function PortalShell({ children }: PortalShellProps) {
                 />
                 <span className="flex-1">{link.label}</span>
                 {link.comingSoon && (
-                  <span className="text-[10px] bg-muted px-1.5 py-0.5 rounded text-muted-foreground uppercase tracking-tighter">
-                    Soon
-                  </span>
+                  <Badge variant="default" className="gap-1.5">
+                    Soons
+                  </Badge>
                 )}
               </Link>
             );
@@ -77,24 +79,6 @@ export function PortalShell({ children }: PortalShellProps) {
 
       {/* Main Content */}
       <main className="min-h-screen w-full pt-16 md:pl-64 bg-background/50">{children}</main>
-
-      {/* Mobile Bottom Nav */}
-      <nav className="fixed bottom-0 left-0 z-50 flex h-16 w-full items-center justify-around border-t border-outline-ghost bg-card/90 px-6 backdrop-blur-md md:hidden">
-        {sidebarLinks.map((link) => {
-          const isActive = pathname === link.href;
-          const Icon = link.icon;
-          return (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`flex flex-col items-center gap-1 font-data ${isActive ? "text-secondary-foreground" : "text-muted-foreground"}`}
-            >
-              <Icon className="h-5 w-5" />
-              <span className="text-[10px] font-bold uppercase tracking-wide">{link.label}</span>
-            </Link>
-          );
-        })}
-      </nav>
     </div>
   );
 }

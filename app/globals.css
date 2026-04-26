@@ -102,7 +102,7 @@ a {
 
   --primary: #3c81e2e8;
   --primary-container: #2c2e33;
-  --primary-kinetic: hsl(210 77.78% 61.18%);
+  --primary-kinetic: hsl(12 87.5% 68.63%);
   --primary-foreground: #f1f5f6;
 
   /* Secondary — soft blossom */
@@ -119,21 +119,21 @@ a {
   --destructive-foreground: #ffdee0;
 
   --border: transparent;
-  --input: color-mix(in srgb, #2d2d8ac2 30%, #3b58e9);
-  --input-background: color-mix(in srgb, #07827354 10%, #283c5934);
+  --input: color-mix(in srgb, #7272f4c2 30%, #aba5fb);
+  --input-background: color-mix(in srgb, #c2cbce8c 10%, #4c66ae0d);
   --input-background-hover: color-mix(in srgb, #a2a097 20%, #4f4f4f);
   --ring: #23d7e7;
 
   /* Ghost outline — outline-variant at 15% */
-  --outline-ghost: color-mix(in srgb, #513ee2 15%, transparent);
+  --outline-ghost: color-mix(in srgb, #8777f9 15%, transparent);
 
   /* Surface tiers for cards/chips */
   --surface-container-high: color-mix(in srgb, #135c8d 58%, #0a1f34);
   --surface-highest: color-mix(in srgb, #0a366f21 12%, #0c4cab);
-  --surface-variant: color-mix(in srgb, #23b9d0 15%, #1acac4);
+  --surface-variant: color-mix(in srgb, #18e3f5 15%, oklch(0.68 0.15 249.83));
 
   /* Charts */
-  --chart-1: oklch(0.63 0.23 16.34);
+  --chart-1: oklch(0.68 0.18 28.98);
   --chart-2: #05dbd0;
   --chart-3: #ff5566b5;
   --chart-4: #fb6757;

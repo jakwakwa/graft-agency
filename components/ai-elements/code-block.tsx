@@ -40,7 +40,7 @@ const addKeysToTokens = (lines: ThemedToken[][]): KeyedLine[] =>
 // Token rendering component
 const TokenSpan = ({ token }: { token: ThemedToken }) => (
   <span
-    className="dark:!bg-[var(--shiki-dark-bg)] dark:!text-[var(--shiki-dark)]"
+    className="dark:bg-(--shiki-dark-bg)! dark:text-(--shiki-dark)!"
     style={
       {
         backgroundColor: token.bgColor,
@@ -84,6 +84,7 @@ type CodeBlockProps = HTMLAttributes<HTMLDivElement> & {
   code: string;
   language: BundledLanguage;
   showLineNumbers?: boolean;
+  wrap?: boolean;
 };
 
 interface TokenizedCode {
@@ -216,10 +217,12 @@ const CodeBlockBody = memo(
   ({
     tokenized,
     showLineNumbers,
+    wrap,
     className,
   }: {
     tokenized: TokenizedCode;
     showLineNumbers: boolean;
+    wrap?: boolean;
     className?: string;
   }) => {
     const preStyle = useMemo(
@@ -234,7 +237,11 @@ const CodeBlockBody = memo(
 
     return (
       <pre
-        className={cn("dark:!bg-[var(--shiki-dark-bg)] dark:!text-[var(--shiki-dark)] m-0 p-4 text-sm", className)}
+        className={cn(
+          "dark:bg-(--shiki-dark-bg)! dark:text-(--shiki-dark)! m-0 p-4 text-sm",
+          wrap ? "whitespace-pre-wrap break-all" : "whitespace-pre",
+          className,
+        )}
         style={preStyle}
       >
         <code className={cn("font-mono text-sm", showLineNumbers && "[counter-increment:line_0] [counter-reset:line]")}>
@@ -248,6 +255,7 @@ const CodeBlockBody = memo(
   (prevProps, nextProps) =>
     prevProps.tokenized === nextProps.tokenized &&
     prevProps.showLineNumbers === nextProps.showLineNumbers &&
+    prevProps.wrap === nextProps.wrap &&
     prevProps.className === nextProps.className,
 );
 
@@ -274,7 +282,7 @@ export const CodeBlockContainer = ({
 export const CodeBlockHeader = ({ children, className, ...props }: HTMLAttributes<HTMLDivElement>) => (
   <div
     className={cn(
-      "flex items-center justify-between border-b bg-muted/80 px-3 py-2 text-muted-foreground text-xs",
+      "flex items-center justify-between border-b px-3 py-2 text-white text-sm bg-chart-3/90 border-2 border-t-chart-3",
       className,
     )}
     {...props}
@@ -305,10 +313,12 @@ export const CodeBlockContent = ({
   code,
   language,
   showLineNumbers = false,
+  wrap = false,
 }: {
   code: string;
   language: BundledLanguage;
   showLineNumbers?: boolean;
+  wrap?: boolean;
 }) => {
   // Memoized raw tokens for immediate display
   const rawTokens = useMemo(() => createRawTokens(code), [code]);
@@ -344,7 +354,7 @@ export const CodeBlockContent = ({
 
   return (
     <div className="relative overflow-auto">
-      <CodeBlockBody showLineNumbers={showLineNumbers} tokenized={tokenized} />
+      <CodeBlockBody showLineNumbers={showLineNumbers} tokenized={tokenized} wrap={wrap} />
     </div>
   );
 };
@@ -353,6 +363,7 @@ export const CodeBlock = ({
   code,
   language,
   showLineNumbers = false,
+  wrap = false,
   className,
   children,
   ...props
@@ -363,7 +374,7 @@ export const CodeBlock = ({
     <CodeBlockContext.Provider value={contextValue}>
       <CodeBlockContainer className={className} language={language} {...props}>
         {children}
-        <CodeBlockContent code={code} language={language} showLineNumbers={showLineNumbers} />
+        <CodeBlockContent code={code} language={language} showLineNumbers={showLineNumbers} wrap={wrap} />
       </CodeBlockContainer>
     </CodeBlockContext.Provider>
   );
