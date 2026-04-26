@@ -3,7 +3,7 @@
 import type { UIMessage } from "ai";
 import { Conversation, ConversationContent } from "@/components/ai-elements/conversation";
 import { Message, MessageContent, MessageResponse } from "@/components/ai-elements/message";
-import { Tool, ToolContent, ToolHeader, ToolInput, ToolOutput } from "@/components/ai-elements/tool";
+import { Tool, ToolContent, ToolHeader, ToolInput, ToolOutput, type ToolPart } from "@/components/ai-elements/tool";
 
 interface ConversationViewerProps {
   messages: UIMessage[];
@@ -22,19 +22,17 @@ export function ConversationViewer({ messages }: ConversationViewerProps) {
                   return <MessageResponse key={partKey}>{part.text}</MessageResponse>;
                 }
 
-                if (part.type === "tool-invocation") {
-                  const { toolInvocation } = part;
+                if (part.type.startsWith("tool-")) {
+                  const toolPart = part as unknown as ToolPart;
+                  const toolName = part.type.slice(5);
+
                   return (
                     <Tool key={partKey}>
-                      <ToolHeader type="dynamic-tool" toolName={toolInvocation.toolName} state={toolInvocation.state} />
+                      <ToolHeader type="dynamic-tool" toolName={toolName} state={toolPart.state} />
                       <ToolContent>
-                        <ToolInput input={toolInvocation.args} wrap />
-                        {"result" in toolInvocation && (
-                          <ToolOutput
-                            output={toolInvocation.result}
-                            errorText={"error" in toolInvocation ? String(toolInvocation.error) : null}
-                            wrap
-                          />
+                        <ToolInput input={toolPart.input} wrap />
+                        {(toolPart.output || toolPart.errorText) && (
+                          <ToolOutput output={toolPart.output} errorText={toolPart.errorText} wrap />
                         )}
                       </ToolContent>
                     </Tool>

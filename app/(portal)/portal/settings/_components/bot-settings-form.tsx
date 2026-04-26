@@ -12,7 +12,7 @@ import { Typography } from "@/components/ui/typography";
 import { Button } from "@/components/ui-v2/button";
 import { saveBotSettingsAction } from "../actions";
 
-interface KnowledgeSnippet {
+export interface KnowledgeSnippet {
   id: string;
   question: string;
   answer: string;
