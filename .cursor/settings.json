@@ -3,9 +3,6 @@
     "cursor-team-kit": {
       "enabled": true
     },
-    "vercel": {
-      "enabled": true
-    },
     "prisma": {
       "enabled": true
     },
