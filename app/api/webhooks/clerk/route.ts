@@ -3,9 +3,12 @@ import { Webhook } from "svix";
 import { applyClerkOrganizationWebhook } from "@/lib/webhooks/clerk-organizations";
 
 /**
- * Clerk → Graft sync for organisations.
+ * Clerk → Graft sync for members and agency.
  * Configure in Clerk Dashboard → Webhooks → endpoint URL `/api/webhooks/clerk`
- * and subscribe to `organization.created` and `organization.updated`.
+ * and subscribe to:
+ * - organization.created (bootstrap)
+ * - organizationMembership.created (provision client)
+ * - organizationMembership.deleted (soft-delete client)
  */
 export async function POST(req: Request) {
   const secret = process.env.CLERK_WEBHOOK_SECRET?.trim();

@@ -3,7 +3,8 @@ import { getPlatformClientId, resolveClientIdFromAuth } from "@/lib/auth/resolve
 import prisma from "@/lib/db/prisma";
 
 const createSchema = z.object({
-  clerkOrganizationId: z.string().min(1),
+  clerkUserId: z.string().min(1),
+  clerkOrganizationId: z.string().min(1).optional(),
   businessName: z.string().min(1).max(500),
   industry: z.string().max(200).optional(),
   websiteUrl: z.string().url().max(2048).optional(),
@@ -38,6 +39,7 @@ export async function POST(req: Request) {
     const client = await prisma.$transaction(async (tx) => {
       const c = await tx.client.create({
         data: {
+          clerkUserId: input.clerkUserId,
           clerkOrganizationId: input.clerkOrganizationId,
           businessName: input.businessName,
           industry: input.industry,
@@ -59,7 +61,7 @@ export async function POST(req: Request) {
     return Response.json(client, { status: 201 });
   } catch (err) {
     if (err && typeof err === "object" && "code" in err && err.code === "P2002") {
-      return Response.json({ error: "Client with this organisation already exists" }, { status: 409 });
+      return Response.json({ error: "Client with this user ID already exists" }, { status: 409 });
     }
     console.error("[Client onboarding] Failed:", err);
     return Response.json({ error: "Failed to create client" }, { status: 500 });

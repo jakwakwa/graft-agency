@@ -47,4 +47,28 @@ export const conversationService = {
       where: { clientId, sessionId },
     });
   },
+
+  async listForClient(clientId: string) {
+    return prisma.conversation.findMany({
+      where: { clientId },
+      orderBy: { updatedAt: "desc" },
+      include: {
+        lead: {
+          select: {
+            customerName: true,
+            email: true,
+          },
+        },
+      },
+    });
+  },
+
+  async getById(id: string, clientId: string) {
+    return prisma.conversation.findFirst({
+      where: { id, clientId },
+      include: {
+        lead: true,
+      },
+    });
+  },
 };

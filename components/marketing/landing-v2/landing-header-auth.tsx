@@ -33,18 +33,8 @@ export function LandingHeaderAuth() {
             className="inline-flex shrink-0 text-xs text-[#acb1d6] hover:bg-white/5 hover:text-white sm:text-sm"
             asChild
           >
-            <Link href={LANDING_ROUTES.dashboard} aria-label="Open the platform dashboard">
-              Platform
-            </Link>
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="inline-flex shrink-0 text-xs text-[#acb1d6] hover:bg-white/5 hover:text-white sm:text-sm"
-            asChild
-          >
-            <Link href={LANDING_ROUTES.tenantDashboard} aria-label="Open the tenant dashboard">
-              Tenant
+            <Link href={LANDING_ROUTES.dashboard} aria-label="Open your dashboard">
+              Dashboard
             </Link>
           </Button>
           <UserButton

@@ -4,15 +4,15 @@ import prisma from "@/lib/db/prisma";
 export { getPlatformClientId } from "@/lib/auth/platform-client";
 
 /**
- * Resolves clientId from the current user's Clerk org.
- * Returns null if user is not in an org or no Client exists for that org.
+ * Resolves clientId from the current user's Clerk userId.
+ * Returns null if no Client exists for that user.
  */
 export async function resolveClientIdFromAuth(): Promise<string | null> {
-  const { orgId } = await auth();
-  if (!orgId) return null;
+  const { userId } = await auth();
+  if (!userId) return null;
 
   const client = await prisma.client.findFirst({
-    where: { clerkOrganizationId: orgId, deletedAt: null },
+    where: { clerkUserId: userId, deletedAt: null },
     select: { id: true },
   });
   return client?.id ?? null;
@@ -55,11 +55,11 @@ export async function hasChatbotAccess(): Promise<boolean> {
 export async function requirePlatformAccess(): Promise<
   { clientId: string } | { error: "Unauthorized"; status: 401 } | { error: "Forbidden"; status: 403 }
 > {
-  const { orgId } = await auth();
-  if (!orgId) return { error: "Unauthorized", status: 401 };
+  const { userId } = await auth();
+  if (!userId) return { error: "Unauthorized", status: 401 };
 
   const client = await prisma.client.findFirst({
-    where: { clerkOrganizationId: orgId, deletedAt: null },
+    where: { clerkUserId: userId, deletedAt: null },
     select: { id: true, isPlatformOwner: true, isReseller: true },
   });
 

@@ -5,8 +5,6 @@ export const LANDING_ROUTES = {
   midnightProspector: "/dashboard/automation/queue",
   whiteLabel: "/portal/embed",
   dashboard: "/dashboard/automation",
-  /** Tenant-scoped dashboard (client workspace). */
-  tenantDashboard: "/tenant",
   portal: "/portal",
   portalBilling: "/portal/billing",
   portalSettings: "/portal/settings",

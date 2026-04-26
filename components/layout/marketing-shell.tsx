@@ -14,10 +14,10 @@ export function MarketingShell({ children }: MarketingShellProps) {
 
   // Top Nav Configuration
   const topNavLinks = [
-    { href: "/dashboard/automation", label: "DASBOARD" },
-    { href: "/dashboard/automation/queue", label: "midnight prospector" },
-    { href: "/dashboard/automation/leads", label: "Lead Capture Genius" },
-    { href: "/portal/embed", label: "White Label Wonder" },
+    { href: "/dashboard/automation", label: "Dashboard" },
+    { href: "/dashboard/automation/queue", label: "Prospect Queue" },
+    { href: "/dashboard/automation/leads", label: "Leads" },
+    { href: "/dashboard/automation/members", label: "Members" },
   ];
 
   // Sidebar Nav Configuration
@@ -40,9 +40,9 @@ export function MarketingShell({ children }: MarketingShellProps) {
       { href: "#pipeline", label: "pipeline" },
       { href: "#integration", label: "integration settings" },
     ];
-  } else if (pathname.includes("/portal/embed")) {
-    sidebarTitle = "White Label Wonder";
-    sidebarLinks = [{ href: "/portal/embed", label: "embed dashboard" }];
+  } else if (pathname.includes("/dashboard/automation/members")) {
+    sidebarTitle = "Platform master owners";
+    sidebarLinks = [{ href: "/dashboard/automation/members", label: "members dashboard" }];
   } else if (pathname.includes("/dashboard/automation")) {
     sidebarTitle = "Platform master owners";
     sidebarLinks = [{ href: "/dashboard/automation", label: "automation dashboard" }];
