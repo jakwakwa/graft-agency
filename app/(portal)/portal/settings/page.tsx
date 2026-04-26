@@ -1,6 +1,8 @@
 import { Typography } from "@/components/ui/typography";
 import { redirectToAccessRequired, requireAuthOrSignIn } from "@/lib/auth/guards";
 import { resolveClientIdFromAuth } from "@/lib/auth/resolve-client";
+import { agentService } from "@/lib/services/agent.service";
+import { BotSettingsForm } from "./_components/bot-settings-form";
 
 export default async function PortalSettingsPage() {
   await requireAuthOrSignIn();
@@ -8,14 +10,16 @@ export default async function PortalSettingsPage() {
   const clientId = await resolveClientIdFromAuth();
   if (!clientId) redirectToAccessRequired();
 
+  const config = await agentService.getConfig(clientId);
+
   return (
-    <section className="flex min-h-screen items-center justify-center p-8">
-      <div className="max-w-2xl text-center">
-        <Typography.H1>Settings</Typography.H1>
-        <Typography.P className="mt-4 text-muted-foreground">
-          This placeholder route confirms the portal segment is wired.
-        </Typography.P>
+    <div className="w-full max-w-6xl space-y-8 mx-auto p-8">
+      <div className="flex flex-col gap-2">
+        <Typography.H1>Bot settings</Typography.H1>
+        <Typography.Lead>Customise how your bot looks, sounds, and what it knows.</Typography.Lead>
       </div>
-    </section>
+
+      <BotSettingsForm initialData={config} />
+    </div>
   );
 }

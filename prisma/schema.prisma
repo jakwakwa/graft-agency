@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client"
   output   = "../generated/prisma"
@@ -10,7 +9,7 @@ datasource db {
 
 model Client {
   id                   String             @id @default(uuid())
-  clerkOrganizationId  String             @unique @map("clerk_organization_id")
+  clerkOrganizationId  String?            @unique @map("clerk_organization_id")
   businessName         String             @map("business_name")
   industry             String?
   websiteUrl           String?            @map("website_url")
@@ -20,23 +19,26 @@ model Client {
   subscriptionStatus   String             @default("inactive") @map("subscription_status")
   paddleCustomerId     String?            @unique @map("paddle_customer_id")
   paddleSubscriptionId String?            @unique @map("paddle_subscription_id")
-  isPlatformOwner      Boolean            @default(false) @map("is_platform_owner")
-  isReseller           Boolean            @default(false) @map("is_reseller")
-  allowedDomains       String[]           @default([]) @map("allowed_domains")
   createdAt            DateTime           @default(now()) @map("created_at")
   updatedAt            DateTime           @updatedAt @map("updated_at")
+  allowedDomains       String[]           @default([]) @map("allowed_domains")
+  isPlatformOwner      Boolean            @default(false) @map("is_platform_owner")
+  isReseller           Boolean            @default(false) @map("is_reseller")
   deletedAt            DateTime?          @map("deleted_at")
+  clerkUserId          String?            @unique @map("clerk_user_id")
+  email                String?            @map("email")
   agentConfig          AgentConfig?
-  prospectingConfig    ProspectingConfig?
   conversations        Conversation[]
   emailTemplates       EmailTemplate[]
   leads                Lead[]
-  prospectQueues       ProspectQueue[]
   productSpecs         ProductSpec[]
+  prospectQueues       ProspectQueue[]
+  prospectingConfig    ProspectingConfig?
 
   @@index([subdomain])
   @@index([isPlatformOwner])
   @@index([deletedAt])
+  @@index([clerkUserId])
   @@map("clients")
 }
 
@@ -44,17 +46,17 @@ model ProspectingConfig {
   id                String    @id @default(uuid())
   clientId          String    @unique @map("client_id")
   cronEnabled       Boolean   @default(false) @map("cron_enabled")
-  cronFrequency     String    @default("daily") @map("cron_frequency")
-  cronDay           Int?      @map("cron_day")
-  cronTime          String    @default("22:45") @map("cron_time")
-  cronStartDate     DateTime? @map("cron_start_date")
-  lastCronRunAt     DateTime? @map("last_cron_run_at")
   searchEnabled     Boolean   @default(false) @map("search_enabled")
   searchCriteria    Json?     @map("search_criteria")
-  valueProposition  String?   @map("value_proposition")
   outreachFromEmail String?   @map("outreach_from_email")
   createdAt         DateTime  @default(now()) @map("created_at")
   updatedAt         DateTime  @updatedAt @map("updated_at")
+  cronDay           Int?      @map("cron_day")
+  cronFrequency     String    @default("daily") @map("cron_frequency")
+  cronStartDate     DateTime? @map("cron_start_date")
+  cronTime          String    @default("22:45") @map("cron_time")
+  valueProposition  String?   @map("value_proposition")
+  lastCronRunAt     DateTime? @map("last_cron_run_at")
   client            Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
   @@map("prospecting_configs")
@@ -67,11 +69,11 @@ model AgentConfig {
   knowledgeBase       Json?    @map("knowledge_base")
   agentName           String?  @map("agent_name")
   greetingMessage     String?  @map("greeting_message")
-  calComUsername      String?  @map("cal_com_username")
-  defaultEventSlug    String?  @map("default_event_slug")
   widgetPrimaryColour String?  @default("#000000") @map("widget_primary_colour")
   createdAt           DateTime @default(now()) @map("created_at")
   updatedAt           DateTime @updatedAt @map("updated_at")
+  calComUsername      String?  @map("cal_com_username")
+  defaultEventSlug    String?  @map("default_event_slug")
   client              Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
   @@map("agent_configs")
@@ -93,8 +95,8 @@ model Lead {
   updatedAt      DateTime       @updatedAt @map("updated_at")
   conversations  Conversation[]
   client         Client?        @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  prospectQueue  ProspectQueue?
   productSpec    ProductSpec?
+  prospectQueue  ProspectQueue?
 
   @@index([clientId, status])
   @@index([status])
@@ -152,78 +154,51 @@ model Conversation {
   @@map("conversations")
 }
 
-enum LeadSource {
-  INBOUND
-  OUTBOUND_PROSPECT
-}
-
-enum LeadStatus {
-  SCRAPED
-  DRAFT_PENDING
-  CONTACTED
-  REPLIED
-  BOOKED
-  CLOSED
-}
-
-enum QueueStatus {
-  PENDING
-  PROCESSING
-  COMPLETED
-  FAILED
-  CANCELED
-}
-
 model ProductSpec {
-  id              String          @id @default(uuid())
-  leadId          String          @unique @map("lead_id")
-  clientId        String          @map("client_id")
-  stage           EngagementStage @default(PENDING)
-  stageVersion    Int             @default(0) @map("stage_version")
-  profiledNeeds   Json?           @map("profiled_needs")
-  prdContent      String?         @map("prd_content")
-  designConcepts  Json?           @map("design_concepts")
-  chosenDesign    Int?            @map("chosen_design")
-  githubRepo      String?         @map("github_repo")
-  githubIssueUrl  String?         @map("github_issue_url")
-  julesSessionId        String?   @map("jules_session_id")
-  julesState            String?   @map("jules_state")
-  julesLastPolledAt     DateTime? @map("jules_last_polled_at")
+  id                       String            @id @default(uuid())
+  leadId                   String            @unique @map("lead_id")
+  clientId                 String            @map("client_id")
+  stage                    EngagementStage   @default(PENDING)
+  profiledNeeds            Json?             @map("profiled_needs")
+  prdContent               String?           @map("prd_content")
+  designConcepts           Json?             @map("design_concepts")
+  chosenDesign             Int?              @map("chosen_design")
+  githubRepo               String?           @map("github_repo")
+  githubIssueUrl           String?           @map("github_issue_url")
+  deploymentUrl            String?           @map("deployment_url")
+  paddleProductId          String?           @map("paddle_product_id")
+  paddlePriceId            String?           @map("paddle_price_id")
+  offerSentAt              DateTime?         @map("offer_sent_at")
+  errorMessage             String?           @map("error_message")
+  createdAt                DateTime          @default(now()) @map("created_at")
+  updatedAt                DateTime          @updatedAt @map("updated_at")
+  julesLastPolledAt        DateTime?         @map("jules_last_polled_at")
+  julesSessionId           String?           @map("jules_session_id")
+  julesState               String?           @map("jules_state")
+  pullRequestUrl           String?           @map("pull_request_url")
+  renderServiceId          String?           @map("render_service_id")
+  renderServiceName        String?           @map("render_service_name")
+  stageVersion             Int               @default(0) @map("stage_version")
+  failedStage              EngagementStage?  @map("failed_stage")
+  failedAt                 DateTime?         @map("failed_at")
+  failureReason            String?           @map("failure_reason")
+  failureSource            String?           @map("failure_source")
+  inngestRunId             String?           @map("inngest_run_id")
+  inngestRunStatus         String?           @map("inngest_run_status")
+  lastReconciledAt         DateTime?         @map("last_reconciled_at")
+  lastReconciledBy         String?           @map("last_reconciled_by")
+  stitchRunIntentKey       String?           @unique @map("stitch_run_intent_key")
+  julesSessionIntentKey    String?           @unique @map("jules_session_intent_key")
+  renderServiceIntentKey   String?           @unique @map("render_service_intent_key")
+  stitchProjectId          String?           @map("stitch_project_id")
+  stitchRunId              String?           @map("stitch_run_id")
   /// Latest Jules activity `progressUpdated.title` (see Activities API).
-  julesProgressTitle       String? @map("jules_progress_title") @db.Text
+  julesProgressTitle       String?           @map("jules_progress_title")
   /// Latest Jules activity `progressUpdated.description`.
-  julesProgressDescription String? @map("jules_progress_description") @db.Text
-  renderServiceId       String?   @map("render_service_id")
-  renderServiceName     String?   @map("render_service_name")
-  pullRequestUrl        String?   @map("pull_request_url")
-  deploymentUrl         String?   @map("deployment_url")
-  paddleProductId       String?   @map("paddle_product_id")
-  paddlePriceId         String?   @map("paddle_price_id")
-  offerSentAt           DateTime? @map("offer_sent_at")
-  errorMessage          String?   @map("error_message")
-  // failure tracking
-  failedStage           EngagementStage? @map("failed_stage")
-  failedAt              DateTime?        @map("failed_at")
-  failureReason         String?          @map("failure_reason")
-  failureSource         String?          @map("failure_source")
-  // orchestrator health
-  inngestRunId          String?   @map("inngest_run_id")
-  inngestRunStatus      String?   @map("inngest_run_status")
-  // reconciliation
-  lastReconciledAt      DateTime? @map("last_reconciled_at")
-  lastReconciledBy      String?   @map("last_reconciled_by")
-  // idempotency sentinels — written BEFORE external call
-  stitchRunIntentKey    String?   @unique @map("stitch_run_intent_key")
-  julesSessionIntentKey String?   @unique @map("jules_session_intent_key")
-  renderServiceIntentKey String?  @unique @map("render_service_intent_key")
-  // external IDs for reconciliation lookups
-  stitchProjectId       String?   @map("stitch_project_id")
-  stitchRunId           String?   @map("stitch_run_id")
-  createdAt             DateTime  @default(now()) @map("created_at")
-  updatedAt             DateTime  @updatedAt @map("updated_at")
-  lead                  Lead      @relation(fields: [leadId], references: [id], onDelete: Cascade)
-  client                Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  stageTransitions      StageTransition[]
+  julesProgressDescription String?           @map("jules_progress_description")
+  client                   Client            @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  lead                     Lead              @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  stageTransitions         StageTransition[]
 
   @@index([clientId, stage])
   @@index([leadId])
@@ -245,6 +220,28 @@ model StageTransition {
 
   @@index([leadId, createdAt])
   @@map("stage_transitions")
+}
+
+enum LeadSource {
+  INBOUND
+  OUTBOUND_PROSPECT
+}
+
+enum LeadStatus {
+  SCRAPED
+  DRAFT_PENDING
+  CONTACTED
+  REPLIED
+  BOOKED
+  CLOSED
+}
+
+enum QueueStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  CANCELED
 }
 
 enum EngagementStage {

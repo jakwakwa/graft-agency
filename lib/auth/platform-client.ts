@@ -4,15 +4,17 @@ async function resolvePlatformClientIdFromEnv(): Promise<string | null> {
   const raw = process.env.PLATFORM_CLIENT_ID?.trim();
   if (!raw) return null;
 
-  const row = await prisma.client.findUnique({
-    where: { id: raw },
+  const row = await prisma.client.findFirst({
+    where: {
+      OR: [{ id: raw }, { clerkUserId: raw }],
+    },
     select: { id: true },
   });
   if (row) return row.id;
 
   if (process.env.NODE_ENV === "development") {
     console.warn(
-      "[resolve-client] PLATFORM_CLIENT_ID is set but no Client exists with that id; ignoring and using PLATFORM_CLERK_ORG_ID / isPlatformOwner fallback.",
+      "[resolve-client] PLATFORM_CLIENT_ID is set but no Client exists with that id or clerkUserId; ignoring and using PLATFORM_CLERK_ORG_ID / isPlatformOwner fallback.",
     );
   }
   return null;
