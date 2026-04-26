@@ -16,6 +16,8 @@ export async function GET(req: Request) {
 
   const pageParam = searchParams.get("page");
   const limitParam = searchParams.get("limit");
+  const sortParam = searchParams.get("sort");
+  const orderParam = searchParams.get("order")?.toLowerCase() === "asc" ? "asc" : "desc";
   const isPaginated = pageParam !== null || limitParam !== null;
 
   const parsedPage = pageParam ? parseInt(pageParam, 10) : NaN;
@@ -29,10 +31,15 @@ export async function GET(req: Request) {
     ...(status ? { status } : {}),
   };
 
+  const orderBy: Prisma.LeadOrderByWithRelationInput =
+    sortParam === "engagementStage"
+      ? { productSpec: { stage: orderParam } }
+      : { createdAt: orderParam };
+
   if (!isPaginated) {
     const leads = await prisma.lead.findMany({
       where,
-      orderBy: { createdAt: "desc" },
+      orderBy,
       include: {
         productSpec: {
           select: { stage: true },
@@ -52,7 +59,7 @@ export async function GET(req: Request) {
     prisma.lead.count({ where }),
     prisma.lead.findMany({
       where,
-      orderBy: { createdAt: "desc" },
+      orderBy,
       skip: (page - 1) * limit,
       take: limit,
       include: {

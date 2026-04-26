@@ -284,32 +284,30 @@ export default function QueueDetailPage() {
                 {approving ? "Approving…" : "Approve & Send"}
               </Button>
             )}
-            {!pipelineIsKnownRunning && (
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button className="rounded-lg bg-muted px-4 py-2 text-xs font-bold uppercase tracking-tighter text-muted-foreground hover:bg-muted/80">
-                    Discard
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Delete this prospect?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      This permanently removes the prospect and all draft outreach. This cannot be undone.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={handleDiscard}
-                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                    >
-                      Delete
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            )}
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button className="rounded-lg bg-muted px-4 py-2 text-xs font-bold uppercase tracking-tighter text-muted-foreground hover:bg-muted/80">
+                  Discard
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete this prospect?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This permanently removes the prospect and all draft outreach. This cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleDiscard}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  >
+                    Delete
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         </div>
 
