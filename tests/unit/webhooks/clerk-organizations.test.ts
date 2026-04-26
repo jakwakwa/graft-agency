@@ -66,7 +66,7 @@ describe("applyClerkOrganizationWebhook", () => {
       where: { isPlatformOwner: true },
       select: { id: true },
     });
-    const existingOwnerIds = existingOwners.map((r) => r.id);
+    const existingOwnerIds = existingOwners.map((r: { id: string }) => r.id);
     await prisma.client.updateMany({
       where: { id: { in: existingOwnerIds } },
       data: { isPlatformOwner: false },
@@ -80,7 +80,7 @@ describe("applyClerkOrganizationWebhook", () => {
 
       expect(result).toEqual({ handled: true, action: "upserted", eventType: "organization.created" });
 
-      const client = await prisma.client.findUnique({ where: { clerkOrganizationId: orgId } });
+      const client = await prisma.client.findFirst({ where: { clerkOrganizationId: orgId } });
       expect(client?.isPlatformOwner).toBe(true);
     } finally {
       // Restore exactly the rows that were hidden, without touching any other fields.

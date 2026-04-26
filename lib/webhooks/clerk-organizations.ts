@@ -68,14 +68,13 @@ export async function applyClerkOrganizationWebhook(
       (await prisma.client.count({ where: { isPlatformOwner: true } })) === 0;
 
     if (shouldBootstrapPlatform) {
-      await prisma.client.upsert({
-        where: { clerkOrganizationId: id },
-        create: {
+      // count === 0 guarantees no existing row — use create (upsert requires a unique key)
+      await prisma.client.create({
+        data: {
           clerkOrganizationId: id,
           businessName,
           isPlatformOwner: true,
         },
-        update: { businessName },
       });
       return { handled: true, action: "upserted", eventType };
     }
