@@ -45,8 +45,8 @@ Scheduled prospecting was originally tied to **Vercel Cron** in `vercel.json`. O
 export const inngest = new Inngest({
   id: "kona-agency",
   name: "GRAFT TODAY",
-  eventKey: process.env.INNGEST_EVENT_KEY,
-  signingKey: process.env.INNGEST_SIGNING_KEY,
+  eventKey: process.env.GRAFT_INNGEST_EVENT_KEY,
+  signingKey: process.env.GRAFT_INNGEST_SIGNING_KEY,
 });
 ```
 
@@ -98,7 +98,7 @@ const isPublicRoute = createRouteMatcher([
 ]);
 ```
 
-6. **Environment (production / preview):** set `INNGEST_SIGNING_KEY` (and `INNGEST_EVENT_KEY` when sending events). Point the Inngest app’s sync URL at `https://<host>/api/kona/inngest`.
+6. **Environment (production / preview):** set `GRAFT_INNGEST_SIGNING_KEY` (and `GRAFT_INNGEST_EVENT_KEY` when sending events). Point the Inngest app’s sync URL at `https://<host>/api/kona/inngest`.
 
 ## Why this works
 

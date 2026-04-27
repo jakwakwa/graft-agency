@@ -15,7 +15,7 @@ Get Inngest wired correctly with the fewest moving parts.
 1. Identify the runtime and framework first: Next.js App Router, Next.js Pages Router, Express, Hono, or another server.
 2. Clarify whether the project should use HTTP `serve` or WebSocket `connect`.
 3. Prefer Bun commands when installing or running packages.
-4. Keep secrets in environment variables. Never hardcode `INNGEST_EVENT_KEY` or `INNGEST_SIGNING_KEY`.
+4. Keep secrets in environment variables. Never hardcode `GRAFT_INNGEST_EVENT_KEY` or `GRAFT_INNGEST_SIGNING_KEY`.
 5. Produce concrete file paths and exact code changes that match the repo's stack.
 
 ## Checklist
