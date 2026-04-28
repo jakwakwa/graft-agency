@@ -89,7 +89,7 @@ a {
 
 .dark {
   /* Base */
-  --background: hsla(220 5.26% 11.18% / 0.9);
+  --background: hsla(220 15.79% 11.18% / 0.9);
   --foreground: #f6f3f1;
 
   /* Surfaces — tonal depth, no hard borders */
@@ -106,7 +106,7 @@ a {
   --primary-foreground: #f1f5f6;
 
   /* Secondary — soft blossom */
-  --secondary: #395dbf74;
+  --secondary: #FE5555FC;
   --secondary-container: #161b22;
   --secondary-foreground: #5a86de;
 

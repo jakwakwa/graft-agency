@@ -55,15 +55,15 @@ export function LandingHeroSection() {
           <div className="relative glass-panel rounded-full p-4 overflow-hidden border-2 border-primary/20">
             <Image
               alt="3D Cybernetic Sentinel"
-              className="w-full aspect-square object-cover rounded-full mix-blend-lighten grayscale hover:grayscale-0 transition-all duration-700"
+              className="w-full aspect-square object-cover rounded-full mix-blend-lighten grayscale-20 hover:grayscale-0 transition-all duration-700"
               data-alt="Close-up of a high-fidelity metallic 3D robot head with intricate wiring, glowing pink internal lights, and polished chrome surface against deep black background"
-              height={800}
+              height={900}
               sizes="(max-width: 1024px) 100vw, 50vw"
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuBdA7-SfusOWHPxCDiwk_lmnlwYt5Z8-XaCtvp4s5ytoEEsyz6hFxACJqIKId7JEXX7o7_7WvuJn0F2nL6HfDejMcchcfht3bLLyZaq1Gj26h-kxcWNUW2jYIx22qlMXhx3hfJMly2UAZ9JVGIUPZ-7glhYRekeWiUCeP5OJ5wbAY1xNJp3xgOfsUFTlfHpK0wSQOMNIhxjS4fWEFfwyVtbRzWrCUiZ8KwFD_9x6B6x7owmob03kyLiopndRCOay4kOopBsji-GayWL"
-              width={800}
+              src={`/friendly-agent.jpeg`}
+              width={900}
             />
           </div>
-          <div className="absolute -top-10 -right-10 glass-panel p-4 rounded-xl text-[10px] font-mono text-secondary/80 border-l-2 border-secondary space-y-1">
+          <div className="absolute -top-10 -right-10 glass-panel p-4 rounded-xl text-[10px] font-mono text-chart-4/80 border-l-2 border-secondary space-y-1">
             <div>[SYSTEM]: INITIALIZING...</div>
             <div>[LINK]: SECURE_AES256</div>
             <div>[STATUS]: ACTIVE_SENTRY</div>
