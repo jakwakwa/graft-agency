@@ -35,7 +35,7 @@ function Heading() {
       <div className="flex flex-col font-['Plus_Jakarta_Sans:ExtraBold',sans-serif] font-extrabold justify-center leading-[0] not-italic relative shrink-0 text-[#e5e0ed] text-[0px] tracking-[-1.8px] w-full">
         <p className="font-['Ovo:Regular',sans-serif] leading-[72px] mb-0 text-[96px]">The Receptionist</p>
         <p className="font-['Ovo:Regular',sans-serif] text-[96px]">
-          <span className="leading-[72px]">{`That `}</span>
+          <span className="leading-[82px]">{`That `}</span>
           <span className="bg-clip-text bg-gradient-to-r from-[#1149f0] from-[3.365%] leading-[72px] text-[transparent] to-[#e35efe] via-[#ffc5ac] via-[45.673%]">{`Never `}</span>
           <span className="bg-clip-text bg-gradient-to-r from-[#9888ff] from-[3.365%] leading-[72px] text-[transparent] to-[#e35efe] via-[#ffc5ac] via-[45.673%]">
             Sleeps
