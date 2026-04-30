@@ -2,9 +2,8 @@
 
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
+import { resolvePlatformOrganizationForClient } from "@/lib/auth/platform-organization";
 import { requirePlatformAccess } from "@/lib/auth/resolve-client";
-
-const AGENCY_CLERK_ORG_ID = process.env.AGENCY_CLERK_ORG_ID || process.env.PLATFORM_CLERK_ORG_ID;
 
 /**
  * Invites a new member to the agency organization. Gated on platform access.
@@ -17,8 +16,13 @@ export async function inviteMemberAction(formData: FormData) {
     throw new Error(access.error);
   }
 
-  if (!AGENCY_CLERK_ORG_ID) {
-    throw new Error("AGENCY_CLERK_ORG_ID is not configured");
+  if (!userId) {
+    throw new Error("Unauthorized");
+  }
+
+  const platformOrganization = await resolvePlatformOrganizationForClient(access.clientId);
+  if ("error" in platformOrganization) {
+    throw new Error(platformOrganization.error);
   }
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL;
@@ -32,8 +36,8 @@ export async function inviteMemberAction(formData: FormData) {
   const clerk = await clerkClient();
 
   await clerk.organizations.createOrganizationInvitation({
-    organizationId: AGENCY_CLERK_ORG_ID,
-    inviterUserId: userId!,
+    organizationId: platformOrganization.organizationId,
+    inviterUserId: userId,
     emailAddress: email,
     role: "org:member",
     redirectUrl: `${appUrl}/dashboard`,
@@ -50,11 +54,12 @@ export async function revokeInvitationAction(invitationId: string) {
   const access = await requirePlatformAccess();
   if ("error" in access) throw new Error(access.error);
 
-  if (!AGENCY_CLERK_ORG_ID) throw new Error("AGENCY_CLERK_ORG_ID is not configured");
+  const platformOrganization = await resolvePlatformOrganizationForClient(access.clientId);
+  if ("error" in platformOrganization) throw new Error(platformOrganization.error);
 
   const clerk = await clerkClient();
   await clerk.organizations.revokeOrganizationInvitation({
-    organizationId: AGENCY_CLERK_ORG_ID,
+    organizationId: platformOrganization.organizationId,
     invitationId,
   });
 
@@ -70,11 +75,12 @@ export async function removeMemberAction(userId: string) {
   const access = await requirePlatformAccess();
   if ("error" in access) throw new Error(access.error);
 
-  if (!AGENCY_CLERK_ORG_ID) throw new Error("AGENCY_CLERK_ORG_ID is not configured");
+  const platformOrganization = await resolvePlatformOrganizationForClient(access.clientId);
+  if ("error" in platformOrganization) throw new Error(platformOrganization.error);
 
   const clerk = await clerkClient();
   await clerk.organizations.deleteOrganizationMembership({
-    organizationId: AGENCY_CLERK_ORG_ID,
+    organizationId: platformOrganization.organizationId,
     userId,
   });
 

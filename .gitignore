@@ -41,7 +41,6 @@ yarn-error.log*
 .vercel
 .next/**
 # Ignore root-level .md only; keep standard docs and all .md in subdirs
-/*.md
 !README.md
 !vision.md
 !LICENSE.md

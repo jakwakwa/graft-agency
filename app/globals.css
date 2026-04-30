@@ -21,10 +21,10 @@
 
 :root {
   color: #111827;
-  background-color: #fafafa;
+  background-color: #121111;
   --card: oklch(0.17 0 229.06 / 0.43);
   --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
+  --popover: oklch(18.957% 0.01211 285.171);
   --popover-foreground: oklch(0.145 0 0);
   --primary: oklch(0.491 0.27 292.581);
   --primary-kinetic: oklch(0.92 0.12 330);
@@ -96,7 +96,7 @@ a {
   /* Surfaces — tonal depth, no hard borders */
   --card: #2c3b5134;
   --card-foreground: #f8f0ee;
-  --popover: #f0b2b2;
+  --popover: #3a3232;
   --popover-foreground: #f49999;
   --muted: #23272de6;
   --muted-foreground: #c8c8c8;
@@ -107,7 +107,7 @@ a {
   --primary-foreground: #f1f5f6;
 
   /* Secondary — soft blossom */
-  --secondary: #FE5555FC;
+  --secondary: #fe5555fc;
   --secondary-container: #161b22;
   --secondary-foreground: #5a86de;
 
@@ -222,21 +222,19 @@ a {
 @layer utilities {
   .glass-super-agent {
     position: relative !important;
-    background: linear-gradient(
-      325deg,
-      oklch(0.16 0 285.94 / 0.76) 20%,
-      oklch(0.16 0 285.94 / 0.95) 120%
-    ) !important;
+    background: linear-gradient(325deg, oklch(0.16 0 285.94 / 0.76) 20%, oklch(0.16 0 285.94 / 0.95) 120%) !important;
     -webkit-backdrop-filter: blur(10px) !important;
     backdrop-filter: blur(20px) !important;
     padding: 40px !important;
     z-index: 99999 !important;
   }
 
-  .backdrop-modal {
+  .backdrop-modal,
+  .cl-modalBackdrop {
     -webkit-backdrop-filter: blur(10px) !important;
-    backdrop-filter: blur(140px) !important;
+    backdrop-filter: blur(18px) !important;
     padding: 40px !important;
+    background-color: #07044144 !important;
   }
 
   .glass-panel {
@@ -247,11 +245,7 @@ a {
   }
 
   .cn-toast {
-    background: linear-gradient(
-      135deg,
-      oklch(0.88 0.2 159.59 / 0.46) 0%,
-      oklch(0.41 0.07 180.01 / 0.47) 100%
-    ) !important;
+    background: linear-gradient(135deg, oklch(0.88 0.2 159.59 / 0.46) 0%, oklch(0.41 0.07 180.01 / 0.47) 100%) !important;
     color: var(--success-foreground) !important;
     text-shadow: 0 -4px 1px 1px rgba(4 45 39 / 0.93) !important;
     border: 2px solid oklch(0.84 0.16 174.92 / 0.83) !important;
@@ -266,11 +260,7 @@ a {
   }
 
   .mesh-bg-hero {
-    background: radial-gradient(
-      circle at 50% 50%,
-      rgba(70 70 70 / 0.24) 0%,
-      rgba(138 138 138 / 0.13) 70%
-    );
+    background: radial-gradient(circle at 50% 50%, rgba(70 70 70 / 0.24) 0%, rgba(138 138 138 / 0.13) 70%);
   }
 
   .scrollbar-hide::-webkit-scrollbar {
@@ -307,12 +297,7 @@ a {
 
     backdrop-filter: blur(5px);
     padding: 30px !important;
-    background: linear-gradient(
-      310deg,
-      #db707224 -20%,
-      rgba(67 83 108 / 0.17) 30%,
-      oklch(0.32 0.01 261.72 / 0.3) 117%
-    ) !important;
+    background: linear-gradient(310deg, #db707224 -20%, rgba(67 83 108 / 0.17) 30%, oklch(0.32 0.01 261.72 / 0.3) 117%) !important;
     border-radius: 30px !important;
     border: 1px solid oklch(0.22 0 17.28 / 0.55);
     box-shadow:
@@ -321,18 +306,11 @@ a {
   }
 
   .bg-ethereal-gradient {
-    background-image: linear-gradient(
-      135deg,
-      var(--primary) 0%,
-      var(--secondary) 100%
-    );
+    background-image: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
   }
 
   .grid-overlay {
-    background-image: radial-gradient(
-      rgba(121 121 121 / 0.99) 1px,
-      transparent 1px
-    );
+    background-image: radial-gradient(rgba(121 121 121 / 0.99) 1px, transparent 1px);
     background-size: 32px 32px;
   }
 

@@ -6,12 +6,11 @@ import { MarketingShell } from "@/components/layout/marketing-shell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Typography } from "@/components/ui/typography";
 import { Button } from "@/components/ui-v2/button";
+import { resolvePlatformOrganizationForClient } from "@/lib/auth/platform-organization";
 import { requirePlatformAccess } from "@/lib/auth/resolve-client";
 import prisma from "@/lib/db/prisma";
 import { InviteForm } from "./_components/invite-form";
 import { removeMemberAction, revokeInvitationAction } from "./actions";
-
-const AGENCY_CLERK_ORG_ID = process.env.AGENCY_CLERK_ORG_ID || process.env.PLATFORM_CLERK_ORG_ID;
 
 export default async function MembersAdminPage() {
   const access = await requirePlatformAccess();
@@ -24,25 +23,27 @@ export default async function MembersAdminPage() {
     );
   }
 
-  if (!AGENCY_CLERK_ORG_ID) {
+  const platformOrganization = await resolvePlatformOrganizationForClient(access.clientId);
+  if ("error" in platformOrganization) {
     return (
       <div className="p-8">
         <Typography.H2>Configuration Required</Typography.H2>
-        <Typography.P>AGENCY_CLERK_ORG_ID is not set in environment variables.</Typography.P>
+        <Typography.P>{platformOrganization.error}</Typography.P>
       </div>
     );
   }
 
+  const memberAdminOrganizationId = platformOrganization.organizationId;
   const clerk = await clerkClient();
 
   // 1. Fetch memberships
   const memberships = await clerk.organizations.getOrganizationMembershipList({
-    organizationId: AGENCY_CLERK_ORG_ID,
+    organizationId: memberAdminOrganizationId,
   });
 
   // 2. Fetch pending invitations
   const invitations = await clerk.organizations.getOrganizationInvitationList({
-    organizationId: AGENCY_CLERK_ORG_ID,
+    organizationId: memberAdminOrganizationId,
     status: ["pending"],
   });
 

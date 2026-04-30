@@ -25,7 +25,7 @@ export default function AccessRequiredPage() {
 
               <div className="flex flex-col gap-3">
                 <Button asChild variant="outline" className="w-full">
-                  <a href="mailto:support@kona.agency" className="flex items-center gap-2">
+                  <a href="mailto:support@graft.today" className="flex items-center gap-2">
                     <Mail className="h-4 w-4" />
                     Contact support
                   </a>

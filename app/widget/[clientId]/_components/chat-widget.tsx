@@ -17,16 +17,16 @@ interface ChatWidgetProps {
 }
 
 function generateSessionId() {
-  return `kona-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+  return `graft-today-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 }
 
 export function ChatWidget({ clientId, agentName, greetingMessage, primaryColour }: ChatWidgetProps) {
   const [sessionId] = useState(() => {
     if (typeof window === "undefined") return generateSessionId();
-    const stored = sessionStorage.getItem(`kona-session-${clientId}`);
+    const stored = sessionStorage.getItem(`graft-today-session-${clientId}`);
     if (stored) return stored;
     const id = generateSessionId();
-    sessionStorage.setItem(`kona-session-${clientId}`, id);
+    sessionStorage.setItem(`graft-today-session-${clientId}`, id);
     return id;
   });
 
@@ -45,7 +45,7 @@ export function ChatWidget({ clientId, agentName, greetingMessage, primaryColour
   // Persist messages to sessionStorage
   useEffect(() => {
     if (messages.length > 0) {
-      sessionStorage.setItem(`kona-chat-${clientId}`, JSON.stringify(messages));
+      sessionStorage.setItem(`graft-today-chat-${clientId}`, JSON.stringify(messages));
     }
   }, [messages, clientId]);
 
@@ -149,7 +149,7 @@ function MessageBubble({ message }: { message: UIMessage }) {
 function loadMessagesFromStorage(clientId: string): UIMessage[] {
   if (typeof window === "undefined") return [];
   try {
-    const stored = sessionStorage.getItem(`kona-chat-${clientId}`);
+    const stored = sessionStorage.getItem(`graft-today-chat-${clientId}`);
     if (!stored) return [];
     return JSON.parse(stored) as UIMessage[];
   } catch {

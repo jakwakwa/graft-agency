@@ -49,7 +49,7 @@ export default function RootLayout({
     >
       <body className="grid-overlay min-h-screen">
         <NextTopLoader
-          color="#5737f0"
+          color="#f05f37"
           initialPosition={0.08}
           crawlSpeed={200}
           height={3}

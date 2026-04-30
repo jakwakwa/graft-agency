@@ -9,7 +9,7 @@ export default async function PortalEmbedPage() {
   const clientId = await resolveClientIdFromAuth();
   if (!clientId) redirectToAccessRequired();
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://kona.agency";
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://graft.today";
 
   return (
     <div className="w-full max-w-6xl space-y-8 mx-auto p-8">
