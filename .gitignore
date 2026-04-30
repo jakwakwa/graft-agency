@@ -69,3 +69,5 @@ next-env.d.ts
 /.clerk/
 .next/server/middleware-build-manifest.js
 graft-today-agency.code-workspace
+.claude/settings.local.json
+.claude/worktrees
