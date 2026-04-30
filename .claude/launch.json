@@ -10,7 +10,7 @@
     {
       "name": "dev:next-only (Next.js, no tunnel)",
       "runtimeExecutable": "bun",
-      "runtimeArgs": ["run", "dev:next-only"],
+      "runtimeArgs": ["run", "dev"],
       "port": 3000
     }
   ]
