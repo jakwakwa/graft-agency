@@ -1,10 +1,12 @@
 import prisma from "@/lib/db/prisma";
 import { isEngagementDryRun } from "@/lib/engagement/dry-run";
 import { inngest } from "@/lib/inngest/client";
-import { createProductOffer, sendOfferEmail } from "@/lib/services/offer.service";
+import { createWebsiteBuildTransaction, sendOfferEmail, type WebsiteBuildType } from "@/lib/services/offer.service";
 import { makeOnFailure } from "./_shared/on-failure";
 
-const BASE_PRICE_GBP = 497;
+function detectBuildType(productType: string): WebsiteBuildType {
+  return productType.toLowerCase().includes("landing") ? "landing" : "smb";
+}
 
 export const offerDispatcherFunction = inngest.createFunction(
   {
@@ -39,25 +41,25 @@ export const offerDispatcherFunction = inngest.createFunction(
     if (!spec) throw new Error(`No ProductSpec found for lead ${leadId}`);
 
     const profiledNeeds = spec.profiledNeeds as Record<string, unknown>;
-    const productName = `${String(profiledNeeds.companyName ?? "Product")} ${String(profiledNeeds.productType ?? "Portal")}`;
+    const buildType = detectBuildType(String(profiledNeeds.productType ?? ""));
 
-    const offer = await step.run("create-paddle-product", () =>
-      createProductOffer({
-        productName,
-        description: String(profiledNeeds.primaryNeed ?? ""),
-        priceGBP: BASE_PRICE_GBP,
+    const { transactionId, checkoutUrl } = await step.run("create-paddle-transaction", () =>
+      createWebsiteBuildTransaction({
+        leadId,
+        productSpecId: spec.id,
+        clientId: lead.clientId ?? "",
+        buildType,
       }),
     );
 
     await step.run("send-offer-email", () =>
       sendOfferEmail({
-        toEmail: "jakwakwa@gmail.com",
+        toEmail: lead.email!,
         toName: lead.customerName ?? "there",
         companyName: String(profiledNeeds.companyName ?? ""),
-        productName,
+        buildType,
         deploymentUrl,
-        checkoutUrl: offer.checkoutUrl,
-        priceGBP: BASE_PRICE_GBP,
+        checkoutUrl,
         painPoints: (Array.isArray(profiledNeeds.painPoints) ? profiledNeeds.painPoints : []).map(String),
       }),
     );
@@ -67,8 +69,7 @@ export const offerDispatcherFunction = inngest.createFunction(
         where: { id: spec.id },
         data: {
           stage: "OFFER_SENT",
-          paddleProductId: offer.productId,
-          paddlePriceId: offer.priceId,
+          paddleTransactionId: transactionId,
           deploymentUrl,
           offerSentAt: new Date(),
         },
@@ -79,6 +80,6 @@ export const offerDispatcherFunction = inngest.createFunction(
       });
     });
 
-    return { leadId, stage: "OFFER_SENT", deploymentUrl, checkoutUrl: offer.checkoutUrl };
+    return { leadId, stage: "OFFER_SENT", deploymentUrl, checkoutUrl };
   },
 );

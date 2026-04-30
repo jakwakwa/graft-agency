@@ -1,5 +1,6 @@
 import { z } from "zod";
 import prisma from "@/lib/db/prisma";
+import { paddle } from "@/lib/paddle";
 
 const organizationPayloadSchema = z.object({
   id: z.string().min(1),
@@ -110,7 +111,7 @@ export async function applyClerkOrganizationWebhook(
       return { handled: true, action: "upserted", eventType };
     }
 
-    await prisma.client.upsert({
+    const client = await prisma.client.upsert({
       where: { clerkUserId: userId },
       create: {
         clerkUserId: userId,
@@ -120,6 +121,20 @@ export async function applyClerkOrganizationWebhook(
       },
       update: { email }, // We don't overwrite businessName here as it might be customized in settings
     });
+
+    // Create a Paddle customer for this client if one doesn't exist yet
+    if (!client.paddleCustomerId && email) {
+      try {
+        const customer = await paddle.customers.create({ email, name: businessName });
+        await prisma.client.update({
+          where: { id: client.id },
+          data: { paddleCustomerId: customer.id },
+        });
+      } catch (err) {
+        // Non-fatal: Paddle customer can be created lazily at checkout if this fails
+        console.error("[Clerk webhook] Failed to create Paddle customer:", err);
+      }
+    }
 
     return { handled: true, action: "upserted", eventType };
   }

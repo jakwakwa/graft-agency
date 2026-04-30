@@ -1,29 +1,54 @@
-import { CreditCard } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
+import prisma from "@/lib/db/prisma";
 import { Typography } from "@/components/ui/typography";
+import { BillingClient } from "./billing-client";
 
-export default function PortalBillingPage() {
+export default async function PortalBillingPage() {
+  const { userId } = await auth();
+  if (!userId) redirect("/sign-in");
+
+  const client = await prisma.client.findUnique({
+    where: { clerkUserId: userId },
+    select: {
+      id: true,
+      email: true,
+      paddleCustomerId: true,
+      paddleSubscriptionId: true,
+      subscriptionActive: true,
+      subscriptionStatus: true,
+      subscriptionAddons: true,
+    },
+  });
+
+  if (!client) redirect("/sign-in");
+
+  const clientToken = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN ?? "";
+  const environment = process.env.NODE_ENV === "production" ? "production" : "sandbox";
+
   return (
-    <div className="w-full max-w-4xl space-y-8 mx-auto p-8">
-      <div className="flex flex-col gap-2">
-        <Typography.H1>Billing — coming soon</Typography.H1>
-        <Typography.Lead>Self-serve billing is on the way. For now, your account is good to go.</Typography.Lead>
+    <div className="w-full max-w-2xl space-y-6 mx-auto p-8">
+      <div className="flex flex-col gap-1">
+        <Typography.H1>Billing</Typography.H1>
+        <Typography.Lead>Manage your subscription and add-ons.</Typography.Lead>
       </div>
 
-      <Card className="border-dashed">
-        <CardContent className="flex flex-col items-center justify-center py-20 text-center space-y-4">
-          <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
-            <CreditCard className="w-8 h-8 text-muted-foreground" />
-          </div>
-          <div className="max-w-xs space-y-2">
-            <Typography.H3>No action required</Typography.H3>
-            <Typography.P className="text-muted-foreground">
-              Your account is currently managed manually by Graft Today Agency. You don't need to set up a payment
-              method yet.
-            </Typography.P>
-          </div>
-        </CardContent>
-      </Card>
+      <BillingClient
+        clientId={client.id}
+        email={client.email ?? ""}
+        paddleCustomerId={client.paddleCustomerId}
+        subscriptionStatus={(client.subscriptionStatus as "inactive" | "active" | "paused" | "canceled" | "past_due") ?? "inactive"}
+        subscriptionActive={client.subscriptionActive}
+        subscriptionAddons={client.subscriptionAddons}
+        prices={{
+          chatbotMonthly: process.env.PADDLE_PRICE_CHATBOT_MONTHLY ?? "",
+          chatbotAnnual: process.env.PADDLE_PRICE_CHATBOT_ANNUAL ?? "",
+          voiceMonthly: process.env.PADDLE_PRICE_VOICE_MONTHLY ?? "",
+          bookingMonthly: process.env.PADDLE_PRICE_BOOKING_MONTHLY ?? "",
+        }}
+        environment={environment}
+        clientToken={clientToken}
+      />
     </div>
   );
 }
