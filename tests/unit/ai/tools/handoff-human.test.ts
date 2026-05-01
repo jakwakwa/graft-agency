@@ -10,6 +10,14 @@ vi.mock("@/lib/services/lead.service", () => ({
 
 const schema = handoffToHumanTool.inputSchema as z.ZodType;
 
+function executeHandoffToHumanTool() {
+  const execute = handoffToHumanTool.execute;
+  if (!execute) {
+    throw new Error("Handoff to human tool has no execute handler");
+  }
+  return execute;
+}
+
 describe("handoffToHuman tool", () => {
   it("has a description", () => {
     expect(handoffToHumanTool.description).toBeDefined();
@@ -35,7 +43,8 @@ describe("handoffToHuman tool", () => {
 
   it("calls leadService.flagForHandoff", async () => {
     const { leadService } = await import("@/lib/services/lead.service");
-    await handoffToHumanTool.execute(
+    const execute = executeHandoffToHumanTool();
+    await execute(
       { reason: "Customer is upset", urgency: "high" as const },
       { toolCallId: "tc-1", messages: [], abortSignal: new AbortController().signal },
     );
@@ -45,7 +54,8 @@ describe("handoffToHuman tool", () => {
   });
 
   it("returns handoff status", async () => {
-    const result = await handoffToHumanTool.execute(
+    const execute = executeHandoffToHumanTool();
+    const result = await execute(
       { reason: "Complex query", urgency: "medium" as const },
       { toolCallId: "tc-1", messages: [], abortSignal: new AbortController().signal },
     );

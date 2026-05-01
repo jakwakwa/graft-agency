@@ -2,7 +2,62 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import prisma from "@/lib/db/prisma";
 
 const mockAuth = vi.fn();
-vi.mock("@clerk/nextjs/server", () => ({ auth: () => mockAuth() }));
+const mockClerkClient = vi.fn();
+vi.mock("@clerk/nextjs/server", () => ({ auth: () => mockAuth(), clerkClient: () => mockClerkClient() }));
+
+afterEach(() => {
+  vi.unstubAllEnvs();
+  mockClerkClient.mockReset();
+});
+
+describe("resolveClientIdFromAuth", () => {
+  afterEach(() => vi.clearAllMocks());
+
+  it("provisions a regular client from current Clerk organisation membership when the webhook was missed", async () => {
+    const orgId = `org-rci-${Date.now()}`;
+    const clerkUserId = `user-rci-member-${Date.now()}`;
+    const owner = await prisma.client.create({
+      data: { businessName: "Platform", clerkOrganizationId: orgId, isPlatformOwner: true },
+    });
+    vi.stubEnv("PLATFORM_CLIENT_ID", owner.id);
+    mockAuth.mockResolvedValue({ userId: clerkUserId });
+    mockClerkClient.mockResolvedValue({
+      organizations: {
+        getOrganizationMembershipList: vi.fn().mockResolvedValue({
+          data: [
+            {
+              publicUserData: {
+                userId: clerkUserId,
+                firstName: "Test",
+                lastName: "Member",
+                identifier: "test.member@example.com",
+              },
+            },
+          ],
+        }),
+      },
+    });
+
+    try {
+      const { resolveClientIdFromAuth } = await import("@/lib/auth/resolve-client");
+      const clientId = await resolveClientIdFromAuth();
+
+      expect(clientId).toEqual(expect.any(String));
+      const client = await prisma.client.findUnique({ where: { clerkUserId } });
+      expect(client).toMatchObject({
+        id: clientId,
+        businessName: "Test Member",
+        email: "test.member@example.com",
+        clerkOrganizationId: orgId,
+        isPlatformOwner: false,
+        isReseller: false,
+        deletedAt: null,
+      });
+    } finally {
+      await prisma.client.deleteMany({ where: { OR: [{ clerkUserId }, { id: owner.id }] } });
+    }
+  });
+});
 
 describe("requirePlatformAccess", () => {
   afterEach(() => vi.clearAllMocks());

@@ -23,11 +23,20 @@ vi.mock("@/lib/services/cal.service", () => ({
 const tool = createBookAppointmentTool("test-client");
 const schema = tool.inputSchema as z.ZodType;
 
+function executeBookAppointmentTool() {
+  const execute = tool.execute;
+  if (!execute) {
+    throw new Error("Book appointment tool has no execute handler");
+  }
+  return execute;
+}
+
 describe("createBookAppointmentTool", () => {
   const validInput = {
     start: "2026-03-20T10:00:00Z",
     name: "Alice Smith",
     email: "alice@example.com",
+    timeZone: "Africa/Johannesburg",
   };
 
   it("has a description", () => {
@@ -46,7 +55,8 @@ describe("createBookAppointmentTool", () => {
 
   it("calls calService.createBooking with config defaults", async () => {
     const { calService } = await import("@/lib/services/cal.service");
-    await tool.execute(validInput, {
+    const execute = executeBookAppointmentTool();
+    await execute(validInput, {
       toolCallId: "tc-1",
       messages: [],
       abortSignal: new AbortController().signal,
@@ -63,7 +73,8 @@ describe("createBookAppointmentTool", () => {
   });
 
   it("returns bookingUid and confirmationUrl", async () => {
-    const result = await tool.execute(validInput, {
+    const execute = executeBookAppointmentTool();
+    const result = await execute(validInput, {
       toolCallId: "tc-1",
       messages: [],
       abortSignal: new AbortController().signal,
@@ -83,7 +94,8 @@ describe("createBookAppointmentTool", () => {
       defaultEventSlug: null,
     } as never);
 
-    const result = await tool.execute(validInput, {
+    const execute = executeBookAppointmentTool();
+    const result = await execute(validInput, {
       toolCallId: "tc-1",
       messages: [],
       abortSignal: new AbortController().signal,

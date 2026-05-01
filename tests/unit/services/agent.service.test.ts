@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { Prisma } from "@/generated/prisma/client";
 import { agentService } from "@/lib/services/agent.service";
 
 vi.mock("@/lib/db/prisma", () => ({
@@ -14,19 +15,29 @@ describe("agentService", () => {
     vi.clearAllMocks();
   });
 
+  function mockAgentConfig(knowledgeBase: Prisma.JsonValue = null) {
+    return {
+      id: "config-1",
+      clientId: "client-1",
+      systemPrompt: "You are helpful.",
+      knowledgeBase,
+      agentName: "Bot",
+      greetingMessage: "Hi",
+      widgetPrimaryColour: "#000000",
+      calComUsername: null,
+      defaultEventSlug: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+  }
+
   describe("getConfig", () => {
     it("returns AgentConfig for valid clientId", async () => {
       const { default: prisma } = await import("@/lib/db/prisma");
       const mockConfig = {
-        id: "config-1",
-        clientId: "client-1",
-        systemPrompt: "You are helpful.",
-        knowledgeBase: null,
+        ...mockAgentConfig(),
         agentName: "GRAFT Bot",
         greetingMessage: "Hello!",
-        widgetPrimaryColour: "#000000",
-        createdAt: new Date(),
-        updatedAt: new Date(),
       };
       vi.mocked(prisma.agentConfig.findUnique).mockResolvedValue(mockConfig);
 
@@ -52,20 +63,12 @@ describe("agentService", () => {
   describe("searchKnowledge", () => {
     it("returns matching FAQ entries from knowledgeBase JSON", async () => {
       const { default: prisma } = await import("@/lib/db/prisma");
-      vi.mocked(prisma.agentConfig.findUnique).mockResolvedValue({
-        id: "config-1",
-        clientId: "client-1",
-        systemPrompt: "You are helpful.",
-        knowledgeBase: [
+      vi.mocked(prisma.agentConfig.findUnique).mockResolvedValue(
+        mockAgentConfig([
           { question: "What are your hours?", answer: "9am to 5pm" },
           { question: "Where are you located?", answer: "London" },
-        ],
-        agentName: "Bot",
-        greetingMessage: "Hi",
-        widgetPrimaryColour: "#000000",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
+        ]),
+      );
 
       const result = await agentService.searchKnowledge({ clientId: "client-1", query: "hours" });
       expect(result.answer).toContain("9am to 5pm");
@@ -73,17 +76,9 @@ describe("agentService", () => {
 
     it("returns empty result when no match", async () => {
       const { default: prisma } = await import("@/lib/db/prisma");
-      vi.mocked(prisma.agentConfig.findUnique).mockResolvedValue({
-        id: "config-1",
-        clientId: "client-1",
-        systemPrompt: "You are helpful.",
-        knowledgeBase: [{ question: "What are your hours?", answer: "9am to 5pm" }],
-        agentName: "Bot",
-        greetingMessage: "Hi",
-        widgetPrimaryColour: "#000000",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
+      vi.mocked(prisma.agentConfig.findUnique).mockResolvedValue(
+        mockAgentConfig([{ question: "What are your hours?", answer: "9am to 5pm" }]),
+      );
 
       const result = await agentService.searchKnowledge({ clientId: "client-1", query: "pricing" });
       expect(result.answer).toBe("");
@@ -91,17 +86,7 @@ describe("agentService", () => {
 
     it("handles null knowledgeBase gracefully", async () => {
       const { default: prisma } = await import("@/lib/db/prisma");
-      vi.mocked(prisma.agentConfig.findUnique).mockResolvedValue({
-        id: "config-1",
-        clientId: "client-1",
-        systemPrompt: "You are helpful.",
-        knowledgeBase: null,
-        agentName: "Bot",
-        greetingMessage: "Hi",
-        widgetPrimaryColour: "#000000",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
+      vi.mocked(prisma.agentConfig.findUnique).mockResolvedValue(mockAgentConfig());
 
       const result = await agentService.searchKnowledge({ clientId: "client-1", query: "anything" });
       expect(result.answer).toBe("");
@@ -109,17 +94,9 @@ describe("agentService", () => {
 
     it("returns empty result for blank search queries", async () => {
       const { default: prisma } = await import("@/lib/db/prisma");
-      vi.mocked(prisma.agentConfig.findUnique).mockResolvedValue({
-        id: "config-1",
-        clientId: "client-1",
-        systemPrompt: "You are helpful.",
-        knowledgeBase: [{ question: "What are your hours?", answer: "9am to 5pm" }],
-        agentName: "Bot",
-        greetingMessage: "Hi",
-        widgetPrimaryColour: "#000000",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
+      vi.mocked(prisma.agentConfig.findUnique).mockResolvedValue(
+        mockAgentConfig([{ question: "What are your hours?", answer: "9am to 5pm" }]),
+      );
 
       const result = await agentService.searchKnowledge({ clientId: "client-1", query: "   " });
       expect(result.answer).toBe("");
@@ -127,17 +104,9 @@ describe("agentService", () => {
 
     it("ignores malformed knowledge base entries", async () => {
       const { default: prisma } = await import("@/lib/db/prisma");
-      vi.mocked(prisma.agentConfig.findUnique).mockResolvedValue({
-        id: "config-1",
-        clientId: "client-1",
-        systemPrompt: "You are helpful.",
-        knowledgeBase: [{ question: "What are your hours?", answer: "9am to 5pm" }, { answer: "Missing question" }],
-        agentName: "Bot",
-        greetingMessage: "Hi",
-        widgetPrimaryColour: "#000000",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
+      vi.mocked(prisma.agentConfig.findUnique).mockResolvedValue(
+        mockAgentConfig([{ question: "What are your hours?", answer: "9am to 5pm" }, { answer: "Missing question" }]),
+      );
 
       const result = await agentService.searchKnowledge({ clientId: "client-1", query: "hours" });
       expect(result.answer).toBe("9am to 5pm");

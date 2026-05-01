@@ -11,6 +11,14 @@ vi.mock("@/lib/services/lead.service", () => ({
 const captureLeadDetailsTool = createCaptureLeadDetailsTool("client-1");
 const schema = captureLeadDetailsTool.inputSchema as z.ZodType;
 
+function executeCaptureLeadDetailsTool() {
+  const execute = captureLeadDetailsTool.execute;
+  if (!execute) {
+    throw new Error("Capture lead details tool has no execute handler");
+  }
+  return execute;
+}
+
 describe("captureLeadDetails tool", () => {
   it("has a description", () => {
     expect(captureLeadDetailsTool.description).toBeDefined();
@@ -41,7 +49,8 @@ describe("captureLeadDetails tool", () => {
 
   it("calls leadService.createFromChat with clientId and correct params", async () => {
     const { leadService } = await import("@/lib/services/lead.service");
-    await captureLeadDetailsTool.execute(
+    const execute = executeCaptureLeadDetailsTool();
+    await execute(
       { name: "Alice", email: "alice@example.com" },
       { toolCallId: "tc-1", messages: [], abortSignal: new AbortController().signal },
     );
@@ -55,7 +64,8 @@ describe("captureLeadDetails tool", () => {
   });
 
   it("returns leadId and confirmation message", async () => {
-    const result = await captureLeadDetailsTool.execute(
+    const execute = executeCaptureLeadDetailsTool();
+    const result = await execute(
       { name: "Alice", email: "alice@example.com" },
       { toolCallId: "tc-1", messages: [], abortSignal: new AbortController().signal },
     );

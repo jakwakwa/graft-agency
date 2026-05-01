@@ -7,6 +7,7 @@ import { resolvePinggyExecutable } from "./dev-pinggy-resolve";
 
 const projectRoot = process.cwd();
 const port = process.env.PORT ?? "3000";
+const clerkWebhookPath = "/api/webhooks/clerk";
 
 function spawnInherited(command: string, args: readonly string[]): ChildProcess {
   return spawn(command, args, {
@@ -37,14 +38,15 @@ async function waitForNextReady(url: string, timeoutMs: number): Promise<void> {
 
 function printWebhookBanner(): void {
   const base = process.env.WEBHOOK_PUBLIC_BASE_URL?.replace(/\/$/, "");
+  const clerkWebhookUrl = base?.endsWith(clerkWebhookPath) ? base : base ? `${base}${clerkWebhookPath}` : null;
   console.log("\n──────── Graft dev ────────");
-  if (base) {
+  if (clerkWebhookUrl) {
     console.log("Clerk webhook URL (Dashboard → Webhooks):");
-    console.log(`  ${base}/api/webhooks/clerk`);
-    console.log("Subscribe to: organisation.created, organisation.updated");
+    console.log(`  ${clerkWebhookUrl}`);
+    console.log("Subscribe to: organization.created, organizationMembership.created, organizationMembership.deleted");
     console.log("Paste the signing secret into CLERK_WEBHOOK_SECRET for this endpoint.");
   } else {
-    console.log("Set WEBHOOK_PUBLIC_BASE_URL in .env.local to your Pinggy HTTPS base URL");
+    console.log("Set WEBHOOK_PUBLIC_BASE_URL in .env.local to your Pinggy HTTPS origin");
     console.log("(stable hostname: Pinggy Pro + token — https://pinggy.io/docs/persistent_subdomain/)");
     console.log("Then register: https://<your-tunnel>/api/webhooks/clerk");
   }

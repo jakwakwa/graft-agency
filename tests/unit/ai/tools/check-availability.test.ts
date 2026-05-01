@@ -24,6 +24,18 @@ vi.mock("@/lib/services/cal.service", () => ({
 
 const tool = createCheckAvailabilityTool("test-client");
 const schema = tool.inputSchema as z.ZodType;
+const dateRangeInput = {
+  dateRange: { from: "2026-03-18", to: "2026-03-22" },
+  timeZone: "Africa/Johannesburg",
+};
+
+function executeCheckAvailabilityTool() {
+  const execute = tool.execute;
+  if (!execute) {
+    throw new Error("Check availability tool has no execute handler");
+  }
+  return execute;
+}
 
 describe("createCheckAvailabilityTool", () => {
   it("has a description", () => {
@@ -44,10 +56,8 @@ describe("createCheckAvailabilityTool", () => {
 
   it("calls calService.getAvailability with config defaults", async () => {
     const { calService } = await import("@/lib/services/cal.service");
-    await tool.execute(
-      { dateRange: { from: "2026-03-18", to: "2026-03-22" } },
-      { toolCallId: "tc-1", messages: [], abortSignal: new AbortController().signal },
-    );
+    const execute = executeCheckAvailabilityTool();
+    await execute(dateRangeInput, { toolCallId: "tc-1", messages: [], abortSignal: new AbortController().signal });
     expect(calService.getAvailability).toHaveBeenCalledWith(
       expect.objectContaining({
         username: "testuser",
@@ -58,12 +68,13 @@ describe("createCheckAvailabilityTool", () => {
   });
 
   it("returns slots array", async () => {
-    const result = await tool.execute(
-      { dateRange: { from: "2026-03-18", to: "2026-03-22" } },
-      { toolCallId: "tc-1", messages: [], abortSignal: new AbortController().signal },
-    );
-    expect(result).toHaveProperty("slots");
-    expect(Array.isArray(result.slots)).toBe(true);
+    const execute = executeCheckAvailabilityTool();
+    const result = await execute(dateRangeInput, {
+      toolCallId: "tc-1",
+      messages: [],
+      abortSignal: new AbortController().signal,
+    });
+    expect(result).toEqual(expect.objectContaining({ slots: expect.any(Array) }));
   });
 
   it("returns error when config has no calComUsername or defaultEventSlug", async () => {
@@ -73,8 +84,9 @@ describe("createCheckAvailabilityTool", () => {
       defaultEventSlug: null,
     } as never);
 
-    const result = await tool.execute(
-      {},
+    const execute = executeCheckAvailabilityTool();
+    const result = await execute(
+      { timeZone: "Africa/Johannesburg" },
       { toolCallId: "tc-1", messages: [], abortSignal: new AbortController().signal },
     );
     expect(result).toHaveProperty("slots", []);

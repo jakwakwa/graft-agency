@@ -1,7 +1,53 @@
-import { auth } from "@clerk/nextjs/server";
+import { auth, clerkClient } from "@clerk/nextjs/server";
+import { getPlatformClientId as resolvePlatformClientId } from "@/lib/auth/platform-client";
 import prisma from "@/lib/db/prisma";
 
 export { getPlatformClientId } from "@/lib/auth/platform-client";
+
+async function provisionClientFromPlatformMembership(userId: string): Promise<string | null> {
+  const platformClientId = await resolvePlatformClientId();
+  if (!platformClientId) return null;
+
+  const platformClient = await prisma.client.findFirst({
+    where: { id: platformClientId, deletedAt: null },
+    select: { clerkOrganizationId: true },
+  });
+  if (!platformClient?.clerkOrganizationId) return null;
+
+  const clerk = await clerkClient();
+  const memberships = await clerk.organizations.getOrganizationMembershipList({
+    organizationId: platformClient.clerkOrganizationId,
+  });
+  const membership = memberships.data.find((item) => item.publicUserData?.userId === userId);
+  if (!membership?.publicUserData) return null;
+
+  const firstName = membership.publicUserData.firstName ?? "";
+  const lastName = membership.publicUserData.lastName ?? "";
+  const email = membership.publicUserData.identifier;
+  const businessName = `${firstName} ${lastName}`.trim() || email || "New Client";
+
+  try {
+    const client = await prisma.client.upsert({
+      where: { clerkUserId: userId },
+      create: {
+        clerkUserId: userId,
+        clerkOrganizationId: platformClient.clerkOrganizationId,
+        businessName,
+        email,
+      },
+      update: {
+        clerkOrganizationId: platformClient.clerkOrganizationId,
+        email,
+        deletedAt: null,
+      },
+      select: { id: true },
+    });
+    return client.id;
+  } catch (err) {
+    console.error("[resolve-client] Failed to provision Clerk organisation member:", err);
+    return null;
+  }
+}
 
 /**
  * Resolves clientId from the current user's Clerk userId.
@@ -15,7 +61,9 @@ export async function resolveClientIdFromAuth(): Promise<string | null> {
     where: { clerkUserId: userId, deletedAt: null },
     select: { id: true },
   });
-  return client?.id ?? null;
+  if (client) return client.id;
+
+  return provisionClientFromPlatformMembership(userId);
 }
 
 /**

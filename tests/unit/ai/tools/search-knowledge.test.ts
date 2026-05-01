@@ -14,6 +14,14 @@ vi.mock("@/lib/services/agent.service", () => ({
 const searchKnowledgeBaseTool = createSearchKnowledgeBaseTool("client-1");
 const schema = searchKnowledgeBaseTool.inputSchema as z.ZodType;
 
+function executeSearchKnowledgeBaseTool() {
+  const execute = searchKnowledgeBaseTool.execute;
+  if (!execute) {
+    throw new Error("Search knowledge base tool has no execute handler");
+  }
+  return execute;
+}
+
 describe("searchKnowledgeBase tool", () => {
   it("has a description", () => {
     expect(searchKnowledgeBaseTool.description).toBeDefined();
@@ -35,7 +43,8 @@ describe("searchKnowledgeBase tool", () => {
 
   it("calls agentService.searchKnowledge", async () => {
     const { agentService } = await import("@/lib/services/agent.service");
-    await searchKnowledgeBaseTool.execute(
+    const execute = executeSearchKnowledgeBaseTool();
+    await execute(
       { query: "opening hours" },
       { toolCallId: "tc-1", messages: [], abortSignal: new AbortController().signal },
     );
@@ -46,7 +55,8 @@ describe("searchKnowledgeBase tool", () => {
   });
 
   it("returns answer and optional sources", async () => {
-    const result = await searchKnowledgeBaseTool.execute(
+    const execute = executeSearchKnowledgeBaseTool();
+    const result = await execute(
       { query: "opening hours" },
       { toolCallId: "tc-1", messages: [], abortSignal: new AbortController().signal },
     );

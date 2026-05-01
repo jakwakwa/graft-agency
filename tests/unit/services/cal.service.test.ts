@@ -135,7 +135,12 @@ describe("calService", () => {
           body: expect.stringContaining("testuser"),
         }),
       );
-      const body = JSON.parse(mockFetch.mock.calls[0][1].body);
+      const firstCall = mockFetch.mock.calls[0];
+      if (!firstCall) {
+        throw new Error("Expected fetch to be called");
+      }
+      const init = firstCall[1] as RequestInit;
+      const body = JSON.parse(String(init.body));
       expect(body).toMatchObject({
         username: "testuser",
         eventTypeSlug: "15min",

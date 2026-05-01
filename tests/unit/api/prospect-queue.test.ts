@@ -31,13 +31,13 @@ describe("prospect-queue API", () => {
     it("returns 401 when not authenticated", async () => {
       mockRequirePlatformAccess.mockResolvedValue({ error: "Unauthorized", status: 401 });
       const { GET } = await import("@/app/api/prospect-queue/route");
-      const response = await GET(new Request("http://localhost/api/prospect-queue"));
+      const response = await GET();
       expect(response.status).toBe(401);
     });
 
     it("returns empty array when queue is empty", async () => {
       const { GET } = await import("@/app/api/prospect-queue/route");
-      const response = await GET(new Request("http://localhost/api/prospect-queue"));
+      const response = await GET();
       expect(response.status).toBe(200);
       const json = await response.json();
       expect(json).toEqual([]);
@@ -52,7 +52,7 @@ describe("prospect-queue API", () => {
         },
       });
       const { GET } = await import("@/app/api/prospect-queue/route");
-      const response = await GET(new Request("http://localhost/api/prospect-queue"));
+      const response = await GET();
       expect(response.status).toBe(200);
       const json = await response.json();
       expect(json).toHaveLength(1);

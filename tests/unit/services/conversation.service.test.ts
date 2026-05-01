@@ -17,6 +17,18 @@ describe("conversationService", () => {
     vi.clearAllMocks();
   });
 
+  function mockConversation(clientId: string) {
+    return {
+      id: "convo-1",
+      clientId,
+      leadId: null,
+      messages: [{ role: "user", content: "Hello" }],
+      sessionId: "session-abc",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+  }
+
   describe("save", () => {
     it("creates a new conversation with messages JSON", async () => {
       const { default: prisma } = await import("@/lib/db/prisma");
@@ -51,9 +63,7 @@ describe("conversationService", () => {
         { role: "user", content: "Hello" },
         { role: "assistant", content: "Hi there!" },
       ];
-      vi.mocked(prisma.conversation.findUnique).mockResolvedValue({
-        clientId: "client-1",
-      });
+      vi.mocked(prisma.conversation.findUnique).mockResolvedValue(mockConversation("client-1"));
       vi.mocked(prisma.conversation.update).mockResolvedValue({
         id: "convo-1",
         clientId: "client-1",
@@ -78,9 +88,7 @@ describe("conversationService", () => {
 
     it("rejects updates when a session belongs to another client", async () => {
       const { default: prisma } = await import("@/lib/db/prisma");
-      vi.mocked(prisma.conversation.findUnique).mockResolvedValue({
-        clientId: "client-2",
-      });
+      vi.mocked(prisma.conversation.findUnique).mockResolvedValue(mockConversation("client-2"));
 
       await expect(
         conversationService.save({
