@@ -11,6 +11,7 @@ const isPublicRoute = createRouteMatcher([
   "/api/cron/(.*)",
   "/api/inngest",
   "/widget/(.*)",
+  "/Robot_concierge.mp4",
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
@@ -21,7 +22,7 @@ export default clerkMiddleware(async (auth, req) => {
 
 export const config = {
   matcher: [
-    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
+    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|mp4|webm|ogg|mov|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
     "/(api|trpc)(.*)",
   ],
 };

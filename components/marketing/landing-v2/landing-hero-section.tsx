@@ -55,7 +55,7 @@ export function LandingHeroSection() {
         className="hero-video-layer"
         style={{ y: videoY, opacity: heroOpacity }}
       >
-        <HeroVideoBackground src="/Robot_concierge.mp4" />
+        <HeroVideoBackground src="/Robot_concierge.mp4" poster={'//Robot_concierge.jpeg/'} />
       </motion.div>
 
       {/* ── Ambient glow orbs ── */}

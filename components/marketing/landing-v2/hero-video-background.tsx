@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface HeroVideoBackgroundProps {
   src: string;
@@ -10,21 +10,29 @@ interface HeroVideoBackgroundProps {
 export function HeroVideoBackground({ src, poster }: HeroVideoBackgroundProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const markLoaded = useCallback(() => setIsLoaded(true), []);
 
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
-    const handleCanPlay = () => setIsLoaded(true);
-    video.addEventListener("canplaythrough", handleCanPlay);
+    if (video.readyState >= video.HAVE_CURRENT_DATA) {
+      markLoaded();
+    }
+
+    video.addEventListener("loadeddata", markLoaded);
+    video.addEventListener("canplay", markLoaded);
 
     // Ensure autoplay on mobile (needs muted + playsinline)
     video.play().catch(() => {
       // Autoplay blocked — still show the poster/fallback
     });
 
-    return () => video.removeEventListener("canplaythrough", handleCanPlay);
-  }, []);
+    return () => {
+      video.removeEventListener("loadeddata", markLoaded);
+      video.removeEventListener("canplay", markLoaded);
+    };
+  }, [markLoaded]);
 
   return (
     <div className="hero-video-wrap" aria-hidden>
@@ -46,6 +54,7 @@ export function HeroVideoBackground({ src, poster }: HeroVideoBackgroundProps) {
         autoPlay
         muted
         playsInline
+        
         preload="auto"
         poster={poster}
         style={{
