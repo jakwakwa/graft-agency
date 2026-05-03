@@ -13,9 +13,9 @@ const dbg = (loc: string, msg: string, data: object, h: string) => {
   } catch {}
 };
 
-function getHeaders(): Record<string, string> {
+function getHeaders(versionOverride?: string): Record<string, string> {
   const apiKey = process.env.CAL_COM_API_KEY;
-  const version = process.env.CAL_COM_VERSION ?? CAL_API_VERSION;
+  const version = versionOverride ?? process.env.CAL_COM_VERSION ?? CAL_API_VERSION;
   const headers: Record<string, string> = {
     "cal-api-version": version,
   };
@@ -27,8 +27,9 @@ function getHeaders(): Record<string, string> {
 
 export const calService = {
   async getAvailability(input: {
-    username: string;
-    eventTypeSlug: string;
+    username?: string;
+    eventTypeSlug?: string;
+    eventTypeId?: number;
     dateRange?: { from: string; to: string };
     start?: string;
     end?: string;
@@ -39,7 +40,12 @@ export const calService = {
     dbg(
       "cal.service:getAvailability",
       "entry",
-      { apiKeyPresent: !!apiKey, username: input.username, eventTypeSlug: input.eventTypeSlug },
+      { 
+        apiKeyPresent: !!apiKey, 
+        username: input.username, 
+        eventTypeSlug: input.eventTypeSlug,
+        eventTypeId: input.eventTypeId
+      },
       "H2",
     );
     // #endregion
@@ -63,18 +69,20 @@ export const calService = {
     }
 
     const params = new URLSearchParams({
-      username: input.username,
-      eventTypeSlug: input.eventTypeSlug,
       start,
       end,
     });
+    if (input.username) params.set("username", input.username);
+    if (input.eventTypeSlug) params.set("eventTypeSlug", input.eventTypeSlug);
+    if (input.eventTypeId) params.set("eventTypeId", String(input.eventTypeId));
+    
     if (input.timeZone) {
       params.set("timeZone", input.timeZone);
     }
 
     const response = await fetch(`${CAL_API_BASE}/slots?${params.toString()}`, {
       method: "GET",
-      headers: getHeaders(),
+      headers: getHeaders("2024-09-04"),
     });
 
     if (!response.ok) {
@@ -118,9 +126,49 @@ export const calService = {
     return { slots };
   },
 
+  async reserveSlot(input: {
+    eventTypeId: number;
+    slotStart: string;
+    slotDuration?: number;
+    reservationDuration?: number;
+  }) {
+    const apiKey = process.env.CAL_COM_API_KEY;
+    if (!apiKey) {
+      return { error: "Calendar integration is not configured yet." };
+    }
+
+    const body: Record<string, unknown> = {
+      eventTypeId: input.eventTypeId,
+      slotStart: input.slotStart,
+    };
+    if (input.slotDuration) body.slotDuration = input.slotDuration;
+    if (input.reservationDuration) body.reservationDuration = input.reservationDuration;
+
+    const response = await fetch(`${CAL_API_BASE}/slots/reservations`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...getHeaders("2024-09-04"),
+      },
+      body: JSON.stringify(body),
+    });
+
+    const result = await response.json();
+    if (!response.ok) {
+      const message = result.message ?? result.error ?? `Calendar reservation error: ${response.status}`;
+      return { error: message };
+    }
+
+    return {
+      status: "success",
+      data: result.data,
+    };
+  },
+
   async createBooking(input: {
-    username: string;
-    eventTypeSlug: string;
+    username?: string;
+    eventTypeSlug?: string;
+    eventTypeId?: number;
     start: string;
     name: string;
     email: string;
@@ -135,8 +183,6 @@ export const calService = {
 
     const timeZone = input.timeZone ?? "Africa/Johannesburg";
     const body: Record<string, unknown> = {
-      username: input.username,
-      eventTypeSlug: input.eventTypeSlug,
       start: input.start,
       attendee: {
         name: input.name,
@@ -147,6 +193,13 @@ export const calService = {
         notes: input.notes ?? "Booked via Graft AI",
       },
     };
+    if (input.eventTypeId) {
+      body.eventTypeId = input.eventTypeId;
+    } else {
+      body.username = input.username;
+      body.eventTypeSlug = input.eventTypeSlug;
+    }
+
     if (input.leadId) {
       body.metadata = { leadId: input.leadId };
     }
@@ -155,7 +208,7 @@ export const calService = {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        ...getHeaders(),
+        ...getHeaders("2024-09-04"),
       },
       body: JSON.stringify(body),
     });
@@ -170,6 +223,29 @@ export const calService = {
     return {
       bookingUid: uid,
       confirmationUrl: uid ? `https://cal.com/booking/${uid}` : undefined,
+    };
+  },
+
+  async getEventTypes() {
+    const apiKey = process.env.CAL_COM_API_KEY;
+    if (!apiKey) {
+      return { error: "Calendar integration is not configured yet." };
+    }
+
+    const response = await fetch(`${CAL_API_BASE}/event-types`, {
+      method: "GET",
+      headers: getHeaders("2024-09-04"),
+    });
+
+    const result = await response.json();
+    if (!response.ok) {
+      const message = result.message ?? result.error ?? `Calendar get event types error: ${response.status}`;
+      return { error: message };
+    }
+
+    return {
+      status: "success",
+      data: result.data,
     };
   },
 };

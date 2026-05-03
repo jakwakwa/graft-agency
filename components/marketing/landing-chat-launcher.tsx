@@ -52,8 +52,10 @@ export function LandingChatLauncher({
           <ChatWidget
             clientId={clientId}
             agentName={agentName}
+            embedOrigin={null}
             greetingMessage={greetingMessage}
             primaryColour={primaryColour}
+            widgetToken={null}
           />
         </div>
       </DialogContent>

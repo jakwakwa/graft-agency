@@ -116,3 +116,20 @@ export async function requirePlatformAccess(): Promise<
 
   return { clientId: client.id };
 }
+
+export async function requirePlatformOwnerAccess(): Promise<
+  { clientId: string } | { error: "Unauthorized"; status: 401 } | { error: "Forbidden"; status: 403 }
+> {
+  const { userId } = await auth();
+  if (!userId) return { error: "Unauthorized", status: 401 };
+
+  const client = await prisma.client.findFirst({
+    where: { clerkUserId: userId, deletedAt: null },
+    select: { id: true, isPlatformOwner: true },
+  });
+
+  if (!client) return { error: "Unauthorized", status: 401 };
+  if (!client.isPlatformOwner) return { error: "Forbidden", status: 403 };
+
+  return { clientId: client.id };
+}

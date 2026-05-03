@@ -6,6 +6,7 @@ import {
   leadProfilerFunction,
   offerDispatcherFunction,
   prdWriterFunction,
+  processWebhookReceiptFunction,
   prospectingScheduledTick,
   stitchDesignerFunction,
 } from "@/lib/inngest";
@@ -22,5 +23,6 @@ export const { GET, POST, PUT } = serve({
     julesPollerFunction,
     offerDispatcherFunction,
     engagementReconcilerFunction,
+    processWebhookReceiptFunction,
   ],
 });

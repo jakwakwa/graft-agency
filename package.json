@@ -4,8 +4,9 @@
   "type": "module",
   "scripts": {
     "dev": "next dev",
-    "dev:tunnel": "DEV_NO_TUNNEL=false bun scripts/dev-with-tunnel.ts",
+    "dev:tunnel": "bun scripts/dev-with-tunnel.ts",
     "dev:next-only": "next dev",
+    "inngest:dev": "bun scripts/inngest-dev-serve.ts",
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "biome check",

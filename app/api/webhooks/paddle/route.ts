@@ -1,6 +1,8 @@
-import { createHmac, timingSafeEqual } from "node:crypto";
+import { createHash, createHmac, timingSafeEqual } from "node:crypto";
 import type { NextRequest } from "next/server";
-import prisma from "@/lib/db/prisma";
+import { inngest } from "@/lib/inngest/client";
+import { webhookReceiptService } from "@/lib/services/webhook-receipt.service";
+import type { Prisma } from "../../../../generated/prisma/client";
 
 function verifyPaddleSignature(body: string, signature: string, secret: string): boolean {
   const parts = signature.split(";");
@@ -21,112 +23,6 @@ function verifyPaddleSignature(body: string, signature: string, secret: string):
   } catch {
     return false;
   }
-}
-
-type SubscriptionData = {
-  id: string;
-  status: string;
-  customer_id?: string;
-  custom_data?: { clientId?: string };
-  items?: Array<{ price: { id: string }; quantity: number }>;
-};
-
-type TransactionData = {
-  id: string;
-  status: string;
-  custom_data?: { leadId?: string; productSpecId?: string; clientId?: string };
-};
-
-const ADDON_PRICE_IDS = [
-  process.env.PADDLE_PRICE_VOICE_MONTHLY,
-  process.env.PADDLE_PRICE_BOOKING_MONTHLY,
-].filter(Boolean) as string[];
-
-async function handleSubscriptionActivated(data: SubscriptionData) {
-  const clientId = data.custom_data?.clientId;
-  if (!clientId) return { warning: "No clientId in custom_data" };
-
-  await prisma.client.update({
-    where: { id: clientId },
-    data: {
-      subscriptionActive: true,
-      subscriptionStatus: "active",
-      paddleSubscriptionId: data.id,
-    },
-  });
-  return { updated: clientId };
-}
-
-async function handleSubscriptionUpdated(data: SubscriptionData) {
-  const clientId = data.custom_data?.clientId;
-  if (!clientId) return { warning: "No clientId in custom_data" };
-
-  const activeAddons = (data.items ?? [])
-    .map((item) => item.price.id)
-    .filter((id) => ADDON_PRICE_IDS.includes(id));
-
-  await prisma.client.update({
-    where: { id: clientId },
-    data: {
-      subscriptionStatus: data.status,
-      subscriptionAddons: activeAddons,
-    },
-  });
-  return { updated: clientId, addons: activeAddons };
-}
-
-async function handleSubscriptionCanceled(data: SubscriptionData) {
-  const clientId = data.custom_data?.clientId;
-  if (!clientId) return { warning: "No clientId in custom_data" };
-
-  await prisma.client.update({
-    where: { id: clientId },
-    data: {
-      subscriptionActive: false,
-      subscriptionStatus: "canceled",
-      subscriptionAddons: [],
-    },
-  });
-  return { updated: clientId };
-}
-
-async function handleSubscriptionPaused(data: SubscriptionData) {
-  const clientId = data.custom_data?.clientId;
-  if (!clientId) return { warning: "No clientId in custom_data" };
-
-  await prisma.client.update({
-    where: { id: clientId },
-    data: { subscriptionStatus: "paused", subscriptionActive: false },
-  });
-  return { updated: clientId };
-}
-
-async function handleSubscriptionPastDue(data: SubscriptionData) {
-  const clientId = data.custom_data?.clientId;
-  if (!clientId) return { warning: "No clientId in custom_data" };
-
-  await prisma.client.update({
-    where: { id: clientId },
-    data: { subscriptionStatus: "past_due" },
-  });
-  return { updated: clientId };
-}
-
-async function handleTransactionCompleted(data: TransactionData) {
-  const { productSpecId } = data.custom_data ?? {};
-  if (!productSpecId) return { warning: "No productSpecId in custom_data" };
-
-  await prisma.productSpec.update({
-    where: { id: productSpecId },
-    data: { stage: "OFFER_SENT" },
-  });
-  return { updated: productSpecId };
-}
-
-async function handleTransactionPaymentFailed(data: TransactionData) {
-  const { productSpecId, clientId } = data.custom_data ?? {};
-  console.error("[Paddle] Transaction payment failed:", { transactionId: data.id, productSpecId, clientId });
-  return { logged: data.id };
 }
 
 export async function POST(req: NextRequest) {
@@ -152,41 +48,31 @@ export async function POST(req: NextRequest) {
     return Response.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  const eventType = payload.event_type;
-  const data = payload.data;
-
   try {
-    let result: unknown;
+    const eventType = payload.event_type ?? "unknown";
+    const receipt = await webhookReceiptService.recordVerifiedReceipt({
+      eventId: resolvePaddleEventId(payload, body),
+      eventType,
+      payload: JSON.parse(JSON.stringify(payload)) as Prisma.InputJsonValue,
+      provider: "PADDLE",
+    });
 
-    switch (eventType) {
-      case "subscription.activated":
-        result = await handleSubscriptionActivated(data as SubscriptionData);
-        break;
-      case "subscription.updated":
-        result = await handleSubscriptionUpdated(data as SubscriptionData);
-        break;
-      case "subscription.canceled":
-        result = await handleSubscriptionCanceled(data as SubscriptionData);
-        break;
-      case "subscription.paused":
-        result = await handleSubscriptionPaused(data as SubscriptionData);
-        break;
-      case "subscription.past_due":
-        result = await handleSubscriptionPastDue(data as SubscriptionData);
-        break;
-      case "transaction.completed":
-        result = await handleTransactionCompleted(data as TransactionData);
-        break;
-      case "transaction.payment_failed":
-        result = await handleTransactionPaymentFailed(data as TransactionData);
-        break;
-      default:
-        return Response.json({ received: true, eventType });
+    if (!receipt.duplicate) {
+      await inngest.send({
+        name: "webhook/receipt.created",
+        data: { receiptId: receipt.receiptId },
+      });
     }
 
-    return Response.json({ received: true, eventType, result });
+    return Response.json({ duplicate: receipt.duplicate, eventType, received: true }, { status: 202 });
   } catch (err) {
-    console.error(`[Paddle webhook] Handler failed for ${eventType}:`, err);
-    return Response.json({ error: "Handler failed" }, { status: 500 });
+    console.error("[Paddle webhook] Failed to persist receipt:", err);
+    return Response.json({ error: "Failed to persist webhook receipt" }, { status: 500 });
   }
+}
+
+function resolvePaddleEventId(payload: { event_id?: unknown; event_type?: string }, rawBody: string): string {
+  return typeof payload.event_id === "string"
+    ? payload.event_id
+    : `${payload.event_type ?? "unknown"}:${createHash("sha256").update(rawBody).digest("hex")}`;
 }

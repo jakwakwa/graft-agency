@@ -1,6 +1,8 @@
 import { headers } from "next/headers";
 import { Webhook } from "svix";
-import { applyClerkOrganizationWebhook } from "@/lib/webhooks/clerk-organizations";
+import { inngest } from "@/lib/inngest/client";
+import { webhookReceiptService } from "@/lib/services/webhook-receipt.service";
+import type { Prisma } from "../../../../generated/prisma/client";
 
 /**
  * Clerk → Graft sync for members and agency.
@@ -38,10 +40,23 @@ export async function POST(req: Request) {
   }
 
   try {
-    const result = await applyClerkOrganizationWebhook(evt.type, evt.data);
-    return Response.json({ ok: true, ...result }, { status: 200 });
+    const receipt = await webhookReceiptService.recordVerifiedReceipt({
+      eventId: svixId,
+      eventType: evt.type,
+      payload: JSON.parse(JSON.stringify(evt.data)) as Prisma.InputJsonValue,
+      provider: "CLERK",
+    });
+
+    if (!receipt.duplicate) {
+      await inngest.send({
+        name: "webhook/receipt.created",
+        data: { receiptId: receipt.receiptId },
+      });
+    }
+
+    return Response.json({ duplicate: receipt.duplicate, ok: true }, { status: 202 });
   } catch (err) {
-    console.error("[Clerk webhook]", err);
-    return Response.json({ error: "Webhook handler failed" }, { status: 500 });
+    console.error("[Clerk webhook] Failed to persist receipt:", err);
+    return Response.json({ error: "Failed to persist webhook receipt" }, { status: 500 });
   }
 }

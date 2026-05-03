@@ -22,6 +22,7 @@ export const createCheckAvailabilityTool = (clientId: string) =>
     inputSchema: z.object({
       username: z.string().optional(),
       eventTypeSlug: z.string().optional(),
+      eventTypeId: z.number().optional().describe("The ID of the event type"),
       dateRange: z
         .object({
           from: z.string().describe("Start of search range (ISO string)"),
@@ -36,6 +37,7 @@ export const createCheckAvailabilityTool = (clientId: string) =>
       const config = await agentService.getConfig(clientId);
       const username = input.username ?? config.calComUsername ?? null;
       const eventTypeSlug = input.eventTypeSlug ?? config.defaultEventSlug ?? null;
+      const eventTypeId = input.eventTypeId;
 
       // #region agent log
       dbg(
@@ -47,27 +49,29 @@ export const createCheckAvailabilityTool = (clientId: string) =>
           defaultEventSlug: config.defaultEventSlug,
           username,
           eventTypeSlug,
-          hasBoth: !!(username && eventTypeSlug),
+          eventTypeId,
+          hasBoth: !!(username && eventTypeSlug) || !!eventTypeId,
         },
         "H1",
       );
       // #endregion
 
-      if (!username || !eventTypeSlug) {
+      if (!eventTypeId && (!username || !eventTypeSlug)) {
         const err = {
           slots: [],
           error:
-            "Calendar not configured. The client must set calComUsername and defaultEventSlug in AgentConfig, or you must provide username and eventTypeSlug.",
+            "Calendar not configured. The client must set calComUsername and defaultEventSlug in AgentConfig, or you must provide username and eventTypeSlug, or an eventTypeId.",
         };
         // #region agent log
-        dbg("check-availability:noConfig", "early return", { reason: "missing username or eventTypeSlug" }, "H1");
+        dbg("check-availability:noConfig", "early return", { reason: "missing configuration" }, "H1");
         // #endregion
         return err;
       }
 
       const result = await calService.getAvailability({
-        username,
-        eventTypeSlug,
+        username: username ?? undefined,
+        eventTypeSlug: eventTypeSlug ?? undefined,
+        eventTypeId,
         dateRange: input.dateRange,
         start: input.start,
         end: input.end,

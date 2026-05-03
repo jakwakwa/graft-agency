@@ -12,15 +12,24 @@ import { ToolStatus } from "./tool-status";
 interface ChatWidgetProps {
   clientId: string;
   agentName: string;
+  embedOrigin: string | null;
   greetingMessage: string;
   primaryColour: string;
+  widgetToken: string | null;
 }
 
 function generateSessionId() {
   return `graft-today-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 }
 
-export function ChatWidget({ clientId, agentName, greetingMessage, primaryColour }: ChatWidgetProps) {
+export function ChatWidget({
+  clientId,
+  agentName,
+  embedOrigin,
+  greetingMessage,
+  primaryColour,
+  widgetToken,
+}: ChatWidgetProps) {
   const [sessionId] = useState(() => {
     if (typeof window === "undefined") return generateSessionId();
     const stored = sessionStorage.getItem(`graft-today-session-${clientId}`);
@@ -35,7 +44,7 @@ export function ChatWidget({ clientId, agentName, greetingMessage, primaryColour
   const { messages, sendMessage, status } = useChat({
     transport: new DefaultChatTransport({
       api: "/api/chat",
-      body: { clientId, sessionId },
+      body: { clientId, embedOrigin, sessionId, token: widgetToken ?? undefined },
     }),
     messages: loadMessagesFromStorage(clientId),
   });

@@ -10,38 +10,56 @@ import { z } from "zod";
 import { selectModel } from "@/lib/ai/model-router";
 import { buildSystemPrompt } from "@/lib/ai/system-prompt";
 import { createTools } from "@/lib/ai/tools";
-import { getPlatformClientId } from "@/lib/auth/resolve-client";
 import { agentService, isSyntheticAgentConfig, PLATFORM_LANDING_WIDGET_DEFAULTS } from "@/lib/services/agent.service";
+import { chatProtectionService } from "@/lib/services/chat-protection.service";
 import { conversationService } from "@/lib/services/conversation.service";
 import type { Prisma } from "../../../generated/prisma/client";
 
 const chatRequestSchema = z.object({
   clientId: z.string().min(1),
+  embedOrigin: z.string().min(1).nullable().optional(),
   messages: z.array(z.unknown()),
   sessionId: z.string().min(1),
+  token: z.string().min(1).optional(),
 });
 
 const toPrismaJson = (value: UIMessage[]): Prisma.InputJsonValue =>
   JSON.parse(JSON.stringify(value)) as Prisma.InputJsonValue;
 
 export async function POST(req: Request) {
-  const body = chatRequestSchema.safeParse(await req.json());
+  let payload: unknown;
+  try {
+    payload = await req.json();
+  } catch {
+    return Response.json({ error: "Invalid request body" }, { status: 400 });
+  }
+
+  const body = chatRequestSchema.safeParse(payload);
   if (!body.success) {
     return Response.json({ error: "Invalid request body" }, { status: 400 });
   }
 
   const requestedClientId = body.data.clientId;
-  let { clientId, messages, sessionId } = body.data;
-  if (clientId === "platform") {
-    const platformId = await getPlatformClientId();
-    if (!platformId) {
-      return Response.json({ error: "Platform client not configured" }, { status: 503 });
-    }
-    clientId = platformId;
+  const { messages, sessionId } = body.data;
+  const authorisation = await chatProtectionService.authorise({
+    embedOrigin: body.data.embedOrigin ?? null,
+    requestedClientId,
+    requestOrigin: req.headers.get("origin"),
+    requestReferer: req.headers.get("referer"),
+    sessionId,
+    token: body.data.token,
+  });
+
+  if (!authorisation.ok) {
+    return Response.json(
+      { error: authorisation.error, reason: authorisation.reason },
+      { status: authorisation.status },
+    );
   }
 
+  const { clientId } = authorisation;
   let config = await agentService.getConfig(clientId);
-  if (requestedClientId === "platform" && isSyntheticAgentConfig(config)) {
+  if (authorisation.isPlatformDemo && isSyntheticAgentConfig(config)) {
     config = {
       ...config,
       agentName: PLATFORM_LANDING_WIDGET_DEFAULTS.agentName,
@@ -72,11 +90,21 @@ export async function POST(req: Request) {
       writer.merge(result.toUIMessageStream());
     },
     onFinish: async ({ messages: finalMessages }) => {
-      await conversationService.save({
-        clientId,
-        sessionId,
-        messages: toPrismaJson(finalMessages),
-      });
+      try {
+        await conversationService.save({
+          clientId,
+          sessionId,
+          messages: toPrismaJson(finalMessages),
+        });
+        await chatProtectionService.recordAllowedUsage({
+          clientId,
+          messageCount: finalMessages.length,
+          model: typeof model === "string" ? model : "selected-model",
+          sessionId,
+        });
+      } catch (err) {
+        console.error("[Chat route] Failed to persist chat completion:", err);
+      }
     },
   });
 

@@ -29,9 +29,11 @@ model Client {
   clerkUserId          String?            @unique @map("clerk_user_id")
   email                String?            @map("email")
   agentConfig          AgentConfig?
+  chatUsages           ChatUsage[]
   conversations        Conversation[]
   emailTemplates       EmailTemplate[]
   leads                Lead[]
+  operationalEvents    OperationalEvent[]
   productSpecs         ProductSpec[]
   prospectQueues       ProspectQueue[]
   prospectingConfig    ProspectingConfig?
@@ -222,6 +224,62 @@ model StageTransition {
   @@map("stage_transitions")
 }
 
+model ChatUsage {
+  id               String          @id @default(uuid())
+  clientId         String          @map("client_id")
+  sessionId        String          @map("session_id")
+  status           ChatUsageStatus
+  denialReason     String?         @map("denial_reason")
+  messageCount     Int             @default(0) @map("message_count")
+  model            String?
+  promptTokens     Int?            @map("prompt_tokens")
+  completionTokens Int?            @map("completion_tokens")
+  totalTokens      Int?            @map("total_tokens")
+  createdAt        DateTime        @default(now()) @map("created_at")
+  client           Client          @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([clientId, createdAt])
+  @@index([status, createdAt])
+  @@map("chat_usage")
+}
+
+model OperationalEvent {
+  id        String                 @id @default(uuid())
+  clientId  String?                @map("client_id")
+  category  OperationalEventCategory
+  eventType String                 @map("event_type")
+  status    OperationalEventStatus
+  message   String?
+  metadata  Json?
+  createdAt DateTime               @default(now()) @map("created_at")
+  client    Client?                @relation(fields: [clientId], references: [id], onDelete: SetNull)
+
+  @@index([clientId, createdAt])
+  @@index([category, status, createdAt])
+  @@map("operational_events")
+}
+
+model WebhookReceipt {
+  id                String               @id @default(uuid())
+  provider          WebhookProvider
+  eventId           String               @map("event_id")
+  eventType         String               @map("event_type")
+  payload           Json
+  signatureVerified Boolean              @default(false) @map("signature_verified")
+  status            WebhookReceiptStatus @default(PENDING)
+  attempts          Int                  @default(0)
+  errorMessage      String?              @map("error_message")
+  receivedAt        DateTime             @default(now()) @map("received_at")
+  processedAt       DateTime?            @map("processed_at")
+  createdAt         DateTime             @default(now()) @map("created_at")
+  updatedAt         DateTime             @updatedAt @map("updated_at")
+
+  @@unique([provider, eventId])
+  @@index([provider, status, receivedAt])
+  @@index([status, receivedAt])
+  @@map("webhook_receipts")
+}
+
 enum LeadSource {
   INBOUND
   OUTBOUND_PROSPECT
@@ -257,5 +315,40 @@ enum EngagementStage {
   DEPLOYING
   DEPLOYED
   OFFER_SENT
+  FAILED
+}
+
+enum ChatUsageStatus {
+  ALLOWED
+  DENIED
+}
+
+enum OperationalEventCategory {
+  CHAT
+  WEBHOOK
+  AI_USAGE
+  SYSTEM
+}
+
+enum OperationalEventStatus {
+  ALLOWED
+  DENIED
+  INFO
+  SUCCESS
+  WARNING
+  ERROR
+}
+
+enum WebhookProvider {
+  CAL
+  CLERK
+  PADDLE
+  VERCEL
+}
+
+enum WebhookReceiptStatus {
+  PENDING
+  PROCESSING
+  PROCESSED
   FAILED
 }

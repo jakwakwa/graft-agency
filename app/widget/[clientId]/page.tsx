@@ -1,3 +1,5 @@
+import { headers } from "next/headers";
+import { createWidgetToken } from "@/lib/security/widget-token";
 import { agentService } from "@/lib/services/agent.service";
 import { ChatWidget } from "./_components/chat-widget";
 
@@ -7,10 +9,13 @@ interface WidgetPageProps {
 
 export default async function WidgetPage({ params }: WidgetPageProps) {
   const { clientId } = await params;
+  const requestHeaders = await headers();
+  const embedOrigin = resolveEmbedOrigin(requestHeaders);
 
   let agentName = "AI Assistant";
   let greetingMessage = "Hello! How can I help you today?";
   let primaryColour = "#7c3aed";
+  let widgetToken: string | null = null;
 
   try {
     const config = await agentService.getConfig(clientId);
@@ -21,14 +26,40 @@ export default async function WidgetPage({ params }: WidgetPageProps) {
     // Use defaults if config not found
   }
 
+  if (clientId !== "platform" && embedOrigin) {
+    try {
+      widgetToken = await createWidgetToken({ clientId, origin: embedOrigin });
+    } catch (err) {
+      console.error("[Widget] Failed to create widget token:", err);
+    }
+  }
+
   return (
     <main className="flex h-dvh w-full flex-col">
       <ChatWidget
         clientId={clientId}
         agentName={agentName}
+        embedOrigin={embedOrigin}
         greetingMessage={greetingMessage}
         primaryColour={primaryColour}
+        widgetToken={widgetToken}
       />
     </main>
   );
+}
+
+function resolveEmbedOrigin(requestHeaders: Headers): string | null {
+  const referer = requestHeaders.get("referer");
+  if (referer) {
+    try {
+      return new URL(referer).origin;
+    } catch {
+      return null;
+    }
+  }
+
+  const host = requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host");
+  if (!host) return null;
+  const protocol = requestHeaders.get("x-forwarded-proto") ?? "https";
+  return `${protocol}://${host}`;
 }

@@ -1,6 +1,8 @@
-import { createHmac, timingSafeEqual } from "node:crypto";
+import { createHash, createHmac, timingSafeEqual } from "node:crypto";
 import type { NextRequest } from "next/server";
-import prisma from "@/lib/db/prisma";
+import { inngest } from "@/lib/inngest/client";
+import { webhookReceiptService } from "@/lib/services/webhook-receipt.service";
+import type { Prisma } from "../../../../generated/prisma/client";
 
 function verifyCalSignature(body: string, signature: string, secret: string): boolean {
   const expected = createHmac("sha256", secret).update(body).digest("hex");
@@ -35,42 +37,32 @@ export async function POST(req: NextRequest) {
     return Response.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  if (payload.triggerEvent !== "BOOKING_CANCELLED") {
-    return Response.json({ received: true });
-  }
-
-  const uid = payload.payload?.uid;
-  if (!uid) {
-    return Response.json({ received: true, warning: "No uid in payload" });
-  }
-
   try {
-    const lead = await prisma.lead.findUnique({
-      where: { calBookingUid: uid },
+    const eventType = payload.triggerEvent ?? "unknown";
+    const receipt = await webhookReceiptService.recordVerifiedReceipt({
+      eventId: resolveCalEventId(payload, body),
+      eventType,
+      payload: JSON.parse(JSON.stringify(payload)) as Prisma.InputJsonValue,
+      provider: "CAL",
     });
-    if (!lead) {
-      return Response.json({ received: true, warning: "Lead not found for booking" });
+
+    if (!receipt.duplicate) {
+      await inngest.send({
+        name: "webhook/receipt.created",
+        data: { receiptId: receipt.receiptId },
+      });
     }
 
-    const followUpDate = new Date();
-    followUpDate.setDate(followUpDate.getDate() + 7);
-
-    await prisma.lead.update({
-      where: { id: lead.id },
-      data: {
-        status: "CLOSED",
-        nextActionDate: followUpDate,
-        chatTranscript: {
-          ...(typeof lead.chatTranscript === "object" && lead.chatTranscript !== null
-            ? (lead.chatTranscript as Record<string, unknown>)
-            : {}),
-          bookingCancelledAt: new Date().toISOString(),
-        },
-      },
-    });
-    return Response.json({ received: true, updated: lead.id });
+    return Response.json({ duplicate: receipt.duplicate, eventType, received: true }, { status: 202 });
   } catch (err) {
-    console.error("[Cal webhook] Failed to update lead:", err);
-    return Response.json({ error: "Failed to update lead" }, { status: 500 });
+    console.error("[Cal webhook] Failed to persist receipt:", err);
+    return Response.json({ error: "Failed to persist webhook receipt" }, { status: 500 });
   }
+}
+
+function resolveCalEventId(payload: { payload?: { uid?: string }; triggerEvent?: string }, rawBody: string): string {
+  if (payload.payload?.uid) {
+    return `${payload.triggerEvent ?? "unknown"}:${payload.payload.uid}`;
+  }
+  return `${payload.triggerEvent ?? "unknown"}:${createHash("sha256").update(rawBody).digest("hex")}`;
 }

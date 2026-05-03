@@ -1,8 +1,9 @@
-export { prospectingScheduledTick } from "./functions/prospecting-tick";
-export { leadProfilerFunction } from "./functions/lead-profiler";
-export { prdWriterFunction } from "./functions/prd-writer";
-export { stitchDesignerFunction } from "./functions/stitch-designer";
+export { engagementReconcilerFunction } from "./functions/engagement-reconciler";
 export { julesBuilderFunction } from "./functions/jules-builder";
 export { julesPollerFunction } from "./functions/jules-poller";
+export { leadProfilerFunction } from "./functions/lead-profiler";
 export { offerDispatcherFunction } from "./functions/offer-dispatcher";
-export { engagementReconcilerFunction } from "./functions/engagement-reconciler";
+export { prdWriterFunction } from "./functions/prd-writer";
+export { processWebhookReceiptFunction } from "./functions/process-webhook-receipt";
+export { prospectingScheduledTick } from "./functions/prospecting-tick";
+export { stitchDesignerFunction } from "./functions/stitch-designer";

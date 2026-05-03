@@ -28,7 +28,7 @@ Does not cover: marketing copy, sales playbooks, or customer-facing help docs.
 | Billing | Paddle | Merchant of Record — subscriptions, add-ons, one-time transactions |
 | Scheduling | Cal.com v2 API | Headless booking — availability checks and booking creation |
 | Email | Resend | Outreach and offer dispatch |
-| Background jobs | Inngest | 8 functions, event-driven with cron triggers |
+| Background jobs | Inngest | 9 functions, event-driven with cron triggers |
 | Design generation | Google Stitch SDK | 3 design concepts per engagement |
 | Code generation | Jules (Google) | AI coding sessions from PRD + design spec |
 | Hosting (prospects) | Render | One static site per prospect, deployed from PR branch |
@@ -117,7 +117,7 @@ Clients embed the chatbot via an iframe. The snippet is available at:
 - Portal: `/portal/embed` — copy-paste guide
 - API: `GET /api/embed/[clientId]` — returns the JavaScript loader
 
-The widget page itself (`/widget/[clientId]`) is a public route. It calls `POST /api/chat` which resolves the client's `AgentConfig` to build the system prompt, tools, and knowledge base.
+The widget page itself (`/widget/[clientId]`) is a public route. It mints a short-lived signed widget token using `WIDGET_TOKEN_SECRET`, scoped to the client and embedding origin, then calls `POST /api/chat`. The chat route verifies the token, checks `Client.allowedDomains`, subscription status, and a database-backed usage quota before model selection or streaming. The `clientId=platform` landing demo remains the only no-token exception.
 
 ### Agent configuration
 
@@ -207,6 +207,7 @@ PENDING → PROFILING → PROFILED → WRITING_PRD → PRD_WRITTEN
 | Component | Purpose |
 |---|---|
 | `engagement-reconciler` | Cron (every 15 min) + on-demand. Detects stale stages, queries external APIs (Jules, Render), promotes or fails. Processes up to 50 leads per cron tick. |
+| `process-webhook-receipt` | Processes verified webhook receipts asynchronously after route-level signature verification and receipt persistence. |
 | `stage-machine.ts` | Atomic transitions with optimistic locking (`stageVersion`). Writes `StageTransition` audit rows. Validates allowed transitions. |
 | `on-failure.ts` | Shared Inngest failure handler. Records failure metadata on ProductSpec, fires `engagement/reconcile.requested`. |
 | `ENGAGEMENT_DRY_RUN` | Env var to stub Paddle/Resend/Vercel side-effects during dev/testing. |
@@ -279,6 +280,8 @@ When a Clerk org membership is created, if the client has no `paddleCustomerId`,
 
 ## 7. Webhook Integrations
 
+All provider webhook routes verify signatures, persist a `WebhookReceipt`, ACK quickly, and enqueue `webhook/receipt.created` for Inngest processing. Duplicate provider event IDs are receipt-safe and do not enqueue duplicate processing.
+
 ### Clerk (`POST /api/webhooks/clerk`)
 
 **Verification:** Svix library with `CLERK_WEBHOOK_SECRET`.
@@ -306,8 +309,16 @@ When a Clerk org membership is created, if the client has no `paddleCustomerId`,
 
 ### Vercel Deploy (`POST /api/webhooks/vercel-deploy`)
 
+**Verification:** HMAC-SHA256 on `x-vercel-signature` header vs `VERCEL_WEBHOOK_SECRET`.
+
 **Handled event:**
 - `deployment.ready` — matches `repoName` to `ProductSpec.githubRepo`, sets stage to `DEPLOYED`, saves `deploymentUrl`, fires `engagement/deployment.ready` Inngest event.
+
+### Operations endpoints
+
+- `GET /api/ops/metrics` — platform-owner-only chat usage, webhook lag/failure counts, token totals, and recent operational events.
+- `GET /api/ops/webhook-receipts` — platform-owner-only receipt list with provider/status filters.
+- `POST /api/ops/webhook-receipts` — platform-owner-only replay for a receipt by `receiptId`.
 
 ---
 
@@ -326,6 +337,9 @@ When a Clerk org membership is created, if the client has no `paddleCustomerId`,
 | `ProductSpec` | `product_specs` | Engagement pipeline state machine. 1:1 with Lead. Tracks stage, PRD, designs, Jules session, Render service, Paddle transaction. Optimistic locking via `stageVersion`. |
 | `StageTransition` | `stage_transitions` | Audit trail for ProductSpec stage changes |
 | `EmailTemplate` | `email_templates` | Reusable email templates per client |
+| `ChatUsage` | `chat_usage` | Chat allow/deny usage rows for quota and spend visibility |
+| `OperationalEvent` | `operational_events` | Vendor-neutral operational log for chat, AI usage, webhook, and system events |
+| `WebhookReceipt` | `webhook_receipts` | Signature-verified provider webhook payloads with processing status and duplicate guard |
 
 ---
 
@@ -486,6 +500,7 @@ bunx tsc --noEmit
 |---|---|
 | `DATABASE_URL` | PostgreSQL connection string |
 | `CLERK_WEBHOOK_SECRET` | Svix signature verification |
+| `WIDGET_TOKEN_SECRET` | Signs short-lived tenant widget tokens |
 | `PADDLE_API_KEY` | Paddle server-side API key |
 | `PADDLE_WEBHOOK_SECRET` | Paddle webhook signature |
 | `NEXT_PUBLIC_PADDLE_CLIENT_TOKEN` | Paddle.js client token (browser) |
@@ -590,3 +605,13 @@ bunx tsc --noEmit
 - [`.env.example`](../.env.example) — Full environment variable reference with inline docs
 - [`app/api/embed/GUIDE.md`](../app/api/embed/GUIDE.md) — Widget embedding guide
 - [`prisma/schema.prisma`](../prisma/schema.prisma) — Database schema source of truth
+
+---
+
+## Update Block
+
+**Last Updated:** 2026-05-02
+
+**What changed:** Added signed chat widget protection, database-backed chat usage/operational event/webhook receipt models, receipt-first webhook processing through Inngest, Vercel webhook signature validation, and platform-owner operations endpoints.
+
+**Verification performed:** `bun run test` focused hardening suites, changed-file Biome check, `bun run build`, and a narrow Playwright widget smoke after installing Chromium.

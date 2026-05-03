@@ -11,6 +11,8 @@ const buildSystemPrompt = vi.fn(() => "mock-system-prompt");
 const createTools = vi.fn(() => ({ searchKnowledgeBase: { description: "tool" } }));
 const getConfig = vi.fn();
 const saveConversation = vi.fn();
+const authoriseChat = vi.fn();
+const recordAllowedUsage = vi.fn();
 
 vi.mock("ai", () => ({
   convertToModelMessages,
@@ -36,6 +38,11 @@ vi.mock("@/lib/services/agent.service", () => ({
   agentService: {
     getConfig,
   },
+  isSyntheticAgentConfig: () => false,
+  PLATFORM_LANDING_WIDGET_DEFAULTS: {
+    agentName: "GRAFT",
+    greetingMessage: "Hello!",
+  },
 }));
 
 vi.mock("@/lib/services/conversation.service", () => ({
@@ -44,9 +51,11 @@ vi.mock("@/lib/services/conversation.service", () => ({
   },
 }));
 
-const getPlatformClientId = vi.fn();
-vi.mock("@/lib/auth/resolve-client", () => ({
-  getPlatformClientId,
+vi.mock("@/lib/services/chat-protection.service", () => ({
+  chatProtectionService: {
+    authorise: authoriseChat,
+    recordAllowedUsage,
+  },
 }));
 
 describe("POST /api/chat", () => {
@@ -76,6 +85,7 @@ describe("POST /api/chat", () => {
       knowledgeBase: null,
       systemPrompt: "Be helpful",
     });
+    authoriseChat.mockResolvedValue({ ok: true, clientId: "client-1", isPlatformDemo: false });
   });
 
   it("returns 400 when the request body is invalid", async () => {
@@ -89,7 +99,35 @@ describe("POST /api/chat", () => {
     );
 
     expect(response.status).toBe(400);
+    expect(authoriseChat).not.toHaveBeenCalled();
     expect(getConfig).not.toHaveBeenCalled();
+  });
+
+  it("rejects unauthorised tenant requests before loading config or selecting a model", async () => {
+    authoriseChat.mockResolvedValueOnce({
+      ok: false,
+      error: "Widget token is required",
+      reason: "MISSING_WIDGET_TOKEN",
+      status: 401,
+    });
+
+    const { POST } = await import("@/app/api/chat/route");
+    const response = await POST(
+      new Request("http://localhost/api/chat", {
+        body: JSON.stringify({
+          clientId: "client-1",
+          messages: [{ id: "u1", parts: [{ text: "Hi", type: "text" }], role: "user" }],
+          sessionId: "session-1",
+        }),
+        headers: { "Content-Type": "application/json", Origin: "https://graft.today" },
+        method: "POST",
+      }),
+    );
+
+    expect(response.status).toBe(401);
+    expect(getConfig).not.toHaveBeenCalled();
+    expect(selectModel).not.toHaveBeenCalled();
+    expect(streamText).not.toHaveBeenCalled();
   });
 
   it("returns 400 when messages cannot be converted", async () => {
@@ -113,7 +151,7 @@ describe("POST /api/chat", () => {
   });
 
   it("resolves clientId 'platform' to platform client and persists", async () => {
-    getPlatformClientId.mockResolvedValue("platform-client-uuid");
+    authoriseChat.mockResolvedValueOnce({ ok: true, clientId: "platform-client-uuid", isPlatformDemo: true });
 
     const { POST } = await import("@/app/api/chat/route");
     const response = await POST(
@@ -129,7 +167,12 @@ describe("POST /api/chat", () => {
     );
 
     expect(response.status).toBe(200);
-    expect(getPlatformClientId).toHaveBeenCalled();
+    expect(authoriseChat).toHaveBeenCalledWith(
+      expect.objectContaining({
+        requestedClientId: "platform",
+        token: undefined,
+      }),
+    );
     expect(createTools).toHaveBeenCalledWith("platform-client-uuid");
     expect(saveConversation).toHaveBeenCalledWith(
       expect.objectContaining({ clientId: "platform-client-uuid", sessionId: "session-1" }),
@@ -137,7 +180,12 @@ describe("POST /api/chat", () => {
   });
 
   it("returns 503 when clientId is 'platform' but platform client not configured", async () => {
-    getPlatformClientId.mockResolvedValue(null);
+    authoriseChat.mockResolvedValueOnce({
+      ok: false,
+      error: "Platform client is not configured",
+      reason: "PLATFORM_CLIENT_NOT_CONFIGURED",
+      status: 503,
+    });
 
     const { POST } = await import("@/app/api/chat/route");
     const response = await POST(
@@ -187,6 +235,12 @@ describe("POST /api/chat", () => {
           role: "assistant",
         },
       ],
+      sessionId: "session-1",
+    });
+    expect(recordAllowedUsage).toHaveBeenCalledWith({
+      clientId: "client-1",
+      messageCount: 1,
+      model: "mock-model",
       sessionId: "session-1",
     });
   });
