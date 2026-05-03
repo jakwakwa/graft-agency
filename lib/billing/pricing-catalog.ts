@@ -55,7 +55,23 @@ const option = (params: Omit<PricingOption, "priceId"> & { priceId?: string }): 
   return { ...params, priceId };
 };
 
-export function buildPricingCatalog(env: PricingCatalogEnv = process.env): PricingCatalog {
+export function getPricingCatalogEnv(): PricingCatalogEnv {
+  return {
+    PADDLE_PRODUCT_CHATBOT: process.env.PADDLE_PRODUCT_CHATBOT,
+    PADDLE_PRODUCT_VOICE: process.env.PADDLE_PRODUCT_VOICE,
+    PADDLE_PRODUCT_BOOKING: process.env.PADDLE_PRODUCT_BOOKING,
+    PADDLE_PRODUCT_LANDING: process.env.PADDLE_PRODUCT_LANDING,
+    PADDLE_PRODUCT_SMB: process.env.PADDLE_PRODUCT_SMB,
+    PADDLE_PRICE_CHATBOT_MONTHLY: process.env.PADDLE_PRICE_CHATBOT_MONTHLY,
+    PADDLE_PRICE_CHATBOT_ANNUAL: process.env.PADDLE_PRICE_CHATBOT_ANNUAL,
+    PADDLE_PRICE_VOICE_MONTHLY: process.env.PADDLE_PRICE_VOICE_MONTHLY,
+    PADDLE_PRICE_BOOKING_MONTHLY: process.env.PADDLE_PRICE_BOOKING_MONTHLY,
+    PADDLE_PRICE_LANDING: process.env.PADDLE_PRICE_LANDING,
+    PADDLE_PRICE_SMB: process.env.PADDLE_PRICE_SMB,
+  };
+}
+
+export function buildPricingCatalog(env: PricingCatalogEnv = getPricingCatalogEnv()): PricingCatalog {
   return {
     offers: [
       {
