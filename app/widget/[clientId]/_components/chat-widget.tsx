@@ -129,7 +129,7 @@ function MessageBubble({ message }: { message: UIMessage }) {
               <div
                 key={`text-${part.text.slice(0, 20)}`}
                 className={`rounded-2xl px-3 py-2 text-sm [&_a]:underline [&_a]:text-primary [&_a]:hover:opacity-80 ${
-                  isUser ? "rounded-br-sm bg-primary text-primary-foreground" : "rounded-bl-sm bg-muted"
+                  isUser ? "rounded-br-sm bg-primary font-sans text-primary-foreground" : "rounded-bl-sm font-sans bg-muted"
                 }`}
               >
                 {isUser ? (

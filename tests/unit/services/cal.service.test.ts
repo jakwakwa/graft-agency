@@ -378,6 +378,61 @@ describe("calService", () => {
     });
   });
 
+  describe("getActiveBookingCount", () => {
+    it("returns error when API key is missing", async () => {
+      vi.stubEnv("CAL_COM_API_KEY", "");
+
+      const result = await calService.getActiveBookingCount({
+        afterStart: "2026-05-03T16:00:00.000Z",
+      });
+
+      expect(result).toEqual({
+        count: 0,
+        error: "Calendar integration is not configured yet.",
+      });
+      expect(mockFetch).not.toHaveBeenCalled();
+    });
+
+    it("requests one future upcoming booking and returns the Cal.com total count", async () => {
+      mockFetch.mockResolvedValue({
+        ok: true,
+        headers: new Headers({ "content-type": "application/json" }),
+        json: () =>
+          Promise.resolve({
+            status: "success",
+            data: [],
+            pagination: {
+              totalItems: 7,
+              remainingItems: 6,
+              returnedItems: 1,
+              itemsPerPage: 1,
+              currentPage: 1,
+              totalPages: 7,
+              hasNextPage: true,
+              hasPreviousPage: false,
+            },
+          }),
+      });
+
+      const result = await calService.getActiveBookingCount({
+        afterStart: "2026-05-03T16:00:00.000Z",
+      });
+
+      const firstCall = mockFetch.mock.calls[0];
+      if (!firstCall) {
+        throw new Error("Expected fetch to be called");
+      }
+
+      const url = new URL(String(firstCall[0]));
+      expect(url.pathname).toBe("/v2/bookings");
+      expect(url.searchParams.get("status")).toBe("upcoming");
+      expect(url.searchParams.get("afterStart")).toBe("2026-05-03T16:00:00.000Z");
+      expect(url.searchParams.get("take")).toBe("1");
+      expect(url.searchParams.get("skip")).toBe("0");
+      expect(result).toEqual({ count: 7 });
+    });
+  });
+
   describe("cancelBooking", () => {
     it("returns error when API key is missing", async () => {
       vi.stubEnv("CAL_COM_API_KEY", "");

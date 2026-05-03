@@ -8,6 +8,7 @@ import { Button } from "@/components/ui-v2/button";
 import { redirectToAccessRequired, requireAuthOrSignIn } from "@/lib/auth/guards";
 import { getPlatformClientId, resolveClientIdFromAuth } from "@/lib/auth/resolve-client";
 import prisma from "@/lib/db/prisma";
+import { calService } from "@/lib/services/cal.service";
 
 function getConversationSummary(messages: unknown): string {
   if (!Array.isArray(messages)) return "No messages";
@@ -42,7 +43,11 @@ export default async function PortalDashboardPage() {
     redirect("/dashboard/automation");
   }
 
-  const [client, leads, bookedCount, conversationCount, recentConversations, agentConfig] = await Promise.all([
+  const activeBookingsPromise = calService.getActiveBookingCount({
+    afterStart: new Date().toISOString(),
+  });
+
+  const [client, leads, activeBookings, conversationCount, recentConversations, agentConfig] = await Promise.all([
     prisma.client.findUnique({
       where: { id: clientId },
       select: { businessName: true },
@@ -59,9 +64,7 @@ export default async function PortalDashboardPage() {
         createdAt: true,
       },
     }),
-    prisma.lead.count({
-      where: { clientId, status: "BOOKED" },
-    }),
+    activeBookingsPromise,
     prisma.conversation.count({
       where: { clientId },
     }),
@@ -99,11 +102,11 @@ export default async function PortalDashboardPage() {
         <Card className="border-l-4 border-primary">
           <CardHeader className="pb-2">
             <Typography.Small className="text-[10px] uppercase tracking-widest text-muted-foreground">
-              Bookings
+              Active Bookings
             </Typography.Small>
           </CardHeader>
           <CardContent>
-            <Typography.H2 className="text-4xl font-black">{bookedCount ?? 0}</Typography.H2>
+            <Typography.H2 className="text-4xl font-black">{activeBookings.count}</Typography.H2>
           </CardContent>
         </Card>
         <Card className="border-l-4 border-secondary">

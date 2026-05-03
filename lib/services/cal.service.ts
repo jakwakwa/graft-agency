@@ -527,6 +527,27 @@ export const calService = {
     };
   },
 
+  async getActiveBookingCount(input?: { afterStart?: string }) {
+    const afterStart = input?.afterStart ?? new Date().toISOString();
+    const result = await calService.listBookings({
+      status: "upcoming",
+      afterStart,
+      take: 1,
+      skip: 0,
+    });
+
+    if ("error" in result) {
+      return {
+        count: 0,
+        error: result.error,
+      };
+    }
+
+    return {
+      count: result.pagination.totalItems,
+    };
+  },
+
   async cancelBooking(input: {
     bookingUid: string;
     cancellationReason?: string;
