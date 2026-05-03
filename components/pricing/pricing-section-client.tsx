@@ -3,7 +3,7 @@
 import { initializePaddle, type Paddle } from "@paddle/paddle-js";
 import { useEffect, useMemo, useState } from "react";
 import { Typography } from "@/components/ui/typography";
-import type { PaddlePreviewItem, PricingCatalog, PricingMode, PricingOffer } from "@/lib/billing/pricing-catalog";
+import type { PricingCatalog, PricingMode, PricingOffer } from "@/lib/billing/pricing-catalog";
 import { getPreviewItems } from "@/lib/billing/pricing-catalog";
 import { BillingCycleToggle } from "./billing-cycle-toggle";
 import { PricingCard } from "./pricing-card";
@@ -26,26 +26,8 @@ interface PricingSectionClientProps {
   customer?: PricingCustomer;
 }
 
-interface PaddlePreviewLineItem {
-  price?: { id?: string };
-  formattedTotals?: { subtotal?: string };
-  formattedUnitTotals?: { subtotal?: string };
-}
-
-interface PaddlePreviewResult {
-  data?: {
-    details?: {
-      lineItems?: PaddlePreviewLineItem[];
-    };
-  };
-}
-
-interface PaddleWithPricePreview extends Paddle {
-  PricePreview?: (request: { items: PaddlePreviewItem[] }) => Promise<PaddlePreviewResult>;
-}
-
 export function PricingSectionClient({ catalogue, mode, paddleConfig, customer }: PricingSectionClientProps) {
-  const [paddle, setPaddle] = useState<PaddleWithPricePreview | null>(null);
+  const [paddle, setPaddle] = useState<Paddle | null>(null);
   const [selectedCycle, setSelectedCycle] = useState<"monthly" | "annual">("monthly");
   const [localizedPrices, setLocalizedPrices] = useState<Record<string, string>>({});
   const canCheckout = mode === "portal" && customer ? !customer.subscriptionActive : false;
@@ -54,12 +36,12 @@ export function PricingSectionClient({ catalogue, mode, paddleConfig, customer }
   useEffect(() => {
     if (!paddleConfig.clientToken) return;
     initializePaddle({ environment: paddleConfig.environment, token: paddleConfig.clientToken }).then((instance) => {
-      if (instance) setPaddle(instance as PaddleWithPricePreview);
+      if (instance) setPaddle(instance);
     });
   }, [paddleConfig.clientToken, paddleConfig.environment]);
 
   useEffect(() => {
-    if (!paddle?.PricePreview || previewItems.length === 0) return;
+    if (!paddle || previewItems.length === 0) return;
     paddle.PricePreview({ items: previewItems }).then((result) => {
       const nextPrices = Object.fromEntries(
         (result.data?.details?.lineItems ?? []).flatMap((item) => {
