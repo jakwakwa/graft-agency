@@ -93,14 +93,14 @@ export function LandingHeroSection() {
               initial="hidden"
               animate="visible"
             >
-              {["THE", "RECEPTIONIST"].map((word) => (
+              {["THE ASSISTANT"].map((word) => (
                 <motion.span key={word} className="hero-headline__word" variants={WORD_VARIANTS}>
                   {word}{" "}
                 </motion.span>
               ))}
               <br />
-              {["THAT"].map((word) => (
-                <motion.span key={word} className="hero-headline__word" variants={WORD_VARIANTS}>
+              {["THAT NEVER"].map((word) => (
+                <motion.span key={word} className="hero-headline__word hero-headline__word--gradient" variants={WORD_VARIANTS}>
                   {word}{" "}
                 </motion.span>
               ))}
@@ -108,7 +108,7 @@ export function LandingHeroSection() {
                 className="hero-headline__word hero-headline__word--gradient"
                 variants={WORD_VARIANTS}
               >
-                NEVER SLEEPS.
+                 SLEEPS.
               </motion.span>
             </motion.h1>
 
