@@ -95,11 +95,11 @@ a {
 
   /* Surfaces — tonal depth, no hard borders */
   --card: #2c3b5134;
-  --card-foreground: #f8f0ee;
+  --card-foreground: #aab0da;
   --popover: #3a3232;
   --popover-foreground: #f49999;
   --muted: #23272de6;
-  --muted-foreground: #c8c8c8;
+  --muted-foreground: #b1aeae;
 
   --primary: #3c81e2e8;
   --primary-container: #2c2e33;
@@ -411,6 +411,14 @@ a {
   html {
     @apply font-sans;
     background: #000000 !important;
+  }
+  a {
+    color: hsl(34, 49%, 91%) !important;
+  }
+
+  a:hover {
+      color: hsl(34, 96%, 80%) !important;
+      background-color: #00000010 !important;
   }
 
   @media (prefers-reduced-motion: no-preference) {
