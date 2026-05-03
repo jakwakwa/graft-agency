@@ -13,6 +13,19 @@ export const PLATFORM_LANDING_WIDGET_DEFAULTS = {
 
 type AgentConfigRow = NonNullable<Awaited<ReturnType<typeof prisma.agentConfig.findUnique>>>;
 
+function getOptionalEnv(name: string): string | null {
+  const value = process.env[name]?.trim();
+  return value && value.length > 0 ? value : null;
+}
+
+function withCalendarDefaults(config: AgentConfigRow): AgentConfigRow {
+  return {
+    ...config,
+    calComUsername: config.calComUsername?.trim() || getOptionalEnv("CAL_USER_USERNAME"),
+    defaultEventSlug: config.defaultEventSlug?.trim() || getOptionalEnv("CAL_USER_EVENT_SLUG"),
+  };
+}
+
 function createFallbackAgentConfig(clientId: string): AgentConfigRow {
   const now = new Date();
   return {
@@ -22,8 +35,8 @@ function createFallbackAgentConfig(clientId: string): AgentConfigRow {
     knowledgeBase: null,
     agentName: "AI Assistant",
     greetingMessage: "Hello! How can I help you today?",
-    calComUsername: process.env.CAL_USER_USERNAME ?? null,
-    defaultEventSlug: process.env.CAL_USER_EVENT_SLUG ?? null,
+    calComUsername: getOptionalEnv("CAL_USER_USERNAME"),
+    defaultEventSlug: getOptionalEnv("CAL_USER_EVENT_SLUG"),
     widgetPrimaryColour: "#7c3aed",
     createdAt: now,
     updatedAt: now,
@@ -64,7 +77,7 @@ export const agentService = {
     const config = await prisma.agentConfig.findUnique({
       where: { clientId },
     });
-    return config ?? createFallbackAgentConfig(clientId);
+    return config ? withCalendarDefaults(config) : createFallbackAgentConfig(clientId);
   },
 
   async searchKnowledge({ clientId, query }: SearchKnowledgeInput): Promise<SearchKnowledgeResult> {

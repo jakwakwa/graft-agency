@@ -13,6 +13,8 @@ vi.mock("@/lib/db/prisma", () => ({
 describe("agentService", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.stubEnv("CAL_USER_USERNAME", "");
+    vi.stubEnv("CAL_USER_EVENT_SLUG", "");
   });
 
   function mockAgentConfig(knowledgeBase: Prisma.JsonValue = null) {
@@ -57,6 +59,35 @@ describe("agentService", () => {
       expect(result.systemPrompt.length).toBeGreaterThan(0);
       expect(result.agentName).toBe("AI Assistant");
       expect(result.id).toBe("00000000-0000-4000-8000-000000000001");
+    });
+
+    it("uses saved Cal.com settings before environment defaults", async () => {
+      vi.stubEnv("CAL_USER_USERNAME", "env-user");
+      vi.stubEnv("CAL_USER_EVENT_SLUG", "env-slug");
+      const { default: prisma } = await import("@/lib/db/prisma");
+      const mockConfig = {
+        ...mockAgentConfig(),
+        calComUsername: "client-user",
+        defaultEventSlug: "client-slug",
+      };
+      vi.mocked(prisma.agentConfig.findUnique).mockResolvedValue(mockConfig);
+
+      const result = await agentService.getConfig("client-1");
+
+      expect(result.calComUsername).toBe("client-user");
+      expect(result.defaultEventSlug).toBe("client-slug");
+    });
+
+    it("falls back to environment Cal.com settings when saved config is missing them", async () => {
+      vi.stubEnv("CAL_USER_USERNAME", "env-user");
+      vi.stubEnv("CAL_USER_EVENT_SLUG", "env-slug");
+      const { default: prisma } = await import("@/lib/db/prisma");
+      vi.mocked(prisma.agentConfig.findUnique).mockResolvedValue(mockAgentConfig());
+
+      const result = await agentService.getConfig("client-1");
+
+      expect(result.calComUsername).toBe("env-user");
+      expect(result.defaultEventSlug).toBe("env-slug");
     });
   });
 

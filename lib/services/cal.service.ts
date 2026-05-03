@@ -3,6 +3,7 @@ import { join } from "node:path";
 
 const CAL_API_BASE = process.env.CAL_API_BASE ?? "https://api.cal.com/v2";
 const CAL_API_VERSION = process.env.CAL_COM_VERSION ?? "2026-02-25";
+const CAL_EVENT_TYPES_API_VERSION = process.env.CAL_COM_EVENT_TYPES_VERSION ?? CAL_API_VERSION;
 const DEBUG_LOG = join(process.cwd(), ".cursor", "debug-0b2dc2.log");
 const dbg = (loc: string, msg: string, data: object, h: string) => {
   try {
@@ -23,6 +24,46 @@ function getHeaders(versionOverride?: string): Record<string, string> {
     headers.Authorization = `Bearer ${apiKey}`;
   }
   return headers;
+}
+
+type JsonObject = Record<string, unknown>;
+
+function isJsonObject(value: unknown): value is JsonObject {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function getCalendarErrorMessage(body: JsonObject | null, fallback: string): string {
+  const message = body?.message;
+  if (typeof message === "string") {
+    return message;
+  }
+
+  const error = body?.error;
+  if (typeof error === "string") {
+    return error;
+  }
+
+  if (isJsonObject(error) && typeof error.message === "string") {
+    return error.message;
+  }
+
+  return fallback;
+}
+
+async function readJsonObject(response: Response): Promise<{ body: JsonObject | null; textPreview?: string }> {
+  const contentType = response.headers?.get("content-type") ?? "application/json";
+  if (!contentType.includes("application/json")) {
+    const text = await response.text().catch(() => "");
+    return { body: null, textPreview: text.slice(0, 200) };
+  }
+
+  try {
+    const value: unknown = await response.json();
+    return { body: isJsonObject(value) ? value : null };
+  } catch {
+    const text = await response.text().catch(() => "");
+    return { body: null, textPreview: text.slice(0, 200) };
+  }
 }
 
 export const calService = {
@@ -82,7 +123,7 @@ export const calService = {
 
     const response = await fetch(`${CAL_API_BASE}/slots?${params.toString()}`, {
       method: "GET",
-      headers: getHeaders("2024-09-04"),
+      headers: getHeaders(),
     });
 
     if (!response.ok) {
@@ -99,10 +140,13 @@ export const calService = {
       return { slots: [], error: errMsg };
     }
 
-    const body = await response.json();
+    const { body, textPreview } = await readJsonObject(response);
+    if (!body) {
+      return { slots: [], error: `Calendar API error: ${response.status} ${textPreview ?? "Invalid JSON response"}` };
+    }
     const data = body.data ?? {};
     // v2 returns data as { "date": [slot, ...] } or data.slots as { "date": [slot, ...] }
-    const slotsData = (typeof data === "object" && !Array.isArray(data) && (data.slots ?? data)) ?? {};
+    const slotsData = isJsonObject(data) ? (data.slots ?? data) : {};
     const slotsObj = typeof slotsData === "object" && !Array.isArray(slotsData) ? slotsData : {};
 
     const slots = Object.entries(slotsObj).flatMap(([date, times]) => {
@@ -148,15 +192,21 @@ export const calService = {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        ...getHeaders("2024-09-04"),
+        ...getHeaders(),
       },
       body: JSON.stringify(body),
     });
 
-    const result = await response.json();
+    const { body: result, textPreview } = await readJsonObject(response);
     if (!response.ok) {
-      const message = result.message ?? result.error ?? `Calendar reservation error: ${response.status}`;
+      const message = getCalendarErrorMessage(
+        result,
+        `Calendar reservation error: ${response.status} ${textPreview ?? ""}`.trim(),
+      );
       return { error: message };
+    }
+    if (!result) {
+      return { error: `Calendar reservation error: ${response.status} ${textPreview ?? "Invalid JSON response"}` };
     }
 
     return {
@@ -208,18 +258,25 @@ export const calService = {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        ...getHeaders("2024-09-04"),
+        ...getHeaders(),
       },
       body: JSON.stringify(body),
     });
 
-    const result = await response.json();
+    const { body: result, textPreview } = await readJsonObject(response);
     if (!response.ok) {
-      const message = result.message ?? result.error ?? `Calendar booking error: ${response.status}`;
+      const message = getCalendarErrorMessage(
+        result,
+        `Calendar booking error: ${response.status} ${textPreview ?? ""}`.trim(),
+      );
       return { error: message };
     }
+    if (!result) {
+      return { error: `Calendar booking error: ${response.status} ${textPreview ?? "Invalid JSON response"}` };
+    }
 
-    const uid = result.data?.uid ?? result.uid ?? result.id;
+    const data = isJsonObject(result.data) ? result.data : null;
+    const uid = data?.uid ?? result.uid ?? result.id;
     return {
       bookingUid: uid,
       confirmationUrl: uid ? `https://cal.com/booking/${uid}` : undefined,
@@ -234,13 +291,19 @@ export const calService = {
 
     const response = await fetch(`${CAL_API_BASE}/event-types`, {
       method: "GET",
-      headers: getHeaders("2024-09-04"),
+      headers: getHeaders(CAL_EVENT_TYPES_API_VERSION),
     });
 
-    const result = await response.json();
+    const { body: result, textPreview } = await readJsonObject(response);
     if (!response.ok) {
-      const message = result.message ?? result.error ?? `Calendar get event types error: ${response.status}`;
+      const message = getCalendarErrorMessage(
+        result,
+        `Calendar get event types error: ${response.status} ${textPreview ?? ""}`.trim(),
+      );
       return { error: message };
+    }
+    if (!result) {
+      return { error: `Calendar get event types error: ${response.status} ${textPreview ?? "Invalid JSON response"}` };
     }
 
     return {

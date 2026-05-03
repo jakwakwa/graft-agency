@@ -23,6 +23,15 @@ const botSettingsSchema = z.object({
     .nullable(),
 });
 
+function optionalFormString(value: FormDataEntryValue | null): string | null {
+  if (typeof value !== "string") {
+    return null;
+  }
+
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : null;
+}
+
 export async function saveBotSettingsAction(formData: FormData) {
   const clientId = await resolveClientIdFromAuth();
   if (!clientId) throw new Error("Unauthorized");
@@ -42,8 +51,8 @@ export async function saveBotSettingsAction(formData: FormData) {
     greetingMessage: formData.get("greetingMessage"),
     systemPrompt: formData.get("systemPrompt"),
     widgetPrimaryColour: formData.get("widgetPrimaryColour") || "#7c3aed",
-    calComUsername: formData.get("calComUsername") || null,
-    defaultEventSlug: formData.get("defaultEventSlug") || null,
+    calComUsername: optionalFormString(formData.get("calComUsername")),
+    defaultEventSlug: optionalFormString(formData.get("defaultEventSlug")),
     knowledgeBase,
   });
 

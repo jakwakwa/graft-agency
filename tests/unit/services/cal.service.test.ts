@@ -8,7 +8,8 @@ describe("calService", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.stubEnv("CAL_COM_API_KEY", "test-api-key");
-    vi.stubEnv("CAL_COM_VERSION", "2026-02-25");
+    vi.stubEnv("CAL_COM_VERSION", "2024-09-04");
+    vi.stubEnv("CAL_COM_EVENT_TYPES_VERSION", "2024-06-14");
   });
 
   describe("getAvailability", () => {
@@ -45,7 +46,7 @@ describe("calService", () => {
           method: "GET",
           headers: expect.objectContaining({
             Authorization: "Bearer test-api-key",
-            "cal-api-version": "2026-02-25",
+            "cal-api-version": "2024-09-04",
           }),
         }),
       );
@@ -130,7 +131,7 @@ describe("calService", () => {
           headers: expect.objectContaining({
             "Content-Type": "application/json",
             Authorization: "Bearer test-api-key",
-            "cal-api-version": "2026-02-25",
+            "cal-api-version": "2024-09-04",
           }),
           body: expect.stringContaining("testuser"),
         }),
@@ -190,6 +191,47 @@ describe("calService", () => {
       });
 
       expect(result.error).toBeDefined();
+    });
+  });
+
+  describe("getEventTypes", () => {
+    it("uses the Cal.com event-types API version that returns event types", async () => {
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            status: "success",
+            data: [{ id: 123, slug: "kona-dev" }],
+          }),
+      });
+
+      await calService.getEventTypes();
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        "https://api.cal.com/v2/event-types",
+        expect.objectContaining({
+          method: "GET",
+          headers: expect.objectContaining({
+            Authorization: "Bearer test-api-key",
+            "cal-api-version": "2024-06-14",
+          }),
+        }),
+      );
+    });
+
+    it("returns a calendar error when event types response is not JSON", async () => {
+      mockFetch.mockResolvedValue({
+        ok: false,
+        status: 404,
+        headers: new Headers({ "content-type": "text/html; charset=utf-8" }),
+        text: () => Promise.resolve("<!DOCTYPE html><html>Not found</html>"),
+      });
+
+      const result = await calService.getEventTypes();
+
+      expect(result).toEqual({
+        error: "Calendar get event types error: 404 <!DOCTYPE html><html>Not found</html>",
+      });
     });
   });
 });

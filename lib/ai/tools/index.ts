@@ -12,14 +12,12 @@ import { createCheckAvailabilityTool } from "./check-availability";
 import { handoffToHumanTool } from "./handoff-human";
 import { createSearchKnowledgeBaseTool } from "./search-knowledge";
 import { createReserveSlotTool } from "./reserve-slot";
-import { createListEventTypesTool } from "./list-event-types";
 
 export const createTools = (clientId: string) => ({
   captureLeadDetails: createCaptureLeadDetailsTool(clientId),
   checkAvailability: createCheckAvailabilityTool(clientId),
   bookAppointment: createBookAppointmentTool(clientId),
   reserveSlot: createReserveSlotTool(clientId),
-  listEventTypes: createListEventTypesTool(clientId),
   searchKnowledgeBase: createSearchKnowledgeBaseTool(clientId),
   handoffToHuman: handoffToHumanTool,
 });
