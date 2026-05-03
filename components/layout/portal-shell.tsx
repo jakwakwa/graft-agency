@@ -1,7 +1,7 @@
 "use client";
 
 import { UserButton } from "@clerk/nextjs";
-import { Code, CreditCard, LayoutDashboard, MessageSquare, Settings } from "lucide-react";
+import { CalendarDays, Code, CreditCard, LayoutDashboard, MessageSquare, Settings } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
@@ -17,6 +17,7 @@ export function PortalShell({ children }: PortalShellProps) {
   const sidebarLinks = [
     { href: "/portal", label: "Dashboard", icon: LayoutDashboard },
     { href: "/portal/conversations", label: "Conversations", icon: MessageSquare },
+    { href: "/portal/bookings", label: "Bookings", icon: CalendarDays },
     { href: "/portal/settings", label: "Bot Settings", icon: Settings },
     { href: "/portal/embed", label: "Embed Code", icon: Code },
     { href: "/portal/billing", label: "Billing", icon: CreditCard, comingSoon: true },
