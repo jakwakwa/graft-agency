@@ -1,3 +1,4 @@
+import { PricingSection } from "@/components/pricing/pricing-section";
 import { landingShellClassName } from "./constants";
 import { LandingBackground } from "./landing-background";
 import { LandingCtaSection } from "./landing-cta-section";
@@ -8,6 +9,8 @@ import { LandingSiteFooter } from "./landing-site-footer";
 import { LandingSiteHeader } from "./landing-site-header";
 
 export default function LandingPageV2() {
+  const environment = process.env.PADDLE_ENVIRONMENT === "production" ? "production" : "sandbox";
+
   return (
     <div className={landingShellClassName}>
       <LandingBackground />
@@ -17,6 +20,13 @@ export default function LandingPageV2() {
         <LandingFeaturesSection />
         <LandingHardenedGrid />
         <LandingCtaSection />
+        <PricingSection
+          mode="landing"
+          paddleConfig={{
+            clientToken: process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN ?? "",
+            environment,
+          }}
+        />
       </main>
       <LandingSiteFooter />
     </div>

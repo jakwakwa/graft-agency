@@ -19,6 +19,7 @@ export const LANDING_HEADER_SECTIONS = [
   { id: "lead-capture", label: "Lead Capture" },
   { id: "midnight-prospector", label: "Midnight Prospector" },
   { id: "white-label", label: "White-Label" },
+  { id: "pricing", label: "Pricing" },
 ] as const;
 
 export const landingShellClassName =
