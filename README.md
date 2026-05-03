@@ -4,7 +4,7 @@
 
 GRAFT.TODAY is a SaaS platform that helps small businesses and freelancers get more clients through automated lead generation and proposal management. 
                   
-**For each of these businesses:**
+## For each of these businesses:
 
 1. The Graft Bot uses Google Search to find actual website URLs from scratch if not provided, it will then audit their online presence to determine if they are currently using visible AI technologies (like chatbots, AI agents). 
 
