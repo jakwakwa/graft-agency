@@ -1,8 +1,8 @@
 import { appendFileSync } from "node:fs";
 import { join } from "node:path";
 
-const CAL_API_BASE = "https://api.cal.com/v2";
-const CAL_API_VERSION = "2026-02-25";
+const CAL_API_BASE = process.env.CAL_API_BASE ?? "https://api.cal.com/v2";
+const CAL_API_VERSION = process.env.CAL_COM_VERSION ?? "2026-02-25";
 const DEBUG_LOG = join(process.cwd(), ".cursor", "debug-0b2dc2.log");
 const dbg = (loc: string, msg: string, data: object, h: string) => {
   try {
