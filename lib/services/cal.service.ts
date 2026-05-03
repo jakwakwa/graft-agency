@@ -1,9 +1,9 @@
 import { appendFileSync } from "node:fs";
 import { join } from "node:path";
 
-const CAL_API_BASE = process.env.CAL_API_BASE ?? "https://api.cal.com/v2";
-const CAL_API_VERSION = process.env.CAL_COM_VERSION ?? "2026-02-25";
-const CAL_EVENT_TYPES_API_VERSION = process.env.CAL_COM_EVENT_TYPES_VERSION ?? CAL_API_VERSION;
+const CAL_SLOTS_API_VERSION = "2024-09-04";
+const CAL_BOOKINGS_API_VERSION = "2026-02-25";
+const CAL_EVENT_TYPES_API_VERSION = "2024-06-14";
 const DEBUG_LOG = join(process.cwd(), ".cursor", "debug-0b2dc2.log");
 const dbg = (loc: string, msg: string, data: object, h: string) => {
   try {
@@ -14,9 +14,17 @@ const dbg = (loc: string, msg: string, data: object, h: string) => {
   } catch {}
 };
 
-function getHeaders(versionOverride?: string): Record<string, string> {
+function getOptionalEnv(name: string): string | null {
+  const value = process.env[name]?.trim();
+  return value && value.length > 0 ? value : null;
+}
+
+function getCalApiBase(): string {
+  return getOptionalEnv("CAL_API_BASE") ?? "https://api.cal.com/v2";
+}
+
+function getHeaders(version: string): Record<string, string> {
   const apiKey = process.env.CAL_COM_API_KEY;
-  const version = versionOverride ?? process.env.CAL_COM_VERSION ?? CAL_API_VERSION;
   const headers: Record<string, string> = {
     "cal-api-version": version,
   };
@@ -81,11 +89,11 @@ export const calService = {
     dbg(
       "cal.service:getAvailability",
       "entry",
-      { 
-        apiKeyPresent: !!apiKey, 
-        username: input.username, 
+      {
+        apiKeyPresent: !!apiKey,
+        username: input.username,
         eventTypeSlug: input.eventTypeSlug,
-        eventTypeId: input.eventTypeId
+        eventTypeId: input.eventTypeId,
       },
       "H2",
     );
@@ -116,14 +124,14 @@ export const calService = {
     if (input.username) params.set("username", input.username);
     if (input.eventTypeSlug) params.set("eventTypeSlug", input.eventTypeSlug);
     if (input.eventTypeId) params.set("eventTypeId", String(input.eventTypeId));
-    
+
     if (input.timeZone) {
       params.set("timeZone", input.timeZone);
     }
 
-    const response = await fetch(`${CAL_API_BASE}/slots?${params.toString()}`, {
+    const response = await fetch(`${getCalApiBase()}/slots?${params.toString()}`, {
       method: "GET",
-      headers: getHeaders(),
+      headers: getHeaders(getOptionalEnv("CAL_SLOTS_API_VERSION") ?? CAL_SLOTS_API_VERSION),
     });
 
     if (!response.ok) {
@@ -188,11 +196,11 @@ export const calService = {
     if (input.slotDuration) body.slotDuration = input.slotDuration;
     if (input.reservationDuration) body.reservationDuration = input.reservationDuration;
 
-    const response = await fetch(`${CAL_API_BASE}/slots/reservations`, {
+    const response = await fetch(`${getCalApiBase()}/slots/reservations`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        ...getHeaders(),
+        ...getHeaders(getOptionalEnv("CAL_SLOTS_API_VERSION") ?? CAL_SLOTS_API_VERSION),
       },
       body: JSON.stringify(body),
     });
@@ -254,11 +262,11 @@ export const calService = {
       body.metadata = { leadId: input.leadId };
     }
 
-    const response = await fetch(`${CAL_API_BASE}/bookings`, {
+    const response = await fetch(`${getCalApiBase()}/bookings`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        ...getHeaders(),
+        ...getHeaders(getOptionalEnv("CAL_BOOKINGS_API_VERSION") ?? CAL_BOOKINGS_API_VERSION),
       },
       body: JSON.stringify(body),
     });
@@ -289,9 +297,9 @@ export const calService = {
       return { error: "Calendar integration is not configured yet." };
     }
 
-    const response = await fetch(`${CAL_API_BASE}/event-types`, {
+    const response = await fetch(`${getCalApiBase()}/event-types`, {
       method: "GET",
-      headers: getHeaders(CAL_EVENT_TYPES_API_VERSION),
+      headers: getHeaders(getOptionalEnv("CAL_EVENT_TYPES_API_VERSION") ?? CAL_EVENT_TYPES_API_VERSION),
     });
 
     const { body: result, textPreview } = await readJsonObject(response);

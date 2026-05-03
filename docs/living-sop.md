@@ -227,7 +227,7 @@ PENDING → PROFILING → PROFILED → WRITING_PRD → PRD_WRITTEN
 
 ## 6. Billing (Paddle)
 
-Paddle is the Merchant of Record — handles global tax/VAT automatically.
+Paddle is the Merchant of Record — handles global tax/VAT automatically. `PADDLE_ENVIRONMENT` selects the Paddle API environment and defaults to `sandbox`; production Vercel deployments must keep `PADDLE_ENVIRONMENT=sandbox` until Paddle go-live is approved.
 
 ### Products & pricing
 
@@ -502,12 +502,17 @@ bunx tsc --noEmit
 | `CLERK_WEBHOOK_SECRET` | Svix signature verification |
 | `WIDGET_TOKEN_SECRET` | Signs short-lived tenant widget tokens |
 | `PADDLE_API_KEY` | Paddle server-side API key |
+| `PADDLE_ENVIRONMENT` | Paddle API environment, currently `sandbox` for all deployments |
 | `PADDLE_WEBHOOK_SECRET` | Paddle webhook signature |
 | `NEXT_PUBLIC_PADDLE_CLIENT_TOKEN` | Paddle.js client token (browser) |
 | `PADDLE_PRODUCT_*` | Product IDs (CHATBOT, VOICE, BOOKING, LANDING, SMB) |
 | `PADDLE_PRICE_*` | Price IDs (CHATBOT_MONTHLY, CHATBOT_ANNUAL, VOICE_MONTHLY, BOOKING_MONTHLY, LANDING, SMB) |
 | `GOOGLE_GENERATIVE_AI_API_KEY` | Gemini API key |
 | `CAL_COM_API_KEY` | Cal.com v2 API key |
+| `CAL_API_BASE` | Cal.com API origin, including `/v2` |
+| `CAL_SLOTS_API_VERSION` | Cal.com slots and slot reservations API version, currently `2024-09-04` |
+| `CAL_BOOKINGS_API_VERSION` | Cal.com bookings API version, currently `2026-02-25` |
+| `CAL_EVENT_TYPES_API_VERSION` | Cal.com event type listing API version, currently `2024-06-14` |
 | `CAL_WEBHOOK_SECRET` | Cal.com webhook HMAC secret |
 | `RESEND_API_KEY` | Resend email API key |
 | `GRAFT_INNGEST_EVENT_KEY` | Inngest event key |
@@ -610,8 +615,8 @@ bunx tsc --noEmit
 
 ## Update Block
 
-**Last Updated:** 2026-05-02
+**Last Updated:** 2026-05-03
 
-**What changed:** Added signed chat widget protection, database-backed chat usage/operational event/webhook receipt models, receipt-first webhook processing through Inngest, Vercel webhook signature validation, and platform-owner operations endpoints.
+**What changed:** Documented the explicit Paddle environment contract: production Vercel deployments continue using Paddle sandbox until go-live, rather than deriving Paddle mode from `NODE_ENV`. Standardised the Cal.com endpoint-specific API version contract to `CAL_SLOTS_API_VERSION`, `CAL_BOOKINGS_API_VERSION`, and `CAL_EVENT_TYPES_API_VERSION`.
 
-**Verification performed:** `bun run test` focused hardening suites, changed-file Biome check, `bun run build`, and a narrow Playwright widget smoke after installing Chromium.
+**Verification performed:** Paddle MCP sandbox subscription check, Prisma MCP production client check, `bun run test tests/unit/paddle.test.ts tests/unit/api/billing-portal.route.test.ts`, `bun run test tests/unit/services/cal.service.test.ts tests/unit/ai/tools/check-availability.test.ts tests/unit/ai/tools/book-appointment.test.ts`, `bun run build`, and changed-file Biome check.

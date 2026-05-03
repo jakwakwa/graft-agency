@@ -1,3 +1,4 @@
+import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const protect = vi.fn();
@@ -64,8 +65,9 @@ describe("billing portal access", () => {
 
   it("does not protect the portal redirect at middleware level", async () => {
     const { default: proxy } = await import("@/proxy");
+    const event = { waitUntil: vi.fn() } as unknown as Parameters<typeof proxy>[1];
 
-    await proxy(new Request("https://graft.today/api/billing/portal"));
+    await proxy(new NextRequest("https://graft.today/api/billing/portal"), event);
 
     expect(protect).not.toHaveBeenCalled();
   });

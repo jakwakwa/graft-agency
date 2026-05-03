@@ -6,13 +6,40 @@ vi.stubGlobal("fetch", mockFetch);
 
 describe("calService", () => {
   beforeEach(() => {
+    vi.unstubAllEnvs();
     vi.clearAllMocks();
     vi.stubEnv("CAL_COM_API_KEY", "test-api-key");
-    vi.stubEnv("CAL_COM_VERSION", "2024-09-04");
-    vi.stubEnv("CAL_COM_EVENT_TYPES_VERSION", "2024-06-14");
+    vi.stubEnv("CAL_SLOTS_API_VERSION", "2024-09-04");
+    vi.stubEnv("CAL_BOOKINGS_API_VERSION", "2026-02-25");
+    vi.stubEnv("CAL_EVENT_TYPES_API_VERSION", "2024-06-14");
   });
 
   describe("getAvailability", () => {
+    it("uses the standard Cal.com slots API version key", async () => {
+      mockFetch.mockResolvedValue({
+        ok: true,
+        headers: new Headers({ "content-type": "application/json" }),
+        json: () =>
+          Promise.resolve({
+            data: {},
+          }),
+      });
+
+      await calService.getAvailability({
+        username: "testuser",
+        eventTypeSlug: "15min",
+      });
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining("https://api.cal.com/v2/slots"),
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            "cal-api-version": "2024-09-04",
+          }),
+        }),
+      );
+    });
+
     it("returns error when API key is missing", async () => {
       vi.stubEnv("CAL_COM_API_KEY", "");
       const result = await calService.getAvailability({
@@ -131,7 +158,7 @@ describe("calService", () => {
           headers: expect.objectContaining({
             "Content-Type": "application/json",
             Authorization: "Bearer test-api-key",
-            "cal-api-version": "2024-09-04",
+            "cal-api-version": "2026-02-25",
           }),
           body: expect.stringContaining("testuser"),
         }),

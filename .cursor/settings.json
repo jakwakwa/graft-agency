@@ -12,7 +12,7 @@
     "superpowers": {
       "enabled": true
     },
-    "clickup": {
+    "vercel": {
       "enabled": true
     }
   }
