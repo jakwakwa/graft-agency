@@ -28,7 +28,8 @@ vi.mock("@/lib/db/prisma", () => ({
 
 // Mock Google GenAI
 vi.mock("@google/genai", () => ({
-  GoogleGenAI: vi.fn().mockImplementation(() => ({
+  GoogleGenAI: vi.fn().mockImplementation(function GoogleGenAI() {
+    return {
     models: {
       generateContent: vi.fn().mockResolvedValue({
         text: JSON.stringify({
@@ -43,7 +44,8 @@ vi.mock("@google/genai", () => ({
         }),
       }),
     },
-  })),
+    };
+  }),
   ThinkingLevel: { HIGH: "HIGH" },
   Type: { OBJECT: "OBJECT", STRING: "STRING", ARRAY: "ARRAY" },
 }));

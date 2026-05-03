@@ -13,11 +13,13 @@ vi.mock("@/lib/paddle", () => ({
 }));
 
 vi.mock("resend", () => ({
-  Resend: vi.fn().mockImplementation(() => ({
-    emails: {
-      send: vi.fn().mockResolvedValue({ data: { id: "email-sent-id" } }),
-    },
-  })),
+  Resend: vi.fn().mockImplementation(function Resend() {
+    return {
+      emails: {
+        send: vi.fn().mockResolvedValue({ data: { id: "email-sent-id" } }),
+      },
+    };
+  }),
 }));
 
 describe("offer service", () => {

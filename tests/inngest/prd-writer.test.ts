@@ -10,7 +10,8 @@ vi.mock("@/lib/db/prisma", () => ({
 }));
 
 vi.mock("@google/genai", () => ({
-  GoogleGenAI: vi.fn().mockImplementation(() => ({
+  GoogleGenAI: vi.fn().mockImplementation(function GoogleGenAI() {
+    return {
     models: {
       generateContent: vi.fn().mockResolvedValue({
         text: `# PRD: Acme Plumbing Booking Portal
@@ -44,7 +45,8 @@ Acme Plumbing loses 40% of potential bookings due to phone-only scheduling.
 - <2min average booking completion time`,
       }),
     },
-  })),
+    };
+  }),
 }));
 
 describe("writePRD", () => {
