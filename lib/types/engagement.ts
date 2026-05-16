@@ -13,17 +13,41 @@ export interface ProfiledNeeds {
   estimatedComplexity: Complexity;
 }
 
+export interface DesignSystemSpec {
+  background: string;
+  surface: string;
+  primary: string;
+  onPrimary: string;
+  secondary: string;
+  onSurface: string;
+  onSurfaceVariant: string;
+  outline: string;
+  headlineFont: string;
+  bodyFont: string;
+  effects?: string;
+  themeMode?: string;
+}
+
 export interface DesignConcept {
   index: number;
   name: string;
   description: string;
-  colorScheme: { primary: string; background: string; text: string };
+  colorScheme: {
+    primary: string;
+    background: string;
+    text: string;
+    surface?: string;
+    secondary?: string;
+    onPrimary?: string;
+  };
   components: string[];
   styleKeywords: string[];
   screenId: string;
   projectId: string;
   screenshotUrl?: string;
   htmlUrl?: string;
+  /** Full design system spec passed to Stitch, forwarded to jules-builder */
+  designSystem?: DesignSystemSpec;
 }
 
 export interface LeadPipelineEvent {

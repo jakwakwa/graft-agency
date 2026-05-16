@@ -28,7 +28,36 @@ Write a PRD in Markdown. It must include:
 4. **Tech Stack** — Next.js 15 App Router, Tailwind CSS, shadcn/ui, Vercel. Do NOT deviate from this stack.
 5. **User Stories** — 3-5 stories in "As a [role], I can [action]" format
 6. **Success Metrics** — 2 measurable outcomes
-7. **Design Direction** — 1 paragraph describing visual style (colours, tone, vibe). Use exactly this Markdown heading (level 2) so downstream tools can parse it: \`## Design Direction\`
+7. **Design Direction** — A comprehensive, structured design brief. Use exactly this Markdown heading (level 2): \`## Design Direction\`. Within this section, use the following sub-headings (level 3):
+
+   ### Visual Effects
+   Name the primary visual effect to apply across the UI (e.g. "heavy glassmorphism", "neumorphism", "bold gradients"). Describe how to apply it (frosted glass panels, translucent overlays, background blur, etc).
+
+   ### Section Layout
+   One bullet per major page section. For each section, describe its purpose and ideal layout in one sentence. Include at least: Hero, Features/Services, Social Proof/Lifestyle, and Footer/CTA.
+
+   ### UI Elements
+   List 2-4 specific interactive UI elements to include (e.g. "AI concierge chatbot modal in bottom-right corner", "animated pricing toggle", "testimonial carousel"). Be specific about placement and style.
+
+   ### Imagery Direction
+   One paragraph describing what real-world imagery to use (specific to the prospect's industry) and what to explicitly AVOID (e.g. "no software dashboards, no tech illustrations, no generic stock photos").
+
+   ### Colour Palette
+   Provide at least 6 named colours with hex codes in this exact format:
+   - Background: #XXXXXX
+   - Surface: #XXXXXX
+   - Primary: #XXXXXX
+   - On-Primary: #XXXXXX
+   - Secondary: #XXXXXX
+   - On-Surface: #XXXXXX
+   - On-Surface Variant: #XXXXXX
+   - Outline: rgba(X, X, X, X)
+
+   ### Typography
+   Name a specific headline font (serif or display, e.g. "Playfair Display") and a specific body font (sans-serif, e.g. "Inter"). Include the font category.
+
+   ### Theme Mode
+   State "dark" or "light".
 
 Keep the MVP ruthlessly scoped. An AI agent must be able to implement this in 24 hours.`;
 
