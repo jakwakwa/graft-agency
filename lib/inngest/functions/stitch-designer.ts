@@ -167,6 +167,8 @@ export const stitchDesignerFunction = inngest.createFunction(
       }),
     );
 
+    const chosenIndex = Math.floor(Math.random() * Math.min(3, designConcepts.length));
+
     await step.run("save-designs", () =>
       transitionStage({
         leadId,
@@ -174,14 +176,14 @@ export const stitchDesignerFunction = inngest.createFunction(
         source: "stitch-designer",
         data: {
           designConcepts: designConcepts as unknown as Prisma.InputJsonValue,
-          chosenDesign: 0,
+          chosenDesign: chosenIndex,
         },
       }),
     );
 
     await step.sendEvent("emit-design-complete", {
       name: "engagement/design.completed",
-      data: { leadId, clientId, profiledNeeds, prdContent, designConcepts, chosenDesignIndex: 0 },
+      data: { leadId, clientId, profiledNeeds, prdContent, designConcepts, chosenDesignIndex: chosenIndex },
     });
 
     return { leadId, stage: "DESIGN_COMPLETE", conceptCount: designConcepts.length };

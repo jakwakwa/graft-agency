@@ -216,7 +216,7 @@ export async function generateDesignConcepts(request: StitchDesignRequest): Prom
     ? stitch.project(existingId)
     : await stitch.createProject(request.productName.slice(0, 80));
 
-  const base = await project.generate(buildBasePrompt(request), "DESKTOP");
+  const base = await project.generate(buildBasePrompt(request), "DESKTOP", "GEMINI_3_PRO");
 
   const variantInstruction = [
     "Create three meaningfully different visual treatments for the same product goals and content.",
@@ -235,9 +235,10 @@ export async function generateDesignConcepts(request: StitchDesignRequest): Prom
     {
       variantCount: 3,
       creativeRange: "EXPLORE",
-      aspects: ["COLOR_SCHEME", "LAYOUT", "TEXT_CONTENT"],
+      aspects: ["TEXT_FONT", "IMAGES", "LAYOUT"],
     },
     "DESKTOP",
+    "GEMINI_3_PRO",
   );
 
   if (screens.length < 1) {
