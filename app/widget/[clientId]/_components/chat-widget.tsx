@@ -19,7 +19,7 @@ interface ChatWidgetProps {
 }
 
 function generateSessionId() {
-  return `graft-today-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+  return `graft-today-${Date.now()}-${crypto.randomUUID()}`;
 }
 
 export function ChatWidget({
