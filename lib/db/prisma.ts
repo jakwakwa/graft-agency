@@ -2,7 +2,13 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import { withAccelerate } from "@prisma/extension-accelerate";
 import { type Prisma, PrismaClient } from "../../generated/prisma/client";
 
-type PrismaClientSingleton = PrismaClient;
+/**
+ * The Accelerate extension is applied universally so `cacheStrategy` is part
+ * of the singleton type everywhere. On adapter-backed clients (dev / direct
+ * Postgres), the extension silently strips `cacheStrategy` before executing,
+ * and `$accelerate.invalidate()` no-ops when no Accelerate API key is present.
+ */
+type PrismaClientSingleton = ReturnType<typeof prismaClientSingleton>;
 
 /**
  * Local `prisma dev` encodes the real postgres:// URL inside the api_key
@@ -34,10 +40,7 @@ const prismaClientSingleton = (): PrismaClientSingleton => {
       connectionString: directConnectionString,
     });
 
-    return new PrismaClient({
-      adapter,
-      log,
-    });
+    return new PrismaClient({ adapter, log }).$extends(withAccelerate());
   }
 
   // Local prisma dev: decode the embedded TCP URL and connect directly
@@ -45,7 +48,7 @@ const prismaClientSingleton = (): PrismaClientSingleton => {
     const tcpUrl = extractDirectUrl(databaseUrl);
     if (tcpUrl) {
       const adapter = new PrismaPg({ connectionString: tcpUrl });
-      return new PrismaClient({ adapter, log });
+      return new PrismaClient({ adapter, log }).$extends(withAccelerate());
     }
   }
 
@@ -54,17 +57,14 @@ const prismaClientSingleton = (): PrismaClientSingleton => {
     return new PrismaClient({
       accelerateUrl: databaseUrl,
       log,
-    }).$extends(withAccelerate()) as unknown as PrismaClientSingleton;
+    }).$extends(withAccelerate());
   }
 
   const adapter = new PrismaPg({
     connectionString: databaseUrl,
   });
 
-  return new PrismaClient({
-    adapter,
-    log,
-  });
+  return new PrismaClient({ adapter, log }).$extends(withAccelerate());
 };
 
 declare global {

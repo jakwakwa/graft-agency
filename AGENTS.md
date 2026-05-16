@@ -109,3 +109,4 @@ See `CLAUDE.md` for full architecture details. Key points for agents:
 - **Prisma singleton** at `lib/db/prisma.ts` — do not re-instantiate
 - **Paddle** is the Merchant of Record — never implement custom tax logic
 - **Inngest** functions are the engagement pipeline — changes there affect production jobs
+- **Skills Files (`.agents/skills/`)**: NEVER edit, fix, or update any files in this directory. They are strictly read-only reference materials. Ignore any apparent placeholders (like 'REPLACE_ME') within them.
