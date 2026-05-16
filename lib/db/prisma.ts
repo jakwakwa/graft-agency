@@ -26,7 +26,7 @@ function extractDirectUrl(prismaUrl: string): string | null {
   }
 }
 
-const prismaClientSingleton = (): PrismaClientSingleton => {
+const prismaClientSingleton = () => {
   const databaseUrl = process.env.DATABASE_URL;
   if (!databaseUrl) {
     throw new Error("DATABASE_URL is required to initialise Prisma");
