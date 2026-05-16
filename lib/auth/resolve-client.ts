@@ -1,5 +1,6 @@
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import { getPlatformClientId as resolvePlatformClientId } from "@/lib/auth/platform-client";
+import { cacheTags } from "@/lib/db/cache";
 import prisma from "@/lib/db/prisma";
 
 export { getPlatformClientId } from "@/lib/auth/platform-client";
@@ -60,6 +61,11 @@ export async function resolveClientIdFromAuth(): Promise<string | null> {
   const client = await prisma.client.findFirst({
     where: { clerkUserId: userId, deletedAt: null },
     select: { id: true },
+    cacheStrategy: {
+      ttl: 60,
+      swr: 300,
+      tags: [cacheTags.clientByUser(userId)],
+    },
   });
   if (client) return client.id;
 
@@ -77,6 +83,11 @@ export async function hasPlatformAccess(): Promise<boolean> {
   const client = await prisma.client.findUnique({
     where: { id: clientId },
     select: { isPlatformOwner: true, isReseller: true },
+    cacheStrategy: {
+      ttl: 60,
+      swr: 300,
+      tags: [cacheTags.client(clientId)],
+    },
   });
   return (client?.isPlatformOwner ?? false) || (client?.isReseller ?? false);
 }
@@ -92,6 +103,11 @@ export async function hasChatbotAccess(): Promise<boolean> {
   const client = await prisma.client.findUnique({
     where: { id: clientId },
     select: { isPlatformOwner: true },
+    cacheStrategy: {
+      ttl: 60,
+      swr: 300,
+      tags: [cacheTags.client(clientId)],
+    },
   });
   return client?.isPlatformOwner ?? false;
 }
@@ -109,6 +125,11 @@ export async function requirePlatformAccess(): Promise<
   const client = await prisma.client.findFirst({
     where: { clerkUserId: userId, deletedAt: null },
     select: { id: true, isPlatformOwner: true, isReseller: true },
+    cacheStrategy: {
+      ttl: 60,
+      swr: 300,
+      tags: [cacheTags.clientByUser(userId)],
+    },
   });
 
   if (!client) return { error: "Unauthorized", status: 401 };
@@ -126,6 +147,11 @@ export async function requirePlatformOwnerAccess(): Promise<
   const client = await prisma.client.findFirst({
     where: { clerkUserId: userId, deletedAt: null },
     select: { id: true, isPlatformOwner: true },
+    cacheStrategy: {
+      ttl: 60,
+      swr: 300,
+      tags: [cacheTags.clientByUser(userId)],
+    },
   });
 
   if (!client) return { error: "Unauthorized", status: 401 };

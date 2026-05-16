@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { cacheTags, invalidateCacheTags } from "@/lib/db/cache";
 import prisma from "@/lib/db/prisma";
 import { paddle } from "@/lib/paddle";
 
@@ -47,10 +48,18 @@ export async function applyClerkOrganizationWebhook(
     if (!parsed.success) {
       throw new Error("Invalid Clerk organization deleted payload");
     }
+    const affectedOrg = await prisma.client.findMany({
+      where: { clerkOrganizationId: parsed.data.id, deletedAt: null },
+      select: { id: true, clerkUserId: true },
+    });
     await prisma.client.updateMany({
       where: { clerkOrganizationId: parsed.data.id, deletedAt: null },
       data: { deletedAt: new Date() },
     });
+    const orgTags = affectedOrg
+      .flatMap((c) => [cacheTags.client(c.id), c.clerkUserId ? cacheTags.clientByUser(c.clerkUserId) : null])
+      .filter((t): t is string => t !== null);
+    await invalidateCacheTags(orgTags);
     return { handled: true, action: "soft_deleted", eventType };
   }
 
@@ -108,6 +117,7 @@ export async function applyClerkOrganizationWebhook(
         where: { id: ownerRow.id },
         data: { clerkUserId: userId, email },
       });
+      await invalidateCacheTags([cacheTags.client(ownerRow.id), cacheTags.clientByUser(userId)]);
       return { handled: true, action: "upserted", eventType };
     }
 
@@ -121,6 +131,7 @@ export async function applyClerkOrganizationWebhook(
       },
       update: { email }, // We don't overwrite businessName here as it might be customized in settings
     });
+    await invalidateCacheTags([cacheTags.client(client.id), cacheTags.clientByUser(userId)]);
 
     // Create a Paddle customer for this client if one doesn't exist yet
     if (!client.paddleCustomerId && email) {
@@ -146,10 +157,19 @@ export async function applyClerkOrganizationWebhook(
       throw new Error("Invalid Clerk membership deleted payload");
     }
 
+    const targetUserId = parsed.data.public_user_data.user_id;
+    const affectedMembers = await prisma.client.findMany({
+      where: { clerkUserId: targetUserId, deletedAt: null },
+      select: { id: true },
+    });
     await prisma.client.updateMany({
-      where: { clerkUserId: parsed.data.public_user_data.user_id, deletedAt: null },
+      where: { clerkUserId: targetUserId, deletedAt: null },
       data: { deletedAt: new Date() },
     });
+    await invalidateCacheTags([
+      cacheTags.clientByUser(targetUserId),
+      ...affectedMembers.map((c) => cacheTags.client(c.id)),
+    ]);
 
     return { handled: true, action: "soft_deleted", eventType };
   }

@@ -8,7 +8,12 @@ import { Button } from "@/components/ui-v2/button";
 import { redirectToAccessRequired, requireAuthOrSignIn } from "@/lib/auth/guards";
 import { getPlatformClientId, resolveClientIdFromAuth } from "@/lib/auth/resolve-client";
 import prisma from "@/lib/db/prisma";
+import type { Prisma } from "../../../generated/prisma/client";
 import { calService } from "@/lib/services/cal.service";
+
+type RecentConversation = Prisma.ConversationGetPayload<{
+  include: { lead: { select: { customerName: true; email: true } } };
+}>;
 
 function getConversationSummary(messages: unknown): string {
   if (!Array.isArray(messages)) return "No messages";
@@ -80,7 +85,7 @@ export default async function PortalDashboardPage() {
           },
         },
       },
-    }),
+    }) as unknown as Promise<RecentConversation[]>,
     prisma.agentConfig.findUnique({
       where: { clientId },
       select: { agentName: true },

@@ -48,7 +48,9 @@ export const conversationService = {
     });
   },
 
-  async listForClient(clientId: string) {
+  async listForClient(
+    clientId: string,
+  ): Promise<Prisma.ConversationGetPayload<{ include: { lead: { select: { customerName: true; email: true } } } }>[]> {
     return prisma.conversation.findMany({
       where: { clientId },
       orderBy: { updatedAt: "desc" },
@@ -60,15 +62,18 @@ export const conversationService = {
           },
         },
       },
-    });
+    }) as never;
   },
 
-  async getById(id: string, clientId: string) {
+  async getById(
+    id: string,
+    clientId: string,
+  ): Promise<Prisma.ConversationGetPayload<{ include: { lead: true } }> | null> {
     return prisma.conversation.findFirst({
       where: { id, clientId },
       include: {
         lead: true,
       },
-    });
+    }) as never;
   },
 };

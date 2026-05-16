@@ -1,3 +1,4 @@
+import { cacheTags } from "@/lib/db/cache";
 import prisma from "@/lib/db/prisma";
 import type { Prisma } from "../../generated/prisma/client";
 
@@ -11,7 +12,7 @@ export const PLATFORM_LANDING_WIDGET_DEFAULTS = {
   widgetPrimaryColour: "#E49B57",
 } as const;
 
-type AgentConfigRow = NonNullable<Awaited<ReturnType<typeof prisma.agentConfig.findUnique>>>;
+type AgentConfigRow = Prisma.AgentConfigGetPayload<{}>;
 
 function getOptionalEnv(name: string): string | null {
   const value = process.env[name]?.trim();
@@ -76,6 +77,7 @@ export const agentService = {
   async getConfig(clientId: string): Promise<AgentConfigRow> {
     const config = await prisma.agentConfig.findUnique({
       where: { clientId },
+      cacheStrategy: { ttl: 30, swr: 120, tags: [cacheTags.agentConfig(clientId)] },
     });
     return config ? withCalendarDefaults(config) : createFallbackAgentConfig(clientId);
   },
@@ -88,6 +90,7 @@ export const agentService = {
 
     const config = await prisma.agentConfig.findUnique({
       where: { clientId },
+      cacheStrategy: { ttl: 30, swr: 120, tags: [cacheTags.agentConfig(clientId)] },
     });
 
     if (!config?.knowledgeBase || !Array.isArray(config.knowledgeBase)) {

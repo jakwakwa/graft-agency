@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { resolveClientIdFromAuth } from "@/lib/auth/resolve-client";
+import { cacheTags, invalidateCacheTags } from "@/lib/db/cache";
 import prisma from "@/lib/db/prisma";
 
 const botSettingsSchema = z.object({
@@ -68,6 +69,8 @@ export async function saveBotSettingsAction(formData: FormData) {
       knowledgeBase: data.knowledgeBase ?? [],
     },
   });
+
+  await invalidateCacheTags([cacheTags.agentConfig(clientId)]);
 
   revalidatePath("/portal/settings");
   revalidatePath("/portal/embed");

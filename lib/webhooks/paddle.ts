@@ -1,3 +1,4 @@
+import { cacheTags, invalidateCacheTags } from "@/lib/db/cache";
 import prisma from "@/lib/db/prisma";
 
 type SubscriptionData = {
@@ -103,6 +104,7 @@ async function syncSubscription(
       subscriptionStatus: options.status,
     },
   });
+  await invalidateCacheTags([cacheTags.client(clientId)]);
   return { addons: options.clearAddons ? [] : activeAddons, updated: clientId };
 }
 
