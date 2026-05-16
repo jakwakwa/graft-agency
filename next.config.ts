@@ -4,7 +4,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-  allowedDevOrigins: ['nnkhbzdtto.a.pinggy.link'],
+  allowedDevOrigins: ["grafttoday.a.pinggy.link"],
   images: {
     remotePatterns: [
       {

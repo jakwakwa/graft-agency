@@ -12,7 +12,7 @@ export const processWebhookReceiptFunction = inngest.createFunction(
     name: "Process Webhook Receipt",
     retries: 3,
     idempotency: "event.data.receiptId",
-    concurrency: { limit: 10, key: "event.data.receiptId" },
+    concurrency: { limit: 5, key: "event.data.receiptId" },
     triggers: [{ event: "webhook/receipt.created" }],
   },
   async ({ event, step }) => {

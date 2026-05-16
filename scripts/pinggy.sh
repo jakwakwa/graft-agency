@@ -1,0 +1,1 @@
+ssh -p 443 -R0:localhost:3009 -o StrictHostKeyChecking=no -o ServerAliveInterval=30 -t Y2wIw5NkfCT@pro.pinggy.io \"b:jakwakwa\@gmail\.com:S2pooAky\-n9u\|cy\" x:https \"w:193.186.4.0/24\"
