@@ -54,7 +54,7 @@ export function HeroVideoBackground({ src, poster }: HeroVideoBackgroundProps) {
         autoPlay
         muted
         playsInline
-        
+        loop
         preload="auto"
         poster={poster}
         style={{

@@ -4,7 +4,7 @@ import prisma from "@/lib/db/prisma";
 describe("getPlatformClientId", () => {
   const createdIds: string[] = [];
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.resetModules();
     vi.unstubAllEnvs();
     vi.stubEnv("PLATFORM_CLIENT_ID", "");

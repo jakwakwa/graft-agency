@@ -27,7 +27,7 @@ export async function invalidateCacheTags(tags: readonly string[]): Promise<void
   for (let i = 0; i < unique.length; i += 5) chunks.push(unique.slice(i, i + 5));
   for (const chunk of chunks) {
     try {
-      await prisma.$accelerate.invalidate({ tags: chunk });
+      await (prisma as any).$accelerate?.invalidate({ tags: chunk });
     } catch (err) {
       console.warn("[cache] invalidate failed (non-fatal):", err);
     }

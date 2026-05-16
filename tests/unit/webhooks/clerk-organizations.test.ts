@@ -72,6 +72,9 @@ describe("applyClerkOrganizationWebhook", () => {
       data: { isPlatformOwner: false },
     });
 
+    // Mock count to ensure we hit the bootstrap logic regardless of other tests
+    const countSpy = vi.spyOn(prisma.client, "count").mockResolvedValue(0);
+
     try {
       const result = await applyClerkOrganizationWebhook("organization.created", {
         id: orgId,
@@ -79,6 +82,7 @@ describe("applyClerkOrganizationWebhook", () => {
       });
 
       expect(result).toEqual({ handled: true, action: "upserted", eventType: "organization.created" });
+      countSpy.mockRestore();
 
       const client = await prisma.client.findFirst({ where: { clerkOrganizationId: orgId } });
       expect(client?.isPlatformOwner).toBe(true);

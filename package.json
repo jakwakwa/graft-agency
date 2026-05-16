@@ -20,7 +20,10 @@
     "db:migrate:deploy": "prisma migrate deploy",
     "db:migrate:status": "prisma migrate status",
     "db:status": "prisma migrate status",
-    "db:reset:test": ". .env && DATABASE_URL=$TEST_DATABASE_URL prisma db push --force-reset",
+    "db:seed:test": ". .env && DATABASE_URL=$TEST_DATABASE_URL bun prisma/seed-test.ts",
+    "db:migrate:test": ". .env && DATABASE_URL=$TEST_DATABASE_URL prisma migrate dev",
+    "db:reset:test": ". .env && DATABASE_URL=$TEST_DATABASE_URL prisma migrate reset --force && bun run db:seed:test",
+    "db:studio:test": ". .env && DATABASE_URL=$TEST_DATABASE_URL prisma studio",
     "postinstall": "prisma generate"
   },
   "devDependencies": {

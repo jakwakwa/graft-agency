@@ -12,6 +12,9 @@ vi.mock("@/lib/db/prisma", () => ({
       findUnique: vi.fn().mockResolvedValue(null),
       update: vi.fn(),
     },
+    operationalEvent: {
+      create: vi.fn().mockResolvedValue({ id: "event-1" }),
+    },
   },
 }));
 
