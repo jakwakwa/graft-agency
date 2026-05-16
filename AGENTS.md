@@ -70,7 +70,7 @@ The following test failures exist on `main` and are **not caused by agent change
 2. Run `bun run lint` — fix any Biome errors before committing.
 3. If unit tests unrelated to your change fail, check the table above. If the failure is listed, ignore it and proceed. If it is not listed, investigate before opening a PR.
 
-Required environment variables (including `DATABASE_URL`, `PADDLE_API_KEY`, etc.) are now provided directly to the Jules agent environment. If you encounter these errors, it may indicate a configuration issue or a regression in how secrets are being accessed. Verify your environment before assuming they are "sandbox-only" failures.
+Required environment variables (including `TEST_DATABASE_URL`, `PADDLE_API_KEY`, etc.) are now provided directly to the Jules agent environment. **CRITICAL: You must use `TEST_DATABASE_URL` for all database-related tests.** If you encounter errors, it may indicate a configuration issue or a regression in how secrets are being accessed. Verify your environment before assuming they are "sandbox-only" failures.
 
 ---
 

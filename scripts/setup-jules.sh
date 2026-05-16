@@ -66,7 +66,7 @@ echo ""
 # Variables that unit tests (vitest) REQUIRE to not error out.
 # Missing = test failure not caused by the agent. Warn only.
 REQUIRED_FOR_TESTS=(
-  "DATABASE_URL"
+  "TEST_DATABASE_URL"
   "CLERK_SECRET_KEY"
   "PADDLE_API_KEY"
   "PADDLE_WEBHOOK_SECRET"
