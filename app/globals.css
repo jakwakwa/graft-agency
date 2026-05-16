@@ -96,20 +96,20 @@ a {
   /* Surfaces — tonal depth, no hard borders */
   --card: #2c3b5134;
   --card-foreground: #aab0da;
-  --popover: #3a3232;
-  --popover-foreground: #f49999;
+  --popover: #22202a;
+  --popover-foreground: #ffd7d7;
   --muted: #23272de6;
   --muted-foreground: #b1aeae;
 
-  --primary: #3c81e2e8;
+  --primary: #392fffab;
   --primary-container: #2c2e33;
   --primary-kinetic: hsl(12 87.5% 68.63%);
   --primary-foreground: #f1f5f6;
 
   /* Secondary — soft blossom */
-  --secondary: #fe5555fc;
+  --secondary: #ef6f4cfc;
   --secondary-container: #161b22;
-  --secondary-foreground: #5a86de;
+  --secondary-foreground: #1c60ea;
 
   /* Accent — tangerine */
   --accent: #1477f179;
@@ -417,8 +417,8 @@ a {
   }
 
   a:hover {
-      color: hsl(34, 96%, 80%) !important;
-      background-color: #00000010 !important;
+    color: hsl(34, 96%, 80%) !important;
+    background-color: #00000010 !important;
   }
 
   @media (prefers-reduced-motion: no-preference) {
