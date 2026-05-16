@@ -3,7 +3,7 @@
 // Features: lazy loading, mobile detection, GPU check, fallback, fade-in on load
 //
 // Usage:
-//   <SplineBackground sceneUrl="https://prod.spline.design/XXXXX/scene.splinecode" />
+//   <SplineBackground sceneUrl="https://prod.spline.design/REPLACE_ME/scene.splinecode" />
 
 import { lazy, Suspense, useState, useEffect, useRef } from 'react';
 
