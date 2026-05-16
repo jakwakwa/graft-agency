@@ -51,7 +51,7 @@ bun run test
 - A live `DATABASE_URL` pointing to a real Postgres instance
 - External service credentials (Paddle, Clerk, Inngest, Cal.com, etc.)
 
-These are never available in the Jules sandbox and will always fail. This is expected and does not indicate a regression.
+While environment variables (like `DATABASE_URL`) are now provided to the Jules environment, `test:all` may still encounter issues if a full browser environment (Chromium) is not available. Proceed with caution when running E2E tests.
 
 ### Known pre-existing test failures (do not block PRs)
 
@@ -70,15 +70,7 @@ The following test failures exist on `main` and are **not caused by agent change
 2. Run `bun run lint` — fix any Biome errors before committing.
 3. If unit tests unrelated to your change fail, check the table above. If the failure is listed, ignore it and proceed. If it is not listed, investigate before opening a PR.
 
-### Test failures caused by missing environment variables
-
-If `bun run test` fails with errors like:
-- `missing DATABASE_URL`
-- `Cannot find module '@ai-sdk/google'`
-- `Paddle configuration error`
-- `CLERK_SECRET_KEY is not set`
-
-These are **environment-only issues** in the sandboxed agent environment. They are not regressions. Unit tests that hit these paths are integration-style tests that should be mocked. Do not attempt to install missing packages or set dummy env vars — open the PR and note the failures in the PR description.
+Required environment variables (including `DATABASE_URL`, `PADDLE_API_KEY`, etc.) are now provided directly to the Jules agent environment. If you encounter these errors, it may indicate a configuration issue or a regression in how secrets are being accessed. Verify your environment before assuming they are "sandbox-only" failures.
 
 ---
 

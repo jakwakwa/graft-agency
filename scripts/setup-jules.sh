@@ -93,7 +93,7 @@ MISSING_NICE=0
 
 for var in "${REQUIRED_FOR_TESTS[@]}"; do
   if [[ -z "${!var:-}" ]]; then
-    warn "Missing: $var  ${DIM}(unit tests that need this will fail — expected in sandbox)${RST}"
+    warn "Missing: $var  ${DIM}(unit tests that need this may fail — verify environment config)${RST}"
     MISSING_REQUIRED=$((MISSING_REQUIRED + 1))
   else
     ok "Present: $var"
@@ -113,9 +113,9 @@ done
 
 echo ""
 if [[ $MISSING_REQUIRED -gt 0 ]]; then
-  warn "$MISSING_REQUIRED required env var(s) missing. Test failures for those paths are pre-existing / environment-only — do NOT block a PR for them."
+  warn "$MISSING_REQUIRED required env var(s) missing. Some integration-style unit tests may fail."
 else
-  ok "All required env vars present."
+  ok "All required env vars present (provided by Jules environment)."
 fi
 
 # ── 3. Install dependencies ───────────────────────────────────────────────────
@@ -145,7 +145,7 @@ fi
 sep
 info "Running unit tests (vitest, no E2E)…"
 echo ""
-dim "NOTE: Some tests may fail due to missing credentials in this sandbox."
+dim "NOTE: Environment variables (DATABASE_URL, etc.) are provided to this sandbox."
 dim "Pre-existing known failures (safe to ignore):"
 dim "  • tests/unit/scripts/dev-local-port.test.ts       — source script missing"
 dim "  • tests/unit/scripts/dev-pinggy-resolve.test.ts   — source script missing"
