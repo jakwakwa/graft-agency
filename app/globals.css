@@ -101,7 +101,7 @@ a {
   --muted: #23272de6;
   --muted-foreground: #b1aeae;
 
-  --primary: #32d7f1ab;
+  --primary: #1695f0d4;
   --primary-container: #2c2e33;
   --primary-kinetic: hsl(12 87.5% 68.63%);
   --primary-foreground: #f1f5f6;
@@ -109,7 +109,7 @@ a {
   /* Secondary — soft blossom */
   --secondary: #ef6f4cfc;
   --secondary-container: #161b22;
-  --secondary-foreground: #1c60ea;
+  --secondary-foreground: #f9e5d8;
 
   /* Accent — tangerine */
   --accent: #1477f179;
