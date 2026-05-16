@@ -304,6 +304,8 @@ Omit any business that matches the CRM list by name or website. Return the resul
     const seenInBatchNameKeys = new Set<string>();
     const seenInBatchUrlKeys = new Set<string>();
 
+    const leadsToCreate: any[] = [];
+
     for (const prospect of verifiedProspects) {
       const { nameKey, urlKey } = prospectIdentityKeys(prospect.companyName, prospect.websiteUrl);
 
@@ -323,37 +325,42 @@ Omit any business that matches the CRM list by name or website. Return the resul
         continue;
       }
 
+      leadsToCreate.push({
+        clientId: config.clientId,
+        customerName: prospect.companyName,
+        source: "OUTBOUND_PROSPECT",
+        status: "DRAFT_PENDING",
+        scrapedData: {
+          websiteUrl: prospect.websiteUrl,
+          draftSubject: prospect.draftSubject,
+          draftBody: prospect.draftBody,
+          businessDescription: prospect.auditSummary,
+          hasChatbot: prospect.aiPresence,
+          hasVoiceAgent: false,
+          painPoints: prospect.painPoints,
+          targetOutreachAngle: "",
+          coreServices: [],
+        },
+      });
+
+      if (nameKey.length > 0) {
+        seenInBatchNameKeys.add(nameKey);
+        excludedNameKeys.add(nameKey);
+      }
+      if (urlKey.length > 0) {
+        seenInBatchUrlKeys.add(urlKey);
+        excludedUrlKeys.add(urlKey);
+      }
+    }
+
+    if (leadsToCreate.length > 0) {
       try {
-        await prisma.lead.create({
-          data: {
-            clientId: config.clientId,
-            customerName: prospect.companyName,
-            source: "OUTBOUND_PROSPECT",
-            status: "DRAFT_PENDING",
-            scrapedData: {
-              websiteUrl: prospect.websiteUrl,
-              draftSubject: prospect.draftSubject,
-              draftBody: prospect.draftBody,
-              businessDescription: prospect.auditSummary,
-              hasChatbot: prospect.aiPresence,
-              hasVoiceAgent: false,
-              painPoints: prospect.painPoints,
-              targetOutreachAngle: "",
-              coreServices: [],
-            },
-          },
+        const result = await prisma.lead.createMany({
+          data: leadsToCreate,
         });
-        added++;
-        if (nameKey.length > 0) {
-          seenInBatchNameKeys.add(nameKey);
-          excludedNameKeys.add(nameKey);
-        }
-        if (urlKey.length > 0) {
-          seenInBatchUrlKeys.add(urlKey);
-          excludedUrlKeys.add(urlKey);
-        }
+        added += result.count;
       } catch {
-        errors++;
+        errors += leadsToCreate.length;
       }
     }
 
