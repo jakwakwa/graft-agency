@@ -12,6 +12,11 @@ describe("selectModel", () => {
     expect(model.modelId).toBe("gemini-3-flash-preview");
   });
 
+  it("returns Pro when there is exactly one tool but it is not searchKnowledgeBase", () => {
+    const model = selectModel(["captureLeadDetails"]);
+    expect(model.modelId).toBe("gemini-3.1-pro-preview");
+  });
+
   it("returns Pro for empty tool set", () => {
     const model = selectModel([]);
     expect(model.modelId).toBe("gemini-3.1-pro-preview");
