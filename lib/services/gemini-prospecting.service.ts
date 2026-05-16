@@ -1,5 +1,6 @@
 import { GoogleGenAI, ThinkingLevel, Type } from "@google/genai";
 import prisma from "@/lib/db/prisma";
+import type { Prisma } from "../../generated/prisma/client";
 import {
   normalizeProspectCompanyName,
   normalizeProspectWebsiteUrl,
@@ -304,7 +305,7 @@ Omit any business that matches the CRM list by name or website. Return the resul
     const seenInBatchNameKeys = new Set<string>();
     const seenInBatchUrlKeys = new Set<string>();
 
-    const leadsToCreate: any[] = [];
+    const leadsToCreate: Prisma.LeadCreateManyInput[] = [];
 
     for (const prospect of verifiedProspects) {
       const { nameKey, urlKey } = prospectIdentityKeys(prospect.companyName, prospect.websiteUrl);
@@ -343,24 +344,49 @@ Omit any business that matches the CRM list by name or website. Return the resul
         },
       });
 
-      if (nameKey.length > 0) {
-        seenInBatchNameKeys.add(nameKey);
-        excludedNameKeys.add(nameKey);
-      }
-      if (urlKey.length > 0) {
-        seenInBatchUrlKeys.add(urlKey);
-        excludedUrlKeys.add(urlKey);
-      }
     }
 
     if (leadsToCreate.length > 0) {
       try {
         const result = await prisma.lead.createMany({
           data: leadsToCreate,
+          skipDuplicates: true,
         });
         added += result.count;
+
+        // update tracking sets only for successfully created batches
+        for (const lead of leadsToCreate) {
+          const { nameKey, urlKey } = prospectIdentityKeys(lead.customerName, scrapedDataWebsiteUrl(lead.scrapedData));
+          if (nameKey.length > 0) {
+            seenInBatchNameKeys.add(nameKey);
+            excludedNameKeys.add(nameKey);
+          }
+          if (urlKey.length > 0) {
+            seenInBatchUrlKeys.add(urlKey);
+            excludedUrlKeys.add(urlKey);
+          }
+        }
       } catch {
-        errors += leadsToCreate.length;
+        // fallback to per-row create to preserve partial progress
+        for (const lead of leadsToCreate) {
+          try {
+            await prisma.lead.create({
+              data: lead,
+            });
+            added++;
+            const { nameKey, urlKey } = prospectIdentityKeys(lead.customerName, scrapedDataWebsiteUrl(lead.scrapedData));
+            if (nameKey.length > 0) {
+              seenInBatchNameKeys.add(nameKey);
+              excludedNameKeys.add(nameKey);
+            }
+            if (urlKey.length > 0) {
+              seenInBatchUrlKeys.add(urlKey);
+              excludedUrlKeys.add(urlKey);
+            }
+          } catch {
+            errors++;
+          }
+        }
       }
     }
 
