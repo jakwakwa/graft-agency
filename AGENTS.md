@@ -6,6 +6,26 @@ Agent instructions for this repository (Jules, Codex, and similar automated codi
 
 ---
 
+## First-time Setup
+
+Run the setup script **once** after cloning (or at the start of any new Jules task) to install dependencies, generate the Prisma client, and validate the environment:
+
+```bash
+bash scripts/setup-jules.sh
+```
+
+The script:
+- Checks Bun is available
+- Audits required env vars and warns (non-fatal) about missing ones
+- Runs `bun install --frozen-lockfile`
+- Runs `bunx prisma generate`
+- Runs `bun run lint`
+- Runs `bun run test` and explains pre-existing known failures
+
+After setup, follow the standard workflow below.
+
+---
+
 ## Runtime
 
 Use **Bun** for all commands — not Node.js, npm, or yarn.
