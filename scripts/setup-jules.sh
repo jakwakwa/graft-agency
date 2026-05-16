@@ -119,6 +119,10 @@ fi
 # ── 3. Install dependencies ───────────────────────────────────────────────────
 sep
 info "Installing dependencies with Bun…"
+# Prisma postinstall hook and unit tests require DATABASE_URL.
+# Map Jules's TEST_DATABASE_URL to DATABASE_URL to ensure we use the sandbox DB.
+export DATABASE_URL="$TEST_DATABASE_URL"
+
 bun install --frozen-lockfile
 ok "Dependencies installed"
 
