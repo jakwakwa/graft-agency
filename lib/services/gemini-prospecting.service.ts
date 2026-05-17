@@ -1,5 +1,6 @@
 import { GoogleGenAI, ThinkingLevel, Type } from "@google/genai";
 import prisma from "@/lib/db/prisma";
+import type { Prisma } from "../../generated/prisma/client";
 import {
   normalizeProspectCompanyName,
   normalizeProspectWebsiteUrl,
@@ -304,6 +305,8 @@ Omit any business that matches the CRM list by name or website. Return the resul
     const seenInBatchNameKeys = new Set<string>();
     const seenInBatchUrlKeys = new Set<string>();
 
+    const leadsToCreate: Prisma.LeadCreateManyInput[] = [];
+
     for (const prospect of verifiedProspects) {
       const { nameKey, urlKey } = prospectIdentityKeys(prospect.companyName, prospect.websiteUrl);
 
@@ -323,37 +326,69 @@ Omit any business that matches the CRM list by name or website. Return the resul
         continue;
       }
 
+      leadsToCreate.push({
+        clientId: config.clientId,
+        customerName: prospect.companyName,
+        source: "OUTBOUND_PROSPECT",
+        status: "DRAFT_PENDING",
+        scrapedData: {
+          websiteUrl: prospect.websiteUrl,
+          draftSubject: prospect.draftSubject,
+          draftBody: prospect.draftBody,
+          businessDescription: prospect.auditSummary,
+          hasChatbot: prospect.aiPresence,
+          hasVoiceAgent: false,
+          painPoints: prospect.painPoints,
+          targetOutreachAngle: "",
+          coreServices: [],
+        },
+      });
+
+      if (nameKey.length > 0) {
+        seenInBatchNameKeys.add(nameKey);
+      }
+      if (urlKey.length > 0) {
+        seenInBatchUrlKeys.add(urlKey);
+      }
+    }
+
+    if (leadsToCreate.length > 0) {
       try {
-        await prisma.lead.create({
-          data: {
-            clientId: config.clientId,
-            customerName: prospect.companyName,
-            source: "OUTBOUND_PROSPECT",
-            status: "DRAFT_PENDING",
-            scrapedData: {
-              websiteUrl: prospect.websiteUrl,
-              draftSubject: prospect.draftSubject,
-              draftBody: prospect.draftBody,
-              businessDescription: prospect.auditSummary,
-              hasChatbot: prospect.aiPresence,
-              hasVoiceAgent: false,
-              painPoints: prospect.painPoints,
-              targetOutreachAngle: "",
-              coreServices: [],
-            },
-          },
+        const result = await prisma.lead.createMany({
+          data: leadsToCreate,
+          skipDuplicates: true,
         });
-        added++;
-        if (nameKey.length > 0) {
-          seenInBatchNameKeys.add(nameKey);
-          excludedNameKeys.add(nameKey);
-        }
-        if (urlKey.length > 0) {
-          seenInBatchUrlKeys.add(urlKey);
-          excludedUrlKeys.add(urlKey);
+        added += result.count;
+
+        // update tracking sets only for successfully created batches
+        for (const lead of leadsToCreate) {
+          const { nameKey, urlKey } = prospectIdentityKeys((lead.customerName as string) || "", scrapedDataWebsiteUrl(lead.scrapedData) || "");
+          if (nameKey.length > 0) {
+            excludedNameKeys.add(nameKey);
+          }
+          if (urlKey.length > 0) {
+            excludedUrlKeys.add(urlKey);
+          }
         }
       } catch {
-        errors++;
+        // fallback to per-row create to preserve partial progress
+        for (const lead of leadsToCreate) {
+          try {
+            await prisma.lead.create({
+              data: lead,
+            });
+            added++;
+            const { nameKey, urlKey } = prospectIdentityKeys((lead.customerName as string) || "", scrapedDataWebsiteUrl(lead.scrapedData) || "");
+            if (nameKey.length > 0) {
+              excludedNameKeys.add(nameKey);
+            }
+            if (urlKey.length > 0) {
+              excludedUrlKeys.add(urlKey);
+            }
+          } catch {
+            errors++;
+          }
+        }
       }
     }
 
