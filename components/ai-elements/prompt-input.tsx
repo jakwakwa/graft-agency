@@ -492,7 +492,7 @@ export const PromptInput = ({
 
 
   const validateFiles = useCallback(
-    (fileList: File[] | FileList) => {
+    (fileList: File[] | FileList, currentCount: number = 0) => {
       const incoming = [...fileList];
       const accepted = incoming.filter((f) => matchesAccept(f));
       if (incoming.length && accepted.length === 0) {
@@ -511,26 +511,27 @@ export const PromptInput = ({
         });
         return null;
       }
-      return sized;
+
+      const capacity = typeof maxFiles === "number" ? Math.max(0, maxFiles - currentCount) : undefined;
+      const capped = typeof capacity === "number" ? sized.slice(0, capacity) : sized;
+      if (typeof capacity === "number" && sized.length > capacity) {
+        onError?.({
+          code: "max_files",
+          message: "Too many files. Some were not added.",
+        });
+      }
+
+      return capped;
     },
-    [matchesAccept, maxFileSize, onError],
+    [matchesAccept, maxFileSize, maxFiles, onError],
   );
 
   const addLocal = useCallback(
     (fileList: File[] | FileList) => {
-      const sized = validateFiles(fileList);
-      if (!sized) return;
-
-
       setItems((prev) => {
-        const capacity = typeof maxFiles === "number" ? Math.max(0, maxFiles - prev.length) : undefined;
-        const capped = typeof capacity === "number" ? sized.slice(0, capacity) : sized;
-        if (typeof capacity === "number" && sized.length > capacity) {
-          onError?.({
-            code: "max_files",
-            message: "Too many files. Some were not added.",
-          });
-        }
+        const capped = validateFiles(fileList, prev.length);
+        if (!capped) return prev;
+
         const next: (FileUIPart & { id: string })[] = [];
         for (const file of capped) {
           next.push({
@@ -544,7 +545,7 @@ export const PromptInput = ({
         return [...prev, ...next];
       });
     },
-    [validateFiles, maxFiles, onError],
+    [validateFiles],
   );
 
   const removeLocal = useCallback(
@@ -562,24 +563,15 @@ export const PromptInput = ({
   // Wrapper that validates files before calling provider's add
   const addWithProviderValidation = useCallback(
     (fileList: File[] | FileList) => {
-      const sized = validateFiles(fileList);
-      if (!sized) return;
-
       const currentCount = files.length;
-      const capacity = typeof maxFiles === "number" ? Math.max(0, maxFiles - currentCount) : undefined;
-      const capped = typeof capacity === "number" ? sized.slice(0, capacity) : sized;
-      if (typeof capacity === "number" && sized.length > capacity) {
-        onError?.({
-          code: "max_files",
-          message: "Too many files. Some were not added.",
-        });
-      }
+      const capped = validateFiles(fileList, currentCount);
+      if (!capped) return;
 
       if (capped.length > 0) {
         controller?.attachments.add(capped);
       }
     },
-    [validateFiles, maxFiles, onError, files.length, controller],
+    [validateFiles, files.length, controller],
   );
 
   const clearAttachments = useCallback(
