@@ -344,6 +344,13 @@ Omit any business that matches the CRM list by name or website. Return the resul
         },
       });
 
+      // Track keys immediately to detect in-batch duplicates
+      if (nameKey.length > 0) {
+        seenInBatchNameKeys.add(nameKey);
+      }
+      if (urlKey.length > 0) {
+        seenInBatchUrlKeys.add(urlKey);
+      }
     }
 
     if (leadsToCreate.length > 0) {
