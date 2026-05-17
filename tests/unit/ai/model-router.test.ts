@@ -26,4 +26,9 @@ describe("selectModel", () => {
     const model = selectModel(["searchKnowledgeBase", "captureLeadDetails"]);
     expect(model.modelId).toBe("gemini-3.1-pro-preview");
   });
+
+  it("returns Pro when there are multiple tools and none are searchKnowledgeBase", () => {
+    const model = selectModel(["captureLeadDetails", "bookAppointment", "checkAvailability"]);
+    expect(model.modelId).toBe("gemini-3.1-pro-preview");
+  });
 });
