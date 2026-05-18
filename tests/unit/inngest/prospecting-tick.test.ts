@@ -56,4 +56,12 @@ describe("runProspectingInngestStep", () => {
     const out = await runProspectingInngestStep();
     expect(out).toEqual({ error: true, message: "boom" });
   });
+  it("propagates unexpected errors from the scheduler", async () => {
+    mockGetPlatformClientId.mockResolvedValue("cid-1");
+    mockRunProspectingScheduledJob.mockRejectedValue(new Error("Unexpected DB failure"));
+    const { runProspectingInngestStep } = await import("@/lib/inngest/functions/prospecting-tick");
+
+    await expect(runProspectingInngestStep()).rejects.toThrow("Unexpected DB failure");
+  });
+
 });
