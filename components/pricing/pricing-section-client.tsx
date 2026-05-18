@@ -8,12 +8,12 @@ import { getPreviewItems } from "@/lib/billing/pricing-catalog";
 import { BillingCycleToggle } from "./billing-cycle-toggle";
 import { PricingCard } from "./pricing-card";
 
-interface PaddleConfig {
+export interface PaddleConfig {
   clientToken: string;
   environment: "sandbox" | "production";
 }
 
-interface PricingCustomer {
+export interface PricingCustomer {
   clientId: string;
   email: string;
   subscriptionActive: boolean;
