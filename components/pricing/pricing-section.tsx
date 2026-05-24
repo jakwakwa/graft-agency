@@ -1,16 +1,5 @@
 import { buildPricingCatalog, type PricingCatalog, type PricingMode } from "@/lib/billing/pricing-catalog";
-import { PricingSectionClient } from "./pricing-section-client";
-
-interface PaddleConfig {
-  clientToken: string;
-  environment: "sandbox" | "production";
-}
-
-interface PricingCustomer {
-  clientId: string;
-  email: string;
-  subscriptionActive: boolean;
-}
+import { type PaddleConfig, type PricingCustomer, PricingSectionClient } from "./pricing-section-client";
 
 interface PricingSectionProps {
   catalogue?: PricingCatalog;

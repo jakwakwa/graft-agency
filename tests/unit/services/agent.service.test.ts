@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Prisma } from "@/generated/prisma/client";
-import { agentService } from "@/lib/services/agent.service";
+import { agentService, PLATFORM_LANDING_WIDGET_DEFAULTS, isSyntheticAgentConfig } from "@/lib/services/agent.service";
 
 vi.mock("@/lib/db/prisma", () => ({
   default: {
@@ -32,6 +32,28 @@ describe("agentService", () => {
       updatedAt: new Date(),
     };
   }
+
+  describe("PLATFORM_LANDING_WIDGET_DEFAULTS", () => {
+    it("contains expected default values", () => {
+      expect(PLATFORM_LANDING_WIDGET_DEFAULTS).toEqual({
+        agentName: "GRAFT",
+        greetingMessage: "Hi! I'm GraftBot — how can I help you today?",
+        widgetPrimaryColour: "#E49B57",
+      });
+    });
+  });
+
+  describe("isSyntheticAgentConfig", () => {
+    it("returns true for fallback config id", () => {
+      const syntheticConfig = { id: "00000000-0000-4000-8000-000000000001" } as any;
+      expect(isSyntheticAgentConfig(syntheticConfig)).toBe(true);
+    });
+
+    it("returns false for regular config id", () => {
+      const regularConfig = { id: "regular-uuid-123" } as any;
+      expect(isSyntheticAgentConfig(regularConfig)).toBe(false);
+    });
+  });
 
   describe("getConfig", () => {
     it("returns AgentConfig for valid clientId", async () => {

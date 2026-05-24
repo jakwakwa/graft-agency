@@ -27,4 +27,9 @@ describe("slugFromCompanyName", () => {
     const long = "A".repeat(100);
     expect(slugFromCompanyName(long).length).toBe(40);
   });
+
+  it("does not leave a trailing dash after truncation", () => {
+    const longWithDash = `${"a".repeat(39)}-${"b".repeat(10)}`;
+    expect(slugFromCompanyName(longWithDash)).toBe("a".repeat(39));
+  });
 });

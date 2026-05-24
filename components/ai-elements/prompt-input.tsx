@@ -490,8 +490,9 @@ export const PromptInput = ({
     [accept],
   );
 
-  const addLocal = useCallback(
-    (fileList: File[] | FileList) => {
+
+  const validateFiles = useCallback(
+    (fileList: File[] | FileList, currentCount: number = 0) => {
       const incoming = [...fileList];
       const accepted = incoming.filter((f) => matchesAccept(f));
       if (incoming.length && accepted.length === 0) {
@@ -499,7 +500,7 @@ export const PromptInput = ({
           code: "accept",
           message: "No files match the accepted types.",
         });
-        return;
+        return null;
       }
       const withinSize = (f: File) => (maxFileSize ? f.size <= maxFileSize : true);
       const sized = accepted.filter(withinSize);
@@ -508,18 +509,29 @@ export const PromptInput = ({
           code: "max_file_size",
           message: "All files exceed the maximum size.",
         });
-        return;
+        return null;
       }
 
+      const capacity = typeof maxFiles === "number" ? Math.max(0, maxFiles - currentCount) : undefined;
+      const capped = typeof capacity === "number" ? sized.slice(0, capacity) : sized;
+      if (typeof capacity === "number" && sized.length > capacity) {
+        onError?.({
+          code: "max_files",
+          message: "Too many files. Some were not added.",
+        });
+      }
+
+      return capped;
+    },
+    [matchesAccept, maxFileSize, maxFiles, onError],
+  );
+
+  const addLocal = useCallback(
+    (fileList: File[] | FileList) => {
       setItems((prev) => {
-        const capacity = typeof maxFiles === "number" ? Math.max(0, maxFiles - prev.length) : undefined;
-        const capped = typeof capacity === "number" ? sized.slice(0, capacity) : sized;
-        if (typeof capacity === "number" && sized.length > capacity) {
-          onError?.({
-            code: "max_files",
-            message: "Too many files. Some were not added.",
-          });
-        }
+        const capped = validateFiles(fileList, prev.length);
+        if (!capped) return prev;
+
         const next: (FileUIPart & { id: string })[] = [];
         for (const file of capped) {
           next.push({
@@ -533,7 +545,7 @@ export const PromptInput = ({
         return [...prev, ...next];
       });
     },
-    [matchesAccept, maxFiles, maxFileSize, onError],
+    [validateFiles],
   );
 
   const removeLocal = useCallback(
@@ -551,40 +563,15 @@ export const PromptInput = ({
   // Wrapper that validates files before calling provider's add
   const addWithProviderValidation = useCallback(
     (fileList: File[] | FileList) => {
-      const incoming = [...fileList];
-      const accepted = incoming.filter((f) => matchesAccept(f));
-      if (incoming.length && accepted.length === 0) {
-        onError?.({
-          code: "accept",
-          message: "No files match the accepted types.",
-        });
-        return;
-      }
-      const withinSize = (f: File) => (maxFileSize ? f.size <= maxFileSize : true);
-      const sized = accepted.filter(withinSize);
-      if (accepted.length > 0 && sized.length === 0) {
-        onError?.({
-          code: "max_file_size",
-          message: "All files exceed the maximum size.",
-        });
-        return;
-      }
-
       const currentCount = files.length;
-      const capacity = typeof maxFiles === "number" ? Math.max(0, maxFiles - currentCount) : undefined;
-      const capped = typeof capacity === "number" ? sized.slice(0, capacity) : sized;
-      if (typeof capacity === "number" && sized.length > capacity) {
-        onError?.({
-          code: "max_files",
-          message: "Too many files. Some were not added.",
-        });
-      }
+      const capped = validateFiles(fileList, currentCount);
+      if (!capped) return;
 
       if (capped.length > 0) {
         controller?.attachments.add(capped);
       }
     },
-    [matchesAccept, maxFileSize, maxFiles, onError, files.length, controller],
+    [validateFiles, files.length, controller],
   );
 
   const clearAttachments = useCallback(

@@ -61,4 +61,32 @@ describe("handoffToHuman tool", () => {
     );
     expect(result).toEqual(expect.objectContaining({ status: "flagged" }));
   });
+
+  it("rejects missing reason property", () => {
+    const result = schema.safeParse({
+      urgency: "low",
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects missing urgency property", () => {
+    const result = schema.safeParse({
+      reason: "Needs human",
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("handles leadService.flagForHandoff throwing an error", async () => {
+    const { leadService } = await import("@/lib/services/lead.service");
+    // @ts-ignore
+    leadService.flagForHandoff.mockRejectedValueOnce(new Error("Database connection failed"));
+
+    const execute = executeHandoffToHumanTool();
+    await expect(
+      execute(
+        { reason: "Customer is upset", urgency: "high" as const },
+        { toolCallId: "tc-1", messages: [], abortSignal: new AbortController().signal },
+      ),
+    ).rejects.toThrow("Database connection failed");
+  });
 });

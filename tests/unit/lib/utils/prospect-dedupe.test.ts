@@ -148,4 +148,24 @@ describe("prospectIdentityKeys", () => {
     const result = prospectIdentityKeys("", "");
     expect(result).toEqual({ nameKey: "", urlKey: "" });
   });
+
+  it("handles messy inputs with mixed casing, tabs, and newlines", () => {
+    const result = prospectIdentityKeys(" \tMeSsY \n CoRp  ", "  HTTPS://WwW.MeSsY.CoM/path/  ");
+    expect(result).toEqual({ nameKey: "messy corp", urlKey: "messy.com/path" });
+  });
+
+  it("handles invalid or unparseable URLs as a fallback", () => {
+    const result = prospectIdentityKeys("Fallback Corp", "not a valid url //");
+    expect(result).toEqual({ nameKey: "fallback corp", urlKey: "not a valid url /" });
+  });
+
+  it("handles input with no protocol and trailing slash", () => {
+    const result = prospectIdentityKeys("Trailing Corp", "trailing.com/");
+    expect(result).toEqual({ nameKey: "trailing corp", urlKey: "trailing.com" });
+  });
+
+  it("handles missing website URL with only company name", () => {
+    const result = prospectIdentityKeys("Only Name Corp", "");
+    expect(result).toEqual({ nameKey: "only name corp", urlKey: "" });
+  });
 });
