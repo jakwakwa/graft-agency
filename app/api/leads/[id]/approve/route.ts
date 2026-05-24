@@ -43,7 +43,16 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
       await tx.productSpec.upsert({
         where: { leadId: id },
         create: { leadId: id, clientId, stage: "PENDING" },
-        update: {},
+        update: {
+          stage: "PENDING",
+          inngestRunStatus: null,
+          inngestRunId: null,
+          errorMessage: null,
+          failureReason: null,
+          failureSource: null,
+          failedStage: null,
+          failedAt: null,
+        },
       });
     }
 

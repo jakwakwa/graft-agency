@@ -14,11 +14,7 @@ export const CustomIcon = ({
   fillOpacity?: string;
   viewBox?: string;
 }) => (
-  <svg
-    className={cn("fill-none preserveAspectRatio-none", className)}
-    preserveAspectRatio="none"
-    viewBox={viewBox}
-  >
+  <svg className={cn("fill-none preserveAspectRatio-none", className)} preserveAspectRatio="none" viewBox={viewBox}>
     <path d={path} fill={fill} fillOpacity={fillOpacity} />
   </svg>
 );

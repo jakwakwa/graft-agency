@@ -86,9 +86,31 @@ export const leadProfilerFunction = inngest.createFunction(
     await step.run("mark-profiling", async () => {
       const existing = await prisma.productSpec.findUnique({ where: { leadId }, select: { stage: true } });
       if (!existing) {
-        await prisma.productSpec.create({ data: { leadId, clientId, stage: "PROFILING", errorMessage: null } });
+        await prisma.productSpec.create({
+          data: {
+            leadId,
+            clientId,
+            stage: "PROFILING",
+            errorMessage: null,
+            inngestRunStatus: null,
+            inngestRunId: null,
+          },
+        });
       } else {
-        await transitionStage({ leadId, to: "PROFILING", source: "profiler", data: { errorMessage: null } });
+        await transitionStage({
+          leadId,
+          to: "PROFILING",
+          source: "profiler",
+          data: {
+            errorMessage: null,
+            inngestRunStatus: null,
+            inngestRunId: null,
+            failureReason: null,
+            failureSource: null,
+            failedStage: null,
+            failedAt: null,
+          },
+        });
       }
     });
 

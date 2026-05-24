@@ -34,7 +34,10 @@ function parseColourLines(text: string | undefined): Record<string, string> {
   for (const line of text.split("\n")) {
     const m = line.match(/[-*]\s*\*?\*?(.+?)\*?\*?\s*:\s*(#[0-9A-Fa-f]{3,8}|rgba?\([^)]+\))/);
     if (m?.[1] && m[2]) {
-      const key = m[1].trim().toLowerCase().replace(/[^a-z]/g, "_");
+      const key = m[1]
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z]/g, "_");
       map[key] = m[2].trim();
     }
   }
@@ -145,9 +148,7 @@ export const stitchDesignerFunction = inngest.createFunction(
       prdContent: string;
     };
 
-    await step.run("mark-designing", () =>
-      transitionStage({ leadId, to: "DESIGNING", source: "stitch-designer" }),
-    );
+    await step.run("mark-designing", () => transitionStage({ leadId, to: "DESIGNING", source: "stitch-designer" }));
 
     const parsed = parseDesignDirection(prdContent, profiledNeeds);
 

@@ -4,7 +4,6 @@ import { Button } from "@/components/ui-v2/button";
 import { Card } from "@/components/ui-v2/card";
 import { Typography } from "@/components/ui/typography";
 
-
 export function HeroDashboardPreview() {
   return (
     <div className="flex w-full justify-center lg:justify-end">

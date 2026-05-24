@@ -36,7 +36,7 @@ const TypographyH3 = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<H
   ({ className, ...props }, ref) => (
     <span
       ref={ref}
-      className={cn("scroll-m-20 font-display mt-6 mb-8 text-2xl font-semibold tracking-tight text-balance", className)}
+      className={cn("scroll-m-20 font-display mt-6 text-2xl font-semibold tracking-tight text-balance", className)}
       {...props}
     />
   ),
@@ -47,7 +47,7 @@ const TypographyH4 = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<H
   ({ className, ...props }, ref) => (
     <h4
       ref={ref}
-      className={cn("scroll-m-20 font-data text-base font-semibold uppercase leading-none text-primary", className)}
+      className={cn("scroll-m-0 font-data font-medium py-1 leading-none text-base  ", className)}
       {...props}
     />
   ),
@@ -84,7 +84,7 @@ TypographyLarge.displayName = "TypographyLarge";
 
 const TypographySmall = React.forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(
   ({ className, ...props }, ref) => (
-    <small ref={ref} className={cn("font-data text-sm leading-none font-medium", className)} {...props} />
+    <small ref={ref} className={cn("font-data text-xs leading-none font-light", className)} {...props} />
   ),
 );
 TypographySmall.displayName = "TypographySmall";

@@ -9,10 +9,9 @@ const bodySchema = z.object({
   action: z.enum(["add", "remove"]),
 });
 
-const ADDON_PRICE_IDS = [
-  process.env.PADDLE_PRICE_VOICE_MONTHLY,
-  process.env.PADDLE_PRICE_BOOKING_MONTHLY,
-].filter(Boolean) as string[];
+const ADDON_PRICE_IDS = [process.env.PADDLE_PRICE_VOICE_MONTHLY, process.env.PADDLE_PRICE_BOOKING_MONTHLY].filter(
+  Boolean,
+) as string[];
 
 export async function POST(req: NextRequest) {
   const { userId } = await auth();

@@ -7,14 +7,7 @@ import { useEffect, useState } from "react";
 import { MarketingShell } from "@/components/layout/marketing-shell";
 import { Typography } from "@/components/ui/typography";
 import { Button } from "@/components/ui-v2/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import {
   Pagination,
   PaginationContent,
@@ -102,11 +95,7 @@ export default function AllProspectsPageClient() {
 
   const getSortIcon = (column: string) => {
     if (sortBy !== column) return <ArrowUpDown className="ml-2 h-4 w-4" />;
-    return sortOrder === "asc" ? (
-      <ArrowUp className="ml-2 h-4 w-4" />
-    ) : (
-      <ArrowDown className="ml-2 h-4 w-4" />
-    );
+    return sortOrder === "asc" ? <ArrowUp className="ml-2 h-4 w-4" /> : <ArrowDown className="ml-2 h-4 w-4" />;
   };
 
   const handleDelete = async (id: string) => {
@@ -141,7 +130,7 @@ export default function AllProspectsPageClient() {
           <PaginationLink href={`?page=1`} isActive={data.page === 1}>
             1
           </PaginationLink>
-        </PaginationItem>
+        </PaginationItem>,
       );
       if (start > 2) items.push(<PaginationEllipsis key="e1" />);
     }
@@ -152,7 +141,7 @@ export default function AllProspectsPageClient() {
           <PaginationLink href={`?page=${i}`} isActive={data.page === i}>
             {i}
           </PaginationLink>
-        </PaginationItem>
+        </PaginationItem>,
       );
     }
 
@@ -163,7 +152,7 @@ export default function AllProspectsPageClient() {
           <PaginationLink href={`?page=${data.pages}`} isActive={data.page === data.pages}>
             {data.pages}
           </PaginationLink>
-        </PaginationItem>
+        </PaginationItem>,
       );
     }
 
@@ -277,9 +266,7 @@ export default function AllProspectsPageClient() {
                         <span
                           className={cn(
                             "inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider",
-                            lead.status === "CLOSED"
-                              ? "bg-muted text-muted-foreground"
-                              : "bg-chart-3/10 text-chart-3"
+                            lead.status === "CLOSED" ? "bg-muted text-muted-foreground" : "bg-chart-3/10 text-chart-3",
                           )}
                         >
                           {lead.status}
@@ -292,7 +279,7 @@ export default function AllProspectsPageClient() {
                             category === "in_progress" && "text-chart-4",
                             category === "complete" && "text-chart-3",
                             category === "failed" && "text-destructive",
-                            category === "not_started" && "text-muted-foreground"
+                            category === "not_started" && "text-muted-foreground",
                           )}
                         >
                           {formatStageLabel(lead.engagementStage)}
@@ -307,9 +294,7 @@ export default function AllProspectsPageClient() {
                             <Link
                               href={`/dashboard/automation/queue/${lead.id}`}
                               aria-label={
-                                lead.customerName
-                                  ? `View details for ${lead.customerName}`
-                                  : "View prospect details"
+                                lead.customerName ? `View details for ${lead.customerName}` : "View prospect details"
                               }
                             >
                               <ChevronRight className="h-4 w-4" />

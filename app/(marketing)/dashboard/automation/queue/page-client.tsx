@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Timer } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { MarketingShell } from "@/components/layout/marketing-shell";
@@ -120,7 +120,11 @@ export default function QueuePage() {
   const qualifiedProspects = leads.filter((lead) => lead.status !== "CLOSED");
   const highlightedLeads = qualifiedProspects.slice(0, 3);
   const foundToday = qualifiedProspects.length;
-  const pitchProgress = config?.cronEnabled ? 84 : 52;
+  const pitchProgress = config?.cronEnabled
+    ? "scheduled"
+    : config?.cronTime
+      ? `${config?.cronTime + " - " + config?.cronFrequency + " " + (config.searchEnabled ? "enabled" : "schedule disabled")}`
+      : "";
 
   return (
     <MarketingShell>
@@ -150,10 +154,10 @@ export default function QueuePage() {
                 <span className="text-xs uppercase tracking-widest text-muted-foreground">
                   Pitching Status Progress
                 </span>
-                <span className="text-lg font-bold text-secondary-foreground">{pitchProgress}%</span>
+                <span className="text-lg font-bold text-secondary-foreground">{pitchProgress}</span>
               </div>
               <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
-                <div className="h-full bg-chart-3" style={{ width: `${pitchProgress}%` }} />
+                <div className="h-full bg-chart-3" style={{ width: `${pitchProgress}` }} />
               </div>
             </div>
             <div className="pointer-events-none absolute right-0 top-0 h-full w-1/2 opacity-20">
@@ -166,18 +170,23 @@ export default function QueuePage() {
               <span className="font-data text-[10px] uppercase tracking-widest text-muted-foreground">
                 Global Scan Depth
               </span>
-              <span className="mt-1 font-headline text-4xl font-bold text-foreground">
-                {Math.max(leads.length * 240, 1200).toLocaleString()}{" "}
-                <span className="text-xs text-secondary-foreground/70">Nodes</span>
+              <span className="mt-1 font-headline text-4xl font-bold text-foreground gap-2 flex items-center">
+                {Math.max(leads.length)}
+                <span className="text-xs text-secondary-foreground/70">Leads</span>
               </span>
-              <div className="mt-4 font-data text-[10px] text-secondary-foreground">+12% FROM PREVIOUS CYCLE</div>
             </div>
             <div className="flex flex-col justify-center rounded-lg border-l-2 border-secondary/40 bg-muted/60 p-6">
               <span className="font-data text-[10px] uppercase tracking-widest text-muted-foreground">
                 Avg Response Latency
               </span>
-              <span className="mt-1 font-headline text-4xl font-bold text-foreground">
-                {config?.cronEnabled ? "18.4" : "28.7"} <span className="text-xs text-secondary-foreground/70">MS</span>
+              <span className="mt-1 font-headline text-4xl font-bold text-foreground flex">
+                {config?.cronEnabled ? "Scheduled Runner" : "Schedule Disabled"}{" "}
+                <span className="text-xs text-secondary-foreground/70">
+                  <span>
+                    {" "}
+                    <Timer />{" "}
+                  </span>
+                </span>
               </span>
               <div className="mt-4 font-data text-[10px] text-chart-1">OPTIMIZED TACTICAL ROUTING</div>
             </div>
@@ -185,7 +194,7 @@ export default function QueuePage() {
         </section>
 
         <section className="grid grid-cols-12 gap-8">
-          <div className="col-span-12 flex h-[500px] flex-col overflow-hidden rounded-xl border border-outline-ghost bg-card lg:col-span-5">
+          <div className="col-span-12 flex h-[500px] flex-col overflow-hidden rounded-xl border border-outline-ghost bg-card lg:col-span-12 hidden">
             <div className="flex items-center justify-between border-b border-outline-ghost bg-muted/40 p-5">
               <div className="flex items-center gap-3">
                 <span className="h-2 w-2 animate-pulse rounded-full bg-primary-kinetic" />
@@ -206,7 +215,7 @@ export default function QueuePage() {
             </div>
           </div>
 
-          <div className="col-span-12 space-y-4 lg:col-span-7">
+          <div className="col-span-12 space-y-4 lg:col-span-12">
             <div className="mb-2 flex items-end justify-between">
               <h3 className="font-display text-lg font-bold text-foreground">High-Intent Targets</h3>
               <Link
@@ -218,8 +227,7 @@ export default function QueuePage() {
             </div>
 
             {(highlightedLeads.length === 0 ? highlightedLeads : leads.slice(0, 15)).map((lead, index) => {
-              const fit = Math.max(91, 99 - index * 4);
-              const statusLabel = index > 0 ? "Queued" : index === 1 ? "Sourcing now" : "No Hits";
+              const statusLabel = lead.status === "CONTACTED" ? "DONE" : "PENDING";
               return (
                 <Link
                   key={lead.id}
@@ -237,7 +245,6 @@ export default function QueuePage() {
                     </p>
                   </div>
                   <div className="text-right">
-                    <div className="text-xs font-bold text-secondary-foreground">{fit}% FIT</div>
                     <div className="mt-1 text-[10px] uppercase text-muted-foreground">{statusLabel}</div>
                   </div>
                   <span className="rounded-sm bg-card p-2 text-foreground transition-colors group-hover:bg-chart-3 group-hover:text-primary-foreground">

@@ -81,7 +81,7 @@ async function loadCrmExclusionSets(clientId: string): Promise<{
 
 async function verifyProspects(
   prospects: ProspectResult[],
-  ai: GoogleGenAI
+  ai: GoogleGenAI,
 ): Promise<{ verified: ProspectResult[]; rejectedCount: number }> {
   if (prospects.length === 0) return { verified: [], rejectedCount: 0 };
 
@@ -109,7 +109,7 @@ async function verifyProspects(
         }
         return { prospect: p, passed: false };
       }
-    })
+    }),
   );
 
   const survivingTierA = tierAResults.filter((r) => r.passed).map((r) => r.prospect);
@@ -161,8 +161,7 @@ ${JSON.stringify(listForGemini, null, 2)}`,
 
     const verified = survivingTierA.filter((p) => {
       const match = results.find(
-        (r) =>
-          normalizeProspectWebsiteUrl(r.websiteUrl) === normalizeProspectWebsiteUrl(p.websiteUrl)
+        (r) => normalizeProspectWebsiteUrl(r.websiteUrl) === normalizeProspectWebsiteUrl(p.websiteUrl),
       );
       return match?.exists && match?.websiteMatchesCompany;
     });

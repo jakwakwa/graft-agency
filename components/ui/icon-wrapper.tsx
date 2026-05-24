@@ -18,16 +18,12 @@ export const IconWrapper = React.forwardRef<HTMLDivElement, IconWrapperProps>(
     return (
       <div
         ref={ref}
-        className={cn(
-          "w-12 h-12 rounded-2xl flex items-center justify-center",
-          bgColors[color],
-          className
-        )}
+        className={cn("w-12 h-12 rounded-2xl flex items-center justify-center", bgColors[color], className)}
         {...props}
       >
         {children}
       </div>
     );
-  }
+  },
 );
 IconWrapper.displayName = "IconWrapper";

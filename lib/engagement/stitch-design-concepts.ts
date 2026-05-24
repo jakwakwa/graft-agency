@@ -163,7 +163,11 @@ function screenLabel(screen: Screen, index: number): string {
   return `Concept ${index + 1}`;
 }
 
-async function screenToDesignConcept(screen: Screen, index: number, request: StitchDesignRequest): Promise<DesignConcept> {
+async function screenToDesignConcept(
+  screen: Screen,
+  index: number,
+  request: StitchDesignRequest,
+): Promise<DesignConcept> {
   const ds = request.designSystem;
   const schemeIndex = index % FALLBACK_SCHEMES.length;
   const fallback = FALLBACK_SCHEMES[schemeIndex];
@@ -222,9 +226,7 @@ export async function generateDesignConcepts(request: StitchDesignRequest): Prom
     "Create three meaningfully different visual treatments for the same product goals and content.",
     `Respect this direction: ${request.styleHint}.`,
     `Cover these areas: ${request.components.join(", ")}.`,
-    request.designSystem?.effects
-      ? `Maintain ${request.designSystem.effects} effects across all variants.`
-      : "",
+    request.designSystem?.effects ? `Maintain ${request.designSystem.effects} effects across all variants.` : "",
     `All variants must feel premium and targeted at ${request.targetAudience}.`,
   ]
     .filter(Boolean)
@@ -246,7 +248,5 @@ export async function generateDesignConcepts(request: StitchDesignRequest): Prom
   }
 
   const take = Math.min(3, screens.length);
-  return Promise.all(
-    screens.slice(0, take).map((screen, i) => screenToDesignConcept(screen, i, request)),
-  );
+  return Promise.all(screens.slice(0, take).map((screen, i) => screenToDesignConcept(screen, i, request)));
 }

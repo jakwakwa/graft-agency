@@ -47,7 +47,7 @@ const ButtonRoot = React.forwardRef<HTMLButtonElement, ButtonProps>(
         </ButtonPrimitive>
       </ButtonContext.Provider>
     );
-  }
+  },
 );
 ButtonRoot.displayName = "ButtonRoot";
 
@@ -61,7 +61,7 @@ const ButtonIcon = React.forwardRef<HTMLSpanElement, React.HTMLAttributes<HTMLSp
         {icon}
       </span>
     );
-  }
+  },
 );
 ButtonIcon.displayName = "ButtonIcon";
 
@@ -72,7 +72,7 @@ const ButtonLabel = React.forwardRef<HTMLSpanElement, React.HTMLAttributes<HTMLS
         {children}
       </span>
     );
-  }
+  },
 );
 ButtonLabel.displayName = "ButtonLabel";
 
@@ -82,11 +82,15 @@ const ButtonSpinner = React.forwardRef<HTMLSpanElement, React.HTMLAttributes<HTM
     if (!isLoading) return null;
 
     return (
-      <span ref={ref} className={cn("inline-flex shrink-0 items-center justify-center animate-spin", className)} {...props}>
+      <span
+        ref={ref}
+        className={cn("inline-flex shrink-0 items-center justify-center animate-spin", className)}
+        {...props}
+      >
         <Loader2 className="w-4 h-4" />
       </span>
     );
-  }
+  },
 );
 ButtonSpinner.displayName = "ButtonSpinner";
 

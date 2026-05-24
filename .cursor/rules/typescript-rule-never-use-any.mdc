@@ -1,6 +1,0 @@
----
-description: 
-alwaysApply: true
----
-
-typescript rule: never use `any` and dont replace with weak solutions. no quickfixes

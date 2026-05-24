@@ -94,7 +94,10 @@ export function NavHeader() {
             )}
 
             {!pathname?.startsWith("/portal") && (
-              <Link href="/portal" className="text-sm font-medium text-secondary transition-colors hover:text-secondary/80">
+              <Link
+                href="/portal"
+                className="text-sm font-medium text-secondary transition-colors hover:text-secondary/80"
+              >
                 My Portal
               </Link>
             )}
