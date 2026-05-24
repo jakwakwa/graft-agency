@@ -12,7 +12,9 @@ import * as dns from "dns";
 const mockLookup = vi.mocked(dns.promises.lookup);
 
 function mockDnsResolve(addresses: string[]) {
-  mockLookup.mockResolvedValue(addresses.map((address) => ({ address, family: address.includes(":") ? 6 : 4 })) as never);
+  mockLookup.mockResolvedValue(
+    addresses.map((address) => ({ address, family: address.includes(":") ? 6 : 4 })) as never,
+  );
 }
 
 const originalFetch = globalThis.fetch;
@@ -147,9 +149,11 @@ describe("safeFetch — redirect handling", () => {
       .mockResolvedValueOnce([{ address: "169.254.169.254", family: 4 }] as never); // redirect target — blocked
 
     // biome-ignore lint/suspicious/noExplicitAny: test mock
-    globalThis.fetch = vi.fn().mockResolvedValue(
-      new Response(null, { status: 302, headers: { location: "http://169.254.169.254/creds" } })
-    ) as any;
+    globalThis.fetch = vi
+      .fn()
+      .mockResolvedValue(
+        new Response(null, { status: 302, headers: { location: "http://169.254.169.254/creds" } }),
+      ) as any;
 
     await expect(safeFetch("https://example.com/redirect")).rejects.toThrow(SsrfRejectedError);
   });
@@ -157,9 +161,9 @@ describe("safeFetch — redirect handling", () => {
   it("rejects after too many redirects", async () => {
     mockDnsResolve(["93.184.216.34"]);
     // biome-ignore lint/suspicious/noExplicitAny: test mock
-    globalThis.fetch = vi.fn().mockResolvedValue(
-      new Response(null, { status: 302, headers: { location: "https://example.com/loop" } })
-    ) as any;
+    globalThis.fetch = vi
+      .fn()
+      .mockResolvedValue(new Response(null, { status: 302, headers: { location: "https://example.com/loop" } })) as any;
 
     await expect(safeFetch("https://example.com/loop")).rejects.toThrow(SsrfRejectedError);
   });

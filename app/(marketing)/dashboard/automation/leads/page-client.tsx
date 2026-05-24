@@ -93,45 +93,37 @@ export default function LeadsPage() {
   const _revenueQualified = qualifiedCount * 7150;
   return (
     <MarketingShell>
-      <div className="grid grid-cols-12 gap-8 px-8">
-        <div className="col-span-12 mt-6 flex flex-col">
-          <h3 className="flex items-center gap-2 font-display text-3xl font-bold text-foreground my-4">
+      <div className="grid grid-cols-14 gap-8 px-8">
+        <div className="col-span-6 mt-6 flex flex-col w-full justify-between">
+          <h3 className="flex items-between w-full justify-center   gap-2 font-display text-3xl font-bold text-foreground my-4">
             Live Pulse
             <div className="h-2 w-2 animate-pulse rounded-full bg-chart-3 mb-2" />
           </h3>
           <span className="font-data text-xs text-muted-foreground mb-8">{activeLeads.length} ACTIVE NOW</span>
 
-          <div className="flex flex-col space-y-3 lg:col-span-6 overflow-hidden">
+          <div className="flex flex-col space-y-3 overflow-hidden">
             {activeLeads.map((lead, i) => (
               <Button
                 key={lead.id}
                 onClick={() => setEditingLead(lead)}
-                className="mx-0 h-15 cursor-pointer border border-transparent bg-card transition-colors hover:border-outline-ghost hover:bg-muted"
+                className="mx-3 h-15 cursor-pointer border border-transparent bg-card transition-colors hover:border-outline-ghost hover:bg-muted"
               >
-                <div className="grid grid-cols-18 h-15 gap-2">
-                  <div className="mb-0 items-center justify-between col-span-11 flex  h-fit">
-                    <div className="flex items-center gap-2 h-auto">
-                      <div className="flex h-4 w-4 flex-col items-center justify-center rounded-sm bg-muted text-muted-foreground">
+                <div className="grid grid-cols-3 h-15 gap-2 w-full">
+                  <div className="mb-0 col-span-3 h-fit w-full">
+                    <div className="flex justify-between items-center gap-2 h-auto">
+                      <div className="flex h-4 w-4 flex-col items-center justify-between rounded-sm bg-muted text-muted-foreground">
                         {lead.customerName?.slice(0, 1)?.toUpperCase() ?? "U"}
                       </div>
-                      <div className="flex flex-col items-start gap-0 justify-center h-15">
+                      <div className="flex flex-row items-center gap-3 justify-between   h-15  col-span-2 w-full">
                         <h4 className="text-xs font-bold">{lead.customerName ?? `Unknown Visitor #${420 + i}`}</h4>
                         <p className="text-[10px] text-muted-foreground">
                           {lead.scrapedData?.websiteUrl ? "LIVE SOURCE" : "AI DETECTED"}
                         </p>
                       </div>
                     </div>
-                    <span className="animate-pulse rounded-sm bg-primary/15 px-2 py-0.5 text-[9px] font-bold uppercase tracking-tighter text-secondary-foreground">
-                      {lead.status === "DRAFT_PENDING" ? "Analyzing" : "Qualified"}
+                    <span className="animate-pulse rounded-sm bg-primary/15 px-2 py-0.5 text-[9px] font-bold uppercase tracking-tighter  text-secondary-foreground">
+                      {lead.status === "DRAFT_PENDING" ? "Pending Decision" : "Qualified"}
                     </span>
-                  </div>
-                  <div className="col-span-7 flex h-15 flex-col justify-center bg-muted/60 p-3">
-                    <p className="overflow-hidden text-[12px] italic text-foreground">
-                      &quot;
-                      {lead.scrapedData?.draftBody?.slice(0, 92) ??
-                        "I'm looking for a white-label solution for my marketing agency..."}
-                      &quot;
-                    </p>
                   </div>
                 </div>
               </Button>

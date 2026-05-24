@@ -33,11 +33,11 @@
   width: 110%;
   height: 110%;
   /* position: relative; */
-/* margin-top: 66px; */
+  /* margin-top: 66px; */
   /* object-fit: cover;   */
   object-position: 20vw 180%;
   filter: brightness(0.85) contrast(3.2) saturate(0.7);
-  opacity: 0.99  !important;
+  opacity: 0.99 !important;
 }
 
 /* Top & bottom gradient mask */
@@ -46,7 +46,14 @@
   inset: 1;
   z-index: 1;
   pointer-events: none;
-  background: linear-gradient(to bottom, #200a0740 0%, #b8675ea1 50%, #4c4b8ff2 75%, hsl(225, 48%, 11%) 90%, #0c101f 110%);
+  background: linear-gradient(
+    to bottom,
+    #200a0740 0%,
+    #b8675ea1 50%,
+    #4c4b8ff2 75%,
+    hsl(225, 48%, 11%) 90%,
+    #0c101f 110%
+  );
 }
 
 /* CRT scanlines */
@@ -80,9 +87,9 @@
   inset: 0;
   z-index: 4;
   pointer-events: none;
-  box-shadow: 
+  box-shadow:
     inset 0 0 110px 40px rgba(95, 28, 6, 0.335),
-    inset 0 0 130px 90px   rgb(6, 0, 30);
+    inset 0 0 130px 90px rgb(6, 0, 30);
 }
 
 /* ── Ambient glow orbs ── */

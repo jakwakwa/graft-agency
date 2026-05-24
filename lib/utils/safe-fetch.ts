@@ -26,7 +26,12 @@ const BLOCKED_IPV4_CIDRS: { base: number; mask: number }[] = [
 
 function ip4ToInt(ip: string): number {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  return ip.split(".").map(Number).reduce((acc, octet) => (acc << 8) | octet, 0) >>> 0;
+  return (
+    ip
+      .split(".")
+      .map(Number)
+      .reduce((acc, octet) => (acc << 8) | octet, 0) >>> 0
+  );
 }
 
 function isBlockedIpv4(addr: string): boolean {
@@ -126,11 +131,7 @@ export function toAbsoluteUrl(raw: string): string | null {
  * For the internal-admin use-case here, the existing pre-check still blocks the vast
  * majority of SSRF vectors; rebinding attacks require DNS control + sub-second TTLs.
  */
-export async function safeFetch(
-  rawUrl: string,
-  init?: Omit<RequestInit, "redirect">,
-  _hops = 0
-): Promise<Response> {
+export async function safeFetch(rawUrl: string, init?: Omit<RequestInit, "redirect">, _hops = 0): Promise<Response> {
   if (_hops > MAX_REDIRECTS) {
     throw new SsrfRejectedError("Too many redirects");
   }

@@ -79,9 +79,7 @@ describe("normalizeProspectWebsiteUrl", () => {
   });
 
   it("preserves multi-segment path", () => {
-    expect(normalizeProspectWebsiteUrl("https://www.example.com/blog/post-1")).toBe(
-      "example.com/blog/post-1"
-    );
+    expect(normalizeProspectWebsiteUrl("https://www.example.com/blog/post-1")).toBe("example.com/blog/post-1");
   });
 
   it("handles http:// protocol", () => {

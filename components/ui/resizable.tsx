@@ -2,11 +2,7 @@
 
 import * as React from "react";
 import { GripVerticalIcon } from "lucide-react";
-import {
-  Group,
-  Panel,
-  Separator,
-} from "react-resizable-panels";
+import { Group, Panel, Separator } from "react-resizable-panels";
 
 import { cn } from "./utils";
 
@@ -21,17 +17,12 @@ function ResizablePanelGroup({
   /** @deprecated Use `orientation` from the underlying Group API */
   direction?: "horizontal" | "vertical";
 }) {
-  const orientation =
-    orientationProp ?? direction ?? "horizontal";
+  const orientation = orientationProp ?? direction ?? "horizontal";
 
   return (
     <Group
       data-slot="resizable-panel-group"
-      className={cn(
-        "group flex h-full w-full",
-        orientation === "vertical" && "flex-col",
-        className,
-      )}
+      className={cn("group flex h-full w-full", orientation === "vertical" && "flex-col", className)}
       orientation={orientation}
       {...props}
     />

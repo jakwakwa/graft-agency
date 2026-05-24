@@ -32,9 +32,7 @@ export async function GET(req: Request) {
   };
 
   const orderBy: Prisma.LeadOrderByWithRelationInput =
-    sortParam === "engagementStage"
-      ? { productSpec: { stage: orderParam } }
-      : { createdAt: orderParam };
+    sortParam === "engagementStage" ? { productSpec: { stage: orderParam } } : { createdAt: orderParam };
 
   if (!isPaginated) {
     const leads = await prisma.lead.findMany({

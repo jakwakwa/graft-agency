@@ -83,11 +83,6 @@ body {
   font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
 .dark {
   /* Base */
   --background: hsla(220 15.79% 11.18% / 0.9);
@@ -412,12 +407,14 @@ a {
     @apply font-sans;
     background: #000000 !important;
   }
+
   a {
-    color: hsl(34, 49%, 91%) !important;
+    font-size: 12px !important;
+    color: hsl(197, 95%, 50%) !important;
   }
 
   a:hover {
-    color: hsl(34, 96%, 80%) !important;
+    color: hsl(34, 92%, 53%) !important;
     background-color: #00000010 !important;
   }
 

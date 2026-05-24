@@ -45,17 +45,10 @@ export function LandingHeroSection() {
   const heroOpacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
 
   return (
-    <section
-      ref={sectionRef}
-      id="hero"
-      className="hero-section"
-    >
+    <section ref={sectionRef} id="hero" className="hero-section">
       {/* ── Video Background Layer ── */}
-      <motion.div
-        className="hero-video-layer"
-        style={{ y: videoY, opacity: heroOpacity }}
-      >
-        <HeroVideoBackground src="/Robot_concierge.mp4" poster={'//Robot_concierge.jpeg/'} />
+      <motion.div className="hero-video-layer" style={{ y: videoY, opacity: heroOpacity }}>
+        <HeroVideoBackground src="/Robot_concierge.mp4" poster={"//Robot_concierge.jpeg/"} />
       </motion.div>
 
       {/* ── Ambient glow orbs ── */}
@@ -66,33 +59,19 @@ export function LandingHeroSection() {
       </div>
 
       {/* ── Content ── */}
-      <motion.div
-        className="hero-content"
-        style={{ y: contentY }}
-      >
+      <motion.div className="hero-content" style={{ y: contentY }}>
         <div className="hero-content__inner">
           {/* Left: text */}
           <div className="hero-text">
             {/* Pill badge */}
-            <motion.div
-              className="hero-badge"
-              variants={FADE_UP}
-              initial="hidden"
-              animate="visible"
-              custom={0}
-            >
+            <motion.div className="hero-badge" variants={FADE_UP} initial="hidden" animate="visible" custom={0}>
               <span className="hero-badge__glow" />
               <Zap className="hero-badge__icon" />
               <span>Hyper-Performance AI Engine</span>
             </motion.div>
 
             {/* Headline */}
-            <motion.h1
-              className="hero-headline"
-              variants={HEADLINE_VARIANTS}
-              initial="hidden"
-              animate="visible"
-            >
+            <motion.h1 className="hero-headline" variants={HEADLINE_VARIANTS} initial="hidden" animate="visible">
               {["THE ASSISTANT"].map((word) => (
                 <motion.span key={word} className="hero-headline__word" variants={WORD_VARIANTS}>
                   {word}{" "}
@@ -100,38 +79,27 @@ export function LandingHeroSection() {
               ))}
               <br />
               {["THAT NEVER"].map((word) => (
-                <motion.span key={word} className="hero-headline__word hero-headline__word--gradient" variants={WORD_VARIANTS}>
+                <motion.span
+                  key={word}
+                  className="hero-headline__word hero-headline__word--gradient"
+                  variants={WORD_VARIANTS}
+                >
                   {word}{" "}
                 </motion.span>
               ))}
-              <motion.span
-                className="hero-headline__word hero-headline__word--gradient"
-                variants={WORD_VARIANTS}
-              >
-                 SLEEPS.
+              <motion.span className="hero-headline__word hero-headline__word--gradient" variants={WORD_VARIANTS}>
+                SLEEPS.
               </motion.span>
             </motion.h1>
 
             {/* Subtitle */}
-            <motion.p
-              className="hero-subtitle"
-              variants={FADE_UP}
-              initial="hidden"
-              animate="visible"
-              custom={0.7}
-            >
-              While your competitors close for the night, GRAFT continues to capture leads,
-              qualify prospects, and scale your brand with zero-latency precision.
+            <motion.p className="hero-subtitle" variants={FADE_UP} initial="hidden" animate="visible" custom={0.7}>
+              While your competitors close for the night, GRAFT continues to capture leads, qualify prospects, and scale
+              your brand with zero-latency precision.
             </motion.p>
 
             {/* CTA buttons */}
-            <motion.div
-              className="hero-cta-group"
-              variants={FADE_UP}
-              initial="hidden"
-              animate="visible"
-              custom={0.9}
-            >
+            <motion.div className="hero-cta-group" variants={FADE_UP} initial="hidden" animate="visible" custom={0.9}>
               <button type="button" className="hero-cta hero-cta--primary">
                 <span className="hero-cta__shimmer" />
                 Initialize Graft
@@ -142,13 +110,7 @@ export function LandingHeroSection() {
             </motion.div>
 
             {/* Stats */}
-            <motion.div
-              className="hero-stats"
-              variants={FADE_UP}
-              initial="hidden"
-              animate="visible"
-              custom={1.1}
-            >
+            <motion.div className="hero-stats" variants={FADE_UP} initial="hidden" animate="visible" custom={1.1}>
               {[
                 { value: "0ms", label: "Latency" },
                 { value: "99.9%", label: "Reliance" },

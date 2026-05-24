@@ -20,7 +20,9 @@ export function LandingSiteFooter() {
           </div>
 
           <div>
-            <Typography.H4 className="mb-6 text-xs font-bold tracking-wider text-white uppercase">Solutions</Typography.H4>
+            <Typography.H4 className="mb-6 text-xs font-bold tracking-wider text-white uppercase">
+              Solutions
+            </Typography.H4>
             <ul className="space-y-4">
               {LANDING_HEADER_SECTIONS.map((item) => (
                 <li key={item.id}>
@@ -33,7 +35,9 @@ export function LandingSiteFooter() {
           </div>
 
           <div>
-            <Typography.H4 className="mb-6 text-xs font-bold tracking-wider text-white uppercase">Company</Typography.H4>
+            <Typography.H4 className="mb-6 text-xs font-bold tracking-wider text-white uppercase">
+              Company
+            </Typography.H4>
             <ul className="space-y-4">
               <li>
                 <LandingSectionLink sectionId="lead-capture" className={footerLinkClass}>

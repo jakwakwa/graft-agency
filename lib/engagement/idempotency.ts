@@ -1,9 +1,5 @@
 import prisma from "@/lib/db/prisma";
-import {
-  createJulesSession,
-  findJulesSessionByLeadTag,
-  type JulesSession,
-} from "@/lib/services/jules-github.service";
+import { createJulesSession, findJulesSessionByLeadTag, type JulesSession } from "@/lib/services/jules-github.service";
 import {
   canProvisionRenderService,
   findRenderServiceByName,
@@ -100,7 +96,12 @@ export async function ensureRenderService(params: {
 
   if (existing?.renderServiceId) {
     return {
-      service: { serviceId: existing.renderServiceId, serviceName: `prospect-${companySlug}`, serviceUrl: null, raw: {} },
+      service: {
+        serviceId: existing.renderServiceId,
+        serviceName: `prospect-${companySlug}`,
+        serviceUrl: null,
+        raw: {},
+      },
       created: false,
     };
   }

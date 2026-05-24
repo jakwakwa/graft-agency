@@ -4,9 +4,6 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { MarketingShell } from "@/components/layout/marketing-shell";
-import { Button } from "@/components/ui-v2/button";
-import { isTerminalStage } from "@/lib/utils/engagement-stages";
-import { EngagementPanel } from "./_components/engagement-panel";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,6 +15,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui-v2/button";
+import { isTerminalStage } from "@/lib/utils/engagement-stages";
+import { EngagementPanel } from "./_components/engagement-panel";
 
 interface ScrapedData {
   websiteUrl?: string;
@@ -155,7 +155,13 @@ export default function QueueDetailPage() {
 
   useEffect(() => {
     if (engagementLoading) return;
-    if (!statusUnavailable && engagementStatus && isTerminalStage(engagementStatus.stage)) return;
+
+    const isTerminal = !statusUnavailable && engagementStatus && isTerminalStage(engagementStatus.stage);
+    const isNotStarted = engagementStatus?.stage === "NOT_STARTED";
+    const isCompleted = engagementStatus?.inngestRunStatus === "Completed";
+    const isFailed = engagementStatus?.inngestRunStatus === "Failed";
+
+    if (isTerminal || isNotStarted || isCompleted || isFailed) return;
 
     const interval = setInterval(async () => {
       try {
@@ -164,7 +170,15 @@ export default function QueueDetailPage() {
           const data: EngagementStatus = await res.json();
           setEngagementStatus(data);
           setStatusUnavailable(false);
-          if (isTerminalStage(data.stage)) clearInterval(interval);
+
+          const nextIsTerminal = isTerminalStage(data.stage);
+          const nextIsNotStarted = data.stage === "NOT_STARTED";
+          const nextIsCompleted = data.inngestRunStatus === "Completed";
+          const nextIsFailed = data.inngestRunStatus === "Failed";
+
+          if (nextIsTerminal || nextIsNotStarted || nextIsCompleted || nextIsFailed) {
+            clearInterval(interval);
+          }
         } else {
           setStatusUnavailable(true);
         }
@@ -260,10 +274,7 @@ export default function QueueDetailPage() {
   // While status is still loading (engagementStatus === null) or temporarily unavailable,
   // show the button — the approve endpoint is idempotent and handles the "already running" case.
   const pipelineIsKnownRunning =
-    engagementStatus !== null &&
-    !statusUnavailable &&
-    stage !== "PENDING" &&
-    stage !== "NOT_STARTED";
+    engagementStatus !== null && !statusUnavailable && stage !== "PENDING" && stage !== "NOT_STARTED";
 
   const canApprove = leadIsApprovable && !pipelineIsKnownRunning;
 
