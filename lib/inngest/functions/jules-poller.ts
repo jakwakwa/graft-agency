@@ -77,36 +77,40 @@ export const julesPollerFunction = inngest.createFunction(
       await step.run("approve-jules-plan", async () => {
         await approveJulesPlan(julesSessionId);
       });
-      await step.sendEvent("requeue-after-plan-approval", {
-        name: "engagement/build.poll.tick",
-        data: {
-          leadId,
-          githubRepo,
-          julesSessionId,
-          pollCycle: (pollCycle ?? 0) + 1,
-        },
-      });
+      if (process.env.INNGEST_POLLING_ENABLED !== "false") {
+        await step.sendEvent("requeue-after-plan-approval", {
+          name: "engagement/build.poll.tick",
+          data: {
+            leadId,
+            githubRepo,
+            julesSessionId,
+            pollCycle: (pollCycle ?? 0) + 1,
+          },
+        });
+      }
       return {
         leadId,
-        outcome: "approved-plan" as const,
+        outcome: process.env.INNGEST_POLLING_ENABLED === "false" ? ("paused" as const) : ("approved-plan" as const),
         julesState: session.state,
         pollCycle: (pollCycle ?? 0) + 1,
       };
     }
 
     if (!isJulesTerminalState(session.state)) {
-      await step.sendEvent("requeue-poll", {
-        name: "engagement/build.poll.tick",
-        data: {
-          leadId,
-          githubRepo,
-          julesSessionId,
-          pollCycle: (pollCycle ?? 0) + 1,
-        },
-      });
+      if (process.env.INNGEST_POLLING_ENABLED !== "false") {
+        await step.sendEvent("requeue-poll", {
+          name: "engagement/build.poll.tick",
+          data: {
+            leadId,
+            githubRepo,
+            julesSessionId,
+            pollCycle: (pollCycle ?? 0) + 1,
+          },
+        });
+      }
       return {
         leadId,
-        outcome: "pending" as const,
+        outcome: process.env.INNGEST_POLLING_ENABLED === "false" ? ("paused" as const) : ("pending" as const),
         julesState: session.state,
         pollCycle: (pollCycle ?? 0) + 1,
       };

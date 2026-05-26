@@ -46,6 +46,10 @@ export const engagementReconcilerFunction = inngest.createFunction(
   async ({ event, step }) => {
     // Scheduled cron mode: fan out per-lead reconcile events.
     if (!("leadId" in (event.data ?? {}))) {
+      if (process.env.INNGEST_POLLING_ENABLED === "false") {
+        return { skipped: true, reason: "polling-disabled" };
+      }
+
       const stale = await step.run("find-stale-specs", () =>
         prisma.productSpec.findMany({
           where: {
