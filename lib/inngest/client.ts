@@ -25,7 +25,7 @@ export const inngest = new Inngest({
   id: "graft-agency",
   name: "GRAFT_EVENT_PROD",
   ...(runningOnVercel ? { isDev: false } : {}),
-  eventKey: process.env.GRAFT_INNGEST_EVENT_KEY,
-  signingKey: process.env.GRAFT_INNGEST_SIGNING_KEY,
+  eventKey: process.env.INNGEST_EVENT_KEY,
+  signingKey: process.env.INNGEST_SIGNING_KEY,
   ...(inngestEnv ? { env: inngestEnv } : {}),
 });

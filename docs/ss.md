@@ -137,7 +137,7 @@ Changed file: the canvas only. Verification: `ReadLints` reported no linter er
 ### Inngest / event workflows (**supported**)
 
 * **Serve endpoint**: `app/api/inngest/route.ts` registers `serve({ client: inngest, functions: [...] })` for `GET/POST/PUT` (lines 14–26).
-* **Client**: `lib/inngest/client.ts` (`Inngest` id `graft-agency`, `GRAFT_INNGEST_EVENT_KEY` / `GRAFT_INNGEST_SIGNING_KEY`, Vercel `isDev: false` guard) — lines 24–31.
+* **Client**: `lib/inngest/client.ts` (`Inngest` id `graft-agency`, `INNGEST_EVENT_KEY` / `INNGEST_SIGNING_KEY`, Vercel `isDev: false` guard) — lines 24–31.
 * **Functions** (under `lib/inngest/functions/`): `prospecting-tick`, `lead-profiler`, `prd-writer`, `stitch-designer`, `jules-builder`, `jules-poller`, `offer-dispatcher`, `engagement-reconciler` — re-exported via `lib/inngest/index.ts` and wired in the route above.
 * **Event graph (code references)**:
   * `engagement/lead.approved` — `app/api/leads/[id]/approve/route.ts` (55–58), `app/api/engagement/trigger/[leadId]/route.ts` (18–19).

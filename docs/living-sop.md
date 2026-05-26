@@ -515,8 +515,8 @@ bunx tsc --noEmit
 | `CAL_EVENT_TYPES_API_VERSION` | Cal.com event type listing API version, currently `2024-06-14` |
 | `CAL_WEBHOOK_SECRET` | Cal.com webhook HMAC secret |
 | `RESEND_API_KEY` | Resend email API key |
-| `GRAFT_INNGEST_EVENT_KEY` | Inngest event key |
-| `GRAFT_INNGEST_SIGNING_KEY` | Inngest signing key |
+| `INNGEST_EVENT_KEY` | Inngest event key |
+| `INNGEST_SIGNING_KEY` | Inngest signing key |
 | `CRON_SECRET` | Bearer token for cron endpoints |
 | `NEXT_PUBLIC_APP_URL` | Public app base URL |
 | `OFFER_FROM_EMAIL` | From address for offer emails |
