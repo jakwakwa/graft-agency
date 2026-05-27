@@ -59,7 +59,7 @@ export function HeroVideoBackground({ src, poster }: HeroVideoBackgroundProps) {
         poster={poster}
         style={{
           opacity: isLoaded ? 1 : 0,
-          transition: "opacity 1.2s cubic-bezier(0.22, 1, 0.36, 1)",
+          transition: "opacity 2s cubic-bezier(0.22, 1, 0.36, 1)",
         }}
       >
         <source src={src} type="video/mp4" />
