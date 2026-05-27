@@ -76,7 +76,7 @@ Required environment variables (including `TEST_DATABASE_URL`, `PADDLE_API_KEY`,
 
 ## Code Quality
 
-Always run before committing:
+Always run before committing. Only commit on user approval!
 
 ```bash
 bun run lint      # Biome check (lint + format check)

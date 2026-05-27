@@ -187,6 +187,8 @@ async function screenToDesignConcept(
       }
     : fallback;
 
+    
+
   const [htmlUrl, screenshotUrl] = await Promise.all([
     screen.getHtml().catch(() => undefined),
     screen.getImage().catch(() => undefined),
@@ -204,7 +206,18 @@ async function screenToDesignConcept(
     htmlUrl,
     designSystem: ds,
   };
+
+  
+
 }
+
+async function engageMentPipelineThumbnails(
+  screen: Screen
+) {
+   const screenshot = screen.getImage();
+  return screenshot;
+}
+
 
 // ---------------------------------------------------------------------------
 // Public API

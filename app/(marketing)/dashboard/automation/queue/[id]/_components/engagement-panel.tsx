@@ -135,7 +135,7 @@ function conceptImage(c: Record<string, unknown>): string | undefined {
   return typeof img === "string" && (img.startsWith("http://") || img.startsWith("https://")) ? img : undefined;
 }
 
-/** Google User Content often 429s direct browser loads; serve through authenticated same-origin proxy. */
+
 function designConceptPreviewSrc(url: string): string {
   try {
     const u = new URL(url);
@@ -598,11 +598,11 @@ export function EngagementPanel({ status, statusUnavailable = false }: Engagemen
                                       target="_blank"
                                       rel="noopener noreferrer"
                                       className="relative block aspect-video overflow-hidden bg-muted/50"
-                                    >
+                                    >https://lh3.googleusercontent.com/aida/ADBb0uhsWZ9UbsqKqNno8jvifa3oCC_-9n4mDRp26F8EGUMrfn0o7HoJoTfKNGclVsTeiuwRxf3VJm1TcVlDf8ecUvcOW5VHSUioCR85ba3ndHrsuodNzsKnCUJtPgqo0kTx_77uBMOIVhkDySiBUv62glEZeLgbE9nH9dN73Ya0LsijrKvCyWRfYZa3C-sRkXr6ccntrFhDYok8nhZOUBLGypP2noDmETRgcYnDjhrpWmgjbh2L25QCfNU_FbA
                                       <span className="sr-only">Open preview: {name}</span>
                                       {/* biome-ignore lint: Google User Content 429s next/image; src is same-origin proxy */}
                                       <img
-                                        src={designConceptPreviewSrc(image)}
+                                        src={image}
                                         alt=""
                                         width={400}
                                         height={225}
