@@ -410,11 +410,11 @@ body {
 
   a {
     font-size: 12px !important;
-    color: hsl(197, 95%, 50%) !important;
+    color: hsl(233, 33%, 95%) !important;
   }
 
   a:hover {
-    color: hsl(34, 92%, 53%) !important;
+    color: hsl(351, 83%, 60%) !important;
     background-color: #00000010 !important;
   }
 

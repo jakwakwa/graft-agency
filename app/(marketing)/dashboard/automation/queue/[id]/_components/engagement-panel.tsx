@@ -121,7 +121,7 @@ function conceptName(c: Record<string, unknown>): string {
 }
 
 function conceptLink(c: Record<string, unknown>): string | undefined {
-  for (const k of ["htmlUrl", "screenshotUrl", "previewUrl", "imageUrl", "url", "link", "stitchUrl", "figmaUrl"]) {
+  for (const k of ["htmlUrl"]) {
     const v = c[k];
     if (typeof v === "string" && (v.startsWith("http://") || v.startsWith("https://"))) {
       return v;
@@ -135,8 +135,33 @@ function conceptImage(c: Record<string, unknown>): string | undefined {
   return typeof img === "string" && (img.startsWith("http://") || img.startsWith("https://")) ? img : undefined;
 }
 
+function conceptScreenId(c: Record<string, unknown>): string | undefined {
+  const v = c.screenId;
+  return typeof v === "string" && v.length > 0 ? v : undefined;
+}
 
-function designConceptPreviewSrc(url: string): string {
+function conceptProjectId(c: Record<string, unknown>): string | undefined {
+  const v = c.projectId;
+  return typeof v === "string" && v.length > 0 ? v : undefined;
+}
+
+/**
+ * Build the image src for a design concept thumbnail.
+ *
+ * When Stitch screen identifiers are available we route through
+ * `/api/engagement/stitch-image` which re-fetches a **fresh** signed URL via
+ * the Stitch SDK — the original `screenshotUrl` stored in the DB is a
+ * time-limited Google signed URL that expires quickly (hence the 403s).
+ *
+ * Falls back to the old googleusercontent proxy when IDs are missing.
+ */
+function designConceptPreviewSrc(url: string, screenId?: string, projectId?: string): string {
+  // Prefer Stitch SDK re-fetch when we have identifiers (always fresh URL)
+  if (screenId && projectId) {
+    return `/api/engagement/stitch-image?projectId=${encodeURIComponent(projectId)}&screenId=${encodeURIComponent(screenId)}`;
+  }
+
+  // Fallback: proxy through the old googleusercontent image proxy
   try {
     const u = new URL(url);
     if (u.protocol !== "https:") return url;
@@ -291,8 +316,9 @@ function ProfiledNeedsBody({ data }: { data: unknown }) {
 // ------------------------------------------------------- main component ---
 
 export function EngagementPanel({ status, statusUnavailable = false }: EngagementPanelProps) {
-  const [openProfile, setOpenProfile] = useState(true);
-  const [openPrd, setOpenPrd] = useState(true);
+  const [openProfile, setOpenProfile] = useState(false);
+  const [openPrd, setOpenPrd] = useState(false);
+    const [openJules, setOpenJules] = useState(false);
   const [openDesigns, setOpenDesigns] = useState(true);
 
   const stage = status?.stage ?? "NOT_STARTED";
@@ -337,14 +363,24 @@ export function EngagementPanel({ status, statusUnavailable = false }: Engagemen
   return (
     <TooltipProvider>
       <section aria-labelledby="engagement-heading">
-        <Card className="rounded-lg border border-border overflow-hidden">
-          <CardHeader className="flex flex-row items-center justify-between pb-4">
+        <Card className="rounded-xl  border-1 border-white/15 bg-black/15">
+          <CardHeader className="flex flex-row items-center  border-1 border-white/15 bg-black/15 justify-between pb-4">
             <div className="flex flex-col gap-0.5">
-              <Typography.H4 id="engagement-heading" className="mb-0">
+              <Typography.H3 id="engagement-heading" className="mb-0">
                 Engagement Pipeline
-              </Typography.H4>
-              {companyName && <p className="text-sm text-muted-foreground">{companyName}</p>}
+              </Typography.H3>
+ 
+                  {isRunning && status?.updatedAt && (
+                <p className="mt-4 text-muted-foreground" aria-live="polite">
+                  Last updated{" "}
+                  {new Date(status.updatedAt).toLocaleTimeString("en-GB", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </p>
+              )}
             </div>
+            
             <div className="flex items-center gap-3 flex-wrap justify-end">
               <Badge variant={stageBadgeVariant(isFailed, isRunning)}>{formatStageLabel(stage)}</Badge>
               {completionPct > 0 && !isFailed && (
@@ -352,6 +388,7 @@ export function EngagementPanel({ status, statusUnavailable = false }: Engagemen
                   {completionPct}%
                 </span>
               )}
+              
               {status?.inngestRunStatus && (
                 <Badge
                   variant={
@@ -402,7 +439,7 @@ export function EngagementPanel({ status, statusUnavailable = false }: Engagemen
               <p className="text-sm text-muted-foreground">Automation has not run yet. Run the pipeline to begin.</p>
             </CardContent>
           )}
-
+  
           {isPipelineStarted && (
             <CardContent className="pt-0">
               {isFailed && status?.errorMessage && (
@@ -417,29 +454,29 @@ export function EngagementPanel({ status, statusUnavailable = false }: Engagemen
               <div className="relative">
                 <div
                   className="absolute top-5 left-0 right-0 h-[2px] bg-border z-0"
-                  style={{ marginInline: "calc(100% / 12)" }}
+                  style={{ marginInline: "calc(100% / 8)" }}
                 >
                   <div
-                    className="h-full bg-primary transition-all duration-500"
+                    className="h-full bg-white/50 animation-pulse "
                     style={{ width: `${completionPct}%` }}
                   />
                 </div>
 
-                <div className="relative z-10 grid grid-cols-6 gap-2">
+                <div className="relative z-1 grid grid-cols-4">
                   {PIPELINE_STEPS.map((step, index) => {
                     const stepStatus = getStepStatus(index, stage);
-                    const StepIcon = STEP_ICONS[index as 0 | 1 | 2 | 3 | 4 | 5];
+                    const StepIcon = STEP_ICONS[index as 0 | 1 | 2 | 3 | 4 ];
 
                     return (
                       <div key={step.label} className="flex flex-col items-center gap-2 text-center">
                         {stepStatus === "done" && (
-                          <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground">
-                            <Check className="h-4 w-4" strokeWidth={3} />
+                          <div className="w-10 h-10 rounded-full border-2 border-emerald-300 bg-emerald-900 flex items-center justify-center text-primary-foreground">
+                            <Check className="h-4 w-4 text-emerald-50" strokeWidth={4} />
                           </div>
                         )}
 
                         {stepStatus === "current" && !isFailed && (
-                          <div className="w-12 h-12 -mt-1 rounded-full border-2 border-primary bg-card flex items-center justify-center text-primary shadow-[0_0_15px_hsl(var(--primary)/0.3)]">
+                          <div className="w-12 h-12 -mt-1 rounded-full border-2 border-primary bg-blue-950 flex items-center justify-center text-primary shadow-[0_0_15px_hsl(var(--primary)/0.3)]">
                             <StepIcon className="h-5 w-5 motion-safe:animate-pulse" />
                           </div>
                         )}
@@ -478,7 +515,7 @@ export function EngagementPanel({ status, statusUnavailable = false }: Engagemen
                           </p>
                           <p
                             className={`text-xs font-medium leading-tight ${
-                              stepStatus === "pending" ? "text-muted-foreground/60" : "text-foreground"
+                              stepStatus === "pending" ? "text-muted-foreground/90" : "text-foreground"
                             }`}
                           >
                             {step.label}
@@ -493,11 +530,11 @@ export function EngagementPanel({ status, statusUnavailable = false }: Engagemen
               {hasArtifacts && (
                 <>
                   <Separator className="my-4" />
-                  <div className="space-y-2">
+                  <div className="space-y-4">
                     <Collapsible
                       className="rounded-md border border-border/80"
                       onOpenChange={setOpenProfile}
-                      open={openProfile}
+                      open={openProfile }
                     >
                       <CollapsibleTrigger
                         render={
@@ -563,9 +600,9 @@ export function EngagementPanel({ status, statusUnavailable = false }: Engagemen
                         }
                       >
                         <div className="flex items-center gap-2">
-                          <span>Design concepts</span>
+                          <span>Design</span>
                           {typeof status?.chosenDesign === "number" && concepts.length > 0 && (
-                            <Badge variant="outline" className="text-[10px]">
+                            <Badge variant="outline" className="text-[12px] text-amber-200  text-right border-1 border-amber-300">
                               Chosen: #{status.chosenDesign + 1}
                             </Badge>
                           )}
@@ -583,33 +620,49 @@ export function EngagementPanel({ status, statusUnavailable = false }: Engagemen
                               const name = conceptName(c);
                               const link = conceptLink(c);
                               const image = conceptImage(c);
+                              const sId = conceptScreenId(c);
+                              const pId = conceptProjectId(c);
                               const isChosen = status?.chosenDesign === i;
                               return (
                                 <div
                                   key={link ?? `${name}-${i}`}
                                   className={cn(
-                                    "flex flex-col rounded-md border bg-muted/20 overflow-hidden",
+                                    "flex flex-col rounded-md border bg-muted/20 overflow-hidden h-fit max-h-[300px] border-2 border-primary/45 shadow-lg shadow-primary/20",
                                     isChosen && "ring-1 ring-primary",
                                   )}
                                 >
-                                  {image && (
+                                  {(image || (sId && pId)) && (
                                     <a
                                       href={link ?? image}
                                       target="_blank"
                                       rel="noopener noreferrer"
-                                      className="relative block aspect-video overflow-hidden bg-muted/50"
-                                    >https://lh3.googleusercontent.com/aida/ADBb0uhsWZ9UbsqKqNno8jvifa3oCC_-9n4mDRp26F8EGUMrfn0o7HoJoTfKNGclVsTeiuwRxf3VJm1TcVlDf8ecUvcOW5VHSUioCR85ba3ndHrsuodNzsKnCUJtPgqo0kTx_77uBMOIVhkDySiBUv62glEZeLgbE9nH9dN73Ya0LsijrKvCyWRfYZa3C-sRkXr6ccntrFhDYok8nhZOUBLGypP2noDmETRgcYnDjhrpWmgjbh2L25QCfNU_FbA
+                                      className="relative block aspect-portrait overflow-hidden bg-muted/50"
+                                    >
                                       <span className="sr-only">Open preview: {name}</span>
                                       {/* biome-ignore lint: Google User Content 429s next/image; src is same-origin proxy */}
                                       <img
-                                        src={image}
+                                        src={designConceptPreviewSrc(image ?? "", sId, pId)}
                                         alt=""
-                                        width={400}
-                                        height={225}
+                                        width={100}
+                                        height={400}
                                         loading="lazy"
                                         decoding="async"
                                         referrerPolicy="no-referrer"
-                                        className="h-full w-full object-cover"
+                                        className="h-full w-full object-fit"
+                                        onError={(e) => {
+                                          const target = e.currentTarget;
+                                          // Prevent infinite retry loop
+                                          if (!target.dataset.retried) {
+                                            target.dataset.retried = "1";
+                                            // If the stitch-image proxy failed, try the original URL through the old proxy
+                                            if (image && sId && pId) {
+                                              target.src = `/api/engagement/proxy-image?url=${encodeURIComponent(image)}`;
+                                            }
+                                          } else {
+                                            // Both attempts failed — hide the broken image
+                                            target.style.display = "none";
+                                          }
+                                        }}
                                       />
                                     </a>
                                   )}
@@ -641,20 +694,34 @@ export function EngagementPanel({ status, statusUnavailable = false }: Engagemen
                 </>
               )}
 
-              {isRunning && status?.updatedAt && (
-                <p className="mt-4 text-xs text-muted-foreground" aria-live="polite">
-                  Last updated{" "}
-                  {new Date(status.updatedAt).toLocaleTimeString("en-GB", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </p>
-              )}
+        
 
               {showJulesCard && (
+             <Collapsible
+                      className="rounded-md border mt-4 border-border/80"
+                      onOpenChange={setOpenJules}
+                      open={openJules}
+                    >
+                        <CollapsibleTrigger
+                        render={
+                          <Button
+                            className="flex w-full items-center justify-between p-3 text-left text-sm font-medium"
+                            variant="ghost"
+                          />
+                        }
+                        
+                      >
+                         <div className="flex items-center gap-2">
+                          <span>Coding Agent</span>
+                    
+                        </div>
+                        <ChevronDown
+                          className={cn("h-4 w-4 shrink-0 transition-transform", openDesigns && "rotate-180")}
+                        />  </CollapsibleTrigger>
+               
+                <CollapsibleContent className="border-t border-border/80 p-3 data-[state=open]:animate-in">
                 <>
-                  <Separator className="my-4" />
-                  <div className="rounded-md border border-border/80 bg-muted/20 p-3 space-y-3">
+           
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-2">
                         <Hammer className="h-4 w-4 text-muted-foreground" aria-hidden />
@@ -668,9 +735,9 @@ export function EngagementPanel({ status, statusUnavailable = false }: Engagemen
                         {julesState ?? "unknown"}
                       </Badge>
                     </div>
-                    <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1.5 text-xs">
+                    <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4 gap-y-3.5 text-xs">
                       {status?.julesSessionId && (
-                        <div className="flex flex-col">
+                        <div className="flex hidden flex-col gap-4 ">
                           <dt className="font-mono uppercase tracking-wide text-muted-foreground text-[10px]">
                             Session
                           </dt>
@@ -678,7 +745,7 @@ export function EngagementPanel({ status, statusUnavailable = false }: Engagemen
                         </div>
                       )}
                       {julesLastPolledLabel && (
-                        <div className="flex flex-col">
+                        <div className="flex flex-col mt-8">
                           <dt className="font-mono uppercase tracking-wide text-muted-foreground text-[10px]">
                             Last polled
                           </dt>
@@ -687,14 +754,14 @@ export function EngagementPanel({ status, statusUnavailable = false }: Engagemen
                       )}
                       {status?.renderServiceName && (
                         <div className="flex flex-col sm:col-span-2">
-                          <dt className="font-mono uppercase tracking-wide text-muted-foreground text-[10px]">
+                          <dt className="font-mono uppercase tracking-wide text-muted-foreground text-[14px] hidden">
                             Render service
                           </dt>
                           <dd className="truncate font-mono">{status.renderServiceName}</dd>
                         </div>
                       )}
                       {status?.pullRequestUrl && (
-                        <div className="flex flex-col sm:col-span-2">
+                        <div className="flex hidden flex-col sm:col-span-2">
                           <dt className="font-mono uppercase tracking-wide text-muted-foreground text-[10px]">
                             Pull request
                           </dt>
@@ -711,7 +778,7 @@ export function EngagementPanel({ status, statusUnavailable = false }: Engagemen
                         </div>
                       )}
                       {status?.deploymentUrl && (
-                        <div className="flex flex-col sm:col-span-2">
+                        <div className="flex flex-col hidden sm:col-span-2">
                           <dt className="font-mono uppercase tracking-wide text-muted-foreground text-[10px]">
                             Render preview
                           </dt>
@@ -784,8 +851,11 @@ export function EngagementPanel({ status, statusUnavailable = false }: Engagemen
                         directly.
                       </p>
                     )}
-                  </div>
+              
                 </>
+                </CollapsibleContent>
+              
+                 </Collapsible>
               )}
 
               <Separator className="my-4" />

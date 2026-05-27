@@ -8,10 +8,7 @@ export const ENGAGEMENT_STAGE_ORDER = [
   "DESIGNING",
   "DESIGN_COMPLETE",
   "BUILDING",
-  "BUILDING_COMPLETE",
-  "DEPLOYING",
-  "DEPLOYED",
-  "OFFER_SENT",
+  "BUILDING_COMPLETE"
 ] as const;
 
 export type EngagementStageKey = (typeof ENGAGEMENT_STAGE_ORDER)[number] | "FAILED" | "NOT_STARTED";
@@ -28,9 +25,6 @@ export const STAGE_LABELS: Record<string, string> = {
   DESIGN_COMPLETE: "Design Complete",
   BUILDING: "Building",
   BUILDING_COMPLETE: "Building Complete",
-  DEPLOYING: "Deploying",
-  DEPLOYED: "Deployed",
-  OFFER_SENT: "Offer Sent",
   FAILED: "Failed",
 };
 
@@ -42,12 +36,10 @@ export interface PipelineStep {
 }
 
 export const PIPELINE_STEPS: PipelineStep[] = [
-  { label: "Business Understanding", stages: ["PROFILING", "PROFILED"], icon: "Brain" },
-  { label: "Product Brief", stages: ["WRITING_PRD", "PRD_WRITTEN"], icon: "FileText" },
-  { label: "Design Directions", stages: ["DESIGNING", "DESIGN_COMPLETE"], icon: "Palette" },
-  { label: "Build Start", stages: ["BUILDING", "BUILDING_COMPLETE"], icon: "Hammer" },
-  { label: "Go Live", stages: ["DEPLOYING", "DEPLOYED"], icon: "Rocket" },
-  { label: "Commercial Offer", stages: ["OFFER_SENT"], icon: "Handshake" },
+  { label: "Understanding", stages: ["PROFILING", "PROFILED"], icon: "Brain" },
+  { label: "Direction", stages: ["WRITING_PRD", "PRD_WRITTEN"], icon: "FileText" },
+  { label: "Design", stages: ["DESIGNING", "DESIGN_COMPLETE"], icon: "Palette" },
+  { label: "Build", stages: ["BUILDING", "BUILDING_COMPLETE"], icon: "Hammer" }
 ];
 
 /**
@@ -69,11 +61,11 @@ export function getStepIndex(stage: string): number {
  * Step completion:
  *   PENDING / NOT_STARTED        → 0%  (0 steps done)
  *   PROFILING / PROFILED          → 0%  (step 0 is current, 0 done before it)
- *   WRITING_PRD / PRD_WRITTEN     → 17% (1 step done)
- *   DESIGNING / DESIGN_COMPLETE   → 33% (2 steps done)
- *   BUILDING / BUILDING_COMPLETE  → 50% (3 steps done)
- *   DEPLOYING                     → 67% (4 steps done)
- *   DEPLOYED                      → 83% (5 steps done — step 4 "Go Live" done, step 5 pending)
+ *   WRITING_PRD / PRD_WRITTEN     → 20% (1 step done)
+ *   DESIGNING / DESIGN_COMPLETE   → 55% (2 steps done)
+ *   BUILDING / BUILDING_COMPLETE  → 100% (3 steps done)
+ * 
+ * step 5 pending)
  *   OFFER_SENT                    → 100% (all 6 steps done)
  *   FAILED                        → percentage based on how far along the failure occurred
  */
@@ -81,12 +73,8 @@ export function getCompletionPercent(stage: string): number {
   if (stage === "NOT_STARTED" || stage === "PENDING") {
     return 0;
   }
-  if (stage === "OFFER_SENT") {
-    return 100;
-  }
-  if (stage === "DEPLOYED") {
-    return 83;
-  }
+
+ 
   if (stage === "FAILED") {
     return 0;
   }
@@ -95,7 +83,7 @@ export function getCompletionPercent(stage: string): number {
     return 0;
   }
   // Each completed step is worth ~16.67% (100/6)
-  return Math.round((stepIdx / 6) * 100);
+  return Math.round((stepIdx /3) * 100);
 }
 
 /**
@@ -120,9 +108,7 @@ export function isInProgressStage(stage: string): boolean {
   if (
     stage === "NOT_STARTED" ||
     stage === "PENDING" ||
-    stage === "FAILED" ||
-    stage === "DEPLOYED" ||
-    stage === "OFFER_SENT"
+    stage === "FAILED" 
   ) {
     return false;
   }
