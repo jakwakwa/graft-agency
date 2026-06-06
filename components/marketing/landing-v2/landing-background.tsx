@@ -10,7 +10,7 @@ export function LandingBackground() {
         preserveAspectRatio="none"
         viewBox="0 0 979 583"
       >
-        <path d={svgPaths.p53f4d80} fill="#053DB5" fillOpacity="0.45" />
+        <path d={svgPaths.p53f4d80} fill="#2b3550ff" fillOpacity="0.45" />
       </svg>
       <svg
         role="presentation"
@@ -19,8 +19,8 @@ export function LandingBackground() {
         preserveAspectRatio="none"
         viewBox="0 0 1065 623"
       >
-        <path d={svgPaths.p9436980} fill="#F90A22EC" fillOpacity="0.1" />
-        <path d={svgPaths.p9436980} fill="#8C045AD0" fillOpacity="0.45" />
+        <path d={svgPaths.p9436980} fill="#0aa9f9ec" fillOpacity="0.1" />
+        <path d={svgPaths.p9436980} fill="#082122d0" fillOpacity="0.45" />
       </svg>
     </div>
   );

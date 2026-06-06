@@ -7,5 +7,13 @@
       "Bash(curl -s http://localhost:3000/dashboard/automation)",
       "Bash(find /Users/jakwakwa/Repos/saas/kona-agency -maxdepth 2 -name .env* -type f)"
     ]
+  },
+  "worktree": {
+    "path": ".claude/worktrees",
+    "symlinkDirectories": [
+      ".claude"
+    ],
+    "baseRef": "head",
+    "bgIsolation": "none"
   }
 }

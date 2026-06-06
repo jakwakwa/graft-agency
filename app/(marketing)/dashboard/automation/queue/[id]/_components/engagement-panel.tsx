@@ -113,7 +113,9 @@ function asRecord(v: unknown): Record<string, unknown> | null {
 
 function parseDesignConcepts(raw: unknown): Array<Record<string, unknown>> {
   if (!Array.isArray(raw)) return [];
-  return raw.map((c) => asRecord(c) ?? {}).filter((c) => Object.keys(c).length > 0);
+  return raw
+    .map((c) => asRecord(c) ?? {})
+    .filter((c) => Object.keys(c).length > 0 && typeof c.projectId === "string" && c.projectId.length > 0);
 }
 
 function conceptName(c: Record<string, unknown>): string {
@@ -128,6 +130,12 @@ function conceptLink(c: Record<string, unknown>): string | undefined {
     }
   }
   return undefined;
+}
+
+function conceptStitchProjectUrl(c: Record<string, unknown>): string | undefined {
+  const pId = conceptProjectId(c);
+  if (!pId) return undefined;
+  return `https://stitch.withgoogle.com/projects/${encodeURIComponent(pId)}`;
 }
 
 function conceptImage(c: Record<string, unknown>): string | undefined {
@@ -633,7 +641,11 @@ export function EngagementPanel({ status, statusUnavailable = false }: Engagemen
                                 >
                                   {(image || (sId && pId)) && (
                                     <a
-                                      href={link ?? image}
+                                      href={
+                                        sId && pId
+                                          ? `/api/engagement/stitch-html?projectId=${encodeURIComponent(pId)}&screenId=${encodeURIComponent(sId)}`
+                                          : (link ?? image)
+                                      }
                                       target="_blank"
                                       rel="noopener noreferrer"
                                       className="relative block aspect-portrait overflow-hidden bg-muted/50"
@@ -668,18 +680,36 @@ export function EngagementPanel({ status, statusUnavailable = false }: Engagemen
                                   )}
                                   <div className="p-2 space-y-1">
                                     <p className="text-sm font-medium leading-tight">{name}</p>
-                                    {link && (
-                                      <a
-                                        href={link}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
-                                      >
-                                        <ExternalLink className="h-3 w-3" />
-                                        Open link
-                                      </a>
-                                    )}
-                                    {!link && !image && (
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                      {conceptStitchProjectUrl(c) && (
+                                        <a
+                                          href={conceptStitchProjectUrl(c)}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+                                        >
+                                          <ExternalLink className="h-3 w-3" />
+                                          Open in Stitch
+                                        </a>
+                                      )}
+                                      {(sId && pId || link) && (() => {
+                                        const htmlHref = sId && pId
+                                          ? `/api/engagement/stitch-html?projectId=${encodeURIComponent(pId)}&screenId=${encodeURIComponent(sId)}`
+                                          : link;
+                                        return (
+                                          <a
+                                            href={htmlHref}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:underline"
+                                          >
+                                            <ExternalLink className="h-3 w-3" />
+                                            Open HTML
+                                          </a>
+                                        );
+                                      })()}
+                                    </div>
+                                    {!conceptStitchProjectUrl(c) && !link && !image && (
                                       <p className="text-xs text-muted-foreground">No preview URL in payload</p>
                                     )}
                                   </div>

@@ -13,7 +13,7 @@ const buttonVariants = cva(
         gradient:
           "bg-gradient-to-br from-primary-kinetic to-primary text-primary-foreground shadow-ambient hover:brightness-110 focus-visible:ring-offset-2 focus-visible:ring-offset-background [a]:hover:brightness-110",
         destructive:
-          "bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
+          "bg-destructive text-white disabled:destructive/10 hover:bg-destructive/90 focus-visible:ring-destructive/20",
         outline:
           "border bg-background text-foreground hover:bg-accent hover:text-accent-foreground dark:bg-input-background dark:border-input dark:hover:bg-input-background-hover",
         secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",

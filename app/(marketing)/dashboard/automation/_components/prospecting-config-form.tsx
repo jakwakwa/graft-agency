@@ -278,7 +278,7 @@ export function ProspectingConfigForm() {
           </label>
         </div>
 
-        <div className="rounded-xl border border-outline-ghost/20 bg-muted/10 p-6 space-y-4">
+        <div className="rounded-xl border border-outline-ghost/50 bg-muted/50 p-6 space-y-4">
           <div className="flex items-center gap-2">
             <Clock className="h-4 w-4 text-primary" />
             <Typography.Small className="font-medium text-muted-foreground uppercase tracking-wide">

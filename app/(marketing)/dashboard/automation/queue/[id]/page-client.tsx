@@ -15,7 +15,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui-v2/button";
+import { Button } from "@/components/ui/button";
 import { isTerminalStage } from "@/lib/utils/engagement-stages";
 import { EngagementPanel } from "./_components/engagement-panel";
 
@@ -256,7 +256,7 @@ export default function QueueDetailPage() {
   if (!lead) {
     return (
       <div className="min-h-screen bg-background p-8 text-foreground">
-        <Link href="/dashboard/automation/queue" className="text-sm text-muted-foreground hover:text-foreground">
+        <Link href="/dashboard/automation/queue" className=" text-muted-foreground hover:text-foreground">
           ← Prospect Queue
         </Link>
         <p className="mt-4 text-muted-foreground">Prospect not found.</p>
@@ -282,9 +282,10 @@ export default function QueueDetailPage() {
     <MarketingShell>
       <div className="mx-auto max-w-5xl p-8 space-y-6">
         <div className="flex items-center justify-between">
-          <Link href="/dashboard/automation/queue" className="text-sm text-muted-foreground hover:text-foreground">
+          <Button variant={"default"} size={"sm"}>
+          <Link href="/dashboard/automation/queue" className="text-white text-shadow-sm  hover:text-foreground text-sm font-bold">
             ← Prospect Queue
-          </Link>
+          </Link>       </Button>
           <div className="flex gap-2">
             {canApprove && (
               <Button
@@ -297,7 +298,8 @@ export default function QueueDetailPage() {
             )}
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button className="rounded-lg bg-muted px-4 py-2 text-xs font-bold uppercase tracking-tighter text-muted-foreground hover:bg-muted/80">
+                <Button 
+                variant="destructive" >
                   Discard
                 </Button>
               </AlertDialogTrigger>
