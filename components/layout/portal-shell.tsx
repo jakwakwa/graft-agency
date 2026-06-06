@@ -5,7 +5,6 @@ import { CalendarDays, Code, CreditCard, LayoutDashboard, MessageSquare, Setting
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
-import { Badge } from "../ui/badge";
 
 interface PortalShellProps {
   children: ReactNode;
@@ -20,7 +19,7 @@ export function PortalShell({ children }: PortalShellProps) {
     { href: "/portal/bookings", label: "Bookings", icon: CalendarDays },
     { href: "/portal/settings", label: "Bot Settings", icon: Settings },
     { href: "/portal/embed", label: "Embed Code", icon: Code },
-    { href: "/portal/billing", label: "Billing", icon: CreditCard, comingSoon: true },
+    { href: "/portal/billing", label: "Billing", icon: CreditCard },
   ];
 
   return (
@@ -67,11 +66,6 @@ export function PortalShell({ children }: PortalShellProps) {
                   className={`h-4 w-4 ${isActive ? "text-primary" : "group-hover:text-primary transition-colors"}`}
                 />
                 <span className="flex-1">{link.label}</span>
-                {link.comingSoon && (
-                  <Badge variant="default" className="gap-1.5">
-                    Soon
-                  </Badge>
-                )}
               </Link>
             );
           })}

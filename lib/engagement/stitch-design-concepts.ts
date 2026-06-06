@@ -250,7 +250,8 @@ export async function generateDesignConcepts(request: StitchDesignRequest): Prom
     {
       variantCount: 3,
       creativeRange: "EXPLORE",
-      aspects: ["TEXT_FONT", "IMAGES", "LAYOUT"],
+      // SDK type is malformed — `aspects` should be Array<aspect> but is typed as `"TEXT_CONTENT"[]`
+      aspects: ["TEXT_FONT", "IMAGES", "LAYOUT"] as unknown as "TEXT_CONTENT"[],
     },
     "DESKTOP",
     "GEMINI_3_PRO",

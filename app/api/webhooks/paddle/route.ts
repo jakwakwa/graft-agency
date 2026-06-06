@@ -1,29 +1,8 @@
-import { createHash, createHmac, timingSafeEqual } from "node:crypto";
 import type { NextRequest } from "next/server";
+import { paddle } from "@/lib/paddle";
 import { inngest } from "@/lib/inngest/client";
 import { webhookReceiptService } from "@/lib/services/webhook-receipt.service";
 import type { Prisma } from "../../../../generated/prisma/client";
-
-function verifyPaddleSignature(body: string, signature: string, secret: string): boolean {
-  const parts = signature.split(";");
-  let ts = "";
-  let h1 = "";
-  for (const part of parts) {
-    const [key, value] = part.split("=");
-    if (key === "ts") ts = value ?? "";
-    if (key === "h1") h1 = value ?? "";
-  }
-  if (!ts || !h1) return false;
-
-  const payload = `${ts}:${body}`;
-  const expected = createHmac("sha256", secret).update(payload).digest("hex");
-  if (expected.length !== h1.length) return false;
-  try {
-    return timingSafeEqual(Buffer.from(expected, "hex"), Buffer.from(h1, "hex"));
-  } catch {
-    return false;
-  }
-}
 
 export async function POST(req: NextRequest) {
   const secret = process.env.PADDLE_WEBHOOK_SECRET;
@@ -37,23 +16,29 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.text();
-  if (!verifyPaddleSignature(body, signature, secret)) {
+
+  let eventId: string;
+  let eventType: string;
+  try {
+    const event = await paddle.webhooks.unmarshal(body, secret, signature);
+    eventId = event.eventId;
+    eventType = event.eventType;
+  } catch {
     return Response.json({ error: "Invalid signature" }, { status: 401 });
   }
 
-  let payload: { event_type?: string; data?: unknown };
+  let payload: Prisma.InputJsonValue;
   try {
-    payload = JSON.parse(body) as typeof payload;
+    payload = JSON.parse(body) as Prisma.InputJsonValue;
   } catch {
     return Response.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
   try {
-    const eventType = payload.event_type ?? "unknown";
     const receipt = await webhookReceiptService.recordVerifiedReceipt({
-      eventId: resolvePaddleEventId(payload, body),
+      eventId,
       eventType,
-      payload: JSON.parse(JSON.stringify(payload)) as Prisma.InputJsonValue,
+      payload,
       provider: "PADDLE",
     });
 
@@ -69,10 +54,4 @@ export async function POST(req: NextRequest) {
     console.error("[Paddle webhook] Failed to persist receipt:", err);
     return Response.json({ error: "Failed to persist webhook receipt" }, { status: 500 });
   }
-}
-
-function resolvePaddleEventId(payload: { event_id?: unknown; event_type?: string }, rawBody: string): string {
-  return typeof payload.event_id === "string"
-    ? payload.event_id
-    : `${payload.event_type ?? "unknown"}:${createHash("sha256").update(rawBody).digest("hex")}`;
 }
