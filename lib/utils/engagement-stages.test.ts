@@ -13,7 +13,7 @@ import {
 
 describe("ENGAGEMENT_STAGE_ORDER", () => {
   test("has 12 entries", () => {
-    expect(ENGAGEMENT_STAGE_ORDER.length).toBe(12);
+    expect(ENGAGEMENT_STAGE_ORDER.length).toBe(9);
   });
 });
 

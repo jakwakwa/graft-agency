@@ -25,7 +25,7 @@ vi.mock("@clerk/nextjs/server", () => ({
 
 function matchesProxyMatcher(pathname: string) {
   const matcher = proxyConfig.matcher[0];
-  return new RegExp(matcher).test(pathname);
+  return new RegExp(matcher!).test(pathname);
 }
 
 describe("Clerk proxy", () => {

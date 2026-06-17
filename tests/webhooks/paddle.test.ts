@@ -1,8 +1,14 @@
-import { createHmac } from "node:crypto";
 import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { Client, WebhookReceipt } from "@/generated/prisma/client";
 
 const mockInngestSend = vi.hoisted(() => vi.fn().mockResolvedValue(undefined));
+
+const mockUnmarshal = vi.hoisted(() => vi.fn());
+
+vi.mock("@/lib/paddle", () => ({
+  paddle: { webhooks: { unmarshal: mockUnmarshal } },
+}));
 
 vi.mock("@/lib/db/prisma", () => ({
   default: {
@@ -17,7 +23,7 @@ vi.mock("@/lib/db/prisma", () => ({
       update: vi.fn(),
     },
     webhookReceipt: {
-      create: vi.fn().mockResolvedValue({ id: "receipt-1" }),
+      create: vi.fn().mockResolvedValue({ id: "receipt-1" } as unknown as WebhookReceipt),
       findUnique: vi.fn().mockResolvedValue(null),
       findUniqueOrThrow: vi.fn(),
       update: vi.fn(),
@@ -46,7 +52,7 @@ describe("applyPaddleWebhook", () => {
       paddleSubscriptionId: "sub_123",
       subscriptionActive: true,
       subscriptionStatus: "active",
-    });
+    } as unknown as Client);
 
     await applyPaddleWebhook({
       data: {
@@ -77,7 +83,7 @@ describe("applyPaddleWebhook", () => {
       subscriptionActive: true,
       subscriptionAddons: ["pri_voice"],
       subscriptionStatus: "active",
-    });
+    } as unknown as Client);
 
     await applyPaddleWebhook({
       data: {
@@ -108,12 +114,12 @@ describe("applyPaddleWebhook", () => {
   it("resolves lifecycle events by Paddle subscription ID when custom data is absent", async () => {
     const { default: prisma } = await import("@/lib/db/prisma");
     const { applyPaddleWebhook } = await import("@/lib/webhooks/paddle");
-    vi.mocked(prisma.client.findFirst).mockResolvedValue({ id: "client-1" });
+    vi.mocked(prisma.client.findFirst).mockResolvedValue({ id: "client-1" } as unknown as Client);
     vi.mocked(prisma.client.update).mockResolvedValue({
       id: "client-1",
       subscriptionActive: false,
       subscriptionStatus: "paused",
-    });
+    } as unknown as Client);
 
     await applyPaddleWebhook({
       data: {
@@ -168,26 +174,19 @@ describe("POST /api/webhooks/paddle", () => {
     const { default: prisma } = await import("@/lib/db/prisma");
     const { POST } = await import("@/app/api/webhooks/paddle/route");
     vi.mocked(prisma.webhookReceipt.findUnique).mockResolvedValue(null);
-    vi.mocked(prisma.webhookReceipt.create).mockResolvedValue({ id: "receipt-1" });
+    vi.mocked(prisma.webhookReceipt.create).mockResolvedValue({ id: "receipt-1" } as unknown as WebhookReceipt);
+    mockUnmarshal.mockResolvedValue({ eventId: "evt_paddle_1", eventType: "subscription.activated" });
 
-    const payload = {
-      data: {
-        custom_data: { clientId: "client-1" },
-        customer_id: "ctm_123",
-        id: "sub_123",
-        status: "active",
-      },
+    const body = JSON.stringify({
+      data: { custom_data: { clientId: "client-1" }, customer_id: "ctm_123", id: "sub_123", status: "active" },
       event_id: "evt_paddle_1",
       event_type: "subscription.activated",
-    };
-    const body = JSON.stringify(payload);
-    const ts = "1710000000";
-    const signature = createHmac("sha256", "test-paddle-secret").update(`${ts}:${body}`).digest("hex");
+    });
     const req = new NextRequest("http://localhost/api/webhooks/paddle", {
       body,
       headers: {
         "Content-Type": "application/json",
-        "paddle-signature": `ts=${ts};h1=${signature}`,
+        "paddle-signature": "ts=1234;h1=mockedsig",
       },
       method: "POST",
     });
