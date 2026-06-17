@@ -69,13 +69,11 @@ async function main() {
     update: {
       cronEnabled: true,
       cronFrequency: "daily",
-      cronTime: "22:45",
     },
     create: {
       clientId: platformOwner.id,
       cronEnabled: true,
       cronFrequency: "daily",
-      cronTime: "22:45",
     },
   });
   console.log(`Seed (Test): ProspectingConfig ensured for Platform Owner.`);

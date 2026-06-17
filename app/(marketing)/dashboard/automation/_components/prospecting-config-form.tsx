@@ -8,19 +8,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Typography } from "@/components/ui/typography";
 
-// SAST is always UTC+2 (no daylight saving)
-function utcToSast(utcTime: string): string {
-  const [h = 0, m = 0] = utcTime.split(":").map(Number);
-  const sast = (h + 2) % 24;
-  return `${String(sast).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
-}
-
-function sastToUtc(sastTime: string): string {
-  const [h = 0, m = 0] = sastTime.split(":").map(Number);
-  const utc = (h - 2 + 24) % 24;
-  return `${String(utc).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
-}
-
 const AUTOMATION_TOAST = { duration: Infinity, closeButton: true } as const;
 
 const DAYS_OF_WEEK = [
@@ -37,9 +24,7 @@ interface ProspectingConfig {
   cronEnabled: boolean;
   cronFrequency: "daily" | "weekly";
   cronDay: number | null;
-  cronTime: string;
   cronStartDate: string | null;
-  searchEnabled: boolean;
   searchCriteria: { industries: string[]; locations: string[]; keywords: string[] } | null;
   outreachFromEmail: string | null;
   valueProposition: string | null;
@@ -50,9 +35,7 @@ export function ProspectingConfigForm() {
     cronEnabled: false,
     cronFrequency: "daily",
     cronDay: null,
-    cronTime: "22:45",
     cronStartDate: null,
-    searchEnabled: false,
     searchCriteria: { industries: [], locations: [], keywords: [] },
     outreachFromEmail: null,
     valueProposition: null,
@@ -75,9 +58,7 @@ export function ProspectingConfigForm() {
           cronEnabled: data.cronEnabled ?? false,
           cronFrequency: data.cronFrequency ?? "daily",
           cronDay: data.cronDay ?? null,
-          cronTime: utcToSast(data.cronTime ?? "22:45"),
           cronStartDate: data.cronStartDate ? data.cronStartDate.split("T")[0] : null,
-          searchEnabled: data.searchEnabled ?? false,
           searchCriteria: data.searchCriteria,
           outreachFromEmail: data.outreachFromEmail,
           valueProposition: data.valueProposition,
@@ -110,9 +91,7 @@ export function ProspectingConfigForm() {
           cronEnabled: config.cronEnabled,
           cronFrequency: config.cronFrequency,
           cronDay: config.cronFrequency === "weekly" ? (config.cronDay ?? 1) : null,
-          cronTime: sastToUtc(config.cronTime),
           cronStartDate: config.cronStartDate ? new Date(config.cronStartDate).toISOString() : null,
-          searchEnabled: config.searchEnabled,
           searchCriteria: {
             industries: splitTrim(industries),
             locations: splitTrim(locations),
@@ -267,15 +246,6 @@ export function ProspectingConfigForm() {
             />
             Cron enabled
           </label>
-          <label className="flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              className="rounded border-outline-ghost bg-transparent text-primary focus:ring-primary"
-              checked={config.searchEnabled}
-              onChange={(e) => setConfig((c) => ({ ...c, searchEnabled: e.target.checked }))}
-            />
-            Auto-search for prospects in cron
-          </label>
         </div>
 
         <div className="rounded-xl border border-outline-ghost/50 bg-muted/50 p-6 space-y-4">
@@ -286,7 +256,8 @@ export function ProspectingConfigForm() {
             </Typography.Small>
           </div>
           <Typography.Muted className="text-xs leading-relaxed">
-            Set your schedule here. Times use SAST (GMT+2); we convert to UTC and snap to 15-minute intervals.
+            Runs once per day (or weekly on the selected day) at approximately 08:00 UTC. The start date defers the
+            first run until on or after that date.
           </Typography.Muted>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
@@ -329,19 +300,6 @@ export function ProspectingConfigForm() {
                 </select>
               </div>
             )}
-
-            <div>
-              <Label htmlFor="cronTime" className="text-xs font-data uppercase tracking-wider">
-                Time (SAST / GMT+2)
-              </Label>
-              <input
-                id="cronTime"
-                type="time"
-                value={config.cronTime}
-                onChange={(e) => setConfig((c) => ({ ...c, cronTime: e.target.value }))}
-                className="mt-1 flex h-10 w-full rounded-lg border border-outline-ghost/20 bg-background/50 px-3 py-1 text-sm outline-none focus:border-primary/50 transition-colors"
-              />
-            </div>
 
             <div>
               <Label htmlFor="cronStartDate" className="text-xs font-data uppercase tracking-wider">

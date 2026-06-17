@@ -25,7 +25,7 @@ export const prospectingScheduledTick = inngest.createFunction(
   {
     id: "prospecting-scheduled-tick",
     name: "Prospecting scheduled tick",
-    triggers: [{ cron: "*/15 * * * *" }],
+    triggers: [{ cron: "0 8 * * *" }],
   },
   async ({ step }) => {
     const summary = await step.run("execute-prospecting", runProspectingInngestStep);

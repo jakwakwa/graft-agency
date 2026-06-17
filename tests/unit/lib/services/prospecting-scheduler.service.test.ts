@@ -37,7 +37,6 @@ describe("runProspectingScheduledJob", () => {
       cronEnabled: true,
       cronFrequency: "daily",
       cronDay: null,
-      cronTime: "04:35",
       cronStartDate: null,
       lastCronRunAt: null,
       searchCriteria: { industries: ["x"], locations: [], keywords: [] },
