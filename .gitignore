@@ -71,3 +71,6 @@ graft-today-agency.code-workspace
 .claude/settings.local.json
 .claude/worktrees
 .cursor/debug-0b2dc2.log
+.agents/**/*.md
+PROJECT.md
+.agents/orchestrator/.keep

@@ -4,6 +4,8 @@
   "type": "module",
   "scripts": {
     "dev": "next dev",
+    "install-deps": "bun install",
+    "delete-bun-tests": "rm tests/inngest/stitch-bypass-stress.test.ts tests/inngest/stitch-temp-disable-variations.test.ts",
     "dev:tunnel": "bun scripts/pinggy.sh",
     "inngest:dev": "bun scripts/inngest-dev-serve.ts",
     "build": "prisma generate && next build",

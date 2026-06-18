@@ -1,10 +1,8 @@
 import type { Prisma } from "@/generated/prisma/client";
-import prisma from "@/lib/db/prisma";
-import { generateDesignConcepts, type StitchDesignRequest } from "@/lib/engagement/stitch-design-concepts";
 import { transitionStage } from "@/lib/engagement/stage-machine";
+import { generateDesignConcepts } from "@/lib/engagement/stitch-design-concepts";
 import { inngest } from "@/lib/inngest/client";
-import type { ProfiledNeeds } from "@/lib/types/engagement";
-import type { DesignSystemSpec } from "@/lib/types/engagement";
+import type { DesignConcept, DesignSystemSpec, ProfiledNeeds } from "@/lib/types/engagement";
 import { makeOnFailure } from "./_shared/on-failure";
 
 // ---------------------------------------------------------------------------
@@ -67,7 +65,7 @@ interface ParsedDesignDirection {
   designSystem: DesignSystemSpec | undefined;
 }
 
-function parseDesignDirection(prdContent: string, profiledNeeds: ProfiledNeeds): ParsedDesignDirection {
+function parseDesignDirection(prdContent: string, _profiledNeeds: ProfiledNeeds): ParsedDesignDirection {
   // Extract the full ## Design Direction block
   const designSectionMatch = prdContent.match(/## Design Direction\n([\s\S]*?)(?=\n## [^#]|$)/);
   const designBlock = designSectionMatch?.[1]?.trim() ?? "";
@@ -131,28 +129,42 @@ function parseDesignDirection(prdContent: string, profiledNeeds: ProfiledNeeds):
  * Inngest: PRD → Stitch (@google/stitch-sdk) → three design concept variants.
  * @see https://stitch.withgoogle.com/docs/sdk/ai-sdk/
  */
-export const stitchDesignerFunction = inngest.createFunction(
-  {
-    id: "stitch-designer",
-    name: "Stitch Design Concept Generator",
-    retries: 2,
-    idempotency: "event.data.leadId",
-    onFailure: makeOnFailure("stitch-designer", "DESIGNING"),
-    triggers: [{ event: "engagement/prd.written" }],
-  },
-  async ({ event, step }) => {
-    const { leadId, clientId, profiledNeeds, prdContent } = event.data as {
-      leadId: string;
-      clientId: string;
-      profiledNeeds: ProfiledNeeds;
-      prdContent: string;
-    };
+export const stitchDesignerHandler = async ({
+  event,
+  step,
+}: {
+  event: {
+    data: Record<string, unknown>;
+  };
+  step: {
+    run: <T>(id: string, fn: () => T | Promise<T>) => Promise<T>;
+    sendEvent: (
+      id: string,
+      event: {
+        name: string;
+        data: Record<string, unknown>;
+      },
+    ) => Promise<unknown>;
+  };
+}) => {
+  const { leadId, clientId, profiledNeeds, prdContent } = event.data as {
+    leadId: string;
+    clientId: string;
+    profiledNeeds: ProfiledNeeds;
+    prdContent: string;
+  };
 
-    await step.run("mark-designing", () => transitionStage({ leadId, to: "DESIGNING", source: "stitch-designer" }));
+  await step.run("mark-designing", () => transitionStage({ leadId, to: "DESIGNING", source: "stitch-designer" }));
 
+  const isStitchDisabled = process.env.STITCH_TEMP_DISABLE === "1" || process.env.STITCH_TEMP_DISABLE === "true";
+
+  let designConcepts: DesignConcept[] = [];
+  let chosenIndex = 0;
+
+  if (!isStitchDisabled) {
     const parsed = parseDesignDirection(prdContent, profiledNeeds);
 
-    const designConcepts = await step.run("generate-designs", () =>
+    designConcepts = await step.run("generate-designs", () =>
       generateDesignConcepts({
         productName: `${profiledNeeds.companyName} ${profiledNeeds.productType}`,
         description: profiledNeeds.primaryNeed,
@@ -168,25 +180,37 @@ export const stitchDesignerFunction = inngest.createFunction(
       }),
     );
 
-    const chosenIndex = Math.floor(Math.random() * Math.min(3, designConcepts.length));
+    chosenIndex = Math.floor(Math.random() * Math.min(3, designConcepts.length));
+  }
 
-    await step.run("save-designs", () =>
-      transitionStage({
-        leadId,
-        to: "DESIGN_COMPLETE",
-        source: "stitch-designer",
-        data: {
-          designConcepts: designConcepts as unknown as Prisma.InputJsonValue,
-          chosenDesign: chosenIndex,
-        },
-      }),
-    );
+  await step.run("save-designs", () =>
+    transitionStage({
+      leadId,
+      to: "DESIGN_COMPLETE",
+      source: "stitch-designer",
+      data: {
+        designConcepts: designConcepts as unknown as Prisma.InputJsonValue,
+        chosenDesign: chosenIndex,
+      },
+    }),
+  );
 
-    await step.sendEvent("emit-design-complete", {
-      name: "engagement/design.completed",
-      data: { leadId, clientId, profiledNeeds, prdContent, designConcepts, chosenDesignIndex: chosenIndex },
-    });
+  await step.sendEvent("emit-design-complete", {
+    name: "engagement/design.completed",
+    data: { leadId, clientId, profiledNeeds, prdContent, designConcepts, chosenDesignIndex: chosenIndex },
+  });
 
-    return { leadId, stage: "DESIGN_COMPLETE", conceptCount: designConcepts.length };
+  return { leadId, stage: "DESIGN_COMPLETE", conceptCount: designConcepts.length };
+};
+
+export const stitchDesignerFunction = inngest.createFunction(
+  {
+    id: "stitch-designer",
+    name: "Stitch Design Concept Generator",
+    retries: 2,
+    idempotency: "event.data.leadId",
+    onFailure: makeOnFailure("stitch-designer", "DESIGNING"),
+    triggers: [{ event: "engagement/prd.written" }],
   },
+  stitchDesignerHandler,
 );
