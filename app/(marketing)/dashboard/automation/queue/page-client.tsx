@@ -21,9 +21,7 @@ interface ProspectingConfig {
   cronEnabled: boolean;
   cronFrequency: string;
   cronDay: number | null;
-  cronTime?: string | null;
   cronStartDate: string | null;
-  searchEnabled: boolean;
   searchCriteria: { industries?: string[]; locations?: string[]; keywords?: string[] } | null;
   valueProposition: string | null;
   outreachFromEmail: string | null;
@@ -120,11 +118,7 @@ export default function QueuePage() {
   const qualifiedProspects = leads.filter((lead) => lead.status !== "CLOSED");
   const highlightedLeads = qualifiedProspects.slice(0, 3);
   const foundToday = qualifiedProspects.length;
-  const pitchProgress = config?.cronEnabled
-    ? "scheduled"
-    : config?.cronTime
-      ? `${config?.cronTime + " - " + config?.cronFrequency + " " + (config.searchEnabled ? "enabled" : "schedule disabled")}`
-      : "";
+  const pitchProgress = config?.cronEnabled ? "scheduled" : "disabled";
 
   return (
     <MarketingShell>
