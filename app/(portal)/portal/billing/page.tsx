@@ -47,15 +47,17 @@ export default async function PortalBillingPage() {
         }}
       />
 
-      <PricingSection
-        mode="portal"
-        paddleConfig={{ clientToken, environment }}
-        customer={{
-          clientId: client.id,
-          email: client.email ?? "",
-          subscriptionActive: client.subscriptionActive,
-        }}
-      />
+      {!client.subscriptionActive && (
+        <PricingSection
+          mode="portal"
+          paddleConfig={{ clientToken, environment }}
+          customer={{
+            clientId: client.id,
+            email: client.email ?? "",
+            subscriptionActive: client.subscriptionActive,
+          }}
+        />
+      )}
     </div>
   );
 }
