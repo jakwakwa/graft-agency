@@ -69,6 +69,8 @@ export function ProspectingConfigForm() {
         setKeywords(criteria.keywords?.join(", ") ?? "");
         setFromEmail(data.outreachFromEmail ?? "");
         setValueProposition(data.valueProposition ?? "");
+      } catch (error) {
+        console.error("Failed to load prospecting config:", error);
       } finally {
         setLoading(false);
       }
