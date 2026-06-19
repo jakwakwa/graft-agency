@@ -1,10 +1,13 @@
-import { type Screen, stitch } from "@google/stitch-sdk";
+import type { Screen } from "@google/stitch-sdk";
+import { createStitchClient } from "@/lib/engagement/stitch-client";
 import type { DesignConcept, DesignSystemSpec } from "@/lib/types/engagement";
 
 /**
  * @google/stitch-sdk — design variants for the engagement pipeline.
  * @see https://stitch.withgoogle.com/docs/sdk/ai-sdk/
- * Env: STITCH_API_KEY (required), STITCH_PROJECT_ID (optional, reuse one Stitch project per dev machine).
+ * Auth: gt-stitch-api service account via OAuth2 Bearer (see lib/engagement/stitch-client.ts).
+ * Env: GCP_STITCH_SA_ACCOUNT_BASE64_KEY + GCP_PROJECT_ID (required),
+ *      STITCH_PROJECT_ID (optional, reuse one Stitch project per dev machine).
  */
 export interface StitchDesignRequest {
   productName: string;
@@ -187,8 +190,6 @@ async function screenToDesignConcept(
       }
     : fallback;
 
-    
-
   const [htmlUrl, screenshotUrl] = await Promise.all([
     screen.getHtml().catch(() => undefined),
     screen.getImage().catch(() => undefined),
@@ -206,61 +207,59 @@ async function screenToDesignConcept(
     htmlUrl,
     designSystem: ds,
   };
-
-  
-
 }
 
-async function engageMentPipelineThumbnails(
-  screen: Screen
-) {
-   const screenshot = screen.getImage();
+async function engageMentPipelineThumbnails(screen: Screen) {
+  const screenshot = screen.getImage();
   return screenshot;
 }
-
 
 // ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
 
 export async function generateDesignConcepts(request: StitchDesignRequest): Promise<DesignConcept[]> {
-  if (!process.env.STITCH_API_KEY?.trim()) {
-    throw new Error("STITCH_API_KEY is not set (required for @google/stitch-sdk).");
+  const { stitch, client } = await createStitchClient();
+
+  try {
+    const existingId = process.env.STITCH_PROJECT_ID?.trim();
+    const project = existingId
+      ? stitch.project(existingId)
+      : await stitch.createProject(request.productName.slice(0, 80));
+
+    const base = await project.generate(buildBasePrompt(request), "DESKTOP", "GEMINI_3_PRO");
+
+    const variantInstruction = [
+      "Create three meaningfully different visual treatments for the same product goals and content.",
+      `Respect this direction: ${request.styleHint}.`,
+      `Cover these areas: ${request.components.join(", ")}.`,
+      request.designSystem?.effects ? `Maintain ${request.designSystem.effects} effects across all variants.` : "",
+      `All variants must feel premium and targeted at ${request.targetAudience}.`,
+    ]
+      .filter(Boolean)
+      .join(" ");
+
+    const screens = await base.variants(
+      variantInstruction,
+      {
+        variantCount: 3,
+        creativeRange: "EXPLORE",
+        // SDK type is malformed — `aspects` should be Array<aspect> but is typed as `"TEXT_CONTENT"[]`
+        aspects: ["TEXT_FONT", "IMAGES", "LAYOUT"] as unknown as "TEXT_CONTENT"[],
+      },
+      "DESKTOP",
+      "GEMINI_3_PRO",
+    );
+
+    if (screens.length < 1) {
+      throw new Error(
+        "Stitch returned no design variants; check the gt-stitch-api service account and project access.",
+      );
+    }
+
+    const take = Math.min(3, screens.length);
+    return await Promise.all(screens.slice(0, take).map((screen, i) => screenToDesignConcept(screen, i, request)));
+  } finally {
+    await client.close().catch(() => {});
   }
-
-  const existingId = process.env.STITCH_PROJECT_ID?.trim();
-  const project = existingId
-    ? stitch.project(existingId)
-    : await stitch.createProject(request.productName.slice(0, 80));
-
-  const base = await project.generate(buildBasePrompt(request), "DESKTOP", "GEMINI_3_PRO");
-
-  const variantInstruction = [
-    "Create three meaningfully different visual treatments for the same product goals and content.",
-    `Respect this direction: ${request.styleHint}.`,
-    `Cover these areas: ${request.components.join(", ")}.`,
-    request.designSystem?.effects ? `Maintain ${request.designSystem.effects} effects across all variants.` : "",
-    `All variants must feel premium and targeted at ${request.targetAudience}.`,
-  ]
-    .filter(Boolean)
-    .join(" ");
-
-  const screens = await base.variants(
-    variantInstruction,
-    {
-      variantCount: 3,
-      creativeRange: "EXPLORE",
-      // SDK type is malformed — `aspects` should be Array<aspect> but is typed as `"TEXT_CONTENT"[]`
-      aspects: ["TEXT_FONT", "IMAGES", "LAYOUT"] as unknown as "TEXT_CONTENT"[],
-    },
-    "DESKTOP",
-    "GEMINI_3_PRO",
-  );
-
-  if (screens.length < 1) {
-    throw new Error("Stitch returned no design variants; check STITCH_API_KEY and project access.");
-  }
-
-  const take = Math.min(3, screens.length);
-  return Promise.all(screens.slice(0, take).map((screen, i) => screenToDesignConcept(screen, i, request)));
 }

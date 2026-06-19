@@ -1,7 +1,7 @@
-import { stitch } from "@google/stitch-sdk";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { requirePlatformAccess } from "@/lib/auth/resolve-client";
+import { createStitchClient } from "@/lib/engagement/stitch-client";
 
 /**
  * Same-origin proxy that re-fetches a Stitch screen screenshot on demand.
@@ -29,10 +29,11 @@ export async function GET(req: NextRequest): Promise<Response> {
     return NextResponse.json({ error: "Missing projectId or screenId" }, { status: 400 });
   }
 
-  if (!process.env.STITCH_API_KEY?.trim()) {
-    return NextResponse.json({ error: "STITCH_API_KEY not configured" }, { status: 500 });
+  if (!process.env.GCP_STITCH_SA_ACCOUNT_BASE64_KEY?.trim()) {
+    return NextResponse.json({ error: "Stitch service account not configured" }, { status: 500 });
   }
 
+  const { stitch, client } = await createStitchClient();
   try {
     const project = stitch.project(projectId);
     const screen = await project.getScreen(screenId);
@@ -73,5 +74,7 @@ export async function GET(req: NextRequest): Promise<Response> {
     const message = err instanceof Error ? err.message : "Unknown error";
     console.error("[stitch-image] Failed to fetch screen image:", message);
     return NextResponse.json({ error: "Failed to fetch screen image" }, { status: 502 });
+  } finally {
+    await client.close().catch(() => {});
   }
 }
