@@ -1,13 +1,31 @@
+import { getGcpProjectId, getServiceAccountAccessToken } from "@/lib/google/service-account";
+
 const JULES_API_BASE = "https://jules.googleapis.com/v1alpha";
+const JULES_SA_KEY_ENV = "GCP_JULES_SA_ACCOUNT_BASE64_KEY";
 
-function getJulesKey(): string {
+/**
+ * Auth headers for the Jules API.
+ *
+ * Preferred: the `gt-jules-api` service account via OAuth2 Bearer (set
+ * GCP_JULES_SA_ACCOUNT_BASE64_KEY). Falls back to the legacy Labs API key
+ * (JULES_API_KEY) when the SA key is absent, so deployments keep working
+ * during migration. `jules.googleapis.com` accepts OAuth2 Bearer (verified).
+ */
+async function julesAuthHeaders(extra?: Record<string, string>): Promise<Record<string, string>> {
+  if (process.env[JULES_SA_KEY_ENV]?.trim()) {
+    const token = await getServiceAccountAccessToken(JULES_SA_KEY_ENV);
+    const projectId = getGcpProjectId();
+    return {
+      Authorization: `Bearer ${token}`,
+      ...(projectId ? { "X-Goog-User-Project": projectId } : {}),
+      ...extra,
+    };
+  }
   const key = process.env.JULES_API_KEY?.trim();
-  if (!key) throw new Error("JULES_API_KEY is not set");
-  return key;
-}
-
-function julesHeaders() {
-  return { "x-goog-api-key": getJulesKey(), "Content-Type": "application/json" };
+  if (!key) {
+    throw new Error(`${JULES_SA_KEY_ENV} or JULES_API_KEY must be set for Jules API auth`);
+  }
+  return { "x-goog-api-key": key, ...extra };
 }
 
 export interface JulesSession {
@@ -37,7 +55,7 @@ export async function createJulesSession(params: {
 
   const r = await fetch(`${JULES_API_BASE}/sessions`, {
     method: "POST",
-    headers: julesHeaders(),
+    headers: await julesAuthHeaders({ "Content-Type": "application/json" }),
     body: JSON.stringify(body),
   });
 
@@ -58,7 +76,7 @@ export async function createJulesSession(params: {
 // Used by the idempotency layer to recover a session created in a prior attempt.
 export async function findJulesSessionByLeadTag(leadId: string): Promise<JulesSession | null> {
   const r = await fetch(`${JULES_API_BASE}/sessions?pageSize=20`, {
-    headers: { "x-goog-api-key": getJulesKey() },
+    headers: await julesAuthHeaders(),
   });
   if (!r.ok) return null;
   const body = (await r.json()) as { sessions?: Array<Record<string, unknown>> };
@@ -75,7 +93,7 @@ export async function findJulesSessionByLeadTag(leadId: string): Promise<JulesSe
 
 export async function getJulesSession(sessionId: string): Promise<JulesSession & { raw: Record<string, unknown> }> {
   const r = await fetch(`${JULES_API_BASE}/sessions/${sessionId}`, {
-    headers: { "x-goog-api-key": getJulesKey() },
+    headers: await julesAuthHeaders(),
   });
 
   if (!r.ok) {
@@ -142,7 +160,7 @@ export function julesProgressToDbFields(progress: JulesProgressUpdate | null): {
 /** GET …/sessions/{id}/activities — best-effort; returns null on non-OK response. */
 export async function fetchLatestJulesProgressUpdate(sessionId: string): Promise<JulesProgressUpdate | null> {
   const r = await fetch(`${JULES_API_BASE}/sessions/${sessionId}/activities?pageSize=50`, {
-    headers: { "x-goog-api-key": getJulesKey() },
+    headers: await julesAuthHeaders(),
   });
   if (!r.ok) return null;
   const body = (await r.json()) as { activities?: Array<Record<string, unknown>> };
@@ -153,7 +171,7 @@ export async function fetchLatestJulesProgressUpdate(sessionId: string): Promise
 export async function approveJulesPlan(sessionId: string): Promise<void> {
   const r = await fetch(`${JULES_API_BASE}/sessions/${sessionId}:approvePlan`, {
     method: "POST",
-    headers: julesHeaders(),
+    headers: await julesAuthHeaders({ "Content-Type": "application/json" }),
     body: JSON.stringify({}),
   });
 
@@ -213,7 +231,7 @@ export function extractPullRequestUrlFromSession(raw: Record<string, unknown>): 
 /** Scan ListActivities for any embedded GitHub PR link (agent messages, artifacts, etc.). */
 export async function extractPullRequestUrlFromActivities(sessionId: string): Promise<string | null> {
   const r = await fetch(`${JULES_API_BASE}/sessions/${sessionId}/activities?pageSize=100`, {
-    headers: { "x-goog-api-key": getJulesKey() },
+    headers: await julesAuthHeaders(),
   });
   if (!r.ok) return null;
   const body = (await r.json()) as { activities?: unknown };
