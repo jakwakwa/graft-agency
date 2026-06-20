@@ -14,7 +14,7 @@ GRAFT.TODAY is a SaaS platform that helps small businesses and freelancers get m
 - Company Name,
 - Website Url,
 - AI Presence,
-- Pain Points,
+- Pain Points
 
 4. After Audit Summary, Graft Bot will write draft email for you to review and approve before dispatch.
 
