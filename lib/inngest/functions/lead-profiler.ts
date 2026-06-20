@@ -1,6 +1,7 @@
 import { GoogleGenAI, ThinkingLevel, Type } from "@google/genai";
 import prisma from "@/lib/db/prisma";
 import { transitionStage } from "@/lib/engagement/stage-machine";
+import { NonRetriableError } from "inngest";
 import { inngest } from "@/lib/inngest/client";
 import type { ProfiledNeeds } from "@/lib/types/engagement";
 import { makeOnFailure } from "./_shared/on-failure";
@@ -84,6 +85,11 @@ export const leadProfilerFunction = inngest.createFunction(
     const { leadId, clientId } = event.data as { leadId: string; clientId: string };
 
     await step.run("mark-profiling", async () => {
+      const lead = await prisma.lead.findUnique({ where: { id: leadId }, select: { id: true } });
+      if (!lead) {
+        throw new NonRetriableError(`Lead ${leadId} not found. Cannot profile.`);
+      }
+
       const existing = await prisma.productSpec.findUnique({ where: { leadId }, select: { stage: true } });
       if (!existing) {
         await prisma.productSpec.create({
