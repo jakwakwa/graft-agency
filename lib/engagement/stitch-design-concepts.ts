@@ -28,23 +28,23 @@ export interface StitchDesignRequest {
 // ---------------------------------------------------------------------------
 
 const FALLBACK_SCHEMES: DesignConcept["colorScheme"][] = [
-  { primary: "#2563eb", background: "#ffffff", text: "#111827" },
-  { primary: "#7c3aed", background: "#0f172a", text: "#f8fafc" },
-  { primary: "#f97316", background: "#f9fafb", text: "#1f2937" },
+  { primary: "#4d7bd7ff", background: "#191f2aff", text: "#d8e2f6ff" },
+  { primary: "#ed9f38ff", background: "#eceafaff", text: "#f8fafc" },
+  { primary: "#222527ff", background: "#dde9f4ff", text: "#575e67ff" },
 ];
 
 const DEFAULT_DESIGN_SYSTEM: DesignSystemSpec = {
-  background: "#0F0F0F",
-  surface: "#1A1A1A",
-  primary: "#8B5CF6",
+  background: "#192328ff",
+  surface: "#38607071",
+  primary: "#5571ccff",
   onPrimary: "#FFFFFF",
-  secondary: "#D4AF37",
-  onSurface: "#F3F4F6",
-  onSurfaceVariant: "#9CA3AF",
-  outline: "rgba(255, 255, 255, 0.1)",
-  headlineFont: "Playfair Display, serif",
-  bodyFont: "Inter, sans-serif",
-  effects: "glassmorphism",
+  secondary: "#3ae3dbff",
+  onSurface: "#dff3e9ff",
+  onSurfaceVariant: "#2b313cff",
+  outline: "rgba(176, 243, 237, 0.1)",
+  headlineFont: "Poppins, sans-serif",
+  bodyFont: "Geist, sans-serif",
+  effects: "",
   themeMode: "dark",
 };
 
@@ -70,10 +70,9 @@ function buildBasePrompt(request: StitchDesignRequest): string {
   ideaLines.push(
     `The vibe should be a premium blend of rich ${request.industry} tradition and ultra-modern digital excellence.`,
     `Use an elegant, traditional ${ds.headlineFont.split(",")[0]?.trim() ?? "serif"} font for headings and a clean, legible ${ds.bodyFont.split(",")[0]?.trim() ?? "sans-serif"} for body text.`,
-    `Visual direction: ${request.styleHint}`,
-  );
-  sections.push(`# IDEA\n${ideaLines.join("\n")}
-
+    `Visual direction: ${request.styleHint}
+    
+    
 ## 0. BRIEF INFERENCE (Read the Room Before Anything Else)
 
 Before touching code or tweaking dials, **infer what the user actually wants**. Most LLM design output is bad because the model jumps to a default aesthetic instead of reading the room.
@@ -414,6 +413,13 @@ This is a vocabulary, not a library. The agent should KNOW these pattern names t
 * **Animated SVG Line Drawing** - Vectors drawing themselves in real time.
 * **Mesh Gradient Background** - Organic lava-lamp blobs.
 * **Lens Blur Depth** - Background UI blurred to focus foreground action
+    
+    
+    
+    `,
+  );
+  sections.push(`# IDEA\n${ideaLines.join("\n")}
+
 `);
 
   // ── CONTENT & LAYOUT ─────────────────────────────────────────────────────
@@ -567,7 +573,7 @@ export async function generateDesignConcepts(request: StitchDesignRequest): Prom
 
     const variantInstruction = [
       "Create three meaningfully different visual treatments for the same product goals and content.",
-      `Respect this direction: ${request.styleHint}.`,
+      // `Respect this direction: ${request.styleHint}.`,
       `Cover these areas: ${request.components.join(", ")}.`,
       request.designSystem?.effects ? `Maintain ${request.designSystem.effects} effects across all variants.` : "",
       `All variants must feel premium and targeted at ${request.targetAudience}.`,

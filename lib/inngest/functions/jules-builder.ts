@@ -51,10 +51,6 @@ export const julesBuilderHandler = async ({
 
 ${chosenDesign.description}
 
-Colour scheme:
-- Primary: ${chosenDesign.colorScheme.primary}
-- Background: ${chosenDesign.colorScheme.background}
-- Text: ${chosenDesign.colorScheme.text}
 
 Key components: ${chosenDesign.components.join(", ")}
 Style keywords: ${chosenDesign.styleKeywords.join(", ")}${chosenDesign.htmlUrl ? `\n\nStitch design HTML reference: ${chosenDesign.htmlUrl}` : ""}${chosenDesign.screenshotUrl ? `\nStitch design screenshot: ${chosenDesign.screenshotUrl}` : ""}`;
@@ -79,7 +75,6 @@ Style keywords: ${chosenDesign.styleKeywords.join(", ")}${chosenDesign.htmlUrl ?
 
   // Render service is provisioned in jules-poller after the PR exists, using the PR head branch
   // so `rootDir` resolves on the branch Jules actually pushed to (not `main` until merge).
-
   await step.sendEvent("emit-build-started", {
     name: "engagement/build.started",
     data: {
@@ -143,6 +138,10 @@ ${params.prdContent}
 ---${designSection}
 
 ## Build Instructions
+
+Use the \`.agents/skills/frontend-design/SKILL.md\` skill to build the landing page. 
+ - It will do most of the heavy lifting for you. 
+ - This skill is not a one-shot - you will have to iterate with it a few times to get it right.
 
 Write ALL files inside the directory \`${dir}/\` — do not modify anything outside this directory.
 
