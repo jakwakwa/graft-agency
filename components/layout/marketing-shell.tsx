@@ -1,5 +1,6 @@
 "use client";
 
+import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 import type { ReactNode } from "react";
@@ -84,7 +85,7 @@ export function MarketingShell({ children }: MarketingShellProps) {
             <div className="h-4 w-px bg-outline-ghost" />
             <span className="text-xs text-muted-foreground">0ms Latency</span>
           </div>
-          <div className="h-8 w-8 rounded-lg bg-chart-3" />
+          <UserButton />
         </div>
       </header>
 
