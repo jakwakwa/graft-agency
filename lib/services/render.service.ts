@@ -172,3 +172,43 @@ export async function updateRenderServiceBranch(serviceId: string, branch: strin
     throw new Error(`Render branch update failed (${r.status}): ${JSON.stringify(err)}`);
   }
 }
+
+export interface RenderDeploy {
+  deployId: string;
+  status: string;
+  serviceId: string;
+}
+
+// Render deploy terminal statuses (deploy will not progress further)
+const RENDER_TERMINAL_STATUSES = new Set([
+  "live",
+  "build_failed",
+  "update_failed",
+  "pre_deploy_failed",
+  "canceled",
+  "deactivated",
+]);
+
+export function isRenderDeployTerminal(status: string): boolean {
+  return RENDER_TERMINAL_STATUSES.has(status);
+}
+
+export function isRenderDeploySuccess(status: string): boolean {
+  return status === "live";
+}
+
+export async function getLatestRenderDeploy(serviceId: string): Promise<RenderDeploy | null> {
+  const r = await fetch(`${RENDER_API_BASE}/services/${serviceId}/deploys?limit=1`, {
+    headers: renderHeaders(),
+  });
+  if (!r.ok) return null;
+  const list = (await r.json()) as Array<{ deploy?: Record<string, unknown> } | Record<string, unknown>>;
+  const first = (list[0] as { deploy?: Record<string, unknown> })?.deploy ?? list[0];
+  if (!first || typeof (first as Record<string, unknown>).id !== "string") return null;
+  const raw = first as Record<string, unknown>;
+  return {
+    deployId: raw.id as string,
+    status: typeof raw.status === "string" ? raw.status : "unknown",
+    serviceId,
+  };
+}

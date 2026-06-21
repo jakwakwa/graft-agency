@@ -6,6 +6,7 @@ import { inngest } from "@/lib/inngest/client";
 import {
   approveJulesPlan,
   fetchGithubPullRequestHeadRef,
+  fetchGithubPullRequestHeadSha,
   fetchLatestJulesProgressUpdate,
   findRenderPreviewUrl,
   getJulesSession,
@@ -14,9 +15,17 @@ import {
   julesProgressToDbFields,
   parseGithubPullRequestFromUrl,
   parseGithubRepoFromJulesSource,
+  postGithubCommitStatus,
   resolveJulesPullRequestUrl,
 } from "@/lib/services/jules-github.service";
-import { canProvisionRenderService, getRenderService, updateRenderServiceBranch } from "@/lib/services/render.service";
+import {
+  canProvisionRenderService,
+  getLatestRenderDeploy,
+  getRenderService,
+  isRenderDeploySuccess,
+  isRenderDeployTerminal,
+  updateRenderServiceBranch,
+} from "@/lib/services/render.service";
 import type { ProfiledNeeds } from "@/lib/types/engagement";
 import { makeOnFailure } from "./_shared/on-failure";
 
@@ -218,8 +227,75 @@ export const julesPollerFunction = inngest.createFunction(
       }
     }
 
+    // Poll Render deploy status and report back to GitHub so Jules CI-listen can react.
+    if (prInBuildsRepo && effectiveRenderServiceId && canProvisionRenderService()) {
+      const prHeadSha = await step.run("fetch-pr-head-sha", () =>
+        fetchGithubPullRequestHeadSha({
+          owner: prInBuildsRepo.owner,
+          repo: prInBuildsRepo.repo,
+          number: prInBuildsRepo.number,
+        }),
+      );
+
+      if (prHeadSha) {
+        await step.run("post-render-status-pending", () =>
+          postGithubCommitStatus({
+            owner: prInBuildsRepo.owner,
+            repo: prInBuildsRepo.repo,
+            sha: prHeadSha,
+            state: "pending",
+            context: "render/prospect-deploy",
+            description: "Render deployment in progress…",
+          }),
+        );
+
+        // Poll up to 10 × 60 s (10 min) for a terminal deploy status.
+        let renderDeployStatus: string | null = null;
+        for (let i = 0; i < 10; i++) {
+          await step.sleep(`render-deploy-poll-wait-${i}`, "60s");
+          const deploy = await step.run(`render-deploy-poll-${i}`, () =>
+            getLatestRenderDeploy(effectiveRenderServiceId),
+          );
+          if (deploy && isRenderDeployTerminal(deploy.status)) {
+            renderDeployStatus = deploy.status;
+            break;
+          }
+        }
+
+        if (renderDeployStatus !== null) {
+          const succeeded = isRenderDeploySuccess(renderDeployStatus);
+          await step.run("post-render-status-final", () =>
+            postGithubCommitStatus({
+              owner: prInBuildsRepo.owner,
+              repo: prInBuildsRepo.repo,
+              sha: prHeadSha,
+              state: succeeded ? "success" : "failure",
+              context: "render/prospect-deploy",
+              description: succeeded
+                ? "Render deployment succeeded"
+                : `Render deployment failed (${renderDeployStatus})`,
+              ...(deploymentUrl ? { targetUrl: deploymentUrl } : {}),
+            }),
+          );
+
+          if (!succeeded) {
+            await step.run("mark-render-failed", () =>
+              transitionStage({
+                leadId,
+                to: "FAILED",
+                source: "jules-poller",
+                reason: `Render deployment failed with status: ${renderDeployStatus}`,
+                data: { errorMessage: `Render deployment failed (${renderDeployStatus})` },
+              }),
+            );
+            return { leadId, outcome: "render-failed" as const, renderDeployStatus };
+          }
+        }
+      }
+    }
+
     if (prInBuildsRepo && !deploymentUrl) {
-      // Fallback for repos where Render preview URLs are only posted on PR comments.
+      // Fallback: scan PR comments for an onrender.com URL.
       for (let i = 0; i < 5; i++) {
         await step.sleep(`render-wait-${i}`, "30s");
         const preview = await step.run(`find-render-${i}`, () =>

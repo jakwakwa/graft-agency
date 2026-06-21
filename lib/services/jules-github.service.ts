@@ -389,6 +389,63 @@ export async function fetchGithubPullRequestHeadRef(params: {
   return typeof ref === "string" && ref.length > 0 ? ref : null;
 }
 
+/** Commit SHA for the head of a PR — needed to post a GitHub commit status. */
+export async function fetchGithubPullRequestHeadSha(params: {
+  owner: string;
+  repo: string;
+  number: number;
+}): Promise<string | null> {
+  const token = process.env.GITHUB_TOKEN?.trim();
+  if (!token) return null;
+
+  const url = `https://api.github.com/repos/${params.owner}/${params.repo}/pulls/${params.number}`;
+  const r = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: "application/vnd.github+json",
+      "X-GitHub-Api-Version": "2022-11-28",
+    },
+  });
+  if (!r.ok) return null;
+  const body = (await r.json()) as { head?: { sha?: string } };
+  const sha = body.head?.sha;
+  return typeof sha === "string" && sha.length > 0 ? sha : null;
+}
+
+/**
+ * Post a GitHub commit status so Jules CI-listen can see Render deploy outcomes.
+ * Uses the legacy Commit Status API (POST /repos/:owner/:repo/statuses/:sha)
+ * which only requires a PAT with `repo` scope — no GitHub App needed.
+ */
+export async function postGithubCommitStatus(params: {
+  owner: string;
+  repo: string;
+  sha: string;
+  state: "pending" | "success" | "failure" | "error";
+  context: string;
+  description: string;
+  targetUrl?: string;
+}): Promise<void> {
+  const token = process.env.GITHUB_TOKEN?.trim();
+  if (!token) return;
+
+  await fetch(`https://api.github.com/repos/${params.owner}/${params.repo}/statuses/${params.sha}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: "application/vnd.github+json",
+      "X-GitHub-Api-Version": "2022-11-28",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      state: params.state,
+      context: params.context,
+      description: params.description,
+      ...(params.targetUrl ? { target_url: params.targetUrl } : {}),
+    }),
+  });
+}
+
 export async function findRenderPreviewUrl(params: {
   owner: string;
   repo: string;
