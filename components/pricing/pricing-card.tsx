@@ -88,7 +88,7 @@ const THEMES: Record<string, CardTheme> = {
   },
 };
 
-const DEFAULT_THEME = THEMES["ai-chatbot"];
+const DEFAULT_THEME = THEMES["ai-chatbot"]!;
 
 export function PricingCard({ offer, selectedCycle, localizedPrices, canCheckout, onCheckout }: PricingCardProps) {
   const price = offer.prices[selectedCycle] ?? offer.prices.oneTime ?? offer.prices.monthly ?? offer.prices.annual;
