@@ -3,8 +3,8 @@
 import { Bolt } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 import { Typography } from "@/components/ui/typography";
+import { Button } from "@/components/ui-v2/button";
 import { ProspectingConfigForm } from "./prospecting-config-form";
 
 const AUTOMATION_TOAST = { duration: Infinity, closeButton: true } as const;
@@ -49,7 +49,7 @@ export function AutomationHubClient() {
   }
 
   return (
-    <div className="p-1.5 rounded-[2.5rem] bg-white/5 ring-1 ring-white/10 dark:ring-white/10 shadow-xl">
+    <div className="p-1.5 rounded-[2.5rem] ring-1 ring-white/10 dark:ring-white/10 shadow-xl">
       <div className="p-8 rounded-[calc(2.5rem-0.375rem)] bg-card/50 backdrop-blur-md">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div className="flex items-center gap-3">
@@ -66,7 +66,7 @@ export function AutomationHubClient() {
             </div>
           </div>
           <Button
-            variant="default"
+            variant="secondary"
             size="sm"
             onClick={handleFindProspects}
             disabled={finding}

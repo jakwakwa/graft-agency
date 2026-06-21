@@ -26,7 +26,7 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(18.957% 0.01211 285.171);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(47.021% 0.25672 264.228);
+  --primary: oklch(63.445% 0.1936 267.745);
   --primary-kinetic: oklch(63.945% 0.21827 9.69);
   --primary-foreground: oklch(0.969 0.016 293.756);
   --secondary: oklch(0.85 0.08 285);
@@ -85,7 +85,7 @@ body {
 
 .dark {
   /* Base */
-  --background: hsla(223, 28%, 10%, 0.9);
+  --background: hsl(260, 10%, 6%);
   --foreground: #f6f3f1;
 
   /* Surfaces — tonal depth, no hard borders */
@@ -93,21 +93,21 @@ body {
   --card-foreground: #aab0da;
   --popover: #221556;
   --popover-foreground: #ffd7d7;
-  --muted: #58595d44;
+  --muted: #717ecb1e;
   --muted-foreground: #b1aeae;
 
-  --primary: #17b3f0d4;
-  --primary-container: #ca901e;
+  --primary: #3871fff7;
+  --primary-container: #f46b50;
   --primary-kinetic: hsla(346, 82%, 55%, 0.87);
   --primary-foreground: #eed9fb;
 
   /* Secondary — soft blossom */
-  --secondary: #f77d7dfc;
-  --secondary-container: #161b22;
+  --secondary: #62dcf8fc;
+  --secondary-container: #24416a;
   --secondary-foreground: #e98592;
 
   /* Accent — tangerine */
-  --accent: #dd65fbca;
+  --accent: #fc7189ca;
   --accent-foreground: #7f9bf7;
 
   /* Semantic */
@@ -147,8 +147,8 @@ body {
 
   /* Shadows & glow */
   --shadow-ambient: 0 24px 48px -12px rgba(21, 109, 232, 0.16);
-  --shadow-neon: 0 0 16px #9f37fadc;
-  --shadow-neon-primary: 0 0 20px #3a8bf584;
+  --shadow-neon: 0 0 26px -5px #527efad8;
+  --shadow-neon-primary: 0 0 20px #17bdfa84;
   --shadow-neon-secondary: 0 0 16px rgba(247, 95, 128, 0.81);
 
   /* Glass surfaces */

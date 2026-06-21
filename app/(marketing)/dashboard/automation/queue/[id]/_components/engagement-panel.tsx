@@ -540,8 +540,8 @@ export function EngagementPanel({ status, statusUnavailable = false }: Engagemen
                   <Separator className="my-4" />
                   <div className="space-y-4">
                     <Collapsible
-                      className="rounded-md border border-border/80"
-                      onOpenChange={setOpenProfile}
+                      className="bg-linear-to-tr from-black/5 via-primary/5 to-accent/20 backdrop-blur-md rounded-md border border-accent/30"
+                      onOpenChange={setOpenProfile} 
                       open={openProfile }
                     >
                       <CollapsibleTrigger
@@ -563,7 +563,7 @@ export function EngagementPanel({ status, statusUnavailable = false }: Engagemen
                     </Collapsible>
 
                     <Collapsible
-                      className="rounded-md border border-border/80"
+                      className="bg-linear-to-tr from-black/5 via-primary/10 to-accent/20 backdrop-blur-md  rounded-md border border-accent/30"
                       onOpenChange={setOpenPrd}
                       open={openPrd}
                     >
@@ -595,7 +595,7 @@ export function EngagementPanel({ status, statusUnavailable = false }: Engagemen
                     </Collapsible>
 
                     <Collapsible
-                      className="rounded-md border border-border/80"
+                      className="bg-linear-to-tr from-black/5 via-primary/5 to-accent/20 backdrop-blur-md  rounded-md border border-accent/30"
                       onOpenChange={setOpenDesigns}
                       open={openDesigns}
                     >
