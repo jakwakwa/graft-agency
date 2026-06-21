@@ -3,8 +3,8 @@ import Image from "next/image";
 
 export function LandingFeaturesSection() {
   return (
-    <section className="py-24 px-10 max-w-7xl mx-auto relative">
-      <div className="mb-16 text-center space-y-2">
+    <section className="py-10 px-4 sm:py-16 sm:px-6 md:py-24 md:px-10 max-w-7xl mx-auto relative">
+      <div className="mb-8 md:mb-16 text-center space-y-2">
         <h2 className="text-3xl md:text-5xl font-black tracking-tight text-on-surface uppercase">
           The Graft <span className="text-primary">Ecosystem</span>
         </h2>
@@ -13,7 +13,7 @@ export function LandingFeaturesSection() {
         </p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6 h-auto md:h-[600px]">
-        <div className="md:col-span-8 glass-panel rounded-xl p-8 relative overflow-hidden group hover:border-primary/40 transition-colors">
+        <div id="lead-capture" className="md:col-span-8 glass-panel rounded-xl p-4 sm:p-6 md:p-8 relative overflow-hidden group hover:border-primary/40 transition-colors">
           <div className="absolute top-0 right-0 w-1/2 h-full opacity-10 group-hover:opacity-20 transition-opacity">
             <div className="relative h-full w-full">
               <Image
@@ -29,7 +29,7 @@ export function LandingFeaturesSection() {
           <div className="relative z-10 flex flex-col h-full justify-between">
             <div>
               <BrainCircuit />
-              <h3 className="text-2xl font-bold text-on-surface mb-2">Lead Capture Genius</h3>
+              <h3 className="text-xl md:text-2xl font-bold text-on-surface mb-2">Lead Capture Genius</h3>
               <p className="text-on-surface-variant max-w-md">
                 Our neural engine qualifies every visitor using semantic analysis. We don't just capture emails; we
                 capture intent and readiness.
@@ -45,7 +45,7 @@ export function LandingFeaturesSection() {
             </div>
           </div>
         </div>
-        <div className="md:col-span-4 glass-panel rounded-xl p-8 border-l-4 border-secondary flex flex-col justify-between group">
+        <div id="midnight-prospector" className="md:col-span-4 glass-panel rounded-xl p-4 sm:p-6 md:p-8 border-l-4 border-secondary flex flex-col justify-between group">
           <div>
             <Radar />
             <h3 className="text-xl font-bold text-on-surface mb-2">Midnight Prospector</h3>
@@ -62,7 +62,7 @@ export function LandingFeaturesSection() {
             </div>
           </div>
         </div>
-        <div className="md:col-span-4 glass-panel rounded-xl p-8 border-r-4 border-primary flex flex-col justify-between">
+        <div id="white-label" className="md:col-span-4 glass-panel rounded-xl p-4 sm:p-6 md:p-8 border-r-4 border-primary flex flex-col justify-between">
           <div>
             <IdCard />
             <h3 className="text-xl font-bold text-on-surface mb-2">White-Label Wonder</h3>
@@ -82,29 +82,29 @@ export function LandingFeaturesSection() {
             </div>
           </div>
         </div>
-        <div className="md:col-span-8 glass-panel rounded-xl p-8 relative overflow-hidden flex flex-col items-center justify-center text-center">
+        <div className="md:col-span-8 glass-panel rounded-xl p-4 sm:p-6 md:p-8 relative overflow-hidden flex flex-col items-center justify-center text-center">
           <div className="absolute inset-0 opacity-5">
             <div className="w-full h-full bg-[radial-gradient(#fff_1px,transparent_1px)] bg-size-[20px_20px]"></div>
           </div>
           <div className="relative z-10">
             <h3 className="text-xl font-bold text-on-surface mb-6 uppercase tracking-widest">Built for Resilience</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-5 md:gap-8">
               <div className="space-y-1">
-                <div className="text-4xl font-black text-on-surface">100%</div>
+                <div className="text-2xl md:text-4xl font-black text-on-surface">100%</div>
                 <div className="text-[9px] uppercase tracking-widest text-on-surface-variant font-bold">
                   Stateless Arch
                 </div>
               </div>
               <div className="space-y-1">
-                <div className="text-4xl font-black text-on-surface">99.99</div>
+                <div className="text-2xl md:text-4xl font-black text-on-surface">99.99</div>
                 <div className="text-[9px] uppercase tracking-widest text-on-surface-variant font-bold">Uptime %</div>
               </div>
               <div className="space-y-1">
-                <div className="text-4xl font-black text-on-surface">Global</div>
+                <div className="text-2xl md:text-4xl font-black text-on-surface">Global</div>
                 <div className="text-[9px] uppercase tracking-widest text-on-surface-variant font-bold">Node Mesh</div>
               </div>
               <div className="space-y-1">
-                <div className="text-4xl font-black text-on-surface">Encrypted</div>
+                <div className="text-2xl md:text-4xl font-black text-on-surface">Encrypted</div>
                 <div className="text-[9px] uppercase tracking-widest text-on-surface-variant font-bold">End-to-End</div>
               </div>
             </div>

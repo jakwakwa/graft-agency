@@ -8,10 +8,10 @@ const footerLinkClass = "text-sm text-[#a5a9c4] transition-colors hover:text-whi
 
 export function LandingSiteFooter() {
   return (
-    <footer className="relative z-10 border-t border-white/5 bg-[#13121b] pt-20 pb-10">
+    <footer className="relative z-10 border-t border-white/5 bg-[#13121b] pt-10 pb-8 md:pt-20 md:pb-10">
       <div className={landingContainerClassName}>
-        <div className="mb-16 grid grid-cols-1 gap-12 md:grid-cols-4 lg:gap-24">
-          <div className="md:col-span-1">
+        <div className="mb-12 md:mb-16 grid grid-cols-1 gap-10 sm:grid-cols-2 md:grid-cols-3 lg:gap-20">
+          <div>
             <span className="mb-4 block text-lg font-bold tracking-wider text-white">GRAFT.TODAY</span>
             <Typography.P className="max-w-[250px] text-sm leading-relaxed">
               High-performance AI orchestration for elite sales teams. Engineered for the South African business
@@ -35,29 +35,6 @@ export function LandingSiteFooter() {
           </div>
 
           <div>
-            <Typography.H4 className="mb-6 text-xs font-bold tracking-wider text-white uppercase">
-              Company
-            </Typography.H4>
-            <ul className="space-y-4">
-              <li>
-                <LandingSectionLink sectionId="lead-capture" className={footerLinkClass}>
-                  About us
-                </LandingSectionLink>
-              </li>
-              <li>
-                <LandingSectionLink sectionId="white-label" className={footerLinkClass}>
-                  Success stories
-                </LandingSectionLink>
-              </li>
-              <li>
-                <Link href={LANDING_ROUTES.security} className={footerLinkClass}>
-                  Security
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          <div>
             <Typography.H4 className="mb-6 text-xs font-bold tracking-wider text-white uppercase">Legal</Typography.H4>
             <ul className="space-y-4">
               <li>
@@ -68,6 +45,11 @@ export function LandingSiteFooter() {
               <li>
                 <Link href={LANDING_ROUTES.terms} className={footerLinkClass}>
                   Terms of service
+                </Link>
+              </li>
+              <li>
+                <Link href={LANDING_ROUTES.security} className={footerLinkClass}>
+                  Security
                 </Link>
               </li>
             </ul>

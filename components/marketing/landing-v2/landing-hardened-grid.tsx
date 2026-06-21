@@ -5,10 +5,10 @@ import Image from "next/image";
 
 export function LandingHardenedGrid() {
   return (
-    <section className="py-24 bg-surface-container-low border-y border-white/5 overflow-hidden">
-      <div className="px-10 max-w-7xl mx-auto flex flex-col lg:flex-row gap-16 items-center">
+    <section className="py-10 sm:py-16 md:py-24 bg-surface-container-low border-y border-white/5 overflow-hidden">
+      <div className="px-4 sm:px-6 md:px-10 max-w-7xl mx-auto flex flex-col lg:flex-row gap-8 md:gap-16 items-center">
         <div className="lg:w-1/2 space-y-6">
-          <h2 className="text-4xl font-black text-on-surface tracking-tight uppercase">
+          <h2 className="text-2xl md:text-4xl font-black text-on-surface tracking-tight uppercase">
             Grid-Hardened <br />
             <span className="text-secondary">Infrastructure</span>
           </h2>
