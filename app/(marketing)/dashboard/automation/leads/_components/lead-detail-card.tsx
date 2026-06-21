@@ -69,7 +69,7 @@ export function LeadDetailCard({ id, customerName, scrapedData, onApprove, onSav
                     {scrapedData.hasChatbot ? "Has Chatbot" : "No Chatbot"}
                   </span>
                   <span
-                    className={`inline-flex items-center rounded-full px-2.5 py-0.5 border-[1.5px] bg-white/5 text-xs font-medium ${scrapedData.hasVoiceAgent ? "bg-yellow-400/5 border-amber-400 text-amber-400" : "bg-emerald-900/5 border-emerald-400 text-emerald-400"}`}
+                    className={`inline-flex items-center rounded-full px-2.5 py-0.5 border-[1.5px] text-xs font-medium ${scrapedData.hasVoiceAgent ? "bg-yellow-400/5 border-amber-400 text-amber-400" : "bg-emerald-900/5 border-emerald-400 text-emerald-400"}`}
                   >
                     {scrapedData.hasVoiceAgent ? "Has Voice Agent" : "No Voice Agent"}
                   </span>

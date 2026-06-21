@@ -55,7 +55,7 @@ export function AutomationHubClient() {
       </div>
       <div className="flex items-center justify-between mb-8">
         <Typography.H3 className="mt-0 mb-0">Agent Performance Tuning</Typography.H3>
-        <Button variant="default" size="sm" onClick={handleFindProspects} disabled={finding}>
+        <Button variant="secondary" size="lg" onClick={handleFindProspects} disabled={finding}>
           {finding ? "Searching..." : "Find Prospects"}
         </Button>
       </div>
