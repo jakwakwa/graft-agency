@@ -30,17 +30,17 @@ export interface StitchDesignRequest {
 const FALLBACK_SCHEMES: DesignConcept["colorScheme"][] = [
   { primary: "#4d7bd7ff", background: "#191f2aff", text: "#d8e2f6ff" },
   { primary: "#ed9f38ff", background: "#eceafaff", text: "#f8fafc" },
-  { primary: "#222527ff", background: "#dde9f4ff", text: "#575e67ff" },
+  { primary: "#000000ff", background: "#080a0fff", text: "#49505aff" },
 ];
 
 const DEFAULT_DESIGN_SYSTEM: DesignSystemSpec = {
-  background: "#192328ff",
+  background: "#17181dff",
   surface: "#38607071",
   primary: "#5571ccff",
-  onPrimary: "#FFFFFF",
-  secondary: "#3ae3dbff",
-  onSurface: "#dff3e9ff",
-  onSurfaceVariant: "#2b313cff",
+  onPrimary: "#f4fafaff",
+  secondary: "#08aca3ff",
+  onSurface: "#2e313dff",
+  onSurfaceVariant: "#dae1eaff",
   outline: "rgba(176, 243, 237, 0.1)",
   headlineFont: "Poppins, sans-serif",
   bodyFont: "Geist, sans-serif",

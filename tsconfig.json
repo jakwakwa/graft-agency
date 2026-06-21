@@ -1,8 +1,6 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
-    "ignoreDeprecations": "6.0",
-    // Bundler mode
     "types": ["bun-types"],
     "target": "ES2017",
     "lib": ["dom", "dom.iterable", "esnext"],

@@ -227,7 +227,7 @@ export function ProspectingConfigForm() {
       </div>
 
       {/* 2. Targeting Parameters (Asymmetric Bento Card layout) */}
-      <div className="p-1.5 rounded-[2rem] bg-slate-100 sm:bg-transparent ring-1 ring-white/10 dark:ring-white/10">
+      <div className="p-1.5 rounded-[2rem] sm:bg-transparent ring-1 ring-white/10 dark:ring-white/10">
         <div className="p-6 rounded-[calc(2rem-0.375rem)] bg-card/40 backdrop-blur-md space-y-6">
           <div className="space-y-1">
             <Typography.Small className="text-[10px] uppercase tracking-widest text-secondary font-bold flex items-center gap-1.5">
@@ -281,7 +281,7 @@ export function ProspectingConfigForm() {
       </div>
 
       {/* 3. Outreach Details (Email & Value Prop) */}
-      <div className="p-1.5 rounded-[2rem] bg-blue-300/40 sm:bg-transparent ring-1 ring-white/10 dark:ring-white/10">
+      <div className="p-1.5 rounded-[2rem] bg-primary/10 sm:bg-transparent ring-1 ring-white/10 dark:ring-white/10">
         <div className="p-6 rounded-[calc(2rem-0.375rem)] bg-card/40 backdrop-blur-md space-y-6">
           <div className="space-y-1">
             <Typography.Small className="text-[10px] uppercase tracking-widest text-accent font-bold flex items-center gap-1.5">
