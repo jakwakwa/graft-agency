@@ -1,0 +1,92 @@
+---
+title: "Engagement pipeline"
+description: "The 8-stage Inngest workflow that produces a full AI-generated proposal and deployment for each lead."
+keywords: ["engagement", "pipeline", "inngest", "jules", "stitch", "render", "proposal"]
+---
+
+The engagement pipeline is a durable 8-stage workflow powered by Inngest. It takes a lead from initial profiling all the way through to a deployed product and a Paddle checkout link — automatically.
+
+## Pipeline stages
+
+Each stage is an Inngest function that reads/writes to a `ProductSpec` record attached to the lead.
+
+<Steps>
+  <Step title="lead-profiler">
+    Analyses the lead's website, industry, and pain points. Produces a structured profile stored in `ProductSpec`.
+  </Step>
+  <Step title="prd-writer">
+    Writes a Product Requirements Document (PRD) based on the lead profile. The PRD drives all downstream stages.
+  </Step>
+  <Step title="stitch-designer">
+    Uses the Google Stitch SDK to generate design concepts (screens, colour palette, component sketches) from the PRD.
+  </Step>
+  <Step title="jules-builder">
+    Submits the PRD and design concepts to Jules Labs, which generates a GitHub repository with working code via GitHub Actions.
+  </Step>
+  <Step title="jules-poller">
+    Polls the GitHub Actions run until the build completes or times out. Stores the generated repo URL in `ProductSpec`.
+  </Step>
+  <Step title="engagement-reconciler">
+    Handles retries, failures, and edge cases. Ensures the pipeline resumes correctly after any transient error.
+  </Step>
+  <Step title="offer-dispatcher (deploy)">
+    Deploys the generated code to [Render](https://render.com) using `lib/services/render.service.ts`.
+  </Step>
+  <Step title="offer-dispatcher (send)">
+    Creates a Paddle checkout link and sends the offer email via Resend, including the live preview URL and payment link.
+  </Step>
+</Steps>
+
+## ProductSpec and EngagementStage
+
+Each lead has at most one `ProductSpec`. The `stage` field is an enum that tracks which pipeline step is active:
+
+```typescript
+enum EngagementStage {
+  NOT_STARTED
+  PROFILING
+  PRD_WRITING
+  DESIGNING
+  BUILDING
+  DEPLOYING
+  DISPATCHING
+  COMPLETED
+  FAILED
+}
+```
+
+Inspect a lead's engagement stage in the portal leads table or via the API:
+
+```bash
+GET /api/leads?sort=engagementStage&order=asc
+```
+
+## Triggering the pipeline
+
+The pipeline starts automatically when a lead's status is set to `DRAFT_PENDING` and engagement is enabled. To trigger manually:
+
+```bash
+POST /api/engagement
+Content-Type: application/json
+Authorization: Bearer <token>
+
+{ "leadId": "uuid-of-lead" }
+```
+
+## Dry-run mode
+
+Set `ENGAGEMENT_DRY_RUN=true` to stub all external service calls — Render deployments, Paddle checkout creation, and Resend email dispatch — without making real API calls. Useful during development and testing.
+
+```bash
+ENGAGEMENT_DRY_RUN=true bun run dev
+```
+
+<Info>
+  Dry-run mode only stubs the final output calls. All Inngest functions still run and all `ProductSpec` state is still written to the database, so you can verify the full pipeline flow locally.
+</Info>
+
+## Monitoring
+
+Run `inngest dev` locally and navigate to the Inngest dashboard at `http://localhost:8288` to inspect each function invocation, view step-level traces, and replay failed runs.
+
+In production, view runs in the [Inngest Cloud dashboard](https://app.inngest.com) under your app's environment.

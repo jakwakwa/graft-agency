@@ -1,0 +1,77 @@
+---
+title: "Prospecting pipeline"
+description: "Automated lead generation: scrape websites, audit AI presence, and generate cold emails."
+keywords: ["prospecting", "leads", "cold email", "gemini", "inngest", "pipeline"]
+---
+
+The prospecting pipeline finds potential clients, analyses their online presence, and drafts personalised outreach emails for your approval.
+
+## How it works
+
+<Steps>
+  <Step title="Add prospects to the queue">
+    Add businesses to your prospect queue via the portal — one at a time or by CSV upload. Each entry needs at minimum a business name; a website URL speeds up the audit.
+  </Step>
+  <Step title="Configure your pipeline">
+    Set your value proposition and outreach email address under **Settings → Prospecting config**. Optionally enable the automated cron to run the pipeline on a schedule.
+  </Step>
+  <Step title="Run the pipeline">
+    Trigger the pipeline manually from **Automation hub**, or let the cron fire automatically. The pipeline processes `PENDING` entries from your queue.
+  </Step>
+  <Step title="Review and approve emails">
+    Processed leads appear in your prospect queue with a draft email. Review and approve before dispatch. Approved emails are sent via Resend.
+  </Step>
+</Steps>
+
+## ProspectingConfig
+
+Your pipeline settings are stored in a `ProspectingConfig` record scoped to your tenant:
+
+| Field | Description |
+|---|---|
+| `valueProposition` | What you offer — used to personalise email drafts |
+| `outreachFromEmail` | Sender address for outbound emails |
+| `cronEnabled` | Whether to run the pipeline automatically |
+| `cronFrequency` | `daily` or `weekly` |
+| `cronDay` | Day of week (0–6) for weekly runs |
+| `searchCriteria` | JSON object with industry/location filters |
+
+## Prospect queue statuses
+
+| Status | Meaning |
+|---|---|
+| `PENDING` | Waiting to be processed |
+| `PROCESSING` | Currently running through the pipeline |
+| `COMPLETED` | Pipeline finished, lead created |
+| `FAILED` | Pipeline failed; `errorMessage` has details |
+
+## Inngest function
+
+The pipeline runs inside the `prospecting-tick` Inngest function at `lib/inngest/functions/prospecting-tick.ts`. It processes queue entries in batches and emits events that trigger follow-up actions.
+
+To process the queue manually without the portal:
+
+```bash
+# POST to the automation endpoint (authenticated)
+curl -X POST https://your-app.vercel.app/api/automation \
+  -H "Authorization: Bearer <token>"
+```
+
+<Tip>
+  Run `inngest dev` locally and trigger the `prospecting/tick` event to step through the pipeline with full observability.
+</Tip>
+
+## Lead statuses
+
+Once the pipeline creates a `Lead`, it moves through these statuses:
+
+| Status | Description |
+|---|---|
+| `SCRAPED` | Created from prospecting, not yet contacted |
+| `DRAFT_PENDING` | Email draft ready for approval |
+| `CONTACTED` | Email sent |
+| `REPLIED` | Prospect replied |
+| `BOOKED` | Appointment booked via Cal.com |
+| `CLOSED` | Deal closed |
+
+Leads with status `DRAFT_PENDING` can optionally trigger the [engagement pipeline](/guides/engagement-pipeline) to generate a full proposal.
