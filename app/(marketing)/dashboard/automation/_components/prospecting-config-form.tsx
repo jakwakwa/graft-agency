@@ -1,6 +1,6 @@
 "use client";
 
-import { Calendar, CalendarDays, Clock, Globe, RefreshCw, Timer, TrendingUp } from "lucide-react";
+import { Clock, Globe, Loader2, Mail, MessageSquare, Save } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Typography } from "@/components/ui/typography";
 
-const AUTOMATION_TOAST = { duration: Infinity, closeButton: true } as const;
+const AUTOMATION_TOAST = { duration: 5000, closeButton: true } as const;
 
 const DAYS_OF_WEEK = [
   { value: 0, label: "Sunday" },
@@ -86,6 +86,7 @@ export function ProspectingConfigForm() {
           .split(",")
           .map((v) => v.trim())
           .filter(Boolean);
+
       const res = await fetch("/api/prospecting-config", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -104,9 +105,9 @@ export function ProspectingConfigForm() {
         }),
       });
       if (!res.ok) throw new Error("Save failed");
-      toast.success("Prospecting config saved.", AUTOMATION_TOAST);
+      toast.success("Prospecting config saved successfully.", AUTOMATION_TOAST);
     } catch {
-      toast.error("Failed to save config.", AUTOMATION_TOAST);
+      toast.error("Failed to save configuration.", AUTOMATION_TOAST);
     } finally {
       setSaving(false);
     }
@@ -115,287 +116,232 @@ export function ProspectingConfigForm() {
   if (loading) {
     return (
       <div className="space-y-8 animate-pulse">
-        <div className="flex gap-4">
-          <div className="h-6 w-32 rounded bg-muted" />
-          <div className="h-6 w-48 rounded bg-muted" />
-        </div>
-        <div className="h-40 w-full rounded-xl bg-muted/50" />
+        <div className="h-12 w-full rounded-xl bg-muted/50" />
         <div className="grid gap-6 sm:grid-cols-2">
-          <div className="h-10 rounded bg-muted" />
-          <div className="h-10 rounded bg-muted" />
+          <div className="h-24 rounded-2xl bg-muted/30" />
+          <div className="h-24 rounded-2xl bg-muted/30" />
         </div>
-        <div className="h-10 w-full rounded bg-muted" />
-        <div className="h-32 w-full rounded bg-muted" />
+        <div className="h-40 w-full rounded-2xl bg-muted/30" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-12">
-      <div className="space-y-12">
-        <div className="space-y-4">
-          <div className="flex justify-between items-center">
-            <span className="text-xs font-data uppercase tracking-widest font-bold flex items-center gap-2">
-              <TrendingUp className="h-3 w-3 text-primary" />
-              Sales Aggression
-            </span>
-            <span className="text-primary font-data font-bold">85%</span>
-          </div>
-          <input
-            className="w-full h-1 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
-            max="100"
-            min="0"
-            type="range"
-            value="85"
-            readOnly
-          />
-          <p className="text-[10px] text-muted-foreground italic">
-            Determines how quickly the agent pushes for a calendar booking after lead intent is detected.
-          </p>
-        </div>
-
-        <div className="space-y-4">
-          <div className="flex justify-between items-center">
-            <span className="text-xs font-data uppercase tracking-widest font-bold flex items-center gap-2">
-              <Globe className="h-3 w-3 text-secondary" />
-              Local Nuance (Bakkie / Load Shedding)
-            </span>
-            <span className="text-secondary font-data font-bold">Max (Resilient)</span>
-          </div>
-          <input
-            className="w-full h-1 bg-muted rounded-lg appearance-none cursor-pointer accent-secondary"
-            max="100"
-            min="0"
-            type="range"
-            value="95"
-            readOnly
-          />
-          <p className="text-[10px] text-muted-foreground italic">
-            Adjusts dialect and situational awareness. Currently monitoring: Stage 0 (AI Resilience Active).
-          </p>
-        </div>
-
-        <div className="space-y-4">
-          <div className="flex justify-between items-center">
-            <span className="text-xs font-data uppercase tracking-widest font-bold flex items-center gap-2">
-              <Timer className="h-3 w-3 text-muted-foreground" />
-              Response Delay
-            </span>
-            <span className="text-muted-foreground font-data font-bold">Humanized (2-4m)</span>
-          </div>
-          <input
-            className="w-full h-1 bg-muted rounded-lg appearance-none cursor-pointer accent-muted-foreground"
-            max="100"
-            min="0"
-            type="range"
-            value="30"
-            readOnly
-          />
-          <p className="text-[10px] text-muted-foreground italic">
-            Simulates human typing and thinking time to maintain lead comfort and conversion authenticity.
-          </p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-card p-6 rounded-xl border border-outline-ghost/10 hover:border-primary/40 transition-all group">
-          <div className="flex justify-between items-start mb-4">
-            <div className="w-10 h-10 bg-muted/50 rounded-lg flex items-center justify-center">
-              <Calendar className="h-5 w-5 text-primary" />
-            </div>
-            <div className="w-11 h-6 bg-muted rounded-full relative">
-              <div className="absolute right-1 top-1 w-4 h-4 bg-primary rounded-full" />
-            </div>
-          </div>
-          <h4 className="text-sm font-data font-bold text-foreground mb-1">Calendly Sync</h4>
-          <p className="text-[10px] text-muted-foreground">Live booking orchestration enabled.</p>
-        </div>
-
-        <div className="bg-card p-6 rounded-xl border border-outline-ghost/10 hover:border-primary/40 transition-all group">
-          <div className="flex justify-between items-start mb-4">
-            <div className="w-10 h-10 bg-muted/50 rounded-lg flex items-center justify-center">
-              <CalendarDays className="h-5 w-5 text-secondary" />
-            </div>
-            <div className="w-11 h-6 bg-muted rounded-full relative" />
-          </div>
-          <h4 className="text-sm font-data font-bold text-foreground mb-1">Cal.com</h4>
-          <p className="text-[10px] text-muted-foreground">Connect for open-source scheduling.</p>
-        </div>
-
-        <div className="bg-card p-6 rounded-xl border border-outline-ghost/10 hover:border-primary/40 transition-all group">
-          <div className="flex justify-between items-start mb-4">
-            <div className="w-10 h-10 bg-muted/50 rounded-lg flex items-center justify-center">
-              <RefreshCw className="h-5 w-5 text-accent" />
-            </div>
-            <div className="w-11 h-6 bg-muted rounded-full relative">
-              <div className="absolute right-1 top-1 w-4 h-4 bg-primary rounded-full" />
-            </div>
-          </div>
-          <h4 className="text-sm font-data font-bold text-foreground mb-1">CRM Sync</h4>
-          <p className="text-[10px] text-muted-foreground">HubSpot/Salesforce active.</p>
-        </div>
-      </div>
-
-      <div className="pt-8 border-t border-outline-ghost/10 space-y-6">
-        <Typography.H4>System Configuration</Typography.H4>
-        <div className="flex flex-wrap items-center gap-4">
-          <label className="flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              className="rounded border-outline-ghost bg-transparent text-primary focus:ring-primary"
-              checked={config.cronEnabled}
-              onChange={(e) => setConfig((c) => ({ ...c, cronEnabled: e.target.checked }))}
-            />
-            Cron enabled
-          </label>
-        </div>
-
-        <div className="rounded-xl border border-outline-ghost/50 bg-muted/50 p-6 space-y-4">
-          <div className="flex items-center gap-2">
-            <Clock className="h-4 w-4 text-primary" />
-            <Typography.Small className="font-medium text-muted-foreground uppercase tracking-wide">
-              Cron Schedule
-            </Typography.Small>
-          </div>
-          <Typography.Muted className="text-xs leading-relaxed">
-            Runs once per day (or weekly on the selected day) at approximately 08:00 UTC. The start date defers the
-            first run until on or after that date.
-          </Typography.Muted>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <Label htmlFor="cronFrequency" className="text-xs font-data uppercase tracking-wider">
-                Frequency
-              </Label>
-              <select
-                id="cronFrequency"
-                value={config.cronFrequency}
-                onChange={(e) =>
-                  setConfig((c) => ({
-                    ...c,
-                    cronFrequency: e.target.value as "daily" | "weekly",
-                    cronDay: e.target.value === "weekly" ? (c.cronDay ?? 1) : null,
-                  }))
-                }
-                className="mt-1 flex h-10 w-full rounded-lg border border-outline-ghost/20 bg-background/50 px-3 py-1 text-sm outline-none focus:border-primary/50 transition-colors"
+    <div className="space-y-8">
+      {/* 1. Cron Control (Switch) */}
+      <div className="p-1.5 rounded-[2rem] bg-white/5 ring-1 ring-white/10 dark:ring-white/10">
+        <div className="p-6 rounded-[calc(2rem-0.375rem)] bg-card/40 backdrop-blur-md space-y-6">
+          <div className="flex items-center justify-between gap-4">
+            <div className="space-y-1">
+              <Label
+                htmlFor="cron-enabled-toggle"
+                className="text-sm font-bold text-foreground flex items-center gap-2"
               >
-                <option value="daily">Daily</option>
-                <option value="weekly">Weekly</option>
-              </select>
+                <Clock className="h-4 w-4 text-primary" />
+                Automated Prospecting Schedule
+              </Label>
+              <p className="text-xs text-muted-foreground leading-relaxed max-w-[55ch]">
+                When enabled, the background engine runs according to your specified frequency to find new high-intent
+                target prospects.
+              </p>
             </div>
+            <button
+              id="cron-enabled-toggle"
+              type="button"
+              className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${config.cronEnabled ? "bg-primary" : "bg-muted-foreground/30"}`}
+              onClick={() => setConfig((c) => ({ ...c, cronEnabled: !c.cronEnabled }))}
+            >
+              <span
+                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-background shadow-md ring-0 transition duration-300 ease-in-out ${config.cronEnabled ? "translate-x-5" : "translate-x-0"}`}
+              />
+            </button>
+          </div>
 
-            {config.cronFrequency === "weekly" && (
+          {config.cronEnabled && (
+            <div className="pt-4 border-t border-outline-ghost/10 grid gap-4 sm:grid-cols-3">
               <div>
-                <Label htmlFor="cronDay" className="text-xs font-data uppercase tracking-wider">
-                  Day of week
+                <Label
+                  htmlFor="cronFrequency"
+                  className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground"
+                >
+                  Frequency
                 </Label>
                 <select
-                  id="cronDay"
-                  value={config.cronDay ?? 1}
-                  onChange={(e) => setConfig((c) => ({ ...c, cronDay: Number(e.target.value) }))}
-                  className="mt-1 flex h-10 w-full rounded-lg border border-outline-ghost/20 bg-background/50 px-3 py-1 text-sm outline-none focus:border-primary/50 transition-colors"
+                  id="cronFrequency"
+                  value={config.cronFrequency}
+                  onChange={(e) =>
+                    setConfig((c) => ({
+                      ...c,
+                      cronFrequency: e.target.value as "daily" | "weekly",
+                      cronDay: e.target.value === "weekly" ? (c.cronDay ?? 1) : null,
+                    }))
+                  }
+                  className="mt-1.5 flex h-10 w-full rounded-lg border border-outline-ghost/20 bg-background px-3 py-1 text-sm outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-colors"
                 >
-                  {DAYS_OF_WEEK.map((d) => (
-                    <option key={d.value} value={d.value}>
-                      {d.label}
-                    </option>
-                  ))}
+                  <option value="daily">Daily</option>
+                  <option value="weekly">Weekly</option>
                 </select>
               </div>
-            )}
 
-            <div>
-              <Label htmlFor="cronStartDate" className="text-xs font-data uppercase tracking-wider">
-                Start date
+              {config.cronFrequency === "weekly" && (
+                <div>
+                  <Label
+                    htmlFor="cronDay"
+                    className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground"
+                  >
+                    Day of Week
+                  </Label>
+                  <select
+                    id="cronDay"
+                    value={config.cronDay ?? 1}
+                    onChange={(e) => setConfig((c) => ({ ...c, cronDay: Number(e.target.value) }))}
+                    className="mt-1.5 flex h-10 w-full rounded-lg border border-outline-ghost/20 bg-background px-3 py-1 text-sm outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-colors"
+                  >
+                    {DAYS_OF_WEEK.map((d) => (
+                      <option key={d.value} value={d.value}>
+                        {d.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              <div>
+                <Label
+                  htmlFor="cronStartDate"
+                  className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground"
+                >
+                  Start Date
+                </Label>
+                <input
+                  id="cronStartDate"
+                  type="date"
+                  value={config.cronStartDate ?? ""}
+                  onChange={(e) => setConfig((c) => ({ ...c, cronStartDate: e.target.value || null }))}
+                  className="mt-1.5 flex h-10 w-full rounded-lg border border-outline-ghost/20 bg-background px-3 py-1 text-sm outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-colors"
+                />
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* 2. Targeting Parameters (Asymmetric Bento Card layout) */}
+      <div className="p-1.5 rounded-[2rem] bg-white/5 ring-1 ring-white/10 dark:ring-white/10">
+        <div className="p-6 rounded-[calc(2rem-0.375rem)] bg-card/40 backdrop-blur-md space-y-6">
+          <div className="space-y-1">
+            <Typography.Small className="text-[10px] uppercase tracking-widest text-secondary font-bold flex items-center gap-1.5">
+              <Globe className="h-3.5 w-3.5 text-secondary" />
+              Targeting Parameters
+            </Typography.Small>
+            <Typography.H4 className="text-lg font-bold text-foreground">Target Prospect Audience</Typography.H4>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="industries" className="text-xs font-semibold text-foreground">
+                Industries
               </Label>
-              <input
-                id="cronStartDate"
-                type="date"
-                value={config.cronStartDate ?? ""}
-                onChange={(e) => setConfig((c) => ({ ...c, cronStartDate: e.target.value || null }))}
-                className="mt-1 flex h-10 w-full rounded-lg border border-outline-ghost/20 bg-background/50 px-3 py-1 text-sm outline-none focus:border-primary/50 transition-colors"
+              <Input
+                id="industries"
+                className="bg-background border-outline-ghost/20 focus-visible:ring-primary"
+                value={industries}
+                onChange={(e) => setIndustries(e.target.value)}
+                placeholder="e.g. accounting, dental, real estate (comma separated)"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="locations" className="text-xs font-semibold text-foreground">
+                Locations
+              </Label>
+              <Input
+                id="locations"
+                className="bg-background border-outline-ghost/20 focus-visible:ring-primary"
+                value={locations}
+                onChange={(e) => setLocations(e.target.value)}
+                placeholder="e.g. Cape Town, Johannesburg (comma separated)"
               />
             </div>
           </div>
-        </div>
 
-        <div className="grid gap-6 sm:grid-cols-2">
-          <div>
-            <Label htmlFor="industries" className="text-xs font-data uppercase tracking-wider">
-              Industries
+          <div className="space-y-2">
+            <Label htmlFor="keywords" className="text-xs font-semibold text-foreground">
+              Keywords
             </Label>
             <Input
-              id="industries"
-              className="mt-1 bg-background/50 border-outline-ghost/20"
-              value={industries}
-              onChange={(e) => setIndustries(e.target.value)}
-              placeholder="e.g. accounting, dental, real estate"
-            />
-          </div>
-          <div>
-            <Label htmlFor="locations" className="text-xs font-data uppercase tracking-wider">
-              Locations
-            </Label>
-            <Input
-              id="locations"
-              className="mt-1 bg-background/50 border-outline-ghost/20"
-              value={locations}
-              onChange={(e) => setLocations(e.target.value)}
-              placeholder="e.g. Cape Town, Johannesburg"
+              id="keywords"
+              className="bg-background border-outline-ghost/20 focus-visible:ring-primary"
+              value={keywords}
+              onChange={(e) => setKeywords(e.target.value)}
+              placeholder="e.g. no chatbot, small business, fast growing (comma separated)"
             />
           </div>
         </div>
-
-        <div>
-          <Label htmlFor="keywords" className="text-xs font-data uppercase tracking-wider">
-            Keywords
-          </Label>
-          <Input
-            id="keywords"
-            className="mt-1 bg-background/50 border-outline-ghost/20"
-            value={keywords}
-            onChange={(e) => setKeywords(e.target.value)}
-            placeholder="e.g. no chatbot, small business"
-          />
-        </div>
-
-        <div>
-          <Label htmlFor="fromEmail" className="text-xs font-data uppercase tracking-wider">
-            Outreach from email
-          </Label>
-          <Input
-            id="fromEmail"
-            type="email"
-            className="mt-1 bg-background/50 border-outline-ghost/20"
-            value={fromEmail}
-            onChange={(e) => setFromEmail(e.target.value)}
-            placeholder="outreach@yourdomain.com"
-          />
-        </div>
-
-        <div>
-          <Label htmlFor="valueProposition" className="text-xs font-data uppercase tracking-wider">
-            Value proposition
-          </Label>
-          <textarea
-            id="valueProposition"
-            value={valueProposition}
-            onChange={(e) => setValueProposition(e.target.value)}
-            placeholder="e.g. We build AI voice agents that answer calls 24/7 so you never miss a lead."
-            rows={3}
-            className="mt-1 flex w-full rounded-lg border border-outline-ghost/20 bg-background/50 px-3 py-2 text-sm outline-none focus:border-primary/50 transition-colors resize-none"
-          />
-        </div>
-
-        <Button
-          variant="default"
-          size="lg"
-          className="w-full bg-gradient-to-r from-primary to-primary-kinetic text-primary-foreground font-black uppercase tracking-widest shadow-neon-primary hover:scale-[1.02] transition-transform"
-          onClick={handleSave}
-          disabled={saving}
-        >
-          {saving ? "Saving..." : "Save Configuration"}
-        </Button>
       </div>
+
+      {/* 3. Outreach Details (Email & Value Prop) */}
+      <div className="p-1.5 rounded-[2rem] bg-white/5 ring-1 ring-white/10 dark:ring-white/10">
+        <div className="p-6 rounded-[calc(2rem-0.375rem)] bg-card/40 backdrop-blur-md space-y-6">
+          <div className="space-y-1">
+            <Typography.Small className="text-[10px] uppercase tracking-widest text-accent font-bold flex items-center gap-1.5">
+              <MessageSquare className="h-3.5 w-3.5 text-accent" />
+              Outreach Details
+            </Typography.Small>
+            <Typography.H4 className="text-lg font-bold text-foreground">Outreach Identity & Proposition</Typography.H4>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="fromEmail" className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+              <Mail className="h-3.5 w-3.5 text-muted-foreground" />
+              Outreach From Email
+            </Label>
+            <Input
+              id="fromEmail"
+              type="email"
+              className="bg-background border-outline-ghost/20 focus-visible:ring-primary"
+              value={fromEmail}
+              onChange={(e) => setFromEmail(e.target.value)}
+              placeholder="outreach@yourdomain.com"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="valueProposition" className="text-xs font-semibold text-foreground">
+              Value Proposition
+            </Label>
+            <textarea
+              id="valueProposition"
+              value={valueProposition}
+              onChange={(e) => setValueProposition(e.target.value)}
+              placeholder="Describe your offer in plain language, e.g. We build custom B2B web applications in under 2 weeks."
+              rows={4}
+              className="flex w-full rounded-lg border border-outline-ghost/20 bg-background px-3 py-2 text-sm outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-colors resize-none leading-relaxed"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Action Button */}
+      <Button
+        variant="default"
+        size="lg"
+        className="w-full h-12 bg-primary text-primary-foreground font-bold uppercase tracking-widest shadow-neon-primary hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] text-xs flex items-center justify-center gap-2"
+        onClick={handleSave}
+        disabled={saving}
+      >
+        {saving ? (
+          <>
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Saving Configuration...
+          </>
+        ) : (
+          <>
+            <Save className="h-4 w-4" />
+            Save Configuration
+          </>
+        )}
+      </Button>
     </div>
   );
 }

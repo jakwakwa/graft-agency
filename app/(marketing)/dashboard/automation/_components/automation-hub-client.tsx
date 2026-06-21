@@ -49,17 +49,34 @@ export function AutomationHubClient() {
   }
 
   return (
-    <div className="glass-card rounded-2xl p-8 relative overflow-hidden">
-      <div className="relative w-8 top-0 right-0 p-4">
-        <Bolt />
+    <div className="p-1.5 rounded-[2.5rem] bg-white/5 ring-1 ring-white/10 dark:ring-white/10 shadow-xl">
+      <div className="p-8 rounded-[calc(2.5rem-0.375rem)] bg-card/50 backdrop-blur-md">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shadow-neon">
+              <Bolt className="h-5 w-5 animate-[spin_8s_linear_infinite]" />
+            </div>
+            <div>
+              <Typography.H3 className="mt-0 mb-0 text-xl font-bold text-foreground">
+                Agent Performance Tuning
+              </Typography.H3>
+              <Typography.Muted className="text-xs text-muted-foreground mt-0.5 block">
+                Calibrate scraping schedule, criteria, and target value propositions
+              </Typography.Muted>
+            </div>
+          </div>
+          <Button
+            variant="default"
+            size="sm"
+            onClick={handleFindProspects}
+            disabled={finding}
+            className="h-10 px-5 bg-foreground text-background hover:bg-foreground/90 font-bold text-xs uppercase tracking-wider active:scale-[0.98] transition-all duration-300"
+          >
+            {finding ? "Searching..." : "Find Prospects"}
+          </Button>
+        </div>
+        <ProspectingConfigForm />
       </div>
-      <div className="flex items-center justify-between mb-8">
-        <Typography.H3 className="mt-0 mb-0">Agent Performance Tuning</Typography.H3>
-        <Button variant="default" size="sm" onClick={handleFindProspects} disabled={finding}>
-          {finding ? "Searching..." : "Find Prospects"}
-        </Button>
-      </div>
-      <ProspectingConfigForm />
     </div>
   );
 }
