@@ -1,245 +1,445 @@
 "use client";
 
+import { Check, ExternalLink, FileText, Globe, Loader2, Mail, Save, Send, Trash2 } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { MarketingShell } from "@/components/layout/marketing-shell";
-import { Button } from "@/components/ui-v2/button";
-import { LeadDetailCard } from "./_components/lead-detail-card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Typography } from "@/components/ui/typography";
 
 interface LeadItem {
   id: string;
   customerName: string | null;
   status: string;
-  scrapedData: { draftSubject?: string; draftBody?: string; websiteUrl?: string; [key: string]: unknown } | null;
+  scrapedData: {
+    websiteUrl?: string;
+    draftSubject?: string;
+    draftBody?: string;
+    hasChatbot?: boolean;
+    hasVoiceAgent?: boolean;
+    businessDescription?: string;
+    coreServices?: Array<{ name: string; description: string }>;
+    painPoints?: string[];
+    targetOutreachAngle?: string;
+    [key: string]: any;
+  } | null;
 }
 
-export default function LeadsPage() {
-  const [leads, setLeads] = useState<LeadItem[]>([]);
-  const [_message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [editingLead, setEditingLead] = useState<LeadItem | null>(null);
+interface LeadsPageClientProps {
+  initialLeads: LeadItem[];
+}
 
-  async function fetchLeads() {
-    setLoading(true);
-    try {
-      const res = await fetch("/api/leads?status=DRAFT_PENDING");
-      if (res.status === 401) {
-        setMessage({ type: "error", text: "Please sign in to view leads." });
-        setLeads([]);
-        return;
-      }
-      if (res.status === 403) {
-        setMessage({ type: "error", text: "Access denied. This area is for platform owners only." });
-        setLeads([]);
-        return;
-      }
-      const data = await res.json();
-      setLeads(Array.isArray(data) ? data : []);
-    } catch {
-      setMessage({ type: "error", text: "Failed to load leads." });
-    } finally {
-      setLoading(false);
-    }
-  }
+export default function LeadsPageClient({ initialLeads }: LeadsPageClientProps) {
+  const [leads, setLeads] = useState<LeadItem[]>(initialLeads);
+  const [editingLead, setEditingLead] = useState<LeadItem | null>(initialLeads[0] ?? null);
+  const [subject, setSubject] = useState("");
+  const [body, setBody] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [approving, setApprove] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: fetch on mount only
   useEffect(() => {
-    fetchLeads();
-  }, []);
+    if (editingLead) {
+      setSubject(editingLead.scrapedData?.draftSubject ?? "");
+      setBody(editingLead.scrapedData?.draftBody ?? "");
+    } else {
+      setSubject("");
+      setBody("");
+    }
+  }, [editingLead?.id, editingLead?.scrapedData?.draftSubject, editingLead?.scrapedData?.draftBody, editingLead]);
 
   async function handleApprove(id: string) {
+    setApprove(true);
     try {
       const res = await fetch(`/api/leads/${id}/approve`, { method: "POST" });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Approve failed");
-      setMessage({ type: "success", text: "Lead approved and email sent." });
-      setEditingLead(null);
-      fetchLeads();
+      toast.success("Lead approved and email sent successfully.");
+
+      const updatedLeads = leads.filter((l) => l.id !== id);
+      setLeads(updatedLeads);
+      setEditingLead(updatedLeads[0] ?? null);
     } catch (err) {
-      setMessage({ type: "error", text: err instanceof Error ? err.message : "Failed to approve." });
+      toast.error(err instanceof Error ? err.message : "Failed to approve lead.");
+    } finally {
+      setApprove(false);
     }
   }
 
-  async function handleSave(id: string, updates: { draftSubject?: string; draftBody?: string }) {
-    const lead = leads.find((l) => l.id === id);
-    const merged = { ...(lead?.scrapedData ?? {}), ...updates };
-    const res = await fetch(`/api/leads/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ scrapedData: merged }),
-    });
-    if (!res.ok) throw new Error("Save failed");
-    setMessage({ type: "success", text: "Draft saved." });
-    fetchLeads();
+  async function handleSave(id: string) {
+    setSaving(true);
+    try {
+      const lead = leads.find((l) => l.id === id);
+      const merged = { ...(lead?.scrapedData ?? {}), draftSubject: subject, draftBody: body };
+      const res = await fetch(`/api/leads/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ scrapedData: merged }),
+      });
+      if (!res.ok) throw new Error("Save failed");
+      toast.success("Draft saved successfully.");
+
+      const updatedLeads = leads.map((l) => {
+        if (l.id === id) {
+          return { ...l, scrapedData: merged };
+        }
+        return l;
+      });
+      setLeads(updatedLeads);
+
+      // Update selected reference
+      const updatedLead = updatedLeads.find((l) => l.id === id);
+      if (updatedLead) setEditingLead(updatedLead);
+    } catch {
+      toast.error("Failed to save draft.");
+    } finally {
+      setSaving(false);
+    }
   }
 
-  if (loading) {
+  async function handleDelete(id: string) {
+    if (!confirm("Are you sure you want to decline and delete this draft prospect?")) return;
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/leads/${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Delete failed");
+      toast.success("Draft prospect deleted.");
+
+      const updatedLeads = leads.filter((l) => l.id !== id);
+      setLeads(updatedLeads);
+      setEditingLead(updatedLeads[0] ?? null);
+    } catch {
+      toast.error("Failed to delete lead.");
+    } finally {
+      setDeleting(false);
+    }
+  }
+
+  if (leads.length === 0) {
     return (
-      <div className="h-full bg-background p-8">
-        <div className="mx-auto max-w-7xl space-y-6">
-          <div className="h-16 animate-pulse rounded-xl bg-muted" />
-          <div className="h-40 animate-pulse rounded-xl bg-muted" />
-          <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-            <div className="h-[520px] animate-pulse rounded-xl bg-card" />
-            <div className="h-[520px] animate-pulse rounded-xl bg-card lg:col-span-2" />
+      <div className="w-full max-w-6xl mx-auto p-8 flex flex-col items-center justify-center min-h-[60dvh] text-center space-y-6">
+        <div className="p-1.5 rounded-[2.5rem]  bg-slate-400 sm:bg-transparent ring-1 ring-white/10 dark:ring-white/10 shadow-neon">
+          <div className="w-16 h-16 rounded-[calc(2.5rem-0.375rem)] bg-card/50 flex items-center justify-center border border-white/5">
+            <Check className="h-8 w-8 text-primary animate-pulse" />
           </div>
         </div>
+        <div className="space-y-2 max-w-md">
+          <Typography.H3 className="text-xl font-bold text-foreground mt-0">Queue Fully Audited</Typography.H3>
+          <Typography.P className="text-xs text-muted-foreground leading-relaxed">
+            Excellent! There are no pending outreach drafts left to review. You are completely caught up.
+          </Typography.P>
+        </div>
+        <Link href="/dashboard/automation/queue">
+          <Button variant="outline" size="lg" className="rounded-full font-bold px-6 py-2.5">
+            Manage Prospect Queue
+          </Button>
+        </Link>
       </div>
     );
   }
 
-  const activeLeads = leads.slice(0, 6);
-  const qualifiedCount = leads.filter((lead) => lead.status !== "CLOSED").length;
-  const _engagementRate = leads.length > 0 ? Math.min(99.9, 94 + leads.length * 0.7) : 98.4;
-  const _revenueQualified = qualifiedCount * 7150;
   return (
     <MarketingShell>
-      <div className="grid grid-cols-14 gap-8 px-8">
-        <div className="col-span-6 mt-6 flex flex-col w-full justify-between">
-          <h3 className="flex items-between w-full justify-center   gap-2 font-display text-3xl font-bold text-foreground my-4">
-            Live Pulse
-            <div className="h-2 w-2 animate-pulse rounded-full bg-chart-3 mb-2" />
-          </h3>
-          <span className="font-data text-xs text-muted-foreground mb-8">{activeLeads.length} ACTIVE NOW</span>
-
-          <div className="flex flex-col space-y-3 overflow-hidden">
-            {activeLeads.map((lead, i) => (
-              <Button
-                key={lead.id}
-                onClick={() => setEditingLead(lead)}
-                className="mx-3 h-15 cursor-pointer border border-transparent bg-card transition-colors hover:border-outline-ghost hover:bg-muted"
-              >
-                <div className="grid grid-cols-3 h-15 gap-2 w-full">
-                  <div className="mb-0 col-span-3 h-fit w-full">
-                    <div className="flex justify-between items-center gap-2 h-auto">
-                      <div className="flex h-4 w-4 flex-col items-center justify-between rounded-sm bg-muted text-muted-foreground">
-                        {lead.customerName?.slice(0, 1)?.toUpperCase() ?? "U"}
-                      </div>
-                      <div className="flex flex-row items-center gap-3 justify-between   h-15  col-span-2 w-full">
-                        <h4 className="text-xs font-bold">{lead.customerName ?? `Unknown Visitor #${420 + i}`}</h4>
-                        <p className="text-[10px] text-muted-foreground">
-                          {lead.scrapedData?.websiteUrl ? "LIVE SOURCE" : "AI DETECTED"}
-                        </p>
-                      </div>
-                    </div>
-                    <span className="animate-pulse rounded-sm bg-primary/15 px-2 py-0.5 text-[9px] font-bold uppercase tracking-tighter  text-secondary-foreground">
-                      {lead.status === "DRAFT_PENDING" ? "Pending Decision" : "Qualified"}
-                    </span>
-                  </div>
-                </div>
-              </Button>
-            ))}
-            <Button className="flex w-full items-center justify-center gap-2 border border-dashed border-outline-ghost py-2 text-xs font-semibold text-foreground hover:text-secondary-foreground">
-              View All Active Streams
-            </Button>
-          </div>
-        </div>
-
-        <div className="col-span-8">
-          <div className="flex flex-col items-end justify-between">
-            <h3 className="font-display text-xl font-bold uppercase tracking-tight text-foreground text-left w-full">
-              Consultations Booked
-            </h3>
-            <div className="flex gap-2 text-muted-foreground flex-end">
-              <Button className="p-1 hover:text-foreground rounded-xs min-w-24">Calendar</Button>
-              <Button className="p-1 hover:text-foreground rounded-xs min-w-24">List</Button>
+      <div className="mx-auto max-w-7xl space-y-8 p-8">
+        {/* Echoed Header Section from queue page */}
+        <section className="grid grid-cols-12 gap-6">
+          <div className="relative col-span-12 flex min-h-[320px] flex-col justify-between overflow-hidden rounded-xl border-l-2 border-chart-3 bg-card p-8 shadow-ambient lg:col-span-8">
+            <div className="relative z-10">
+              <span className="font-data text-xs font-bold uppercase tracking-[0.2em] text-secondary-foreground">
+                Audit Pipeline
+              </span>
+              <h1 className="mt-2 max-w-2xl font-headline text-5xl font-extrabold leading-none tracking-tighter text-foreground">
+                Outreach <span className="text-chart-3">Approval Queue</span>
+              </h1>
+              <p className="mt-4 max-w-lg text-muted-foreground">
+                Review, edit, and approve auto-generated outbound email drafts before dispatching. A human-in-the-loop
+                audit maintains lead comfort and conversion authenticity.
+              </p>
             </div>
+            <div className="z-10 mt-8">
+              <div className="mb-2 flex items-end justify-between">
+                <span className="text-xs uppercase tracking-widest text-muted-foreground">
+                  Approval Action Progress
+                </span>
+                <span className="text-lg font-bold text-secondary-foreground">
+                  {leads.length > 0 ? "Pending Decision" : "Queue Fully Audited"}
+                </span>
+              </div>
+              <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                <div className="h-full bg-chart-3" style={{ width: leads.length > 0 ? "50%" : "100%" }} />
+              </div>
+            </div>
+            <div className="pointer-events-none absolute right-0 top-0 h-full w-1/2 opacity-20">
+              <div className="absolute inset-0 bg-linear-to-l from-chart-3/20 to-transparent" />
+            </div>
+          </div>
 
-            <div className="w-full space-y-6 rounded-sm border border-outline-ghost bg-card p-6">
-              <div className="mb-6 grid grid-cols-7 overflow-hidden  h-42 border-border bg-muted/40 justify-center items-center rounded-md">
-                {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
-                  <div
-                    key={day}
-                    className={` p-2 text-center text-[10px] font-bold bg-black/10 hover:bg-black/20 transition-all duration-300 border border-outline-ghost h-10 uppercase ${
-                      day === "Fri"
-                        ? "text-foreground bg-chart-5/70 border-chart-3"
-                        : "text-muted-foreground h-10 bg-black/50 border border-outline-ghost"
+          <div className="col-span-12 grid gap-6 lg:col-span-4">
+            <div className="flex flex-col justify-center rounded-lg border-l-2 border-secondary/40 bg-muted/60 p-6">
+              <span className="font-data text-[10px] uppercase tracking-widest text-muted-foreground">
+                Pending Drafts
+              </span>
+              <span className="mt-1 font-headline text-4xl font-bold text-foreground gap-2 flex items-center">
+                {leads.length}
+                <span className="text-xs text-secondary-foreground/70">Drafts</span>
+              </span>
+            </div>
+            <div className="flex flex-col justify-center rounded-lg border-l-2 border-secondary/40 bg-muted/60 p-6">
+              <span className="font-data text-[10px] uppercase tracking-widest text-muted-foreground">
+                Approval Protocol
+              </span>
+              <span className="mt-1 font-headline text-xl font-bold text-foreground">Human-In-The-Loop</span>
+              <div className="mt-4 font-data text-[10px] text-chart-1">100% SECURE AUTONOMY</div>
+            </div>
+          </div>
+        </section>
+
+        {/* Dynamic Split Screen Bento Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 xl:items-stretch">
+          {/* Left Column: Drafts Queue (col-span-5) */}
+          <div className="lg:col-span-5 flex flex-col gap-4">
+            <Typography.H4 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+              Inbox Queue
+            </Typography.H4>
+            <div className="space-y-3 max-h-[70vh] overflow-y-auto pr-2 scrollbar-thin">
+              {leads.map((lead) => {
+                const isSelected = editingLead?.id === lead.id;
+                return (
+                  <button
+                    key={lead.id}
+                    type="button"
+                    onClick={() => setEditingLead(lead)}
+                    className={`w-full text-left p-6 transition-all duration-300 rounded-xl border border-outline-ghost/10 backdrop-blur-md cursor-pointer ${
+                      isSelected
+                        ? "border-l-4 border-l-primary bg-card/75 shadow-md scale-[1.01]"
+                        : "border-l-4 border-l-muted/30 bg-card/25 hover:border-l-primary/40 hover:bg-card/50"
                     }`}
                   >
-                    {day}
-                  </div>
-                ))}
-                {[21, 22, 23, 24, 25, 26, 27].map((day) => (
-                  <div
-                    key={day}
-                    className={`h-84 p-2 text-xs ${
-                      day === 25
-                        ? "bg-black/20 font-bold text-secondary-foreground text-center"
-                        : "bg-card/20 text-muted-foreground text-center hover:bg-black/20 transition-all duration-300"
-                    }`}
-                  >
-                    {day}
-                    {day === 25 && (
-                      <>
-                        <div className="inset-x-1 top-8 rounded-sm bg-chart-3 p-1.5">
-                          <p className="text-[9px] font-bold leading-tight text-primary-foreground">
-                            10:00 AM Discovery
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-start gap-2">
+                        <div className="space-y-0.5">
+                          <h4 className="text-sm font-bold text-foreground leading-tight">
+                            {lead.customerName ?? "Unknown Lead"}
+                          </h4>
+                          <p className="text-[10.5px] text-muted-foreground truncate max-w-[24ch]">
+                            {lead.scrapedData?.websiteUrl || "No website audit"}
                           </p>
                         </div>
-                        <div className="inset-x-1 top-16 rounded-sm bg-muted p-1.5">
-                          <p className="text-[9px] font-medium leading-tight text-foreground">2:30 PM Onboard</p>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                ))}
-              </div>
+                        <span
+                          className={`text-[9px] font-bold uppercase tracking-widest border px-2 py-0.5 rounded transition-all duration-300 ${
+                            isSelected
+                              ? "bg-primary/20 text-primary border-primary/30"
+                              : "bg-muted/10 text-muted-foreground border-outline-ghost/10"
+                          }`}
+                        >
+                          Decision
+                        </span>
+                      </div>
 
-              <div>
-                <div className="mb-4 flex items-center gap-2">
-                  <h4 className="font-data text-xs font-bold uppercase tracking-widest text-muted-foreground">
-                    Agent Decision Stream
-                  </h4>
-                </div>
-                <div className="max-h-48 space-y-2 overflow-y-auto rounded-sm bg-muted/50 p-4 font-mono text-[11px] text-secondary-foreground/80">
-                  <p>
-                    <span className="text-muted-foreground">15:24:02</span> [INTENT] Analyzing user query...{" "}
-                    <span className="text-chart-3">MATCH FOUND: WHITELABEL</span>
-                  </p>
-                  <p>
-                    <span className="text-muted-foreground">15:24:05</span> [ACTION] Deploying value-prop sequence
-                    #04...
-                  </p>
-                  <p>
-                    <span className="text-muted-foreground">15:24:10</span> [CAPTURE] Extracting budget parameters...{" "}
-                    <span className="text-chart-3">EST: $50k+</span>
-                  </p>
-                  <p>
-                    <span className="text-muted-foreground">15:24:12</span> [CALENDAR] Checking availability for Fri,
-                    Oct 25...
-                  </p>
-                  <p>
-                    <span className="text-muted-foreground">15:24:15</span> [SUCCESS] Lead Qualified. Routing to
-                    High-Priority Queue.
-                  </p>
-                  <p className="animate-pulse">_</p>
-                </div>
-              </div>
+                      <div className="flex items-center gap-4 text-[10px] text-muted-foreground border-t border-outline-ghost/10 pt-2.5">
+                        <span className="flex items-center gap-1">
+                          <Globe className="h-3.5 w-3.5 text-secondary" />
+                          {lead.scrapedData?.hasChatbot ? "Has Chatbot" : "No Chatbot"}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Mail className="h-3.5 w-3.5 text-accent" />
+                          {lead.scrapedData?.hasVoiceAgent ? "Has Voice" : "No Voice"}
+                        </span>
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </div>
-        </div>
-        <div className="flex items-center gap-4 rounded-sm col-span-4 h-42 border border-outline-ghost bg-muted/50 p-4">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-chart-1 text-primary-foreground">
-            C
+
+          {/* Right Column: Audit Panel & Email Editor (col-span-7) */}
+          <div className="lg:col-span-7">
+            {editingLead ? (
+              <div className="space-y-6">
+                <Typography.H4 className="text-xs font-bold uppercase tracking-widest text-accent">
+                  Draft Workspace
+                </Typography.H4>
+                <div className="p-1.5 rounded-[2.5rem] sm:bg-transparent md:bg-linear-to-tr from-primary/10 to-accent/10 ring-1 ring-white/10 dark:ring-white/10 shadow-xl">
+                  <div className="p-8 rounded-[calc(2.5rem-0.375rem)] bg-card/50 backdrop-blur-md space-y-6">
+                    {/* Lead Title Block */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-outline-ghost/10 pb-5">
+                      <div className="space-y-1">
+                        <Typography.H2 className="text-xl font-bold text-foreground mt-0 mb-0">
+                          {editingLead.customerName ?? "Unknown Prospect"}
+                        </Typography.H2>
+                        {editingLead.scrapedData?.websiteUrl && (
+                          <Link
+                            href={editingLead.scrapedData.websiteUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[10px] mt-4 font-bold uppercase tracking-widest hover:text-accent/50 flex items-center gap-1 transition-colors"
+                          >
+                            <ExternalLink className="h-3 w-3 text-primary dark:text-primary-kinetic" />
+                            Visit Website
+                          </Link>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Audit Summary Details */}
+                    <div className="space-y-4">
+                      {editingLead.scrapedData?.businessDescription && (
+                        <div className="bg-linear-to-r from-primary/10 via-accent/20 to-accent/10 border border-outline-ghost/10 rounded-xl p-4 space-y-1.5 shadow-lg">
+                          <Label className="text-sm font-bold uppercase tracking-wider text-orange-300">
+                            Company Intel
+                          </Label>
+                          <p className="text-sm text-foreground/80 leading-relaxed font-semibold">
+                            {editingLead.scrapedData.businessDescription}
+                          </p>
+                        </div>
+                      )}
+
+                      <div className="grid gap-4 sm:grid-cols-2">
+                        <div className="bg-muted border-2 border-primary/10 rounded-xl p-4 flex items-center justify-between">
+                          <span className="text-xs font-semibold text-foreground">Chatbot Detector</span>
+                          <span
+                            className={`text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full border-2 shadow-md ${editingLead.scrapedData?.websiteUrl ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-primary/10 text-primary border-primary/20"}`}
+                          >
+                            {editingLead.scrapedData?.websiteUrl ? "None detected" : "AI Chatbot Present"}
+                          </span>
+                        </div>
+
+                        <div className="bg-muted border-2 border-primary/10 rounded-xl p-4 flex items-center justify-between">
+                          <span className="text-xs font-semibold text-foreground">Decision State</span>
+                          <span className="bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest shadow-md">
+                            Pending Review
+                          </span>
+                        </div>
+                      </div>
+
+                      {(editingLead.scrapedData?.industries || editingLead.scrapedData?.locations) && (
+                        <div className="p-4 rounded-xl border border-outline-ghost/10 bg-muted/10 text-xs text-muted-foreground space-y-1">
+                          <p className="font-semibold text-foreground text-[11px]">Match Context:</p>
+                          {editingLead.scrapedData?.industries && (
+                            <p>
+                              • Industries:{" "}
+                              {Array.isArray(editingLead.scrapedData.industries)
+                                ? editingLead.scrapedData.industries.join(", ")
+                                : String(editingLead.scrapedData.industries)}
+                            </p>
+                          )}
+                          {editingLead.scrapedData?.locations && (
+                            <p>
+                              • Locations:{" "}
+                              {Array.isArray(editingLead.scrapedData.locations)
+                                ? editingLead.scrapedData.locations.join(", ")
+                                : String(editingLead.scrapedData.locations)}
+                            </p>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Email Compose Area */}
+                    <div className="space-y-4 hidden border-t border-outline-ghost/10 pt-6">
+                      <div className="space-y-2">
+                        <Label htmlFor="subject" className="text-xs font-bold text-foreground">
+                          Email Subject Line
+                        </Label>
+                        <Input
+                          id="subject"
+                          value={subject}
+                          onChange={(e) => setSubject(e.target.value)}
+                          placeholder="e.g. Collaboration Proposal - Graft Today"
+                          className="bg-background border-outline-ghost/20 focus-visible:ring-primary text-sm"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="valuePropBody" className="text-xs font-bold text-foreground">
+                          Email Draft Body
+                        </Label>
+                        <Textarea
+                          id="valuePropBody"
+                          value={body}
+                          onChange={(e) => setBody(e.target.value)}
+                          placeholder="Type outreach email..."
+                          rows={10}
+                          className="bg-background border-outline-ghost/20 focus-visible:ring-primary text-sm leading-relaxed resize-none"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Action Panel Buttons (Bento Style row) */}
+                    <div className="pt-4 border-t border-outline-ghost/10 flex flex-col sm:flex-row gap-3">
+                      <Button
+                        variant="outline"
+                        size="lg"
+                        className="sm:flex-1 h-11 text-xs font-bold uppercase tracking-wider active:scale-[0.98] transition-all duration-300"
+                        onClick={() => handleSave(editingLead.id)}
+                        disabled={saving || approving || deleting}
+                      >
+                        {saving ? (
+                          <>
+                            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                            Saving...
+                          </>
+                        ) : (
+                          <>
+                            <Save className="h-4 w-4 mr-2" />
+                            Save Draft
+                          </>
+                        )}
+                      </Button>
+
+                      <Button
+                        variant="default"
+                        size="lg"
+                        className="sm:flex-1 h-11 bg-primary text-primary-foreground font-bold uppercase tracking-wider shadow-neon active:scale-[0.98] transition-all duration-300"
+                        onClick={() => handleApprove(editingLead.id)}
+                        disabled={saving || approving || deleting}
+                      >
+                        {approving ? (
+                          <>
+                            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                            Approving...
+                          </>
+                        ) : (
+                          <>
+                            <Send className="h-4 w-4 mr-2" />
+                            Approve Engagement
+                          </>
+                        )}
+                      </Button>
+
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-11 w-11 rounded-lg border border-destructive/20 text-destructive hover:bg-destructive/10 hover:text-destructive active:scale-[0.95] transition-all duration-300"
+                        onClick={() => handleDelete(editingLead.id)}
+                        disabled={saving || approving || deleting}
+                        title="Delete and Decline"
+                      >
+                        {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center h-full border border-dashed border-outline-ghost/20 rounded-[2.5rem] py-24 text-center text-muted-foreground bg-card/10">
+                <div className="w-12 h-12 rounded-full border border-outline-ghost/10 flex items-center justify-center mb-4 bg-muted/20">
+                  <FileText className="h-5 w-5 text-muted-foreground/60" />
+                </div>
+                <Typography.H4 className="text-sm font-bold text-foreground">Select a draft</Typography.H4>
+                <p className="text-[11px] text-muted-foreground/60 max-w-[240px] mt-1 leading-relaxed">
+                  Choose a pending prospect draft from the left queue to begin your human-in-the-loop review.
+                </p>
+              </div>
+            )}
           </div>
-          <div className="flex-1">
-            <h5 className="text-sm font-bold text-foreground">Calendly Integration Active</h5>
-            <p className="text-xs text-muted-foreground">Synchronizing 4 team calendars in real-time.</p>
-          </div>
-          <Button className="text-xs font-bold uppercase tracking-tighter text-secondary-foreground transition-colors bg-secondary hover:text-chart-5">
-            Manage Sync
-          </Button>
         </div>
       </div>
-      {editingLead && (
-        <LeadDetailCard
-          id={editingLead.id}
-          customerName={editingLead.customerName}
-          scrapedData={editingLead.scrapedData}
-          onApprove={handleApprove}
-          onSave={handleSave}
-          onClose={() => setEditingLead(null)}
-        />
-      )}
     </MarketingShell>
   );
 }

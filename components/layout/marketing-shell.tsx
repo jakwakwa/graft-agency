@@ -88,55 +88,8 @@ export function MarketingShell({ children }: MarketingShellProps) {
         </div>
       </header>
 
-      {/* Sidebar */}
-      <aside className="fixed left-0 top-16 z-40 hidden h-[calc(100vh-64px)] w-64 flex-col border-r border-outline-ghost bg-sidebar-accent pb-4 pt-8 md:flex">
-        <div className="mb-8 px-6">
-          <h2 className="mb-1 font-data text-xs font-bold uppercase tracking-widest text-secondary-foreground">
-            {sidebarTitle}
-          </h2>
-          <p className="text-[10px] text-muted-foreground">Protocol Active</p>
-        </div>
-        <nav className="flex-1 space-y-1 px-3">
-          {sidebarLinks.map((link) => {
-            const isActive = pathname === link.href || (link.href !== "#" && pathname.endsWith(link.href));
-            return link.href.startsWith("#") ? (
-              <span
-                key={link.label}
-                className={`flex cursor-not-allowed items-center gap-3 px-4 py-3 font-sans font-semibold transition-all ${
-                  isActive
-                    ? "translate-x-1 border-l-2 border-primary bg-primary/10 text-secondary-foreground"
-                    : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
-                }`}
-              >
-                {link.label}
-              </span>
-            ) : (
-              <Link
-                key={link.label}
-                href={link.href}
-                className={`flex items-center gap-3 px-4 py-3 font-sans font-semibold transition-all ${
-                  isActive
-                    ? "translate-x-1 border-l-2 border-primary bg-primary/10 text-secondary-foreground"
-                    : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
-                }`}
-              >
-                {link.label}
-              </Link>
-            );
-          })}
-        </nav>
-        <div className="mt-auto space-y-1 px-3">
-          <button
-            type="button"
-            className="mb-4 w-full rounded-sm bg-chart-3 py-3 font-data text-xs font-bold uppercase tracking-wider text-primary-foreground transition-transform hover:scale-[0.98]"
-          >
-            Launch Agent
-          </button>
-        </div>
-      </aside>
-
       {/* Main Content */}
-      <main className="min-h-screen w-full pt-16 md:pl-64">{children}</main>
+      <main className="min-h-screen w-full pt-16">{children}</main>
 
       {/* Mobile Bottom Nav */}
       <nav className="fixed bottom-0 left-0 z-50 flex h-16 w-full items-center justify-around border-t border-outline-ghost bg-card/90 px-6 backdrop-blur-md md:hidden">

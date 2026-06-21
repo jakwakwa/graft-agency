@@ -56,14 +56,14 @@ next-env.d.ts
 .DS_Store
 
 /generated/prisma 
-
+.agents/skills/
 # Local Pinggy CLI binaries (see bin/README.md)
 /bin/pinggy
 /bin/pinggy-macos-arm64
 /bin/pinggy-macos-x64
 /bin/pinggy-linux-x64
 /bin/pinggy-linux-arm64
-
+.claude/worktrees
 # clerk configuration (can include secrets)
 /.clerk/
 .next/server/middleware-build-manifest.js
