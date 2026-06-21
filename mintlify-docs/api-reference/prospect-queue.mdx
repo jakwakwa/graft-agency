@@ -1,0 +1,124 @@
+---
+title: "Prospect queue"
+description: "Manage the queue of businesses to run through the prospecting pipeline."
+keywords: ["prospect", "queue", "api", "pipeline"]
+---
+
+## List queue entries
+
+Returns the prospect queue for the authenticated tenant.
+
+```
+GET /api/prospect-queue
+```
+
+### Query parameters
+
+| Parameter | Type | Description |
+|---|---|---|
+| `status` | string | Filter by queue status |
+| `page` | number | Page number |
+| `limit` | number | Records per page (max: `100`) |
+
+### Response
+
+```json
+{
+  "data": [
+    {
+      "id": "uuid",
+      "clientId": "uuid",
+      "businessName": "Acme Plumbing",
+      "websiteUrl": "https://acmeplumbing.co.za",
+      "status": "PENDING",
+      "attempts": 0,
+      "lastAttemptAt": null,
+      "errorMessage": null,
+      "leadId": null,
+      "createdAt": "2026-01-15T10:00:00.000Z",
+      "updatedAt": "2026-01-15T10:00:00.000Z"
+    }
+  ],
+  "total": 34,
+  "page": 1,
+  "limit": 25,
+  "pages": 2
+}
+```
+
+### Queue statuses
+
+| Status | Description |
+|---|---|
+| `PENDING` | Waiting to be processed |
+| `PROCESSING` | Currently running through the pipeline |
+| `COMPLETED` | Pipeline finished; `leadId` is set |
+| `FAILED` | Pipeline failed; see `errorMessage` |
+
+---
+
+## Add to queue
+
+Adds one or more businesses to the prospect queue.
+
+```
+POST /api/prospect-queue
+```
+
+### Request body
+
+```json
+{
+  "entries": [
+    {
+      "businessName": "Acme Plumbing",
+      "websiteUrl": "https://acmeplumbing.co.za"
+    }
+  ]
+}
+```
+
+| Field | Required | Description |
+|---|---|---|
+| `businessName` | Yes | Display name of the business |
+| `websiteUrl` | No | Website URL to scrape (speeds up audit) |
+
+### Response
+
+```json
+{
+  "created": 1,
+  "ids": ["uuid"]
+}
+```
+
+---
+
+## Delete queue entry
+
+Removes a single entry from the queue. Only `PENDING` or `FAILED` entries can be deleted.
+
+```
+DELETE /api/prospect-queue/:id
+```
+
+### Response
+
+```json
+{ "deleted": true }
+```
+
+---
+
+## Example: bulk upload via CSV
+
+Parse a CSV client-side and `POST` the entries in batches:
+
+```typescript
+const rows = parseCsv(file); // [{ businessName, websiteUrl }]
+await fetch("/api/prospect-queue", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ entries: rows }),
+});
+```

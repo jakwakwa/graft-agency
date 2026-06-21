@@ -1,0 +1,141 @@
+---
+title: "Architecture"
+description: "How GRAFT.TODAY is structured: multi-tenancy, pipelines, and service boundaries."
+keywords: ["architecture", "multi-tenant", "inngest", "clerk", "prisma"]
+---
+
+## Multi-tenancy model
+
+Every tenant is a **Clerk Organisation** that maps 1:1 to a **Client** record in Postgres.
+
+```
+Clerk Organisation
+       │
+       ▼
+   Client (Prisma)
+   ├── AgentConfig      (chatbot settings, knowledge base)
+   ├── ProspectingConfig (cron schedule, search criteria)
+   ├── Lead[]            (inbound + outbound prospects)
+   ├── Conversation[]    (chat sessions)
+   └── ProductSpec[]     (engagement pipeline state per lead)
+```
+
+The `lib/auth/resolve-client.ts` module maps a Clerk `userId` → `clientId` on every authenticated request. All data-access queries are scoped by `clientId` at the service layer.
+
+### Access tiers
+
+| Flag | Description |
+|---|---|
+| Default tenant | Access to their own data only |
+| `isPlatformOwner` | Elevated access across all tenants |
+| `isReseller` | Intermediate access for reseller accounts |
+
+## Core pipelines
+
+### 1. Prospecting pipeline
+
+Triggered by cron or manually from the Automation hub.
+
+```
+ProspectQueue entry
+       │
+       ▼
+  Web scrape (website URL)
+       │
+       ▼
+  Gemini audit
+  (AI presence, pain points)
+       │
+       ▼
+  Draft cold email
+       │
+       ▼
+  Approval queue → dispatch via Resend
+```
+
+The `prospecting-tick` Inngest function drives this loop. Config is stored in `ProspectingConfig` per tenant.
+
+### 2. Engagement pipeline
+
+An 8-stage Inngest workflow triggered when a lead enters `DRAFT_PENDING` status.
+
+```
+lead-profiler
+      │ inngest/event
+      ▼
+prd-writer
+      │
+      ▼
+stitch-designer   ← Google Stitch SDK (design concepts)
+      │
+      ▼
+jules-builder     ← Jules Labs (code generation via GitHub)
+      │
+      ▼
+jules-poller      ← polls GitHub Actions for completion
+      │
+      ▼
+engagement-reconciler  ← handles retries and failures
+      │
+      ▼
+offer-dispatcher  ← deploys to Render, creates Paddle checkout
+```
+
+Each stage writes to `ProductSpec.stage` (enum `EngagementStage`). Set `ENGAGEMENT_DRY_RUN=true` to stub external calls (Vercel, Paddle, Resend) during development.
+
+### 3. Chat pipeline
+
+Each tenant embeds a `<iframe>` pointing to `/widget/[clientId]`. The widget streams responses from `/api/chat` using the Vercel AI SDK.
+
+Available tools (server-side, closed over `clientId`):
+- `capture-lead` — creates a Lead record
+- `book-appointment` — creates a Cal.com booking
+- `check-availability` — queries Cal.com slots
+- `handoff-human` — flags conversation for human review
+- `search-knowledge` — semantic search over AgentConfig knowledge base
+
+## Key directories
+
+```
+app/
+├── (portal)/          Authenticated tenant dashboard
+├── (marketing)/       Public pages (privacy, terms)
+├── api/               Route handlers
+│   ├── chat/          Streaming chat endpoint
+│   ├── leads/         Leads CRUD
+│   ├── prospect-queue/
+│   ├── engagement/    Pipeline trigger
+│   ├── webhooks/      Clerk, Paddle, Cal.com, Vercel
+│   ├── billing/       Paddle subscription management
+│   ├── inngest/       Inngest event handler
+│   └── cron/          Scheduled task endpoints
+└── widget/[clientId]/ Embeddable chatbot iframe
+
+lib/
+├── ai/                LLM integrations and tool factories
+├── auth/              Clerk → Client resolution
+├── inngest/functions/ All 8 engagement pipeline functions
+├── services/          Business logic (lead, conversation, email…)
+└── db/prisma.ts       Prisma singleton
+```
+
+## Data flow: authentication
+
+```
+Request → Next.js middleware (Clerk auth)
+              │
+              ▼
+        requirePlatformAccess()   (lib/auth/resolve-client.ts)
+              │
+        ┌─────┴──────┐
+        │  userId     │
+        ▼             ▼
+   Clerk session   DB lookup
+              │
+              ▼
+          { clientId }  ← scopes all downstream queries
+```
+
+## Payments
+
+Paddle is the Merchant of Record and handles global tax and VAT automatically. The webhook at `app/api/webhooks/paddle/` syncs subscription state (`subscriptionActive`, `subscriptionStatus`, `paddleSubscriptionId`) back to the `Client` record. Feature flags are derived from these fields.

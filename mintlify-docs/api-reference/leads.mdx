@@ -1,0 +1,95 @@
+---
+title: "Leads"
+description: "List and manage outbound prospect leads."
+keywords: ["leads", "api", "outbound", "prospects"]
+---
+
+## List leads
+
+Returns outbound prospect leads for the authenticated tenant.
+
+```
+GET /api/leads
+```
+
+### Query parameters
+
+| Parameter | Type | Description |
+|---|---|---|
+| `status` | string | Filter by status: `SCRAPED`, `DRAFT_PENDING`, `CONTACTED`, `REPLIED`, `BOOKED`, `CLOSED` |
+| `page` | number | Page number for paginated results |
+| `limit` | number | Records per page (max: `100`) |
+| `sort` | string | Sort field: `createdAt` (default) or `engagementStage` |
+| `order` | string | `asc` or `desc` (default: `desc`) |
+
+### Response
+
+Without `page` or `limit` — flat array:
+
+```json
+[
+  {
+    "id": "uuid",
+    "clientId": "uuid",
+    "customerName": "Acme Corp",
+    "email": "hello@acme.com",
+    "phone": null,
+    "source": "OUTBOUND_PROSPECT",
+    "status": "DRAFT_PENDING",
+    "scrapedData": { "aiPresence": false, "painPoints": ["..."] },
+    "chatTranscript": null,
+    "calBookingUid": null,
+    "nextActionDate": null,
+    "engagementStage": "PRD_WRITING",
+    "createdAt": "2026-01-15T10:30:00.000Z",
+    "updatedAt": "2026-01-15T11:00:00.000Z"
+  }
+]
+```
+
+With `page` and `limit` — paginated envelope:
+
+```json
+{
+  "data": [...],
+  "total": 87,
+  "page": 1,
+  "limit": 25,
+  "pages": 4
+}
+```
+
+### Lead statuses
+
+| Status | Description |
+|---|---|
+| `SCRAPED` | Created from prospecting, not yet actioned |
+| `DRAFT_PENDING` | Email draft ready for approval |
+| `CONTACTED` | Outreach email sent |
+| `REPLIED` | Prospect replied to outreach |
+| `BOOKED` | Appointment booked via Cal.com |
+| `CLOSED` | Deal closed |
+
+### Engagement stages
+
+The `engagementStage` field reflects the current state of the [engagement pipeline](/guides/engagement-pipeline):
+
+| Stage | Description |
+|---|---|
+| `NOT_STARTED` | Pipeline not triggered |
+| `PROFILING` | Lead profile being generated |
+| `PRD_WRITING` | PRD being written |
+| `DESIGNING` | Design concepts being created |
+| `BUILDING` | Code being generated |
+| `DEPLOYING` | App being deployed to Render |
+| `DISPATCHING` | Offer email being sent |
+| `COMPLETED` | Full pipeline finished |
+| `FAILED` | Pipeline failed |
+
+### Example
+
+```bash
+# All leads with status DRAFT_PENDING, sorted by engagement stage
+curl "https://graft.today/api/leads?status=DRAFT_PENDING&sort=engagementStage&order=asc" \
+  -H "Authorization: Bearer <token>"
+```

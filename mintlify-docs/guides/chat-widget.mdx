@@ -1,0 +1,84 @@
+---
+title: "Chat widget"
+description: "Embed the GraftBot chatbot on any website as an iframe."
+keywords: ["chat", "widget", "iframe", "embed", "graftbot"]
+---
+
+Each tenant gets their own chatbot widget hosted at `/widget/[clientId]`. Embed it on any page with a single `<iframe>` tag.
+
+## Basic embed
+
+```html
+<iframe
+  src="https://graft.today/widget/YOUR_CLIENT_ID"
+  width="400"
+  height="600"
+  frameborder="0"
+  allow="microphone"
+  style="border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.15);"
+></iframe>
+```
+
+Replace `YOUR_CLIENT_ID` with the UUID from your portal settings page.
+
+## Allowed domains
+
+To prevent unauthorised embeds, add your domain to the **Allowed domains** list in your portal settings. Requests from unlisted origins return a 403.
+
+```
+Settings → Widget → Allowed domains → Add domain
+```
+
+<Info>
+  During local development, `localhost` is always allowed regardless of the allowed domains list.
+</Info>
+
+## Widget configuration
+
+Customise the chatbot from the portal under **Settings → Agent config**:
+
+| Setting | Description |
+|---|---|
+| Agent name | Display name shown in the chat header |
+| Greeting message | First message the bot sends |
+| System prompt | Instructions that shape the bot's behaviour |
+| Knowledge base | JSON content the bot can search |
+| Primary colour | Hex colour for the chat bubble and buttons |
+| Cal.com username | Used for appointment booking |
+| Default event slug | Which Cal.com event type to book |
+
+## Available tools
+
+The chatbot has access to these server-side tools. Each is scoped to the tenant's `clientId`:
+
+### `capture-lead`
+Creates a `Lead` record when the user provides their contact details.
+
+```
+Required: name, email
+Optional: phone
+```
+
+### `book-appointment`
+Creates a Cal.com booking on behalf of the user.
+
+```
+Required: name, email, date/time slot
+```
+
+### `check-availability`
+Returns available time slots from Cal.com for the configured event type.
+
+### `handoff-human`
+Flags the conversation for human review and notifies the tenant.
+
+### `search-knowledge`
+Performs semantic search over the tenant's knowledge base to answer product or service questions.
+
+## AI model routing
+
+The chat endpoint at `/api/chat` selects the AI model based on the request and tenant config. It supports both Google Gemini and Claude via the Vercel AI SDK. The model router is defined in `lib/ai/`.
+
+## Rate limiting and protection
+
+Chat sessions are protected by `lib/services/chat-protection.service.ts`. This enforces per-session rate limits and blocks abuse patterns before they reach the LLM.
