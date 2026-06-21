@@ -2,7 +2,7 @@
 
 import { initializePaddle, type Paddle } from "@paddle/paddle-js";
 import { useEffect, useMemo, useState } from "react";
-import { Typography } from "@/components/ui/typography";
+import { Typography } from "@/components/ui/typography"; // used for Muted below
 import type { PricingCatalog, PricingMode, PricingOffer } from "@/lib/billing/pricing-catalog";
 import { getPreviewItems } from "@/lib/billing/pricing-catalog";
 import { BillingCycleToggle } from "./billing-cycle-toggle";
@@ -94,20 +94,28 @@ export function PricingSectionClient({
         : "grid gap-4 md:grid-cols-2 xl:grid-cols-5 w-full";
 
   return (
-    <section id={id} className="relative z-10 px-6 py-20">
+    <section id={id} className="relative z-10 px-4 sm:px-6 py-8 sm:py-12 md:py-20">
       <div className="mx-auto flex max-w-7xl flex-col gap-10">
         <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
-          <div className="max-w-2xl">
-            <h2>
-              <Typography.H2 className="pb-3 text-on-surface">
-                {kindFilter === "website" ? "Bespoke Agency Design & Builds" : "Simple pricing for always-on growth"}
-              </Typography.H2>
+          <div className="max-w-2xl space-y-3">
+            <h2 className="text-3xl md:text-4xl font-black tracking-tight uppercase text-on-surface leading-tight">
+              {kindFilter === "website" ? (
+                <>
+                  Bespoke Agency{" "}
+                  <span className="text-secondary">Design &amp; Builds</span>
+                </>
+              ) : (
+                <>
+                  Simple pricing for{" "}
+                  <span className="text-primary">always&#8209;on growth</span>
+                </>
+              )}
             </h2>
-            <Typography.Lead className="text-on-surface-variant">
+            <p className="text-on-surface-variant text-sm sm:text-base leading-relaxed">
               {kindFilter === "website"
                 ? "High-converting, hand-crafted landing pages and multi-page websites with your AI chatbot pre-configured and installed."
                 : "Localised Paddle pricing for the chatbot subscription and add-ons."}
-            </Typography.Lead>
+            </p>
           </div>
           {kindFilter !== "website" && (
             <BillingCycleToggle selectedCycle={selectedCycle} onSelectCycle={setSelectedCycle} />

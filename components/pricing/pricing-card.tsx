@@ -27,15 +27,15 @@ interface CardTheme {
 
 const THEMES: Record<string, CardTheme> = {
   "ai-chatbot": {
-    borderHover: "hover:border-[#9888ff]/40",
-    shadowHover: "hover:shadow-[#9888ff]/5",
-    badgeBg: "bg-[#9888ff]/10",
-    badgeText: "text-[#9888ff]",
-    badgeBorder: "border-[#9888ff]/20",
-    checkText: "text-[#9888ff]",
-    btnPrimary: "bg-[#9888ff] text-white hover:bg-[#8372f5] shadow-md shadow-[#9888ff]/10",
+    borderHover: "hover:border-blue-500/40",
+    shadowHover: "hover:shadow-blue-500/5",
+    badgeBg: "bg-blue-500/10",
+    badgeText: "text-blue-400",
+    badgeBorder: "border-blue-500/20",
+    checkText: "text-blue-400",
+    btnPrimary: "bg-blue-500 text-white hover:bg-blue-400 shadow-md shadow-blue-500/10",
     btnOutline:
-      "bg-transparent text-on-surface border-white/10 hover:bg-[#9888ff]/10 hover:border-[#9888ff]/30 hover:text-[#9888ff]",
+      "bg-transparent text-on-surface border-white/10 hover:bg-blue-500/10 hover:border-blue-500/30 hover:text-blue-400",
     defaultBadge: "Core Subscription",
   },
   "voice-agent": {

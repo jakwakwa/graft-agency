@@ -10,8 +10,8 @@ export function LandingSiteFooter() {
   return (
     <footer className="relative z-10 border-t border-white/5 bg-[#13121b] pt-10 pb-8 md:pt-20 md:pb-10">
       <div className={landingContainerClassName}>
-        <div className="mb-12 md:mb-16 grid grid-cols-1 gap-10 sm:grid-cols-2 md:grid-cols-3 lg:gap-20">
-          <div>
+        <div className="mb-12 md:mb-16 grid grid-cols-2 gap-8 md:grid-cols-3 lg:gap-20">
+          <div className="col-span-2 md:col-span-1">
             <span className="mb-4 block text-lg font-bold tracking-wider text-white">GRAFT.TODAY</span>
             <Typography.P className="max-w-[250px] text-sm leading-relaxed">
               High-performance AI orchestration for elite sales teams. Engineered for the South African business

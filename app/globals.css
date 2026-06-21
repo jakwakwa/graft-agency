@@ -96,18 +96,18 @@ body {
   --muted: #717ecb1e;
   --muted-foreground: #b1aeae;
 
-  --primary: #3871fff7;
-  --primary-container: #f46b50;
-  --primary-kinetic: hsla(346, 82%, 55%, 0.87);
-  --primary-foreground: #eed9fb;
+  --primary: #006aebf7;
+  --primary-container: #e7435c;
+  --primary-kinetic: hsla(256, 94%, 54%, 0.813);
+  --primary-foreground: #c4c7ef;
 
   /* Secondary — soft blossom */
-  --secondary: #62dcf8fc;
+  --secondary: #da8f9dfc;
   --secondary-container: #24416a;
-  --secondary-foreground: #e98592;
+  --secondary-foreground: #f4ccd1;
 
   /* Accent — tangerine */
-  --accent: #fc7189ca;
+  --accent: #5330f2ca;
   --accent-foreground: #7f9bf7;
 
   /* Semantic */
@@ -118,7 +118,7 @@ body {
   --input: color-mix(in srgb, #7272f4eb 30%, #3c2ff1);
   --input-background: color-mix(in srgb, #c2cbce8c 10%, #0606089a);
   --input-background-hover: color-mix(in srgb, #08192d 20%, #4f4f4f);
-  --ring: #2351e7;
+  --ring: #e74123;
 
   /* Ghost outline — outline-variant at 15% */
   --outline-ghost: color-mix(in srgb, #8777f9 15%, transparent);
@@ -129,10 +129,10 @@ body {
   --surface-variant: color-mix(in srgb, #9218f5 15%, oklch(71.496% 0.15601 46.804));
 
   /* Charts */
-  --chart-1: oklch(66.52% 0.21973 308.485);
+  --chart-1: oklch(59.416% 0.21456 281.284);
   --chart-2: #27b2f2;
   --chart-3: hsla(215, 96%, 65%, 0.71);
-  --chart-4: #f04f3d;
+  --chart-4: #00c3ac;
   --chart-5: #1d6fc6;
 
   /* Sidebar */
@@ -143,11 +143,11 @@ body {
   --sidebar-accent: #74727819;
   --sidebar-accent-foreground: #3f3f3f;
   --sidebar-border: color-mix(in srgb, #3c3c3c 8%, transparent);
-  --sidebar-ring: #7866f2;
+  --sidebar-ring: #eae086;
 
   /* Shadows & glow */
-  --shadow-ambient: 0 24px 48px -12px rgba(21, 109, 232, 0.16);
-  --shadow-neon: 0 0 26px -5px #527efad8;
+  --shadow-ambient: 0 24px 48px -12px rgba(227, 50, 156, 0.16);
+  --shadow-neon: 0 0 26px -5px #52fad6d8;
   --shadow-neon-primary: 0 0 20px #17bdfa84;
   --shadow-neon-secondary: 0 0 16px rgba(247, 95, 128, 0.81);
 
@@ -410,7 +410,7 @@ body {
 
   a {
     font-size: 12px ;
-    color: #fcc7c3 !important;
+    color: #bfc3fb !important;
   }
 
   a:hover {

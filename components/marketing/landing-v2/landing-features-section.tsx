@@ -8,7 +8,7 @@ export function LandingFeaturesSection() {
         <h2 className="text-3xl md:text-5xl font-black tracking-tight text-on-surface uppercase">
           The Graft <span className="text-primary">Ecosystem</span>
         </h2>
-        <p className="text-on-surface-variant text-sm tracking-[0.2em] uppercase font-semibold">
+        <p className="text-on-surface-variant text-sm tracking-normal sm:tracking-[0.2em] uppercase font-semibold">
           Autonomous operations for the elite.
         </p>
       </div>
@@ -28,26 +28,22 @@ export function LandingFeaturesSection() {
           </div>
           <div className="relative z-10 flex flex-col h-full justify-between">
             <div>
-              <BrainCircuit />
+              <div className="mb-3 inline-flex items-center justify-center w-8 h-8 rounded-lg bg-primary/15">
+                <BrainCircuit className="h-4 w-4 text-primary" />
+              </div>
               <h3 className="text-xl md:text-2xl font-bold text-on-surface mb-2">Lead Capture Genius</h3>
               <p className="text-on-surface-variant max-w-md">
                 Our neural engine qualifies every visitor using semantic analysis. We don't just capture emails; we
                 capture intent and readiness.
               </p>
             </div>
-            <div className="mt-8">
-              <div className="flex gap-4 items-center">
-                <div className="h-px grow bg-outline-variant"></div>
-                <span className="text-[10px] tracking-widest uppercase font-bold text-primary">
-                  Live Qualifiers: 1,248
-                </span>
-              </div>
-            </div>
           </div>
         </div>
         <div id="midnight-prospector" className="md:col-span-4 glass-panel rounded-xl p-4 sm:p-6 md:p-8 border-l-4 border-secondary flex flex-col justify-between group">
           <div>
-            <Radar />
+            <div className="mb-3 inline-flex items-center justify-center w-8 h-8 rounded-lg bg-secondary/15">
+              <Radar className="h-4 w-4 text-secondary" />
+            </div>
             <h3 className="text-xl font-bold text-on-surface mb-2">Midnight Prospector</h3>
             <p className="text-on-surface-variant text-sm">
               While you sleep, Graft hunts. Automated outreach that sounds human because it's trained on your unique
@@ -64,21 +60,23 @@ export function LandingFeaturesSection() {
         </div>
         <div id="white-label" className="md:col-span-4 glass-panel rounded-xl p-4 sm:p-6 md:p-8 border-r-4 border-primary flex flex-col justify-between">
           <div>
-            <IdCard />
+            <div className="mb-3 inline-flex items-center justify-center w-8 h-8 rounded-lg bg-primary/15">
+              <IdCard className="h-4 w-4 text-primary" />
+            </div>
             <h3 className="text-xl font-bold text-on-surface mb-2">White-Label Wonder</h3>
             <p className="text-on-surface-variant text-sm">
               Resell our infrastructure under your own banner. Full CSS control and API-first architecture.
             </p>
           </div>
-          <div className="mt-6 flex -space-x-2">
-            <div className="w-8 h-8 rounded-full bg-primary/20 border border-primary/50 flex items-center justify-center text-[10px] font-bold">
-              A
-            </div>
-            <div className="w-8 h-8 rounded-full bg-secondary/20 border border-secondary/50 flex items-center justify-center text-[10px] font-bold">
-              B
-            </div>
-            <div className="w-8 h-8 rounded-full bg-tertiary/20 border border-tertiary/50 flex items-center justify-center text-[10px] font-bold">
-              C
+          <div className="mt-6">
+            <div className="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold mb-2">Any brand identity</div>
+            <div className="flex gap-2">
+              <div className="w-5 h-5 rounded-full bg-[#ff3c6e] ring-1 ring-white/10" />
+              <div className="w-5 h-5 rounded-full bg-[#38bdf8] ring-1 ring-white/10" />
+              <div className="w-5 h-5 rounded-full bg-[#a78bfa] ring-1 ring-white/10" />
+              <div className="w-5 h-5 rounded-full bg-[#4ade80] ring-1 ring-white/10" />
+              <div className="w-5 h-5 rounded-full bg-[#fb923c] ring-1 ring-white/10" />
+              <div className="w-5 h-5 rounded-full bg-[#f0e040] ring-1 ring-white/10" />
             </div>
           </div>
         </div>
