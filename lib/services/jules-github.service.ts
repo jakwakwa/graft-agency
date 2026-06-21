@@ -416,6 +416,8 @@ export async function fetchGithubPullRequestHeadSha(params: {
  * Post a GitHub commit status so Jules CI-listen can see Render deploy outcomes.
  * Uses the legacy Commit Status API (POST /repos/:owner/:repo/statuses/:sha)
  * which only requires a PAT with `repo` scope — no GitHub App needed.
+ *
+ * Throws on API errors so Inngest retries surface failures rather than swallowing them.
  */
 export async function postGithubCommitStatus(params: {
   owner: string;
@@ -427,23 +429,33 @@ export async function postGithubCommitStatus(params: {
   targetUrl?: string;
 }): Promise<void> {
   const token = process.env.GITHUB_TOKEN?.trim();
-  if (!token) return;
+  if (!token) throw new Error("GITHUB_TOKEN is not set — cannot post commit status to GitHub");
 
-  await fetch(`https://api.github.com/repos/${params.owner}/${params.repo}/statuses/${params.sha}`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: "application/vnd.github+json",
-      "X-GitHub-Api-Version": "2022-11-28",
-      "Content-Type": "application/json",
+  const r = await fetch(
+    `https://api.github.com/repos/${params.owner}/${params.repo}/statuses/${params.sha}`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        state: params.state,
+        context: params.context,
+        description: params.description,
+        ...(params.targetUrl ? { target_url: params.targetUrl } : {}),
+      }),
     },
-    body: JSON.stringify({
-      state: params.state,
-      context: params.context,
-      description: params.description,
-      ...(params.targetUrl ? { target_url: params.targetUrl } : {}),
-    }),
-  });
+  );
+
+  if (!r.ok) {
+    const body = await r.json().catch(() => ({}));
+    throw new Error(
+      `GitHub commit status POST failed (${r.status}): ${JSON.stringify(body)}`,
+    );
+  }
 }
 
 export async function findRenderPreviewUrl(params: {

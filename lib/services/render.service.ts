@@ -177,6 +177,7 @@ export interface RenderDeploy {
   deployId: string;
   status: string;
   serviceId: string;
+  createdAt: string;
 }
 
 // Render deploy terminal statuses (deploy will not progress further)
@@ -209,6 +210,7 @@ export async function getLatestRenderDeploy(serviceId: string): Promise<RenderDe
   return {
     deployId: raw.id as string,
     status: typeof raw.status === "string" ? raw.status : "unknown",
+    createdAt: typeof raw.createdAt === "string" ? raw.createdAt : new Date(0).toISOString(),
     serviceId,
   };
 }
