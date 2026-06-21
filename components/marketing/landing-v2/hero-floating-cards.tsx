@@ -1,6 +1,6 @@
 "use client";
 
-import { type Variants, motion } from "motion/react";
+import { motion, type Variants } from "motion/react";
 
 const FLOAT_VARIANTS: Variants = {
   hidden: { opacity: 0, y: 30, scale: 0.92 },

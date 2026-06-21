@@ -8,7 +8,7 @@ export const ENGAGEMENT_STAGE_ORDER = [
   "DESIGNING",
   "DESIGN_COMPLETE",
   "BUILDING",
-  "BUILDING_COMPLETE"
+  "BUILDING_COMPLETE",
 ] as const;
 
 export type EngagementStageKey = (typeof ENGAGEMENT_STAGE_ORDER)[number] | "FAILED" | "NOT_STARTED";
@@ -39,7 +39,7 @@ export const PIPELINE_STEPS: PipelineStep[] = [
   { label: "Understanding", stages: ["PROFILING", "PROFILED"], icon: "Brain" },
   { label: "Direction", stages: ["WRITING_PRD", "PRD_WRITTEN"], icon: "FileText" },
   { label: "Design", stages: ["DESIGNING", "DESIGN_COMPLETE"], icon: "Palette" },
-  { label: "Build", stages: ["BUILDING", "BUILDING_COMPLETE"], icon: "Hammer" }
+  { label: "Build", stages: ["BUILDING", "BUILDING_COMPLETE"], icon: "Hammer" },
 ];
 
 /**
@@ -64,7 +64,7 @@ export function getStepIndex(stage: string): number {
  *   WRITING_PRD / PRD_WRITTEN     → 20% (1 step done)
  *   DESIGNING / DESIGN_COMPLETE   → 55% (2 steps done)
  *   BUILDING / BUILDING_COMPLETE  → 100% (3 steps done)
- * 
+ *
  * step 5 pending)
  *   OFFER_SENT                    → 100% (all 6 steps done)
  *   FAILED                        → percentage based on how far along the failure occurred
@@ -74,7 +74,6 @@ export function getCompletionPercent(stage: string): number {
     return 0;
   }
 
- 
   if (stage === "FAILED") {
     return 0;
   }
@@ -83,7 +82,7 @@ export function getCompletionPercent(stage: string): number {
     return 0;
   }
   // Each completed step is worth ~16.67% (100/6)
-  return Math.round((stepIdx /3) * 100);
+  return Math.round((stepIdx / 3) * 100);
 }
 
 /**
@@ -105,11 +104,7 @@ export function isFailedStage(stage: string): boolean {
  * Non-terminal, non-NOT_STARTED, non-FAILED, non-PENDING stage.
  */
 export function isInProgressStage(stage: string): boolean {
-  if (
-    stage === "NOT_STARTED" ||
-    stage === "PENDING" ||
-    stage === "FAILED" 
-  ) {
+  if (stage === "NOT_STARTED" || stage === "PENDING" || stage === "FAILED") {
     return false;
   }
   return getStepIndex(stage) >= 0;

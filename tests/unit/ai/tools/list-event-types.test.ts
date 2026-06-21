@@ -35,11 +35,14 @@ describe("createListEventTypesTool", () => {
   it("calls calService.getEventTypes and returns the result", async () => {
     const { calService } = await import("@/lib/services/cal.service");
     const execute = executeListEventTypesTool();
-    const result = await execute({}, {
-      toolCallId: "tc-1",
-      messages: [],
-      abortSignal: new AbortController().signal,
-    });
+    const result = await execute(
+      {},
+      {
+        toolCallId: "tc-1",
+        messages: [],
+        abortSignal: new AbortController().signal,
+      },
+    );
 
     expect(calService.getEventTypes).toHaveBeenCalled();
     expect(result).toEqual([
@@ -54,11 +57,14 @@ describe("createListEventTypesTool", () => {
 
     const execute = executeListEventTypesTool();
     await expect(
-      execute({}, {
-        toolCallId: "tc-1",
-        messages: [],
-        abortSignal: new AbortController().signal,
-      })
+      execute(
+        {},
+        {
+          toolCallId: "tc-1",
+          messages: [],
+          abortSignal: new AbortController().signal,
+        },
+      ),
     ).rejects.toThrow("API Error");
   });
 });

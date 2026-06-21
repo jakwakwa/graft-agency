@@ -490,7 +490,6 @@ export const PromptInput = ({
     [accept],
   );
 
-
   const validateFiles = useCallback(
     (fileList: File[] | FileList, currentCount: number = 0) => {
       const incoming = [...fileList];

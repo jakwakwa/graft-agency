@@ -1,8 +1,8 @@
 import { Asterisk, AtSign, Globe } from "lucide-react";
 import Link from "next/link";
+import { Typography } from "@/components/ui/typography";
 import { LANDING_HEADER_SECTIONS, LANDING_ROUTES, landingContainerClassName } from "./constants";
 import { LandingSectionLink } from "./landing-section-link";
-import { Typography } from "@/components/ui/typography";
 
 const footerLinkClass = "text-sm text-[#a5a9c4] transition-colors hover:text-white";
 
@@ -50,9 +50,9 @@ export function LandingSiteFooter() {
                 </LandingSectionLink>
               </li>
               <li>
-                <LandingSectionLink sectionId="midnight-prospector" className={footerLinkClass}>
+                <Link href={LANDING_ROUTES.security} className={footerLinkClass}>
                   Security
-                </LandingSectionLink>
+                </Link>
               </li>
             </ul>
           </div>

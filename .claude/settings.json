@@ -10,9 +10,7 @@
   },
   "worktree": {
     "path": ".claude/worktrees",
-    "symlinkDirectories": [
-      ".claude"
-    ],
+    "symlinkDirectories": [".claude"],
     "baseRef": "head",
     "bgIsolation": "none"
   }

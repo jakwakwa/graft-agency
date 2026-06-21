@@ -33,7 +33,7 @@
   height: 90%;
   position: relative;
   /* margin-top: 66px; */
-  object-fit: cover;  
+  object-fit: cover;
   object-position: 20vw 5vh;
   filter: brightness(0.9) contrast(3.2) saturate(0);
   opacity: 1 !important;
@@ -42,16 +42,15 @@
 /* Top & bottom gradient mask */
 .hero-video-mask {
   position: absolute;
-  inset: 1;
-  left: 20%;
+  inset: 0;
   z-index: 2;
   pointer-events: none;
   background: linear-gradient(
     to bottom,
-    #e3465bf0 0%,
-    #04c793d5 50%,
-    hsla(184, 94%, 52%, 0.595) 90%,
-
+    #070708 0%,
+    transparent 15%,
+    transparent 85%,
+    #070708 100%
   );
 }
 
@@ -149,7 +148,7 @@
   z-index: 10;
   width: 100%;
   max-width: 82rem;
-  padding:  80px !important;
+  padding: 80px !important;
   margin: 0 auto;
   padding: 8rem 1.5rem 4rem;
   will-change: transform;
@@ -182,7 +181,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-top: 10px;
+  top: 10px;
   width: fit-content;
   padding: 0.2rem 0.7rem;
   border-radius: 9999px;

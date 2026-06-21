@@ -361,7 +361,10 @@ Omit any business that matches the CRM list by name or website. Return the resul
 
         // update tracking sets only for successfully created batches
         for (const lead of leadsToCreate) {
-          const { nameKey, urlKey } = prospectIdentityKeys((lead.customerName as string) || "", scrapedDataWebsiteUrl(lead.scrapedData) || "");
+          const { nameKey, urlKey } = prospectIdentityKeys(
+            (lead.customerName as string) || "",
+            scrapedDataWebsiteUrl(lead.scrapedData) || "",
+          );
           if (nameKey.length > 0) {
             excludedNameKeys.add(nameKey);
           }
@@ -377,7 +380,10 @@ Omit any business that matches the CRM list by name or website. Return the resul
               data: lead,
             });
             added++;
-            const { nameKey, urlKey } = prospectIdentityKeys((lead.customerName as string) || "", scrapedDataWebsiteUrl(lead.scrapedData) || "");
+            const { nameKey, urlKey } = prospectIdentityKeys(
+              (lead.customerName as string) || "",
+              scrapedDataWebsiteUrl(lead.scrapedData) || "",
+            );
             if (nameKey.length > 0) {
               excludedNameKeys.add(nameKey);
             }

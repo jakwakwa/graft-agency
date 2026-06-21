@@ -1,4 +1,5 @@
 import { PricingSection } from "@/components/pricing/pricing-section";
+import { PricingTabs } from "@/components/pricing/pricing-tabs";
 import { landingShellClassName } from "./constants";
 import { LandingBackground } from "./landing-background";
 import { LandingCtaSection } from "./landing-cta-section";
@@ -20,8 +21,20 @@ export default function LandingPageV2() {
         <LandingFeaturesSection />
         <LandingHardenedGrid />
         <LandingCtaSection />
+        <PricingTabs />
         <PricingSection
+          id="bot-pricing"
           mode="landing"
+          kindFilter="bot"
+          paddleConfig={{
+            clientToken: process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN ?? "",
+            environment,
+          }}
+        />
+        <PricingSection
+          id="website-pricing"
+          mode="landing"
+          kindFilter="website"
           paddleConfig={{
             clientToken: process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN ?? "",
             environment,

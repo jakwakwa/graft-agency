@@ -10,6 +10,7 @@ export const LANDING_ROUTES = {
   portalSettings: "/portal/settings",
   privacy: "/privacy",
   terms: "/terms",
+  security: "/security",
 } as const;
 
 /**
@@ -19,7 +20,8 @@ export const LANDING_HEADER_SECTIONS = [
   { id: "lead-capture", label: "Lead Capture" },
   { id: "midnight-prospector", label: "Midnight Prospector" },
   { id: "white-label", label: "White-Label" },
-  { id: "pricing", label: "Pricing" },
+  { id: "bot-pricing", label: "Bot Pricing" },
+  { id: "website-pricing", label: "Website Builds" },
 ] as const;
 
 export const landingShellClassName =

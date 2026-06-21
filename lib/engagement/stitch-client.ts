@@ -4,7 +4,7 @@ import { getGcpProjectId, getStitchAccessToken } from "@/lib/google/service-acco
 /**
  * Build a Stitch client authenticated with the `gt-stitch-api` service account
  * (OAuth2 Bearer) — the professional replacement for the leaked `STITCH_API_KEY`.
- * 
+ *
  * `projectId` (GCP project) becomes the `X-Goog-User-Project` quota/billing header
  * — distinct from `STITCH_PROJECT_ID`, which selects a Stitch *design* project.
  *

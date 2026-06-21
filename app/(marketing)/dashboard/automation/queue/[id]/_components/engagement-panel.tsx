@@ -326,7 +326,7 @@ function ProfiledNeedsBody({ data }: { data: unknown }) {
 export function EngagementPanel({ status, statusUnavailable = false }: EngagementPanelProps) {
   const [openProfile, setOpenProfile] = useState(false);
   const [openPrd, setOpenPrd] = useState(false);
-    const [openJules, setOpenJules] = useState(false);
+  const [openJules, setOpenJules] = useState(false);
   const [openDesigns, setOpenDesigns] = useState(true);
 
   const stage = status?.stage ?? "NOT_STARTED";
@@ -377,8 +377,8 @@ export function EngagementPanel({ status, statusUnavailable = false }: Engagemen
               <Typography.H3 id="engagement-heading" className="mb-0">
                 Engagement Pipeline
               </Typography.H3>
- 
-                  {isRunning && status?.updatedAt && (
+
+              {isRunning && status?.updatedAt && (
                 <p className="mt-4 text-muted-foreground" aria-live="polite">
                   Last updated{" "}
                   {new Date(status.updatedAt).toLocaleTimeString("en-GB", {
@@ -388,7 +388,7 @@ export function EngagementPanel({ status, statusUnavailable = false }: Engagemen
                 </p>
               )}
             </div>
-            
+
             <div className="flex items-center gap-3 flex-wrap justify-end">
               <Badge variant={stageBadgeVariant(isFailed, isRunning)}>{formatStageLabel(stage)}</Badge>
               {completionPct > 0 && !isFailed && (
@@ -396,7 +396,7 @@ export function EngagementPanel({ status, statusUnavailable = false }: Engagemen
                   {completionPct}%
                 </span>
               )}
-              
+
               {status?.inngestRunStatus && (
                 <Badge
                   variant={
@@ -447,7 +447,7 @@ export function EngagementPanel({ status, statusUnavailable = false }: Engagemen
               <p className="text-sm text-muted-foreground">Automation has not run yet. Run the pipeline to begin.</p>
             </CardContent>
           )}
-  
+
           {isPipelineStarted && (
             <CardContent className="pt-0">
               {isFailed && status?.errorMessage && (
@@ -464,16 +464,13 @@ export function EngagementPanel({ status, statusUnavailable = false }: Engagemen
                   className="absolute top-5 left-0 right-0 h-[2px] bg-border z-0"
                   style={{ marginInline: "calc(100% / 8)" }}
                 >
-                  <div
-                    className="h-full bg-white/50 animation-pulse "
-                    style={{ width: `${completionPct}%` }}
-                  />
+                  <div className="h-full bg-white/50 animation-pulse " style={{ width: `${completionPct}%` }} />
                 </div>
 
                 <div className="relative z-1 grid grid-cols-4">
                   {PIPELINE_STEPS.map((step, index) => {
                     const stepStatus = getStepStatus(index, stage);
-                    const StepIcon = STEP_ICONS[index as 0 | 1 | 2 | 3 | 4 ];
+                    const StepIcon = STEP_ICONS[index as 0 | 1 | 2 | 3 | 4];
 
                     return (
                       <div key={step.label} className="flex flex-col items-center gap-2 text-center">
@@ -535,7 +532,7 @@ export function EngagementPanel({ status, statusUnavailable = false }: Engagemen
                 </div>
               </div>
 
-              {hasArtifacts && (  
+              {hasArtifacts && (
                 <>
                   <Separator className="my-4" />
                   <div className="space-y-4">
@@ -547,7 +544,7 @@ export function EngagementPanel({ status, statusUnavailable = false }: Engagemen
                       <CollapsibleTrigger
                         render={
                           <Button
-                          variant={"outline"}
+                            variant={"outline"}
                             className="flex w-full bg-secondary items-center justify-between p-3 text-left text-sm font-medium"
                           />
                         }
@@ -610,7 +607,10 @@ export function EngagementPanel({ status, statusUnavailable = false }: Engagemen
                         <div className="flex items-center gap-2">
                           <span>Design</span>
                           {typeof status?.chosenDesign === "number" && concepts.length > 0 && (
-                            <Badge variant="outline" className="text-[12px] text-amber-200  text-right border-1 border-amber-300">
+                            <Badge
+                              variant="outline"
+                              className="text-[12px] text-amber-200  text-right border-1 border-amber-300"
+                            >
                               Chosen: #{status.chosenDesign + 1}
                             </Badge>
                           )}
@@ -692,22 +692,24 @@ export function EngagementPanel({ status, statusUnavailable = false }: Engagemen
                                           Open in Stitch
                                         </a>
                                       )}
-                                      {(sId && pId || link) && (() => {
-                                        const htmlHref = sId && pId
-                                          ? `/api/engagement/stitch-html?projectId=${encodeURIComponent(pId)}&screenId=${encodeURIComponent(sId)}`
-                                          : link;
-                                        return (
-                                          <a
-                                            href={htmlHref}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:underline"
-                                          >
-                                            <ExternalLink className="h-3 w-3" />
-                                            Open HTML
-                                          </a>
-                                        );
-                                      })()}
+                                      {((sId && pId) || link) &&
+                                        (() => {
+                                          const htmlHref =
+                                            sId && pId
+                                              ? `/api/engagement/stitch-html?projectId=${encodeURIComponent(pId)}&screenId=${encodeURIComponent(sId)}`
+                                              : link;
+                                          return (
+                                            <a
+                                              href={htmlHref}
+                                              target="_blank"
+                                              rel="noopener noreferrer"
+                                              className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:underline"
+                                            >
+                                              <ExternalLink className="h-3 w-3" />
+                                              Open HTML
+                                            </a>
+                                          );
+                                        })()}
                                     </div>
                                     {!conceptStitchProjectUrl(c) && !link && !image && (
                                       <p className="text-xs text-muted-foreground">No preview URL in payload</p>
@@ -724,168 +726,163 @@ export function EngagementPanel({ status, statusUnavailable = false }: Engagemen
                 </>
               )}
 
-        
-
               {showJulesCard && (
-             <Collapsible
-                      className="rounded-md border mt-4 border-border/80"
-                      onOpenChange={setOpenJules}
-                      open={openJules}
-                    >
-                        <CollapsibleTrigger
-                        render={
-                          <Button
-                            className="flex w-full items-center justify-between p-3 text-left text-sm font-medium"
-                            variant="ghost"
-                          />
-                        }
-                        
-                      >
-                         <div className="flex items-center gap-2">
-                          <span>Coding Agent</span>
-                    
-                        </div>
-                        <ChevronDown
-                          className={cn("h-4 w-4 shrink-0 transition-transform", openDesigns && "rotate-180")}
-                        />  </CollapsibleTrigger>
-               
-                <CollapsibleContent className="border-t border-border/80 p-3 data-[state=open]:animate-in">
-                <>
-           
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-2">
-                        <Hammer className="h-4 w-4 text-muted-foreground" aria-hidden />
-                        <span className="text-sm font-medium">Jules build</span>
-                        {julesIsRunning && <Spinner className="h-3.5 w-3.5 text-primary" />}
-                      </div>
-                      <Badge
-                        variant={julesIsFailed ? "destructive" : julesIsDone ? "secondary" : "outline"}
-                        className="font-mono text-[10px] uppercase tracking-wider"
-                      >
-                        {julesState ?? "unknown"}
-                      </Badge>
+                <Collapsible
+                  className="rounded-md border mt-4 border-border/80"
+                  onOpenChange={setOpenJules}
+                  open={openJules}
+                >
+                  <CollapsibleTrigger
+                    render={
+                      <Button
+                        className="flex w-full items-center justify-between p-3 text-left text-sm font-medium"
+                        variant="ghost"
+                      />
+                    }
+                  >
+                    <div className="flex items-center gap-2">
+                      <span>Coding Agent</span>
                     </div>
-                    <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4 gap-y-3.5 text-xs">
-                      {status?.julesSessionId && (
-                        <div className="flex hidden flex-col gap-4 ">
-                          <dt className="font-mono uppercase tracking-wide text-muted-foreground text-[10px]">
-                            Session
-                          </dt>
-                          <dd className="truncate font-mono">{status.julesSessionId}</dd>
+                    <ChevronDown
+                      className={cn("h-4 w-4 shrink-0 transition-transform", openDesigns && "rotate-180")}
+                    />{" "}
+                  </CollapsibleTrigger>
+
+                  <CollapsibleContent className="border-t border-border/80 p-3 data-[state=open]:animate-in">
+                    <>
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          <Hammer className="h-4 w-4 text-muted-foreground" aria-hidden />
+                          <span className="text-sm font-medium">Jules build</span>
+                          {julesIsRunning && <Spinner className="h-3.5 w-3.5 text-primary" />}
                         </div>
-                      )}
-                      {julesLastPolledLabel && (
-                        <div className="flex flex-col mt-8">
-                          <dt className="font-mono uppercase tracking-wide text-muted-foreground text-[10px]">
-                            Last polled
-                          </dt>
-                          <dd>{julesLastPolledLabel}</dd>
-                        </div>
-                      )}
-                      {status?.renderServiceName && (
-                        <div className="flex flex-col sm:col-span-2">
-                          <dt className="font-mono uppercase tracking-wide text-muted-foreground text-[14px] hidden">
-                            Render service
-                          </dt>
-                          <dd className="truncate font-mono">{status.renderServiceName}</dd>
-                        </div>
-                      )}
-                      {status?.pullRequestUrl && (
-                        <div className="flex hidden flex-col sm:col-span-2">
-                          <dt className="font-mono uppercase tracking-wide text-muted-foreground text-[10px]">
-                            Pull request
-                          </dt>
-                          <dd className="truncate">
-                            <a
-                              href={status.pullRequestUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-primary hover:underline"
-                            >
-                              {status.pullRequestUrl}
-                            </a>
-                          </dd>
-                        </div>
-                      )}
-                      {status?.deploymentUrl && (
-                        <div className="flex flex-col hidden sm:col-span-2">
-                          <dt className="font-mono uppercase tracking-wide text-muted-foreground text-[10px]">
-                            Render preview
-                          </dt>
-                          <dd className="truncate">
-                            <a
-                              href={status.deploymentUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-primary hover:underline"
-                            >
-                              {status.deploymentUrl}
-                            </a>
-                          </dd>
-                        </div>
-                      )}
-                    </dl>
-                    {(status?.julesProgressTitle?.trim() || status?.julesProgressDescription?.trim()) && (
-                      <div
-                        className="rounded-md border border-primary/20 bg-primary/5 px-3 py-2 space-y-1"
-                        aria-live="polite"
-                      >
-                        <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
-                          Jules activity
-                        </p>
-                        {status.julesProgressTitle?.trim() && (
-                          <p className="text-sm font-medium text-foreground leading-snug">
-                            {status.julesProgressTitle}
-                          </p>
-                        )}
-                        {status.julesProgressDescription?.trim() && (
-                          <p className="text-xs text-muted-foreground leading-relaxed">
-                            {status.julesProgressDescription}
-                          </p>
-                        )}
-                      </div>
-                    )}
-                    {julesIsRunning && status?.inngestRunStatus === "Failed" && (
-                      <Alert variant="destructive" className="py-2">
-                        <AlertCircle className="h-3.5 w-3.5" />
-                        <AlertDescription className="text-xs">
-                          Orchestrator crashed — Jules session is still building. Reconciler is tracking progress and
-                          will update this page automatically.
-                        </AlertDescription>
-                      </Alert>
-                    )}
-                    {julesIsRunning && status?.inngestRunStatus !== "Failed" && !status?.pullRequestUrl && (
-                      <p className="text-xs text-muted-foreground">
-                        Jules often runs 20–40 minutes. Each poll refreshes session state and the latest{" "}
-                        <span className="whitespace-nowrap">progress-updated</span> line from the{" "}
-                        <a
-                          href="https://jules.google/docs/api/reference/activities#progress-updated"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-primary hover:underline"
+                        <Badge
+                          variant={julesIsFailed ? "destructive" : julesIsDone ? "secondary" : "outline"}
+                          className="font-mono text-[10px] uppercase tracking-wider"
                         >
-                          Activities API
-                        </a>
-                        . The PR link appears once GitHub has the branch or PR.
-                      </p>
-                    )}
-                    {julesStateUpper === "AWAITING_PLAN_APPROVAL" && (
-                      <p className="text-xs text-muted-foreground">
-                        Jules is waiting on plan approval. The workflow auto-approves this state and continues polling.
-                      </p>
-                    )}
-                    {julesIsDone && !status?.pullRequestUrl && (
-                      <p className="text-xs text-muted-foreground">
-                        Jules session completed but no PR was detected in{" "}
-                        <code className="font-mono">{status?.githubRepo ?? "the builds repo"}</code>. Check the session
-                        directly.
-                      </p>
-                    )}
-              
-                </>
-                </CollapsibleContent>
-              
-                 </Collapsible>
+                          {julesState ?? "unknown"}
+                        </Badge>
+                      </div>
+                      <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4 gap-y-3.5 text-xs">
+                        {status?.julesSessionId && (
+                          <div className="flex hidden flex-col gap-4 ">
+                            <dt className="font-mono uppercase tracking-wide text-muted-foreground text-[10px]">
+                              Session
+                            </dt>
+                            <dd className="truncate font-mono">{status.julesSessionId}</dd>
+                          </div>
+                        )}
+                        {julesLastPolledLabel && (
+                          <div className="flex flex-col mt-8">
+                            <dt className="font-mono uppercase tracking-wide text-muted-foreground text-[10px]">
+                              Last polled
+                            </dt>
+                            <dd>{julesLastPolledLabel}</dd>
+                          </div>
+                        )}
+                        {status?.renderServiceName && (
+                          <div className="flex flex-col sm:col-span-2">
+                            <dt className="font-mono uppercase tracking-wide text-muted-foreground text-[14px] hidden">
+                              Render service
+                            </dt>
+                            <dd className="truncate font-mono">{status.renderServiceName}</dd>
+                          </div>
+                        )}
+                        {status?.pullRequestUrl && (
+                          <div className="flex hidden flex-col sm:col-span-2">
+                            <dt className="font-mono uppercase tracking-wide text-muted-foreground text-[10px]">
+                              Pull request
+                            </dt>
+                            <dd className="truncate">
+                              <a
+                                href={status.pullRequestUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-primary hover:underline"
+                              >
+                                {status.pullRequestUrl}
+                              </a>
+                            </dd>
+                          </div>
+                        )}
+                        {status?.deploymentUrl && (
+                          <div className="flex flex-col hidden sm:col-span-2">
+                            <dt className="font-mono uppercase tracking-wide text-muted-foreground text-[10px]">
+                              Render preview
+                            </dt>
+                            <dd className="truncate">
+                              <a
+                                href={status.deploymentUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-primary hover:underline"
+                              >
+                                {status.deploymentUrl}
+                              </a>
+                            </dd>
+                          </div>
+                        )}
+                      </dl>
+                      {(status?.julesProgressTitle?.trim() || status?.julesProgressDescription?.trim()) && (
+                        <div
+                          className="rounded-md border border-primary/20 bg-primary/5 px-3 py-2 space-y-1"
+                          aria-live="polite"
+                        >
+                          <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+                            Jules activity
+                          </p>
+                          {status.julesProgressTitle?.trim() && (
+                            <p className="text-sm font-medium text-foreground leading-snug">
+                              {status.julesProgressTitle}
+                            </p>
+                          )}
+                          {status.julesProgressDescription?.trim() && (
+                            <p className="text-xs text-muted-foreground leading-relaxed">
+                              {status.julesProgressDescription}
+                            </p>
+                          )}
+                        </div>
+                      )}
+                      {julesIsRunning && status?.inngestRunStatus === "Failed" && (
+                        <Alert variant="destructive" className="py-2">
+                          <AlertCircle className="h-3.5 w-3.5" />
+                          <AlertDescription className="text-xs">
+                            Orchestrator crashed — Jules session is still building. Reconciler is tracking progress and
+                            will update this page automatically.
+                          </AlertDescription>
+                        </Alert>
+                      )}
+                      {julesIsRunning && status?.inngestRunStatus !== "Failed" && !status?.pullRequestUrl && (
+                        <p className="text-xs text-muted-foreground">
+                          Jules often runs 20–40 minutes. Each poll refreshes session state and the latest{" "}
+                          <span className="whitespace-nowrap">progress-updated</span> line from the{" "}
+                          <a
+                            href="https://jules.google/docs/api/reference/activities#progress-updated"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-primary hover:underline"
+                          >
+                            Activities API
+                          </a>
+                          . The PR link appears once GitHub has the branch or PR.
+                        </p>
+                      )}
+                      {julesStateUpper === "AWAITING_PLAN_APPROVAL" && (
+                        <p className="text-xs text-muted-foreground">
+                          Jules is waiting on plan approval. The workflow auto-approves this state and continues
+                          polling.
+                        </p>
+                      )}
+                      {julesIsDone && !status?.pullRequestUrl && (
+                        <p className="text-xs text-muted-foreground">
+                          Jules session completed but no PR was detected in{" "}
+                          <code className="font-mono">{status?.githubRepo ?? "the builds repo"}</code>. Check the
+                          session directly.
+                        </p>
+                      )}
+                    </>
+                  </CollapsibleContent>
+                </Collapsible>
               )}
 
               <Separator className="my-4" />

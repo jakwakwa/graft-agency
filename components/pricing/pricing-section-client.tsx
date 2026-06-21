@@ -24,14 +24,36 @@ interface PricingSectionClientProps {
   mode: PricingMode;
   paddleConfig: PaddleConfig;
   customer?: PricingCustomer;
+  kindFilter?: "bot" | "website" | "all";
+  id?: string;
 }
 
-export function PricingSectionClient({ catalogue, mode, paddleConfig, customer }: PricingSectionClientProps) {
+export function PricingSectionClient({
+  catalogue,
+  mode,
+  paddleConfig,
+  customer,
+  kindFilter = "all",
+  id = "pricing",
+}: PricingSectionClientProps) {
   const [paddle, setPaddle] = useState<Paddle | null>(null);
   const [selectedCycle, setSelectedCycle] = useState<"monthly" | "annual">("monthly");
   const [localizedPrices, setLocalizedPrices] = useState<Record<string, string>>({});
   const canCheckout = mode === "portal" && customer ? !customer.subscriptionActive : false;
-  const previewItems = useMemo(() => getPreviewItems(catalogue), [catalogue]);
+
+  const filteredOffers = useMemo(() => {
+    return catalogue.offers.filter((offer) => {
+      if (kindFilter === "bot") {
+        return offer.kind === "subscription" || offer.kind === "addon";
+      }
+      if (kindFilter === "website") {
+        return offer.kind === "one_time";
+      }
+      return true;
+    });
+  }, [catalogue.offers, kindFilter]);
+
+  const previewItems = useMemo(() => getPreviewItems({ offers: filteredOffers }), [filteredOffers]);
 
   useEffect(() => {
     if (!paddleConfig.clientToken) return;
@@ -55,7 +77,7 @@ export function PricingSectionClient({ catalogue, mode, paddleConfig, customer }
   }, [paddle, previewItems]);
 
   const handleCheckout = (offer: PricingOffer) => {
-    const price = offer.prices[selectedCycle];
+    const price = offer.prices[selectedCycle] ?? offer.prices.oneTime;
     if (!paddle || !customer || !price) return;
     paddle.Checkout.open({
       items: [{ priceId: price.priceId, quantity: 1 }],
@@ -64,27 +86,40 @@ export function PricingSectionClient({ catalogue, mode, paddleConfig, customer }
     });
   };
 
+  const gridClass =
+    kindFilter === "website"
+      ? "grid gap-8 md:grid-cols-2 max-w-4xl mx-auto w-full"
+      : kindFilter === "bot"
+        ? "grid gap-6 md:grid-cols-3 w-full"
+        : "grid gap-4 md:grid-cols-2 xl:grid-cols-5 w-full";
+
   return (
-    <section id="pricing" className="relative z-10 px-6 py-24">
+    <section id={id} className="relative z-10 px-6 py-20">
       <div className="mx-auto flex max-w-7xl flex-col gap-10">
         <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
           <div className="max-w-2xl">
             <h2>
-              <Typography.H2 className="pb-3 text-on-surface">Simple pricing for always-on growth</Typography.H2>
+              <Typography.H2 className="pb-3 text-on-surface">
+                {kindFilter === "website" ? "Bespoke Agency Design & Builds" : "Simple pricing for always-on growth"}
+              </Typography.H2>
             </h2>
             <Typography.Lead className="text-on-surface-variant">
-              Localised Paddle pricing for the chatbot subscription, add-ons, and website build offers.
+              {kindFilter === "website"
+                ? "High-converting, hand-crafted landing pages and multi-page websites with your AI chatbot pre-configured and installed."
+                : "Localised Paddle pricing for the chatbot subscription and add-ons."}
             </Typography.Lead>
           </div>
-          <BillingCycleToggle selectedCycle={selectedCycle} onSelectCycle={setSelectedCycle} />
+          {kindFilter !== "website" && (
+            <BillingCycleToggle selectedCycle={selectedCycle} onSelectCycle={setSelectedCycle} />
+          )}
         </div>
         {mode === "portal" && customer?.subscriptionActive ? (
           <Typography.Muted className="rounded-2xl border border-white/10 bg-white/5 p-4 text-on-surface-variant">
             Included in your active subscription
           </Typography.Muted>
         ) : null}
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
-          {catalogue.offers.map((offer) => (
+        <div className={gridClass}>
+          {filteredOffers.map((offer) => (
             <PricingCard
               key={offer.id}
               offer={offer}

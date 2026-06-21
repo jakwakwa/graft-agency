@@ -11,36 +11,19 @@
     "groups": [
       {
         "group": "Getting started",
-        "pages": [
-          "index",
-          "quickstart",
-          "architecture"
-        ]
+        "pages": ["index", "quickstart", "architecture"]
       },
       {
         "group": "Guides",
-        "pages": [
-          "guides/multi-tenancy",
-          "guides/chat-widget",
-          "guides/prospecting",
-          "guides/engagement-pipeline"
-        ]
+        "pages": ["guides/multi-tenancy", "guides/chat-widget", "guides/prospecting", "guides/engagement-pipeline"]
       },
       {
         "group": "Deployment",
-        "pages": [
-          "deployment/environment-variables",
-          "deployment/webhooks"
-        ]
+        "pages": ["deployment/environment-variables", "deployment/webhooks"]
       },
       {
         "group": "API reference",
-        "pages": [
-          "api-reference/overview",
-          "api-reference/leads",
-          "api-reference/prospect-queue",
-          "api-reference/chat"
-        ]
+        "pages": ["api-reference/overview", "api-reference/leads", "api-reference/prospect-queue", "api-reference/chat"]
       }
     ]
   },

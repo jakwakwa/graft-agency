@@ -27,7 +27,7 @@ export const prospectingScheduledTick = inngest.createFunction(
     name: "Prospecting scheduled tick",
     triggers: [{ cron: "0 8 * * *" }],
   },
-  async ({ step }: {step: any}) => {
+  async ({ step }: { step: any }) => {
     const summary = await step.run("execute-prospecting", runProspectingInngestStep);
 
     if (summary.error === true && typeof summary.message === "string") {

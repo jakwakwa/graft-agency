@@ -42,4 +42,4 @@ From within Graft Platform you can
 
 ## Learn More
 
-To learn more about GRAFT.TODAY, visit [https://graft.today](https://graft.today) or [https://graft.today/docs](https://graft.today/docs)
+To learn more about GRAFT.TODAY, visit [https://GRAFT.TODAY(https://graft.today) or [https://graft.today/docs](https://graft.today/docs)

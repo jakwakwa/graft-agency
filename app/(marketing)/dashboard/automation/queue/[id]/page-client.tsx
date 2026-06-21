@@ -283,9 +283,13 @@ export default function QueueDetailPage() {
       <div className="mx-auto max-w-5xl p-8 space-y-6">
         <div className="flex items-center justify-between">
           <Button variant={"default"} size={"sm"}>
-          <Link href="/dashboard/automation/queue" className="text-white text-shadow-sm  hover:text-foreground text-sm font-bold">
-            ← Prospect Queue
-          </Link>       </Button>
+            <Link
+              href="/dashboard/automation/queue"
+              className="text-white text-shadow-sm  hover:text-foreground text-sm font-bold"
+            >
+              ← Prospect Queue
+            </Link>{" "}
+          </Button>
           <div className="flex gap-2">
             {canApprove && (
               <Button
@@ -298,10 +302,7 @@ export default function QueueDetailPage() {
             )}
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button 
-                variant="destructive" >
-                  Discard
-                </Button>
+                <Button variant="destructive">Discard</Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>

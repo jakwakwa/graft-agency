@@ -1,10 +1,10 @@
 "use client";
 
-import { type Variants, motion, useScroll, useTransform } from "motion/react";
-import { useRef } from "react";
 import { Zap } from "lucide-react";
-import { HeroVideoBackground } from "./hero-video-background";
+import { motion, useScroll, useTransform, type Variants } from "motion/react";
+import { useRef } from "react";
 import { HeroFloatingCards } from "./hero-floating-cards";
+import { HeroVideoBackground } from "./hero-video-background";
 
 const HEADLINE_VARIANTS: Variants = {
   hidden: {},

@@ -7,7 +7,6 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { cn } from "@/lib/utils";
 
-
 const workSans = Work_Sans({
   subsets: ["latin"],
   variable: "--font-sans",
@@ -63,7 +62,6 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           <ClerkProvider>{children}</ClerkProvider>
           <Toaster />
-       
         </ThemeProvider>
       </body>
     </html>

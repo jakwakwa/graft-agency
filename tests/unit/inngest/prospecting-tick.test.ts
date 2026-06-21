@@ -63,5 +63,4 @@ describe("runProspectingInngestStep", () => {
 
     await expect(runProspectingInngestStep()).rejects.toThrow("Unexpected DB failure");
   });
-
 });
