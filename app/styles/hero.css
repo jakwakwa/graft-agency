@@ -46,13 +46,7 @@
   inset: 0;
   z-index: 2;
   pointer-events: none;
-  background: linear-gradient(
-    to bottom,
-    #0d07b6a5 0%,
-    transparent 15%,
-    transparent 90%,
-    #0430a6b7 120%
-  );
+  background: linear-gradient(to bottom, #0d07b6a5 0%, transparent 15%, transparent 90%, #0430a6b7 120%);
 }
 
 /* CRT scanlines */
@@ -76,11 +70,11 @@
   position: absolute;
   inset: 0;
   z-index: 1;
-  bottom:-30vh;
-  left:-119vw;
+  bottom: -30vh;
+  left: -119vw;
   transform: scale(1);
   pointer-events: none;
-  background: radial-gradient(ellipse 50% 40% at 0% 25% , rgb(18, 56, 179) 90%, rgba(18, 229, 208, 0) 60%);
+  background: radial-gradient(ellipse 50% 40% at 0% 25%, rgb(18, 56, 179) 90%, rgba(18, 229, 208, 0) 60%);
 }
 
 /* Chromatic edge glow */
@@ -90,7 +84,7 @@
   z-index: 2;
   pointer-events: none;
   box-shadow:
-   inset 760PX 0px 80px 45px rgba(2, 6, 26, 0.99),
+    inset 760px 0px 80px 45px rgba(2, 6, 26, 0.99),
     inset 0 -210px 40px 10px rgb(13, 3, 33);
 }
 
@@ -120,7 +114,7 @@
 }
 
 .hero-orb--secondary {
-  width: 350PX;
+  width: 350px;
   height: 300px;
   bottom: 5%;
   left: -10%;
@@ -339,7 +333,7 @@
   color: #ff9da1;
   border: 1px solid rgba(200, 13, 60, 0.711);
   backdrop-filter: blur(8px);
-   box-shadow:
+  box-shadow:
     0 4px 24px -4px rgba(14, 16, 21, 0.904),
     0 0 0 1px rgba(240, 81, 155, 0.874);
 }
@@ -601,6 +595,12 @@
 
   .hero-video {
     display: none;
+  }
+
+  .hero-scroll-indicator {
+    left: auto;
+    right: 2rem;
+    transform: none;
   }
 }
 
