@@ -30,13 +30,17 @@ jobs:
   migrate:
     name: prisma migrate deploy
     runs-on: ubuntu-latest
+    # DIRECT_DATABASE_URL lives as a secret on the "Production" GitHub Environment.
+    # Declaring the environment here makes that secret available to the job (and records
+    # each migration as a Production deployment in the repo's Environments view).
+    environment: Production
     env:
       DIRECT_DATABASE_URL: ${{ secrets.DIRECT_DATABASE_URL }}
     steps:
       - name: Verify DIRECT_DATABASE_URL is configured
         run: |
           if [ -z "$DIRECT_DATABASE_URL" ]; then
-            echo "::error::DIRECT_DATABASE_URL repository secret is not set. Add the DIRECT connection string (host db.prisma.io) from the Prisma Console as a secret named DIRECT_DATABASE_URL."
+            echo "::error::DIRECT_DATABASE_URL is not available to this job. Set it as a secret on the 'Production' GitHub Environment (Settings > Environments > Production) using the DIRECT connection string (host db.prisma.io) from the Prisma Console."
             exit 1
           fi
 
