@@ -1,22 +1,52 @@
-# .github/workflows/deploy.yml
-name: Deploy
+# Applies committed Prisma migrations to the production (Prisma Postgres) database.
+#
+# Runs `prisma migrate deploy` against a DIRECT postgresql:// connection. The
+# prisma+postgres:// Accelerate/pooled URL the app uses at runtime is rejected by
+# the migrate engine (P1013), so this workflow uses the DIRECT_DATABASE_URL secret
+# (the db.prisma.io direct connection string from the Prisma Console).
+#
+# Vercel continues to build & host the app on push; this workflow only handles the
+# database schema so the two concerns stay separate and observable.
+name: Migrate database
 
 on:
   push:
     branches: [main]
+    paths:
+      - "prisma/migrations/**"
+      - "prisma/schema.prisma"
+      - "prisma.config.ts"
+  workflow_dispatch:
+
+# Never run two migration jobs against the same database at once.
+concurrency:
+  group: prisma-migrate-deploy
+  cancel-in-progress: false
 
 permissions:
   contents: read
-  deployments: write
 
 jobs:
-  deploy:
+  migrate:
+    name: prisma migrate deploy
     runs-on: ubuntu-latest
+    env:
+      DIRECT_DATABASE_URL: ${{ secrets.DIRECT_DATABASE_URL }}
     steps:
+      - name: Verify DIRECT_DATABASE_URL is configured
+        run: |
+          if [ -z "$DIRECT_DATABASE_URL" ]; then
+            echo "::error::DIRECT_DATABASE_URL repository secret is not set. Add the DIRECT connection string (host db.prisma.io) from the Prisma Console as a secret named DIRECT_DATABASE_URL."
+            exit 1
+          fi
+
       - uses: actions/checkout@v4
 
-      - name: Deploy to Prisma Compute
-        uses: prisma/project-compute/github-action@main
-        with:
-          api-token: ${{ secrets.PRISMA_API_TOKEN }}
-          compute-service-id: cmqj5s6f206mp1mdo1hrryo43
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Apply migrations
+        run: bunx prisma migrate deploy
