@@ -1,0 +1,38 @@
+name: Prospect CI
+
+on:
+  pull_request:
+    paths:
+      - 'prospects/**'    # only fires when Jules touches a prospect dir
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # needed for git diff to see base branch
+
+      - name: Detect changed prospect
+        id: slug
+        run: |
+          SLUG=$(git diff --name-only \
+            origin/${{ github.base_ref }}...HEAD \
+            | grep '^prospects/' | head -1 \
+            | cut -d/ -f2)
+          echo "slug=$SLUG" >> $GITHUB_OUTPUT
+          echo "::notice::Building prospect: $SLUG"
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install
+        working-directory: prospects/${{ steps.slug.outputs.slug }}
+        run: bun install --frozen-lockfile
+
+      - name: Type check          # catches the most common Jules mistakes
+        working-directory: prospects/${{ steps.slug.outputs.slug }}
+        run: bunx tsc --noEmit
+
+      - name: Build
+        working-directory: prospects/${{ steps.slug.outputs.slug }}
+        run: bun run build
