@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useIsMobile } from "@/components/ui/use-mobile";
 
 interface HeroVideoBackgroundProps {
   src: string;
@@ -10,9 +11,12 @@ interface HeroVideoBackgroundProps {
 export function HeroVideoBackground({ src, poster }: HeroVideoBackgroundProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const isMobile = useIsMobile();
   const markLoaded = useCallback(() => setIsLoaded(true), []);
 
   useEffect(() => {
+    if (isMobile) return;
+
     const video = videoRef.current;
     if (!video) return;
 
@@ -23,7 +27,7 @@ export function HeroVideoBackground({ src, poster }: HeroVideoBackgroundProps) {
     video.addEventListener("loadeddata", markLoaded);
     video.addEventListener("canplay", markLoaded);
 
-    // Ensure autoplay on mobile (needs muted + playsinline)
+    // Ensure autoplay on desktop (needs muted + playsinline)
     video.play().catch(() => {
       // Autoplay blocked — still show the poster/fallback
     });
@@ -32,7 +36,7 @@ export function HeroVideoBackground({ src, poster }: HeroVideoBackgroundProps) {
       video.removeEventListener("loadeddata", markLoaded);
       video.removeEventListener("canplay", markLoaded);
     };
-  }, [markLoaded]);
+  }, [isMobile, markLoaded]);
 
   return (
     <div className="hero-video-wrap" aria-hidden>
@@ -48,22 +52,25 @@ export function HeroVideoBackground({ src, poster }: HeroVideoBackgroundProps) {
       {/* Chromatic edge glow */}
       <div className="hero-chromatic-edge" />
 
-      <video
-        ref={videoRef}
-        className="hero-video"
-        autoPlay
-        muted
-        playsInline
-        loop
-        preload="auto"
-        poster={poster}
-        style={{
-          opacity: isLoaded ? 1 : 0,
-          transition: "opacity 2s cubic-bezier(0.22, 1, 0.36, 1)",
-        }}
-      >
-        <source src={src} type="video/mp4" />
-      </video>
+      {!isMobile && (
+        <video
+          ref={videoRef}
+          className="hero-video"
+          autoPlay
+          muted
+          playsInline
+          loop
+          preload="auto"
+          poster={poster}
+          style={{
+            opacity: isLoaded ? 1 : 0,
+            transition: "opacity 2s cubic-bezier(0.22, 1, 0.36, 1)",
+          }}
+        >
+          <source src={src} type="video/mp4" />
+        </video>
+      )}
     </div>
   );
 }
+

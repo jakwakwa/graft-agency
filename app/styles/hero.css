@@ -600,8 +600,7 @@
   }
 
   .hero-video {
-    object-position: center center;
-    filter: brightness(0.7) contrast(2.5) saturate(2);
+    display: none;
   }
 }
 
