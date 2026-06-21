@@ -535,20 +535,20 @@ export function EngagementPanel({ status, statusUnavailable = false }: Engagemen
                 </div>
               </div>
 
-              {hasArtifacts && (
+              {hasArtifacts && (  
                 <>
                   <Separator className="my-4" />
                   <div className="space-y-4">
                     <Collapsible
                       className="bg-linear-to-tr from-black/5 via-primary/5 to-accent/20 backdrop-blur-md rounded-md border border-accent/30"
-                      onOpenChange={setOpenProfile} 
-                      open={openProfile }
+                      onOpenChange={setOpenProfile}
+                      open={openProfile}
                     >
                       <CollapsibleTrigger
                         render={
                           <Button
-                            className="flex w-full items-center justify-between p-3 text-left text-sm font-medium"
-                            variant="ghost"
+                          variant={"outline"}
+                            className="flex w-full bg-secondary items-center justify-between p-3 text-left text-sm font-medium"
                           />
                         }
                       >

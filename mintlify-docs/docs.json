@@ -1,78 +1,45 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "prism",
+  "theme": "mint",
   "name": "GRAFT.TODAY",
-  "logo": {
-    "light": "/images/logo-light.svg",
-    "dark": "/images/logo-dark.svg"
-  },
-  "favicon": "/images/favicon.svg",
   "colors": {
     "primary": "#6366f1",
     "light": "#818cf8",
     "dark": "#4f46e5"
   },
-  "topbar": {
-    "style": "default"
-  },
   "navigation": {
-    "tabs": [
+    "groups": [
       {
-        "tab": "Docs",
-        "groups": [
-          {
-            "group": "Getting started",
-            "pages": [
-              "index",
-              "quickstart",
-              "architecture"
-            ]
-          },
-          {
-            "group": "Guides",
-            "pages": [
-              "guides/multi-tenancy",
-              "guides/chat-widget",
-              "guides/prospecting",
-              "guides/engagement-pipeline"
-            ]
-          },
-          {
-            "group": "Deployment",
-            "pages": [
-              "deployment/environment-variables",
-              "deployment/webhooks"
-            ]
-          }
+        "group": "Getting started",
+        "pages": [
+          "index",
+          "quickstart",
+          "architecture"
         ]
       },
       {
-        "tab": "API reference",
-        "groups": [
-          {
-            "group": "Overview",
-            "pages": [
-              "api-reference/overview"
-            ]
-          },
-          {
-            "group": "Leads",
-            "pages": [
-              "api-reference/leads"
-            ]
-          },
-          {
-            "group": "Prospect queue",
-            "pages": [
-              "api-reference/prospect-queue"
-            ]
-          },
-          {
-            "group": "Chat",
-            "pages": [
-              "api-reference/chat"
-            ]
-          }
+        "group": "Guides",
+        "pages": [
+          "guides/multi-tenancy",
+          "guides/chat-widget",
+          "guides/prospecting",
+          "guides/engagement-pipeline"
+        ]
+      },
+      {
+        "group": "Deployment",
+        "pages": [
+          "deployment/environment-variables",
+          "deployment/webhooks"
+        ]
+      },
+      {
+        "group": "API reference",
+        "pages": [
+          "api-reference/overview",
+          "api-reference/leads",
+          "api-reference/prospect-queue",
+          "api-reference/chat"
         ]
       }
     ]
