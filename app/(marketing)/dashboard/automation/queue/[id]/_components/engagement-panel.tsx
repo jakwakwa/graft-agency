@@ -74,6 +74,22 @@ interface EngagementPanelProps {
 // ------------------------------------------------------- step icon mapping ---
 
 type StepIconProps = { className?: string };
+function getStepStatusColor(stepStatus: string, isFailed: boolean): string {
+  if (stepStatus === "done") return "text-primary";
+  if (stepStatus === "current") {
+    return isFailed ? "text-destructive" : "text-primary";
+  }
+  return "text-muted-foreground";
+}
+
+function getStepStatusLabel(stepStatus: string, isFailed: boolean): string {
+  if (stepStatus === "done") return "Done";
+  if (stepStatus === "current") {
+    return isFailed ? "Failed" : "Running";
+  }
+  return "Pending";
+}
+
 type StepIconFn = (props: StepIconProps) => React.ReactNode;
 
 const STEP_ICONS: [StepIconFn, StepIconFn, StepIconFn, StepIconFn, StepIconFn, StepIconFn] = [
@@ -99,6 +115,18 @@ const PROFILE_LABELS: Record<string, string> = {
 };
 
 // ---------------------------------------------------------------- helpers ---
+
+function getJulesBadgeVariant(isFailed: boolean, isDone: boolean): "destructive" | "secondary" | "outline" {
+  if (isFailed) return "destructive";
+  if (isDone) return "secondary";
+  return "outline";
+}
+
+function getInngestBadgeVariant(status: string | null | undefined): "destructive" | "secondary" | "outline" {
+  if (status === "Failed") return "destructive";
+  if (status === "Completed") return "secondary";
+  return "outline";
+}
 
 function stageBadgeVariant(isFailed: boolean, isRunning: boolean): "destructive" | "outline" | "secondary" {
   if (isFailed) return "destructive";
@@ -151,6 +179,13 @@ function conceptScreenId(c: Record<string, unknown>): string | undefined {
 function conceptProjectId(c: Record<string, unknown>): string | undefined {
   const v = c.projectId;
   return typeof v === "string" && v.length > 0 ? v : undefined;
+}
+
+function conceptHtmlHref(pId?: string, sId?: string, link?: string): string | undefined {
+  if (sId && pId) {
+    return `/api/engagement/stitch-html?projectId=${encodeURIComponent(pId)}&screenId=${encodeURIComponent(sId)}`;
+  }
+  return link;
 }
 
 /**
@@ -338,8 +373,6 @@ export function EngagementPanel({ status, statusUnavailable = false }: Engagemen
 
   const profiledNeeds = status?.profiledNeeds;
   const profiledRecord = asRecord(profiledNeeds);
-  const companyName =
-    profiledRecord && typeof profiledRecord.companyName === "string" ? profiledRecord.companyName : null;
   const prdContent = status?.prdContent?.trim() ?? "";
   const concepts = parseDesignConcepts(status?.designConcepts);
   const hasArtifacts = Boolean(profiledRecord || prdContent.length > 0 || concepts.length > 0);
@@ -399,13 +432,7 @@ export function EngagementPanel({ status, statusUnavailable = false }: Engagemen
 
               {status?.inngestRunStatus && (
                 <Badge
-                  variant={
-                    status.inngestRunStatus === "Failed"
-                      ? "destructive"
-                      : status.inngestRunStatus === "Completed"
-                        ? "secondary"
-                        : "outline"
-                  }
+                  variant={getInngestBadgeVariant(status.inngestRunStatus)}
                   className="font-mono text-[10px] uppercase tracking-wider"
                 >
                   Inngest: {status.inngestRunStatus}
@@ -500,23 +527,12 @@ export function EngagementPanel({ status, statusUnavailable = false }: Engagemen
 
                         <div className="space-y-0.5">
                           <p
-                            className={`text-[9px] font-mono font-bold uppercase tracking-wider ${
-                              stepStatus === "done"
-                                ? "text-primary"
-                                : stepStatus === "current"
-                                  ? isFailed
-                                    ? "text-destructive"
-                                    : "text-primary"
-                                  : "text-muted-foreground"
-                            }`}
+                            className={cn(
+                              "text-[9px] font-mono font-bold uppercase tracking-wider",
+                              getStepStatusColor(stepStatus, isFailed),
+                            )}
                           >
-                            {stepStatus === "done"
-                              ? "Done"
-                              : stepStatus === "current"
-                                ? isFailed
-                                  ? "Failed"
-                                  : "Running"
-                                : "Pending"}
+                            {getStepStatusLabel(stepStatus, isFailed)}
                           </p>
                           <p
                             className={`text-xs font-medium leading-tight ${
@@ -641,11 +657,7 @@ export function EngagementPanel({ status, statusUnavailable = false }: Engagemen
                                 >
                                   {(image || (sId && pId)) && (
                                     <a
-                                      href={
-                                        sId && pId
-                                          ? `/api/engagement/stitch-html?projectId=${encodeURIComponent(pId)}&screenId=${encodeURIComponent(sId)}`
-                                          : (link ?? image)
-                                      }
+                                      href={conceptHtmlHref(pId, sId, link ?? image)}
                                       target="_blank"
                                       rel="noopener noreferrer"
                                       className="relative block aspect-portrait overflow-hidden bg-muted/50"
@@ -694,10 +706,7 @@ export function EngagementPanel({ status, statusUnavailable = false }: Engagemen
                                       )}
                                       {((sId && pId) || link) &&
                                         (() => {
-                                          const htmlHref =
-                                            sId && pId
-                                              ? `/api/engagement/stitch-html?projectId=${encodeURIComponent(pId)}&screenId=${encodeURIComponent(sId)}`
-                                              : link;
+                                          const htmlHref = conceptHtmlHref(pId, sId, link as string);
                                           return (
                                             <a
                                               href={htmlHref}
@@ -749,138 +758,135 @@ export function EngagementPanel({ status, statusUnavailable = false }: Engagemen
                   </CollapsibleTrigger>
 
                   <CollapsibleContent className="border-t border-border/80 p-3 data-[state=open]:animate-in">
-                    <>
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-2">
-                          <Hammer className="h-4 w-4 text-muted-foreground" aria-hidden />
-                          <span className="text-sm font-medium">Jules build</span>
-                          {julesIsRunning && <Spinner className="h-3.5 w-3.5 text-primary" />}
-                        </div>
-                        <Badge
-                          variant={julesIsFailed ? "destructive" : julesIsDone ? "secondary" : "outline"}
-                          className="font-mono text-[10px] uppercase tracking-wider"
-                        >
-                          {julesState ?? "unknown"}
-                        </Badge>
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <Hammer className="h-4 w-4 text-muted-foreground" aria-hidden />
+                        <span className="text-sm font-medium">Jules build</span>
+                        {julesIsRunning && <Spinner className="h-3.5 w-3.5 text-primary" />}
                       </div>
-                      <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4 gap-y-3.5 text-xs">
-                        {status?.julesSessionId && (
-                          <div className="flex hidden flex-col gap-4 ">
-                            <dt className="font-mono uppercase tracking-wide text-muted-foreground text-[10px]">
-                              Session
-                            </dt>
-                            <dd className="truncate font-mono">{status.julesSessionId}</dd>
-                          </div>
-                        )}
-                        {julesLastPolledLabel && (
-                          <div className="flex flex-col mt-8">
-                            <dt className="font-mono uppercase tracking-wide text-muted-foreground text-[10px]">
-                              Last polled
-                            </dt>
-                            <dd>{julesLastPolledLabel}</dd>
-                          </div>
-                        )}
-                        {status?.renderServiceName && (
-                          <div className="flex flex-col sm:col-span-2">
-                            <dt className="font-mono uppercase tracking-wide text-muted-foreground text-[14px] hidden">
-                              Render service
-                            </dt>
-                            <dd className="truncate font-mono">{status.renderServiceName}</dd>
-                          </div>
-                        )}
-                        {status?.pullRequestUrl && (
-                          <div className="flex hidden flex-col sm:col-span-2">
-                            <dt className="font-mono uppercase tracking-wide text-muted-foreground text-[10px]">
-                              Pull request
-                            </dt>
-                            <dd className="truncate">
-                              <a
-                                href={status.pullRequestUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-primary hover:underline"
-                              >
-                                {status.pullRequestUrl}
-                              </a>
-                            </dd>
-                          </div>
-                        )}
-                        {status?.deploymentUrl && (
-                          <div className="flex flex-col hidden sm:col-span-2">
-                            <dt className="font-mono uppercase tracking-wide text-muted-foreground text-[10px]">
-                              Render preview
-                            </dt>
-                            <dd className="truncate">
-                              <a
-                                href={status.deploymentUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-primary hover:underline"
-                              >
-                                {status.deploymentUrl}
-                              </a>
-                            </dd>
-                          </div>
-                        )}
-                      </dl>
-                      {(status?.julesProgressTitle?.trim() || status?.julesProgressDescription?.trim()) && (
-                        <div
-                          className="rounded-md border border-primary/20 bg-primary/5 px-3 py-2 space-y-1"
-                          aria-live="polite"
-                        >
-                          <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
-                            Jules activity
-                          </p>
-                          {status.julesProgressTitle?.trim() && (
-                            <p className="text-sm font-medium text-foreground leading-snug">
-                              {status.julesProgressTitle}
-                            </p>
-                          )}
-                          {status.julesProgressDescription?.trim() && (
-                            <p className="text-xs text-muted-foreground leading-relaxed">
-                              {status.julesProgressDescription}
-                            </p>
-                          )}
+                      <Badge
+                        variant={getJulesBadgeVariant(julesIsFailed, julesIsDone)}
+                        className="font-mono text-[10px] uppercase tracking-wider"
+                      >
+                        {julesState ?? "unknown"}
+                      </Badge>
+                    </div>
+                    <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4 gap-y-3.5 text-xs">
+                      {status?.julesSessionId && (
+                        <div className="flex hidden flex-col gap-4 ">
+                          <dt className="font-mono uppercase tracking-wide text-muted-foreground text-[10px]">
+                            Session
+                          </dt>
+                          <dd className="truncate font-mono">{status.julesSessionId}</dd>
                         </div>
                       )}
-                      {julesIsRunning && status?.inngestRunStatus === "Failed" && (
-                        <Alert variant="destructive" className="py-2">
-                          <AlertCircle className="h-3.5 w-3.5" />
-                          <AlertDescription className="text-xs">
-                            Orchestrator crashed — Jules session is still building. Reconciler is tracking progress and
-                            will update this page automatically.
-                          </AlertDescription>
-                        </Alert>
+                      {julesLastPolledLabel && (
+                        <div className="flex flex-col mt-8">
+                          <dt className="font-mono uppercase tracking-wide text-muted-foreground text-[10px]">
+                            Last polled
+                          </dt>
+                          <dd>{julesLastPolledLabel}</dd>
+                        </div>
                       )}
-                      {julesIsRunning && status?.inngestRunStatus !== "Failed" && !status?.pullRequestUrl && (
-                        <p className="text-xs text-muted-foreground">
-                          Jules often runs 20–40 minutes. Each poll refreshes session state and the latest{" "}
-                          <span className="whitespace-nowrap">progress-updated</span> line from the{" "}
-                          <a
-                            href="https://jules.google/docs/api/reference/activities#progress-updated"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-primary hover:underline"
-                          >
-                            Activities API
-                          </a>
-                          . The PR link appears once GitHub has the branch or PR.
+                      {status?.renderServiceName && (
+                        <div className="flex flex-col sm:col-span-2">
+                          <dt className="font-mono uppercase tracking-wide text-muted-foreground text-[14px] hidden">
+                            Render service
+                          </dt>
+                          <dd className="truncate font-mono">{status.renderServiceName}</dd>
+                        </div>
+                      )}
+                      {status?.pullRequestUrl && (
+                        <div className="flex hidden flex-col sm:col-span-2">
+                          <dt className="font-mono uppercase tracking-wide text-muted-foreground text-[10px]">
+                            Pull request
+                          </dt>
+                          <dd className="truncate">
+                            <a
+                              href={status.pullRequestUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-primary hover:underline"
+                            >
+                              {status.pullRequestUrl}
+                            </a>
+                          </dd>
+                        </div>
+                      )}
+                      {status?.deploymentUrl && (
+                        <div className="flex flex-col hidden sm:col-span-2">
+                          <dt className="font-mono uppercase tracking-wide text-muted-foreground text-[10px]">
+                            Render preview
+                          </dt>
+                          <dd className="truncate">
+                            <a
+                              href={status.deploymentUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-primary hover:underline"
+                            >
+                              {status.deploymentUrl}
+                            </a>
+                          </dd>
+                        </div>
+                      )}
+                    </dl>
+                    {(status?.julesProgressTitle?.trim() || status?.julesProgressDescription?.trim()) && (
+                      <div
+                        className="rounded-md border border-primary/20 bg-primary/5 px-3 py-2 space-y-1"
+                        aria-live="polite"
+                      >
+                        <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+                          Jules activity
                         </p>
-                      )}
-                      {julesStateUpper === "AWAITING_PLAN_APPROVAL" && (
-                        <p className="text-xs text-muted-foreground">
-                          Jules is waiting on plan approval. The workflow auto-approves this state and continues
-                          polling.
-                        </p>
-                      )}
-                      {julesIsDone && !status?.pullRequestUrl && (
-                        <p className="text-xs text-muted-foreground">
-                          Jules session completed but no PR was detected in{" "}
-                          <code className="font-mono">{status?.githubRepo ?? "the builds repo"}</code>. Check the
-                          session directly.
-                        </p>
-                      )}
-                    </>
+                        {status.julesProgressTitle?.trim() && (
+                          <p className="text-sm font-medium text-foreground leading-snug">
+                            {status.julesProgressTitle}
+                          </p>
+                        )}
+                        {status.julesProgressDescription?.trim() && (
+                          <p className="text-xs text-muted-foreground leading-relaxed">
+                            {status.julesProgressDescription}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                    {julesIsRunning && status?.inngestRunStatus === "Failed" && (
+                      <Alert variant="destructive" className="py-2">
+                        <AlertCircle className="h-3.5 w-3.5" />
+                        <AlertDescription className="text-xs">
+                          Orchestrator crashed — Jules session is still building. Reconciler is tracking progress and
+                          will update this page automatically.
+                        </AlertDescription>
+                      </Alert>
+                    )}
+                    {julesIsRunning && status?.inngestRunStatus !== "Failed" && !status?.pullRequestUrl && (
+                      <p className="text-xs text-muted-foreground">
+                        Jules often runs 20–40 minutes. Each poll refreshes session state and the latest{" "}
+                        <span className="whitespace-nowrap">progress-updated</span> line from the{" "}
+                        <a
+                          href="https://jules.google/docs/api/reference/activities#progress-updated"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary hover:underline"
+                        >
+                          Activities API
+                        </a>
+                        . The PR link appears once GitHub has the branch or PR.
+                      </p>
+                    )}
+                    {julesStateUpper === "AWAITING_PLAN_APPROVAL" && (
+                      <p className="text-xs text-muted-foreground">
+                        Jules is waiting on plan approval. The workflow auto-approves this state and continues polling.
+                      </p>
+                    )}
+                    {julesIsDone && !status?.pullRequestUrl && (
+                      <p className="text-xs text-muted-foreground">
+                        Jules session completed but no PR was detected in{" "}
+                        <code className="font-mono">{status?.githubRepo ?? "the builds repo"}</code>. Check the session
+                        directly.
+                      </p>
+                    )}
                   </CollapsibleContent>
                 </Collapsible>
               )}
