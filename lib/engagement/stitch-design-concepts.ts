@@ -280,8 +280,122 @@ These are tools, not defaults. Use them when the design read calls for them. **N
 * **"Motion claimed, motion shown."** If "MOTION_INTENSITY > 4", the page must actually move: entry transitions on hero, scroll-reveal on key sections, hover physics on CTAs, at minimum. A static page that claims "MOTION_INTENSITY: 7" is broken. Conversely, if you cannot ship working motion in the available scope, drop the dial to 3 and ship a clean static page. Never half-build motion that breaks (cut-off ScrollTriggers, jumpy enters, missing cleanups).
 * **MOTION MUST BE MOTIVATED (mandatory).** Before adding any animation, ask: "what does this animation communicate?" Valid answers: hierarchy (drawing attention to the right thing), storytelling (revealing content in sequence that matches a narrative), feedback (acknowledging a user action), state transition (showing something changed). Invalid answer: "it looked cool". GSAP everywhere because GSAP is available is amateur. Each ScrollTrigger, each marquee, each pinned section needs a reason. If you cannot articulate the reason in one sentence, drop the animation.
 * **MARQUEE MAX-ONE-PER-PAGE (mandatory).** Horizontal scrolling text marquees ("logos endlessly scrolling", "manifesto scrolling sideways", "kinetic word strip") are appropriate at most ONCE per page. Two or more marquees on the same page reads as lazy filler. Pick the one section where the marquee actually serves the content; the others get a different layout.
-* **GSAP Sticky-Stack Pattern (when scroll-stack is used).** A "card stack on scroll" must be a REAL sticky-stack, not a sequential reveal list. See Section 5.A below for the canonical code skeleton. Common failure: trigger fires halfway through scroll instead of pinning at viewport top. Fix: "start: \"top top\"" not "start: \"top center\"" or "\"top 80%\"". 
-* **GSAP Horizontal-Pan Pattern (when horizontal scroll-hijack is used).** See Section 5.B below for the canonical skeleton. Common failure: animation starts before the section is pinned, so the user sees half a slide. Same fix: "start: \"top top\"", pin the wrapper, scrub the inner track.
+* **GSAP Sticky-Stack Pattern (when scroll-stack is used).** A "card stack on scroll" must be a REAL sticky-stack, not a sequential reveal list. See Section 5.A below for the canonical code skeleton. Common failure: trigger fires halfway through scroll instead of pinning at viewport top. Fix: "start: "top top"" not "start: "top center"" or ""top 80%"".
+* **GSAP Horizontal-Pan Pattern (when horizontal scroll-hijack is used).** See Section 5.B below for the canonical skeleton. Common failure: animation starts before the section is pinned, so the user sees half a slide. Same fix: "start: "top top"", pin the wrapper, scrub the inner track.
+
+### 5.A Sticky-Stack - Canonical Skeleton
+
+*(Note: The following is a canonical code skeleton provided for the AI to implement this pattern correctly. It represents production-ready architecture for scroll-stacking.)*
+
+\`\`\`tsx
+"use client";
+import { useRef, useEffect } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useReducedMotion } from "motion/react";
+
+gsap.registerPlugin(ScrollTrigger);
+
+export function StickyStack({ cards }: { cards: React.ReactNode[] }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const reduce = useReducedMotion();
+
+  useEffect(() => {
+    if (reduce || !ref.current) return;
+    const ctx = gsap.context(() => {
+      const cardEls = gsap.utils.toArray<HTMLElement>(".stack-card");
+      cardEls.forEach((card, i) => {
+        if (i === cardEls.length - 1) return;
+        ScrollTrigger.create({
+          trigger: card,
+          start: "top top",                              // pin at viewport top
+          endTrigger: cardEls[cardEls.length - 1],
+          end: "top top",
+          pin: true,
+          pinSpacing: false,
+        });
+        gsap.to(card, {
+          scale: 0.92,
+          opacity: 0.55,
+          ease: "none",
+          scrollTrigger: {
+            trigger: cardEls[i + 1],
+            start: "top bottom",
+            end: "top top",
+            scrub: true,
+          },
+        });
+      });
+    }, ref);
+    return () => ctx.revert();
+  }, [reduce]);
+
+  return (
+    <div ref={ref} className="relative">
+      {cards.map((card, i) => (
+        <div
+          key={i}
+          className="stack-card sticky top-0 min-h-[100dvh] flex items-center justify-center"
+        >
+          {card}
+        </div>
+      ))}
+    </div>
+  );
+}
+\`\`\`
+
+Critical points: \`start: "top top"\`, \`pin: true\`, every card except the last is pinned, the scale/opacity transform is driven by the NEXT card's scroll trigger (so previous card shrinks as next one arrives).
+
+### 5.B Horizontal-Pan - Canonical Skeleton
+
+\`\`\`tsx
+"use client";
+import { useRef, useEffect } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useReducedMotion } from "motion/react";
+
+gsap.registerPlugin(ScrollTrigger);
+
+export function HorizontalPan({ children }: { children: React.ReactNode }) {
+  const wrap = useRef<HTMLDivElement>(null);
+  const track = useRef<HTMLDivElement>(null);
+  const reduce = useReducedMotion();
+
+  useEffect(() => {
+    if (reduce || !wrap.current || !track.current) return;
+    const ctx = gsap.context(() => {
+      const distance = track.current!.scrollWidth - window.innerWidth;
+      gsap.to(track.current, {
+        x: -distance,
+        ease: "none",
+        scrollTrigger: {
+          trigger: wrap.current,
+          start: "top top",                              // pin starts when section top hits viewport top
+          end: () => \`+=\${distance}\`,                    // scroll distance = track width minus viewport
+          pin: true,
+          scrub: 1,
+          invalidateOnRefresh: true,
+        },
+      });
+    }, wrap);
+    return () => ctx.revert();
+  }, [reduce]);
+
+  return (
+    <section ref={wrap} className="relative overflow-hidden">
+      <div ref={track} className="flex h-[100dvh] items-center">
+        {children}
+      </div>
+    </section>
+  );
+}
+\`\`\`
+
+Critical points: \`start: "top top"\`, \`pin: true\`, \`end: "+=\${distance}"\` (scroll length = horizontal travel needed), \`scrub: 1\`. The wrapper is pinned, the inner track slides horizontally as the user scrolls vertically.
+
+
 
 ## 9. AI TELLS (Forbidden Patterns)
 
@@ -551,7 +665,7 @@ async function screenToDesignConcept(
   };
 }
 
-async function engageMentPipelineThumbnails(screen: Screen) {
+async function _engageMentPipelineThumbnails(screen: Screen) {
   const screenshot = screen.getImage();
   return screenshot;
 }
