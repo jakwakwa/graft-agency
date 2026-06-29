@@ -7,3 +7,4 @@ export { prdWriterFunction } from "./functions/prd-writer";
 export { processWebhookReceiptFunction } from "./functions/process-webhook-receipt";
 export { prospectingScheduledTick } from "./functions/prospecting-tick";
 export { stitchDesignerFunction } from "./functions/stitch-designer";
+export { strategyEngineFunction } from "./functions/strategy-engine";

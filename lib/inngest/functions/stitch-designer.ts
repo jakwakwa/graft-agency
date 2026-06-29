@@ -2,7 +2,7 @@ import type { Prisma } from "@/generated/prisma/client";
 import { transitionStage } from "@/lib/engagement/stage-machine";
 import { generateDesignConcepts } from "@/lib/engagement/stitch-design-concepts";
 import { inngest } from "@/lib/inngest/client";
-import type { DesignConcept, DesignSystemSpec, ProfiledNeeds } from "@/lib/types/engagement";
+import type { CampaignSop, DesignConcept, DesignSystemSpec, ProfiledNeeds } from "@/lib/types/engagement";
 import { makeOnFailure } from "./_shared/on-failure";
 
 // ---------------------------------------------------------------------------
@@ -147,11 +147,12 @@ export const stitchDesignerHandler = async ({
     ) => Promise<unknown>;
   };
 }) => {
-  const { leadId, clientId, profiledNeeds, prdContent } = event.data as {
+  const { leadId, clientId, profiledNeeds, prdContent, campaignSop } = event.data as {
     leadId: string;
     clientId: string;
     profiledNeeds: ProfiledNeeds;
     prdContent: string;
+    campaignSop?: CampaignSop;
   };
 
   await step.run("mark-designing", () => transitionStage({ leadId, to: "DESIGNING", source: "stitch-designer" }));
@@ -164,11 +165,22 @@ export const stitchDesignerHandler = async ({
   if (!isStitchDisabled) {
     const parsed = parseDesignDirection(prdContent, profiledNeeds);
 
+    // Fold the Strategy Engine's campaign tone into the visual direction so the
+    // Stitch concepts reflect the campaign, not just the PRD design block.
+    const designTone = campaignSop?.designTone ?? [];
+    const styleHint = [
+      parsed.styleHint,
+      designTone.length ? `Campaign tone: ${designTone.join(", ")}.` : "",
+      campaignSop?.visualFramework ? `Presentation framework: ${campaignSop.visualFramework}` : "",
+    ]
+      .filter(Boolean)
+      .join(" ");
+
     designConcepts = await step.run("generate-designs", () =>
       generateDesignConcepts({
         productName: `${profiledNeeds.companyName} ${profiledNeeds.productType}`,
         description: profiledNeeds.primaryNeed,
-        styleHint: parsed.styleHint,
+        styleHint,
         components: parsed.components,
         industry: profiledNeeds.industry,
         productType: profiledNeeds.productType,
@@ -177,6 +189,7 @@ export const stitchDesignerHandler = async ({
         uiElements: parsed.uiElements,
         imageryDirection: parsed.imageryDirection,
         designSystem: parsed.designSystem,
+        campaignContext: { visualFramework: campaignSop?.visualFramework, designTone },
       }),
     );
 
@@ -197,7 +210,7 @@ export const stitchDesignerHandler = async ({
 
   await step.sendEvent("emit-design-complete", {
     name: "engagement/design.completed",
-    data: { leadId, clientId, profiledNeeds, prdContent, designConcepts, chosenDesignIndex: chosenIndex },
+    data: { leadId, clientId, profiledNeeds, prdContent, campaignSop, designConcepts, chosenDesignIndex: chosenIndex },
   });
 
   return { leadId, stage: "DESIGN_COMPLETE", conceptCount: designConcepts.length };
@@ -210,7 +223,7 @@ export const stitchDesignerFunction = inngest.createFunction(
     retries: 2,
     idempotency: "event.data.leadId",
     onFailure: makeOnFailure("stitch-designer", "DESIGNING"),
-    triggers: [{ event: "engagement/prd.written" }],
+    triggers: [{ event: "engagement/strategy.completed" }],
   },
   stitchDesignerHandler,
 );

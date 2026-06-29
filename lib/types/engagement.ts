@@ -1,6 +1,29 @@
 export type ProductType = "web-app" | "website" | "mobile-app" | "dashboard" | "saas";
 export type Complexity = "simple" | "medium" | "complex";
 
+/** Which artifact Jules builds for an approved lead. */
+export type BuildVariant = "landing" | "campaign";
+
+/**
+ * Campaign Standard Operating Procedure — the operational blueprint produced by
+ * the Strategy Engine. Persisted to `ProductSpec.campaignSop` and consumed by
+ * Stitch (visual tone) and the offer-dispatcher draft (refined email copy).
+ */
+export interface CampaignSop {
+  /** Refined cold-outreach email the operator forwards to the prospect. */
+  refinedEmail: { subject: string; body: string };
+  /** Human-readable strategy narrative / operating procedure. */
+  strategyNarrative: string;
+  /** Conversion objectives / KPIs the campaign targets. */
+  objectives: string[];
+  /** Visual framework + presentation guidance fed to Stitch and Jules. */
+  visualFramework: string;
+  /** Tone keywords / dial hints that steer the Stitch design variants. */
+  designTone: string[];
+  /** Best-practice notes sourced via grounded web search. */
+  outreachBestPractices?: string[];
+}
+
 export interface ProfiledNeeds {
   leadId: string;
   companyName: string;
@@ -56,6 +79,9 @@ export interface LeadPipelineEvent {
   stage: string;
   profiledNeeds?: ProfiledNeeds;
   prdContent?: string;
+  engagementObjectives?: string;
+  buildVariant?: BuildVariant;
+  campaignSop?: CampaignSop;
   designConcepts?: DesignConcept[];
   chosenDesignIndex?: number;
   githubRepo?: string;

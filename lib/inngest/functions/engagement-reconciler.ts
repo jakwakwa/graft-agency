@@ -19,6 +19,8 @@ const NON_TERMINAL_STAGES = [
   "PROFILED",
   "WRITING_PRD",
   "PRD_WRITTEN",
+  "WRITING_STRATEGY",
+  "STRATEGY_COMPLETE",
   "DESIGNING",
   "DESIGN_COMPLETE",
   "BUILDING",
@@ -30,6 +32,8 @@ const ORCHESTRATOR_ONLY_STAGES = [
   "PROFILED",
   "WRITING_PRD",
   "PRD_WRITTEN",
+  "WRITING_STRATEGY",
+  "STRATEGY_COMPLETE",
   "DESIGNING",
   "DESIGN_COMPLETE",
 ] as const;
@@ -87,6 +91,7 @@ export const engagementReconcilerFunction = inngest.createFunction(
         select: {
           stage: true,
           stageVersion: true,
+          clientId: true,
           inngestRunStatus: true,
           updatedAt: true,
           julesSessionId: true,
@@ -251,6 +256,13 @@ export const engagementReconcilerFunction = inngest.createFunction(
           data: { lastReconciledAt: new Date(), lastReconciledBy: "reconciler" },
         }),
       );
+      // If a deploy URL is already known, bridge to the offer stage (idempotent per leadId).
+      if (spec.deploymentUrl) {
+        await step.sendEvent("emit-deployment-ready", {
+          name: "engagement/deployment.ready",
+          data: { leadId, clientId: spec.clientId, deploymentUrl: spec.deploymentUrl },
+        });
+      }
       return { action: "promoted-building-complete", result };
     }
 
@@ -259,17 +271,23 @@ export const engagementReconcilerFunction = inngest.createFunction(
       if (spec.renderServiceId && !spec.deploymentUrl) {
         const renderService = await step.run("fetch-render-service", () => getRenderService(spec.renderServiceId!));
         if (renderService.serviceUrl) {
+          const resolvedUrl = renderService.serviceUrl;
           await step.run("save-render-url", () =>
             prisma.productSpec.update({
               where: { leadId },
               data: {
-                deploymentUrl: renderService.serviceUrl,
+                deploymentUrl: resolvedUrl,
                 lastReconciledAt: new Date(),
                 lastReconciledBy: "reconciler",
               },
             }),
           );
-          return { action: "resolved-render-url", url: renderService.serviceUrl };
+          // Render URL just became available — bridge to the offer stage.
+          await step.sendEvent("emit-deployment-ready", {
+            name: "engagement/deployment.ready",
+            data: { leadId, clientId: spec.clientId, deploymentUrl: resolvedUrl },
+          });
+          return { action: "resolved-render-url", url: resolvedUrl };
         }
       }
       await step.run("mark-reconciled", () =>

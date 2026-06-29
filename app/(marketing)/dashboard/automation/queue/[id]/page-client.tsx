@@ -16,6 +16,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { isTerminalStage } from "@/lib/utils/engagement-stages";
 import { EngagementPanel } from "./_components/engagement-panel";
 
@@ -77,6 +78,8 @@ export default function QueueDetailPage() {
   const [engagementStatus, setEngagementStatus] = useState<EngagementStatus | null>(null);
   const [engagementLoading, setEngagementLoading] = useState(true);
   const [statusUnavailable, setStatusUnavailable] = useState(false);
+  const [objectives, setObjectives] = useState("");
+  const [buildVariant, setBuildVariant] = useState<"campaign" | "landing">("campaign");
 
   useEffect(() => {
     if (!id) return;
@@ -194,7 +197,11 @@ export default function QueueDetailPage() {
     if (!lead) return;
     setApproving(true);
     try {
-      const res = await fetch(`/api/leads/${id}/approve`, { method: "POST" });
+      const res = await fetch(`/api/leads/${id}/approve`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ engagementObjectives: objectives, buildVariant }),
+      });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Approve failed");
 
@@ -292,13 +299,31 @@ export default function QueueDetailPage() {
           </Button>
           <div className="flex gap-2">
             {canApprove && (
-              <Button
-                onClick={handleApprove}
-                disabled={approving}
-                className="rounded-lg bg-chart-2 px-4 py-2 text-xs font-bold uppercase tracking-tighter text-primary-foreground hover:bg-chart-2/90"
-              >
-                {approving ? "Approving…" : "Approve & Send"}
-              </Button>
+              <div className="flex w-72 flex-col items-stretch gap-2">
+                <Textarea
+                  value={objectives}
+                  onChange={(e) => setObjectives(e.target.value)}
+                  placeholder="Engagement objectives — conversion goals, KPIs, target metrics (optional; inferred if blank)"
+                  rows={2}
+                  className="text-sm"
+                />
+                <select
+                  value={buildVariant}
+                  onChange={(e) => setBuildVariant(e.target.value as "campaign" | "landing")}
+                  className="rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  aria-label="Build variant"
+                >
+                  <option value="campaign">Campaign dashboard</option>
+                  <option value="landing">Landing page</option>
+                </select>
+                <Button
+                  onClick={handleApprove}
+                  disabled={approving}
+                  className="rounded-lg bg-chart-2 px-4 py-2 text-xs font-bold uppercase tracking-tighter text-primary-foreground hover:bg-chart-2/90"
+                >
+                  {approving ? "Approving…" : "Approve & Send"}
+                </Button>
+              </div>
             )}
             <AlertDialog>
               <AlertDialogTrigger asChild>

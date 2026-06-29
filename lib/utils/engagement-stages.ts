@@ -1,10 +1,12 @@
-// The 12 ordered stages (FAILED is terminal but out-of-band)
+// The ordered in-pipeline stages (FAILED is terminal but out-of-band)
 export const ENGAGEMENT_STAGE_ORDER = [
   "PENDING",
   "PROFILING",
   "PROFILED",
   "WRITING_PRD",
   "PRD_WRITTEN",
+  "WRITING_STRATEGY",
+  "STRATEGY_COMPLETE",
   "DESIGNING",
   "DESIGN_COMPLETE",
   "BUILDING",
@@ -21,6 +23,8 @@ export const STAGE_LABELS: Record<string, string> = {
   PROFILED: "Profiled",
   WRITING_PRD: "Writing PRD",
   PRD_WRITTEN: "PRD Written",
+  WRITING_STRATEGY: "Writing Strategy",
+  STRATEGY_COMPLETE: "Strategy Complete",
   DESIGNING: "Designing",
   DESIGN_COMPLETE: "Design Complete",
   BUILDING: "Building",
@@ -38,6 +42,7 @@ export interface PipelineStep {
 export const PIPELINE_STEPS: PipelineStep[] = [
   { label: "Understanding", stages: ["PROFILING", "PROFILED"], icon: "Brain" },
   { label: "Direction", stages: ["WRITING_PRD", "PRD_WRITTEN"], icon: "FileText" },
+  { label: "Strategy", stages: ["WRITING_STRATEGY", "STRATEGY_COMPLETE"], icon: "Target" },
   { label: "Design", stages: ["DESIGNING", "DESIGN_COMPLETE"], icon: "Palette" },
   { label: "Build", stages: ["BUILDING", "BUILDING_COMPLETE"], icon: "Hammer" },
 ];
@@ -77,12 +82,17 @@ export function getCompletionPercent(stage: string): number {
   if (stage === "FAILED") {
     return 0;
   }
+  // Terminal success stages sit past the last pipeline step → fully complete.
+  if (stage === "OFFER_SENT" || stage === "DEPLOYED") {
+    return 100;
+  }
   const stepIdx = getStepIndex(stage);
   if (stepIdx <= 0) {
     return 0;
   }
-  // Each completed step is worth ~16.67% (100/6)
-  return Math.round((stepIdx / 3) * 100);
+  // Progress is the fraction of pipeline steps completed before the current one.
+  const lastStepIdx = PIPELINE_STEPS.length - 1;
+  return Math.round((stepIdx / lastStepIdx) * 100);
 }
 
 /**

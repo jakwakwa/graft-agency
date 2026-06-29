@@ -15,9 +15,32 @@ export async function POST(
   if (!lead) return NextResponse.json({ error: "Lead not found" }, { status: 404 });
   if (!lead.clientId) return NextResponse.json({ error: "Lead has no clientId" }, { status: 400 });
 
+  // Optional operator inputs (same shape as the approve endpoint).
+  let body: { engagementObjectives?: unknown; buildVariant?: unknown } = {};
+  try {
+    body = await req.json();
+  } catch {
+    // No JSON body.
+  }
+  const engagementObjectives =
+    typeof body.engagementObjectives === "string" && body.engagementObjectives.trim()
+      ? body.engagementObjectives.trim()
+      : null;
+  const buildVariant = body.buildVariant === "landing" || body.buildVariant === "campaign" ? body.buildVariant : null;
+
+  if (engagementObjectives !== null || buildVariant !== null) {
+    await prisma.productSpec.updateMany({
+      where: { leadId },
+      data: {
+        ...(engagementObjectives !== null ? { engagementObjectives } : {}),
+        ...(buildVariant !== null ? { buildVariant } : {}),
+      },
+    });
+  }
+
   await inngest.send({
     name: "engagement/lead.approved",
-    data: { leadId, clientId: lead.clientId },
+    data: { leadId, clientId: lead.clientId, engagementObjectives, buildVariant },
   });
 
   return NextResponse.json({ ok: true, leadId, event: "engagement/lead.approved" });

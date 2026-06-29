@@ -21,6 +21,8 @@ export interface StitchDesignRequest {
   uiElements?: string[];
   imageryDirection?: string;
   designSystem?: DesignSystemSpec;
+  /** Campaign SOP guidance from the Strategy Engine that steers tone + framing. */
+  campaignContext?: { visualFramework?: string; designTone?: string[] };
 }
 
 // ---------------------------------------------------------------------------
@@ -576,6 +578,9 @@ export async function generateDesignConcepts(request: StitchDesignRequest): Prom
       // `Respect this direction: ${request.styleHint}.`,
       `Cover these areas: ${request.components.join(", ")}.`,
       request.designSystem?.effects ? `Maintain ${request.designSystem.effects} effects across all variants.` : "",
+      request.campaignContext?.designTone?.length
+        ? `Honour the campaign tone: ${request.campaignContext.designTone.join(", ")}.`
+        : "",
       `All variants must feel premium and targeted at ${request.targetAudience}.`,
     ]
       .filter(Boolean)

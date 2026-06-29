@@ -4,6 +4,7 @@ import prisma from "@/lib/db/prisma";
 export type TransitionSource =
   | "profiler"
   | "prd-writer"
+  | "strategy-engine"
   | "stitch-designer"
   | "jules-builder"
   | "jules-poller"
@@ -17,7 +18,9 @@ export const ALLOWED_TRANSITIONS: Record<EngagementStage, EngagementStage[]> = {
   PROFILING: ["PROFILED", "FAILED"],
   PROFILED: ["WRITING_PRD", "FAILED"],
   WRITING_PRD: ["PRD_WRITTEN", "FAILED"],
-  PRD_WRITTEN: ["DESIGNING", "FAILED"],
+  PRD_WRITTEN: ["WRITING_STRATEGY", "FAILED"],
+  WRITING_STRATEGY: ["STRATEGY_COMPLETE", "FAILED"],
+  STRATEGY_COMPLETE: ["DESIGNING", "FAILED"],
   DESIGNING: ["DESIGN_COMPLETE", "FAILED"],
   DESIGN_COMPLETE: ["BUILDING", "FAILED"],
   BUILDING: ["BUILDING_COMPLETE", "FAILED"],
@@ -25,7 +28,7 @@ export const ALLOWED_TRANSITIONS: Record<EngagementStage, EngagementStage[]> = {
   DEPLOYING: ["DEPLOYED", "FAILED"],
   DEPLOYED: ["OFFER_SENT", "FAILED"],
   OFFER_SENT: [],
-  FAILED: ["PROFILING", "WRITING_PRD", "DESIGNING", "BUILDING"],
+  FAILED: ["PROFILING", "WRITING_PRD", "WRITING_STRATEGY", "DESIGNING", "BUILDING"],
 };
 
 export type TransitionResult =
