@@ -49,6 +49,7 @@ Do the following:
 4. Write a short human-readable strategy narrative (the operating procedure: who we're targeting, the angle, why it converts).
 5. Describe a visual framework for a single-page personalised presentation/dashboard the prospect will see when they click the CTA — this is NOT a generic landing page; tailor it to what would most persuade THIS prospect.
 6. Provide design-tone keywords (e.g. "luxury", "high-tech minimalism", "hyper-modern utility") that will steer the visual design system.
+7. Classify the prospect as "traditional" (an established, conventional, heritage or formal business — e.g. law firms, accountants, established trades, institutions) or "niche" (a flexible, modern, specialised or experimental business — e.g. boutique studios, indie brands, novel services). This drives the dark dashboard theme.
 
 Output strictly as JSON matching the schema.`;
 
@@ -77,9 +78,17 @@ Output strictly as JSON matching the schema.`;
             objectives: { type: Type.ARRAY, items: { type: Type.STRING } },
             visualFramework: { type: Type.STRING },
             designTone: { type: Type.ARRAY, items: { type: Type.STRING } },
+            businessArchetype: { type: Type.STRING, enum: ["traditional", "niche"] },
             outreachBestPractices: { type: Type.ARRAY, items: { type: Type.STRING } },
           },
-          required: ["refinedEmail", "strategyNarrative", "objectives", "visualFramework", "designTone"],
+          required: [
+            "refinedEmail",
+            "strategyNarrative",
+            "objectives",
+            "visualFramework",
+            "designTone",
+            "businessArchetype",
+          ],
         },
       },
     });

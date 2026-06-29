@@ -15,6 +15,7 @@ const sopJson = JSON.stringify({
   objectives: ["Book a discovery call", "Demonstrate the booking flow"],
   visualFramework: "Hero with live booking widget, proof band, single CTA.",
   designTone: ["premium", "trustworthy"],
+  businessArchetype: "traditional",
   outreachBestPractices: ["Keep it under 120 words", "One clear CTA"],
 });
 
@@ -59,6 +60,7 @@ describe("generateCampaignStrategy", () => {
     expect(sop.objectives.length).toBeGreaterThan(0);
     expect(sop.designTone).toContain("premium");
     expect(sop.visualFramework).toContain("CTA");
+    expect(sop.businessArchetype).toBe("traditional");
   });
 
   it("throws when the Gemini API key is missing", async () => {

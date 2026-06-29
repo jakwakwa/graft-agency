@@ -5,6 +5,12 @@ export type Complexity = "simple" | "medium" | "complex";
 export type BuildVariant = "landing" | "campaign";
 
 /**
+ * Prospect business archetype, used to pick the dark dashboard preset:
+ * `traditional` → Obsidian Scholar (editorial), `niche` → Obsidian Precision.
+ */
+export type BusinessArchetype = "traditional" | "niche";
+
+/**
  * Campaign Standard Operating Procedure — the operational blueprint produced by
  * the Strategy Engine. Persisted to `ProductSpec.campaignSop` and consumed by
  * Stitch (visual tone) and the offer-dispatcher draft (refined email copy).
@@ -20,6 +26,8 @@ export interface CampaignSop {
   visualFramework: string;
   /** Tone keywords / dial hints that steer the Stitch design variants. */
   designTone: string[];
+  /** Whether the prospect is a traditional or flexible/niche business (drives dark preset choice). */
+  businessArchetype?: BusinessArchetype;
   /** Best-practice notes sourced via grounded web search. */
   outreachBestPractices?: string[];
 }

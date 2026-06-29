@@ -1,6 +1,9 @@
 import type { Prisma } from "@/generated/prisma/client";
+import prisma from "@/lib/db/prisma";
+import { resolveBuildVariant } from "@/lib/engagement/build-variant";
 import { transitionStage } from "@/lib/engagement/stage-machine";
 import { generateDesignConcepts } from "@/lib/engagement/stitch-design-concepts";
+import { selectStitchPreset } from "@/lib/engagement/stitch-presets";
 import { inngest } from "@/lib/inngest/client";
 import type { CampaignSop, DesignConcept, DesignSystemSpec, ProfiledNeeds } from "@/lib/types/engagement";
 import { makeOnFailure } from "./_shared/on-failure";
@@ -176,6 +179,14 @@ export const stitchDesignerHandler = async ({
       .filter(Boolean)
       .join(" ");
 
+    // Always apply exactly one of the three presets. Landing → GRAFT Kit;
+    // campaign dashboards → a dark preset by business archetype.
+    const buildVariant = await step.run("resolve-build-variant", async () => {
+      const spec = await prisma.productSpec.findUnique({ where: { leadId }, select: { buildVariant: true } });
+      return resolveBuildVariant(spec?.buildVariant);
+    });
+    const preset = selectStitchPreset({ buildVariant, businessArchetype: campaignSop?.businessArchetype });
+
     designConcepts = await step.run("generate-designs", () =>
       generateDesignConcepts({
         productName: `${profiledNeeds.companyName} ${profiledNeeds.productType}`,
@@ -190,6 +201,7 @@ export const stitchDesignerHandler = async ({
         imageryDirection: parsed.imageryDirection,
         designSystem: parsed.designSystem,
         campaignContext: { visualFramework: campaignSop?.visualFramework, designTone },
+        presetDisplayName: preset.displayName,
       }),
     );
 
