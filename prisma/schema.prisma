@@ -162,6 +162,9 @@ model ProductSpec {
   stage                    EngagementStage   @default(PENDING)
   profiledNeeds            Json?             @map("profiled_needs")
   prdContent               String?           @map("prd_content")
+  engagementObjectives     String?           @map("engagement_objectives")
+  buildVariant             String?           @map("build_variant")
+  campaignSop              Json?             @map("campaign_sop")
   designConcepts           Json?             @map("design_concepts")
   chosenDesign             Int?              @map("chosen_design")
   githubRepo               String?           @map("github_repo")
@@ -306,6 +309,8 @@ enum EngagementStage {
   PROFILED
   WRITING_PRD
   PRD_WRITTEN
+  WRITING_STRATEGY
+  STRATEGY_COMPLETE
   DESIGNING
   DESIGN_COMPLETE
   BUILDING

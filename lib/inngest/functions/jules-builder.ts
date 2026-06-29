@@ -1,10 +1,17 @@
+import prisma from "@/lib/db/prisma";
 import { slugFromCompanyName } from "@/lib/engagement/company-slug";
 import { ensureJulesSession } from "@/lib/engagement/idempotency";
 import { transitionStage } from "@/lib/engagement/stage-machine";
 import { inngest } from "@/lib/inngest/client";
 import { defaultJulesGithubSource } from "@/lib/services/jules-github.service";
-import type { DesignConcept, ProfiledNeeds } from "@/lib/types/engagement";
+import type { BuildVariant, CampaignSop, DesignConcept, ProfiledNeeds } from "@/lib/types/engagement";
 import { makeOnFailure } from "./_shared/on-failure";
+
+/** Resolve the build flavour: per-lead choice from the spec, else env default, else campaign. */
+function resolveBuildVariant(specValue: string | null | undefined): BuildVariant {
+  if (specValue === "landing" || specValue === "campaign") return specValue;
+  return process.env.DEFAULT_BUILD_VARIANT === "landing" ? "landing" : "campaign";
+}
 
 export const julesBuilderHandler = async ({
   event,
@@ -24,16 +31,23 @@ export const julesBuilderHandler = async ({
     ) => Promise<unknown>;
   };
 }) => {
-  const { leadId, clientId, profiledNeeds, prdContent, designConcepts, chosenDesignIndex } = event.data as {
-    leadId: string;
-    clientId: string;
-    profiledNeeds: ProfiledNeeds;
-    prdContent: string;
-    designConcepts: DesignConcept[];
-    chosenDesignIndex: number;
-  };
+  const { leadId, clientId, profiledNeeds, prdContent, designConcepts, chosenDesignIndex, campaignSop } =
+    event.data as {
+      leadId: string;
+      clientId: string;
+      profiledNeeds: ProfiledNeeds;
+      prdContent: string;
+      designConcepts: DesignConcept[];
+      chosenDesignIndex: number;
+      campaignSop?: CampaignSop;
+    };
 
   await step.run("mark-building", () => transitionStage({ leadId, to: "BUILDING", source: "jules-builder" }));
+
+  const buildVariant = await step.run("resolve-build-variant", async () => {
+    const spec = await prisma.productSpec.findUnique({ where: { leadId }, select: { buildVariant: true } });
+    return resolveBuildVariant(spec?.buildVariant);
+  });
 
   const isStitchDisabled =
     process.env.STITCH_TEMP_DISABLE === "1" ||
@@ -67,7 +81,8 @@ Style keywords: ${chosenDesign.styleKeywords.join(", ")}${chosenDesign.htmlUrl ?
       leadId,
       companyName: profiledNeeds.companyName,
       companySlug,
-      makePrompt: () => buildJulesPrompt({ profiledNeeds, prdContent, designDescription, companySlug }),
+      makePrompt: () =>
+        buildJulesPrompt({ profiledNeeds, prdContent, designDescription, companySlug, buildVariant, campaignSop }),
       repoSource,
       startingBranch: "main",
     }),
@@ -114,8 +129,11 @@ function buildJulesPrompt(params: {
   prdContent: string;
   designDescription?: string;
   companySlug: string;
+  buildVariant: BuildVariant;
+  campaignSop?: CampaignSop;
 }): string {
   const dir = `prospects/${params.companySlug}`;
+  const company = params.profiledNeeds.companyName;
 
   const designSection = params.designDescription
     ? `
@@ -126,6 +144,47 @@ ${params.designDescription}
 
 ---`
     : "";
+
+  if (params.buildVariant === "campaign") {
+    const sop = params.campaignSop;
+    const sopSection = sop
+      ? `
+
+## Campaign Strategy
+
+${sop.strategyNarrative}
+
+### Visual Framework
+${sop.visualFramework}
+
+### Conversion Objectives
+${sop.objectives.map((o) => `- ${o}`).join("\n")}`
+      : "";
+
+    return `## Build Request — GRAFT.TODAY Prospect Engagement Campaign
+
+${params.prdContent}
+${sopSection}
+
+---${designSection}
+
+## Build Instructions
+
+Use the \`.agents/skills/frontend-design/SKILL.md\` skill to build a personalised single-page **engagement campaign presentation** for ${company}. This is the experience the prospect lands on when they click the call-to-action in our outbound email — NOT a generic landing page. Tailor every section to persuade THIS prospect, following the campaign strategy and visual framework above.
+
+Write ALL files inside the directory \`${dir}/\` — do not modify anything outside this directory.
+
+1. Create a self-contained Next.js single-page presentation inside \`${dir}/\`. Structure it around the campaign strategy, conversion objectives, and visual framework above.
+2. Lead with the campaign's core message and make the value proposition unmistakable for ${company}.
+3. Stack: Next.js 15 App Router, Tailwind CSS v4, TypeScript. The \`package.json\` MUST include \`dev\`, \`build\`, \`start\`, and \`lint\` scripts.
+4. Must look polished and premium — this is a high-fidelity sales presentation, not a prototype skeleton.
+5. No backend needed — all content is static.
+6. Do not modify deployment infrastructure files outside \`${dir}/\` (Render service provisioning is handled by the pipeline).
+7. All pages must be responsive (mobile-first).
+8. Open a PR titled: \`feat: campaign dashboard — ${company}\`
+
+The parent pipeline deploys this branch to Render for the prospect (live service URL and/or PR preview).`;
+  }
 
   const step1 = params.designDescription
     ? `1. Create a self-contained Next.js landing page inside \`${dir}/\``
@@ -139,8 +198,8 @@ ${params.prdContent}
 
 ## Build Instructions
 
-Use the \`.agents/skills/frontend-design/SKILL.md\` skill to build the landing page. 
- - It will do most of the heavy lifting for you. 
+Use the \`.agents/skills/frontend-design/SKILL.md\` skill to build the landing page.
+ - It will do most of the heavy lifting for you.
  - This skill is not a one-shot - you will have to iterate with it a few times to get it right.
 
 Write ALL files inside the directory \`${dir}/\` — do not modify anything outside this directory.

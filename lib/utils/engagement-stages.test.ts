@@ -12,8 +12,8 @@ import {
 } from "./engagement-stages";
 
 describe("ENGAGEMENT_STAGE_ORDER", () => {
-  test("has 12 entries", () => {
-    expect(ENGAGEMENT_STAGE_ORDER.length).toBe(9);
+  test("has 11 entries", () => {
+    expect(ENGAGEMENT_STAGE_ORDER.length).toBe(11);
   });
 });
 
@@ -26,8 +26,20 @@ describe("getStepIndex", () => {
     expect(getStepIndex("WRITING_PRD")).toBe(1);
   });
 
-  test("OFFER_SENT is step 5", () => {
-    expect(getStepIndex("OFFER_SENT")).toBe(5);
+  test("WRITING_STRATEGY is step 2", () => {
+    expect(getStepIndex("WRITING_STRATEGY")).toBe(2);
+  });
+
+  test("DESIGNING is step 3", () => {
+    expect(getStepIndex("DESIGNING")).toBe(3);
+  });
+
+  test("BUILDING is step 4", () => {
+    expect(getStepIndex("BUILDING")).toBe(4);
+  });
+
+  test("OFFER_SENT has no pipeline step", () => {
+    expect(getStepIndex("OFFER_SENT")).toBe(-1);
   });
 
   test("NOT_STARTED returns -1", () => {
@@ -144,7 +156,11 @@ describe("getStepStatus", () => {
     expect(getStepStatus(0, "PRD_WRITTEN")).toBe("done");
   });
 
-  test("step 5 is 'pending' when stage is PROFILING", () => {
-    expect(getStepStatus(5, "PROFILING")).toBe("pending");
+  test("step 4 is 'pending' when stage is PROFILING", () => {
+    expect(getStepStatus(4, "PROFILING")).toBe("pending");
+  });
+
+  test("Strategy step is 'done' when stage is DESIGNING", () => {
+    expect(getStepStatus(2, "DESIGNING")).toBe("done");
   });
 });

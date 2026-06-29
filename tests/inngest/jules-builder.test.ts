@@ -1,7 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import prisma from "@/lib/db/prisma";
 import { transitionStage } from "@/lib/engagement/stage-machine";
 import { julesBuilderHandler } from "@/lib/inngest/functions/jules-builder";
-import type { DesignConcept, ProfiledNeeds } from "@/lib/types/engagement";
+import type { CampaignSop, DesignConcept, ProfiledNeeds } from "@/lib/types/engagement";
 
 let capturedPrompt: string | undefined;
 
@@ -26,7 +27,12 @@ vi.mock("@/lib/engagement/idempotency", () => ({
 }));
 
 vi.mock("@/lib/db/prisma", () => ({
-  default: {},
+  default: {
+    productSpec: {
+      // Default to the legacy landing-page variant so the prompt assertions below hold.
+      findUnique: vi.fn(() => Promise.resolve({ buildVariant: "landing" })),
+    },
+  },
 }));
 
 vi.mock("@google/genai", () => ({}));
@@ -258,6 +264,40 @@ describe("julesBuilderHandler", () => {
           step: mockStep,
         }),
       ).rejects.toThrow("No design concept found");
+    });
+  });
+
+  describe("buildVariant routing", () => {
+    beforeEach(() => {
+      delete process.env.STITCH_TEMP_DISABLE;
+    });
+
+    it("builds the campaign-dashboard prompt when buildVariant is 'campaign'", async () => {
+      (prisma.productSpec.findUnique as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ buildVariant: "campaign" });
+
+      const campaignSop: CampaignSop = {
+        refinedEmail: { subject: "Quick idea for Acme", body: "Hi — saw your site…" },
+        strategyNarrative: "Lead with the booking pain point.",
+        objectives: ["Book a discovery call"],
+        visualFramework: "Bold hero, proof band, single CTA.",
+        designTone: ["luxury", "high-tech minimalism"],
+      };
+
+      const mockStep = {
+        run: vi.fn(async <T>(_id: string, fn: () => T | Promise<T>) => await fn()),
+        sendEvent: vi.fn(async () => Promise.resolve(undefined)),
+      };
+
+      await julesBuilderHandler({
+        event: { data: { ...sampleEventData, designConcepts: sampleConcepts, chosenDesignIndex: 0, campaignSop } },
+        step: mockStep,
+      });
+
+      expect(capturedPrompt).toContain("engagement campaign presentation");
+      expect(capturedPrompt).toContain("## Campaign Strategy");
+      expect(capturedPrompt).toContain("Lead with the booking pain point.");
+      expect(capturedPrompt).toContain("feat: campaign dashboard — Acme Corp");
+      expect(capturedPrompt).not.toContain("feat: prospect landing page");
     });
   });
 });

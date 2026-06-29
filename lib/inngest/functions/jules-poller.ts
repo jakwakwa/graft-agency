@@ -328,6 +328,21 @@ export const julesPollerFunction = inngest.createFunction(
       }),
     );
 
+    // Bridge to the offer stage. The Render flow has no deploy webhook, so the
+    // poller emits deployment.ready itself once a live URL exists. offer-dispatcher
+    // is idempotent per leadId, so a duplicate emit from the reconciler is safe.
+    if (deploymentUrl) {
+      const clientId = await step.run("load-client-id", () =>
+        prisma.productSpec
+          .findUnique({ where: { leadId }, select: { clientId: true } })
+          .then((s) => s?.clientId ?? ""),
+      );
+      await step.sendEvent("emit-deployment-ready", {
+        name: "engagement/deployment.ready",
+        data: { leadId, clientId, deploymentUrl },
+      });
+    }
+
     return {
       leadId,
       outcome: "success" as const,

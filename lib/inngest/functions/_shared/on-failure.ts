@@ -5,6 +5,7 @@ import { inngest } from "@/lib/inngest/client";
 export type FailureSource =
   | "profiler"
   | "prd-writer"
+  | "strategy-engine"
   | "stitch-designer"
   | "jules-builder"
   | "jules-poller"

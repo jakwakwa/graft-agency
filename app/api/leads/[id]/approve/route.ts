@@ -2,10 +2,23 @@ import { requirePlatformAccess } from "@/lib/auth/resolve-client";
 import prisma from "@/lib/db/prisma";
 import { inngest } from "@/lib/inngest/client";
 
-export async function POST(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const result = await requirePlatformAccess();
   if ("error" in result) return Response.json({ error: result.error }, { status: result.status });
   const { clientId } = result;
+
+  // Operator inputs captured at approval time (both optional).
+  let body: { engagementObjectives?: unknown; buildVariant?: unknown } = {};
+  try {
+    body = await req.json();
+  } catch {
+    // No JSON body — approve with defaults.
+  }
+  const engagementObjectives =
+    typeof body.engagementObjectives === "string" && body.engagementObjectives.trim()
+      ? body.engagementObjectives.trim()
+      : null;
+  const buildVariant = body.buildVariant === "landing" || body.buildVariant === "campaign" ? body.buildVariant : null;
 
   const { id } = await params;
   const lead = await prisma.lead.findFirst({
@@ -42,7 +55,7 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
       // concurrent request sees a non-null, non-PENDING stage and no-ops.
       await tx.productSpec.upsert({
         where: { leadId: id },
-        create: { leadId: id, clientId, stage: "PENDING" },
+        create: { leadId: id, clientId, stage: "PENDING", engagementObjectives, buildVariant },
         update: {
           stage: "PENDING",
           inngestRunStatus: null,
@@ -52,6 +65,8 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
           failureSource: null,
           failedStage: null,
           failedAt: null,
+          ...(engagementObjectives !== null ? { engagementObjectives } : {}),
+          ...(buildVariant !== null ? { buildVariant } : {}),
         },
       });
     }
@@ -63,7 +78,7 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
   if (pipelineStarted) {
     await inngest.send({
       name: "engagement/lead.approved",
-      data: { leadId: id, clientId },
+      data: { leadId: id, clientId, engagementObjectives, buildVariant },
     });
   }
 

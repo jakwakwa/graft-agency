@@ -9,6 +9,7 @@ import {
   processWebhookReceiptFunction,
   prospectingScheduledTick,
   stitchDesignerFunction,
+  strategyEngineFunction,
 } from "@/lib/inngest";
 import { inngest } from "@/lib/inngest/client";
 
@@ -18,6 +19,7 @@ export const { GET, POST, PUT } = serve({
     prospectingScheduledTick,
     leadProfilerFunction,
     prdWriterFunction,
+    strategyEngineFunction,
     stitchDesignerFunction,
     julesBuilderFunction,
     julesPollerFunction,
