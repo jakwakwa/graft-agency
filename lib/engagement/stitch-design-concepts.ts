@@ -62,7 +62,7 @@ function buildBasePrompt(request: StitchDesignRequest): string {
 
   // ── IDEA ──────────────────────────────────────────────────────────────────
   const ideaLines = [
-    `A premium web landing page for ${request.productName}.`,
+    `GRAFT.TODAY is an agency that is selling Ai Concierge Agent Bots. They need a bespoke and interactive presentation laid out on the web for their prospective client: ${request.productName}.`,
     `This is a real-world ${request.industry} ${request.productType}.
     `,
   ];
@@ -154,37 +154,19 @@ Avoid these signatures
     sections.push(`# IMAGERY\n${request.imageryDirection}`);
   } else {
     sections.push(
-      `# IMAGERY\nEnsure all background and card images depict real, high-end ${request.industry} scenery relevant to ${request.productName}. Absolutely no software dashboards, tech illustrations, or generic SaaS graphics.`,
+      `# IMAGERY\nEnsure all background and card images depict real, high-end ${request.industry} scenery relevant to ${request.productName}..`,
     );
   }
 
   // ── DESIGN SYSTEM ─────────────────────────────────────────────────────────
   const designSystemBlock = [
-    "# DESIGN SYSTEM",
-    "## Overview",
-    `A modern ${ds.themeMode ?? "dark"}-mode interface featuring deep backgrounds, vibrant primary accents, and elegant secondary tones. The system provides a high-contrast foundation perfectly suited for sleek modern UI aesthetics.`,
-    "## Colours",
-    `- **Background** (${ds.background}): Deepest base level for the application.`,
-    `- **Surface** (${ds.surface}): Elevated cards, panels, and contained sections.`,
-    `- **Primary** (${ds.primary}): Call-to-action buttons, active states, and key highlights.`,
-    `- **On-Primary** (${ds.onPrimary}): Premium high contrast typography text on top of primary elements.`,
-    `- **Secondary** (${ds.secondary}): Accent details and supporting UI components.`,
-    `- **On-Surface** (${ds.onSurface}): Primary typography and core reading material.`,
-    `- **On-Surface Variant** (${ds.onSurfaceVariant}): Muted text, secondary labels, and helper copy.`,
-    `- **Outline** (${ds.outline}): Structural borders and subtle dividers.`,
-    "## Typography",
-    `- **Headlines & Display**: ${ds.headlineFont} for elegant, impactful focal points.`,
-    `- **Body & Labels**: ${ds.bodyFont} for high legibility across standard interface elements and metadata.`,
-    "## Background Images",
-    `- **Cyber Gradient**: A dual-point radial gradient blending the primary and secondary colours, used for subtle atmospheric background illumination.`,
-    "## Configuration",
     `- **Theme Strategy**: ${ds.themeMode ? ds.themeMode.charAt(0).toUpperCase() + ds.themeMode.slice(1) : "Dark"} mode.`,
   ];
   sections.push(designSystemBlock.join("\n"));
 
   // ── FINAL INSTRUCTION ─────────────────────────────────────────────────────
   sections.push(
-    `One cohesive, premium landing page (desktop) combining all the above sections and design system. Target audience: ${request.targetAudience}.`,
+    `Target audience: ${request.targetAudience}.`,
   );
 
   return sections.join("\n\n");
