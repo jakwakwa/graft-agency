@@ -1,5 +1,5 @@
 ---
-name: GRAFT Kit
+name: Graft-Kit Clarity
 colors:
   surface: '#fdf8f8'
   surface-dim: '#ddd9d8'
@@ -128,7 +128,7 @@ spacing:
   xl: 128px
   section: 160px
 ---
-## DESIGN.md (GRAFT Kit preset01) -->
+
 ## Brand & Style
 
 GRAFT TODAY unifies the "Prospective Engagement Intelligence" of an organization through a sophisticated blend of **Corporate Modernism** and **Glassmorphism**. The brand personality is authoritative yet ethereal, positioned as an "Operating System" for high-end creative work. 

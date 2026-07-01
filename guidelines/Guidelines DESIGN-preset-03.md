@@ -1,159 +1,156 @@
 ---
-name: Obsidian Precision
+name: Coach Vici
 colors:
-  surface: '#0b1326'
-  surface-dim: '#0b1326'
-  surface-bright: '#31394d'
-  surface-container-lowest: '#060e20'
-  surface-container-low: '#131b2e'
-  surface-container: '#171f33'
-  surface-container-high: '#222a3d'
-  surface-container-highest: '#2d3449'
-  on-surface: '#dae2fd'
-  on-surface-variant: '#c4c7c8'
-  inverse-surface: '#dae2fd'
-  inverse-on-surface: '#283044'
-  outline: '#8e9192'
-  outline-variant: '#444748'
-  surface-tint: '#c6c6c7'
-  primary: '#ffffff'
-  on-primary: '#2f3131'
-  primary-container: '#e2e2e2'
-  on-primary-container: '#636565'
-  inverse-primary: '#5d5f5f'
-  secondary: '#c0c1ff'
-  on-secondary: '#1000a9'
-  secondary-container: '#3131c0'
-  on-secondary-container: '#b0b2ff'
-  tertiary: '#ffffff'
-  on-tertiary: '#003824'
-  tertiary-container: '#6ffbbe'
-  on-tertiary-container: '#00734e'
+  surface: '#0e112a'
+  surface-dim: '#0e112a'
+  surface-bright: '#343752'
+  surface-container-lowest: '#090c25'
+  surface-container-low: '#161933'
+  surface-container: '#1b1e37'
+  surface-container-high: '#252842'
+  surface-container-highest: '#30334d'
+  on-surface: '#dfe0ff'
+  on-surface-variant: '#c5c5d4'
+  inverse-surface: '#dfe0ff'
+  inverse-on-surface: '#2c2e49'
+  outline: '#8f909d'
+  outline-variant: '#444652'
+  surface-tint: '#b7c4ff'
+  primary: '#b7c4ff'
+  on-primary: '#032780'
+  primary-container: '#8ba2ff'
+  on-primary-container: '#18348c'
+  inverse-primary: '#4058b0'
+  secondary: '#c2c1ff'
+  on-secondary: '#1800a7'
+  secondary-container: '#3630bf'
+  on-secondary-container: '#b1b1ff'
+  tertiary: '#7cdb89'
+  on-tertiary: '#003913'
+  tertiary-container: '#5cba6c'
+  on-tertiary-container: '#004719'
   error: '#ffb4ab'
   on-error: '#690005'
   error-container: '#93000a'
   on-error-container: '#ffdad6'
-  primary-fixed: '#e2e2e2'
-  primary-fixed-dim: '#c6c6c7'
-  on-primary-fixed: '#1a1c1c'
-  on-primary-fixed-variant: '#454747'
-  secondary-fixed: '#e1e0ff'
-  secondary-fixed-dim: '#c0c1ff'
-  on-secondary-fixed: '#07006c'
-  on-secondary-fixed-variant: '#2f2ebe'
-  tertiary-fixed: '#6ffbbe'
-  tertiary-fixed-dim: '#4edea3'
-  on-tertiary-fixed: '#002113'
-  on-tertiary-fixed-variant: '#005236'
-  background: '#0b1326'
-  on-background: '#dae2fd'
-  surface-variant: '#2d3449'
+  primary-fixed: '#dce1ff'
+  primary-fixed-dim: '#b7c4ff'
+  on-primary-fixed: '#001552'
+  on-primary-fixed-variant: '#263f96'
+  secondary-fixed: '#e2dfff'
+  secondary-fixed-dim: '#c2c1ff'
+  on-secondary-fixed: '#0c006b'
+  on-secondary-fixed-variant: '#332dbc'
+  tertiary-fixed: '#97f8a3'
+  tertiary-fixed-dim: '#7cdb89'
+  on-tertiary-fixed: '#002108'
+  on-tertiary-fixed-variant: '#00531f'
+  background: '#0e112a'
+  on-background: '#dfe0ff'
+  surface-variant: '#30334d'
 typography:
-  headline-xl:
-    fontFamily: Manrope
-    fontSize: 64px
-    fontWeight: '700'
+  display-xl:
+    fontFamily: Public Sans
+    fontSize: 72px
+    fontWeight: '500'
     lineHeight: '1.1'
     letterSpacing: -0.02em
   headline-lg:
-    fontFamily: Manrope
-    fontSize: 48px
-    fontWeight: '600'
+    fontFamily: Public Sans
+    fontSize: 36px
+    fontWeight: '500'
     lineHeight: '1.2'
-    letterSpacing: -0.015em
-  headline-md:
-    fontFamily: Manrope
-    fontSize: 32px
-    fontWeight: '600'
-    lineHeight: '1.3'
-    letterSpacing: -0.01em
   body-lg:
-    fontFamily: Inter
+    fontFamily: Public Sans
     fontSize: 18px
     fontWeight: '400'
-    lineHeight: '1.75'
-    letterSpacing: 0em
-  body-md:
-    fontFamily: Inter
-    fontSize: 16px
-    fontWeight: '400'
     lineHeight: '1.6'
-    letterSpacing: 0em
-  label-sm:
-    fontFamily: Inter
+  label-mono:
+    fontFamily: Space Grotesk
+    fontSize: 10px
+    fontWeight: '700'
+    lineHeight: '1'
+    letterSpacing: 0.2em
+  nav-link:
+    fontFamily: Public Sans
     fontSize: 14px
     fontWeight: '500'
     lineHeight: '1'
-    letterSpacing: 0.05em
 rounded:
-  sm: 0.125rem
-  DEFAULT: 0.25rem
-  md: 0.375rem
-  lg: 0.5rem
-  xl: 0.75rem
+  sm: 0.5rem
+  DEFAULT: 1rem
+  md: 1.5rem
+  lg: 2rem
+  xl: 3rem
   full: 9999px
 spacing:
-  base: 4px
-  gutter: 32px
-  margin: 64px
-  section-gap: 128px
-  max-width: 1200px
+  container-max: 80rem
+  section-padding: 6rem
+  gutter: 1.5rem
+  card-padding: 2rem
+  unit: 4px
 ---
-
-# DESIGN.md (Preset 03)
 
 ## Brand & Style
 
-This design system is built on a foundation of Minimalism blended with Corporate Modern sensibilities. It targets high-end enterprise users who value clarity, speed, and discretion. The aesthetic is "dark-first," utilizing deep charcoals rather than pure blacks to maintain soft transitions and a premium feel.
+Coach Vici embodies a "Futuristic Academic" aesthetic, blending the rigor of institutional research with the sleekness of advanced AI technology. The brand personality is authoritative yet supportive, characterized by a sophisticated dark-mode environment that favors deep blues over pure blacks to maintain a premium, expansive feel.
 
-The UI should evoke a sense of calm authority and technical mastery. High-quality whitespace is used aggressively to separate concerns, ensuring that the user never feels overwhelmed. Every interaction should feel intentional and friction-less, moving away from decorative "fluff" toward functional elegance.
+The design style is a refined **Glassmorphism**, utilizing translucent layers, backdrop blurs, and subtle radial gradients to create a sense of depth and luminosity. This is balanced with **Minimalist** information density and high-quality typography to ensure the complex data remains accessible and professional. The overall emotional response should be one of "Structured Innovation"—the feeling that one is stepping into a high-tech laboratory designed for personal optimization.
 
-Colors
+## Colors
 
-The palette is strictly controlled to maintain a high-end SaaS feel. The primary "color" is actually a lack of color—high-contrast white text against a deep slate background. 
+The color palette is built on a "Deep Space" foundation using `vici-dark` (#0a0d26). Primary accents use `vici-light-blue` (#8ba2ff) for technical highlights and `vici-purple` (#5e5ce6) for brand-specific UI elements and AI interactions. `vici-green` (#9effa9) serves as a high-contrast semantic color for success, completion, and growth metrics.
 
-Primary Background: A deep, desaturated navy-charcoal (#0F172A) serves as the canvas.
-Accents: A sophisticated Indigo (#6366F1) is used sparingly for primary actions to provide a "digital-first" energy. 
-Success/Utility: A crisp Emerald (#10B981) denotes positive trends or system status.
-Surface Tints: Lighter shades of the neutral background (approx. 5-8% lighter) are used to define containers without breaking the dark-mode immersion.
+Gradients are essential to the visual language:
+- **Hero Background:** A radial gradient from `vici-purple` at 15% opacity to the base dark background.
+- **Text Gradients:** Important headers use a linear gradient from white to `vici-light-blue`.
+- **Glass Effects:** Surfaces use white at 5% opacity with high blur values to create a "frosted" digital surface.
 
-Typography
+## Typography
 
-This design system prioritizes legibility and hierarchy through a dual-font approach. Manrope is used for headlines to provide a refined, modern, and slightly geometric character that feels high-end. Inter is utilized for body and UI elements due to its exceptional clarity and systematic nature.
+The system relies on **Public Sans** for its institutional clarity and neutral balance, making it perfect for an academic-led AI platform. For technical labels and "system" status indicators, use **Space Grotesk** (or a similar geometric mono) to inject a futuristic, data-heavy feel.
 
-A generous line height (1.6 to 1.75) is applied to body text to ensure a "breezy" reading experience, preventing the dark background from feeling heavy. Headline tracking is slightly tightened to create a "locked-in" professional look for hero sections.
+Hierarchy is established through extreme scale: very large, tight-leaded display text for impact, and tiny, tracked-out monospaced labels for metadata. Use the white-to-blue gradient on primary headlines to soften the impact of large typography on the dark background.
 
-Layout & Spacing
+## Layout & Spacing
 
-This design system employs a Fixed Grid model for desktop to ensure a controlled, editorial-style presentation. The central content container is capped at 1200px.
+The layout follows a **Fixed Grid** philosophy centered in a 1280px (80rem) container. Vertical rhythm is governed by a 4px baseline unit, with generous section padding (96px/6rem) to create the "airy" feel necessary for high-end digital experiences.
 
-Vertical Rhythm: Sections are separated by massive gaps (128px) to emphasize the premium nature of the brand.
-Internal Spacing: A 4px base unit (0.25rem) governs all component padding. 
-Grid: A 12-column grid is used for landing page features, typically following a 6-6 split for hero sections and 4-4-4 for feature cards.
-Gutters: Wide 32px gutters prevent visual crowding between text blocks.
+Components like the Lead Form Bar utilize a "Composite Bar" layout, where multiple inputs are grouped into a single visual container, separated only by thin, low-opacity borders. This minimizes visual noise and emphasizes the workflow.
 
-Elevation & Depth
+## Elevation & Depth
 
-To maintain a sleek, minimal aesthetic, this design system avoids heavy drop shadows. Instead, it uses Tonal Layers and Low-Contrast Outlines.
+Elevation is achieved through **Backdrop Blurs** rather than traditional shadows. Surfaces are defined by:
+1.  **Base Layer:** The solid `#0a0d26` background.
+2.  **Surface Layer:** `rgba(255, 255, 255, 0.05)` with a 12px blur.
+3.  **Active/Raised Layer:** A slightly higher opacity (8-10%) or the addition of a 1px white border at 10% opacity.
 
-Surfaces: Elevated components (like cards) are distinguished by a slightly lighter background hex and a 1px border with 10% white opacity.
-Backdrop Blurs: When modals or dropdowns appear, a subtle 12px blur (glassmorphism) is applied to the layer below to maintain context while focusing the user.
-Interactive Depth: Hover states are signaled by a subtle increase in border-opacity or a shift in the background-tint, rather than an "upward" shadow movement.
+The only significant shadow used is a `shadow-2xl` on floating action buttons (FABs) to pop them out of the blurred glass hierarchy. Interaction depth is created using scale transforms (e.g., `scale-105`) rather than moving elements closer on the Z-axis.
 
-Shapes
+## Shapes
 
-The shape language is "Soft" (0.25rem - 0.75rem). This choice balances the professional rigidity of a SaaS tool with a touch of modern friendliness. 
+The shape language is "Squircle-adjacent," utilizing generous corner radii to humanize the technical aesthetic. 
+- **Cards:** Use `rounded-2xl` (1.5rem) or even `3rem` for large feature containers to emphasize the "capsule" feel.
+- **Interactive Elements:** Buttons and tags use `rounded-full` (9999px) for a soft, pill-shaped profile that contrasts with the structured grid.
+- **Inputs:** Use `rounded-xl` (0.75rem) to differentiate them from buttons while maintaining the soft-corner theme.
 
-Small elements (buttons, inputs): Use the base 0.25rem (4px) radius.
-Medium elements (cards, containers): Use the 0.5rem (8px) radius.
-Large elements (modals, hero images): Use the 0.75rem (12px) radius.
-Strictness: Avoid pill shapes or circles unless they are for avatars or notification badges.
+## Components
 
-Components
+### Buttons
+- **Primary:** Pill-shaped, white background with dark text. Transitions to `vici-green` on hover.
+- **Secondary/Demo:** Large, `rounded-xl`, dark background with a 1px border. Uses heavy tracking and tiny uppercase text for a "System Initialize" feel.
+- **Action Icons:** 12px rounded squares (not circles) with centered icons, typically using `vici-green` or `vici-purple`.
 
-Buttons: Primary buttons use a solid white background with black text (Manrope SemiBold). Secondary buttons are "ghost" style with a 1px white border (20% opacity) and white text.
-Inputs: Darker than the background (#0B1120) with a subtle 1px border. Focus state is a 1px Indigo border with no outer glow.
-Cards: No background shadow. Use a 1px stroke (#FFFFFF, 10% opacity) and a slightly lighter fill than the page background to define the area.
-Chips: Small, uppercase labels with a subtle background tint (e.g., Indigo at 15% opacity) to categorize features without visual noise.
-Lists: Icon-led lists should use high-quality, thin-stroke (1.5px) SVG icons in the primary or secondary color.
-Scrollbars: Custom-styled to be thin, dark, and rounded to disappear into the UI.
+### Input Fields
+- Transparent backgrounds with `backdrop-filter: blur(12px)`.
+- Bottom-only or subtle 1px borders.
+- Focused state: Border transitions to `vici-green` with a soft glow (box-shadow).
+
+### Cards
+- **Glass Card:** The standard container. 1px white border at 5-10% opacity, `backdrop-blur-md`, and a subtle inner glow.
+- **Chat Bubble (AI):** Simple glass card style with a `vici-purple` icon identifier.
+- **Chat Bubble (User):** `vici-purple` at 20% opacity with a `vici-purple` border; no background blur to distinguish it from the "system."
+
+### Progress & Metrics
+- Linear progress bars should be thin (4px) with a `vici-green` fill and a low-opacity white track.
+- Use `10px` monospaced labels above metrics for a "dashboard" effect.

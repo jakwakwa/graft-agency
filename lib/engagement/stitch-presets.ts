@@ -9,10 +9,10 @@ import type { BuildVariant, BusinessArchetype } from "@/lib/types/engagement";
  * Mapping:
  *   - landing  → GRAFT Kit (the only light system, brand default)
  *   - campaign → dark dashboard preset:
- *       traditional business → Obsidian Scholar (editorial)
- *       flexible / niche      → Obsidian Precision (default)
+ *       traditional business → Obsidian Precision (editorial)
+ *       flexible / niche      → Coach Vici (default)
  */
-export type StitchPresetKey = "graft-kit" | "obsidian-precision" | "obsidian-scholar";
+export type StitchPresetKey = "graft-kit-clarity" | "obsidian-precision" | "coach-vici";
 
 export interface StitchPreset {
   key: StitchPresetKey;
@@ -21,19 +21,19 @@ export interface StitchPreset {
   theme: "light" | "dark";
 }
 
-export const GRAFT_KIT: StitchPreset = { key: "graft-kit", displayName: "GRAFT Kit", theme: "light" };
-export const OBSIDIAN_SCHOLAR: StitchPreset = {
-  key: "obsidian-scholar",
-  displayName: "Obsidian Scholar",
-  theme: "dark",
-};
+export const GRAFT_KIT: StitchPreset = { key: "graft-kit-clarity", displayName: "Graft-kit Clarity", theme: "light" };
 export const OBSIDIAN_PRECISION: StitchPreset = {
   key: "obsidian-precision",
   displayName: "Obsidian Precision",
+  theme: "light",
+};
+export const COACH_VICI: StitchPreset = {
+  key: "coach-vici",
+  displayName: "Coach Vici",
   theme: "dark",
 };
 
-export const STITCH_PRESETS: readonly StitchPreset[] = [GRAFT_KIT, OBSIDIAN_SCHOLAR, OBSIDIAN_PRECISION];
+export const STITCH_PRESETS: readonly StitchPreset[] = [GRAFT_KIT, COACH_VICI, OBSIDIAN_PRECISION];
 
 /**
  * Pick the preset for a build. Landing pages use the light GRAFT Kit; campaign
@@ -44,6 +44,6 @@ export function selectStitchPreset(opts: {
   buildVariant: BuildVariant;
   businessArchetype?: BusinessArchetype;
 }): StitchPreset {
-  if (opts.buildVariant === "landing") return GRAFT_KIT;
-  return opts.businessArchetype === "traditional" ? OBSIDIAN_SCHOLAR : OBSIDIAN_PRECISION;
+  if (opts.buildVariant === "landing") return OBSIDIAN_PRECISION;
+  return opts.businessArchetype === "traditional" ? GRAFT_KIT : COACH_VICI;
 }

@@ -1,5 +1,5 @@
 ---
-***name: Obsidian Scholar
+name: Obsidian Scholar
 colors:
   surface: '#141313'
   surface-dim: '#141313'
@@ -97,7 +97,6 @@ spacing:
   margin-mobile: 20px
   section-gap: 120px
 ---
-# DESIGN.md (Preset02)
 
 ## Brand & Style
 
