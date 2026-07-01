@@ -14,7 +14,11 @@ vi.mock("@/lib/engagement/stitch-design-concepts", () => ({
 }));
 
 vi.mock("@/lib/db/prisma", () => ({
-  default: {},
+  default: {
+    productSpec: {
+      findUnique: vi.fn(() => Promise.resolve({ buildVariant: "campaign" })),
+    },
+  },
 }));
 
 vi.mock("@google/genai", () => ({}));

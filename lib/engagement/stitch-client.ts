@@ -1,20 +1,22 @@
 import { Stitch, StitchToolClient } from "@google/stitch-sdk";
-import { getGcpProjectId, getStitchAccessToken } from "@/lib/google/service-account";
 
 /**
- * Build a Stitch client authenticated with the `gt-stitch-api` service account
- * (OAuth2 Bearer) — the professional replacement for the leaked `STITCH_API_KEY`.
+ * Build a Stitch client authenticated with the operator's PERSONAL Stitch
+ * account via `STITCH_API_KEY`. We use the personal account (not the GCP
+ * service account) so the operator retains Stitch Labs access to view and edit
+ * the design systems + generated screens the pipeline produces, and so the
+ * three personal-account presets resolve by name at runtime.
  *
- * `projectId` (GCP project) becomes the `X-Goog-User-Project` quota/billing header
- * — distinct from `STITCH_PROJECT_ID`, which selects a Stitch *design* project.
+ * `STITCH_PROJECT_ID` must point at the project in this account that holds the
+ * three presets (GRAFT Kit / Obsidian Scholar / Obsidian Precision).
  *
  * The caller owns the returned `client` and MUST `await client.close()` when done.
  */
 export async function createStitchClient(): Promise<{ stitch: Stitch; client: StitchToolClient }> {
-  if (process.env.STITCH_API_KEY) {
-    delete process.env.STITCH_API_KEY;
+  if (!process.env.STITCH_API_KEY?.trim()) {
+    throw new Error("STITCH_API_KEY is required (personal Stitch account) — set it for the engagement pipeline.");
   }
-  const accessToken = await getStitchAccessToken();
-  const client = new StitchToolClient({ accessToken, projectId: getGcpProjectId() });
+  // StitchToolClient reads STITCH_API_KEY from the environment.
+  const client = new StitchToolClient();
   return { stitch: new Stitch(client), client };
 }

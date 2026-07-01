@@ -23,6 +23,8 @@ export interface StitchDesignRequest {
   designSystem?: DesignSystemSpec;
   /** Campaign SOP guidance from the Strategy Engine that steers tone + framing. */
   campaignContext?: { visualFramework?: string; designTone?: string[] };
+  /** displayName of the Stitch preset (one of the three) to apply to the variants; resolved by name at runtime. */
+  presetDisplayName?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -719,7 +721,43 @@ export async function generateDesignConcepts(request: StitchDesignRequest): Prom
     }
 
     const take = Math.min(3, screens.length);
-    return await Promise.all(screens.slice(0, take).map((screen, i) => screenToDesignConcept(screen, i, request)));
+    const variantScreens = screens.slice(0, take);
+
+    // Apply the chosen preset design system to THIS run's variant screens so the
+    // concepts inherit the preset's colours/typography. The preset is resolved by
+    // displayName (account-agnostic). Scoped to our own screens (never the whole
+    // shared project). Best-effort: a failure here must not sink the build — the
+    // variants are still usable without the preset re-render.
+    if (request.presetDisplayName) {
+      try {
+        const systems = await project.listDesignSystems();
+        const match = systems.find((d) => (d.data as { displayName?: string } | undefined)?.displayName === request.presetDisplayName);
+        if (!match) {
+          throw new Error(
+            `preset "${request.presetDisplayName}" not found in project ${project.projectId}; ` +
+              "ensure the three presets exist in this Stitch project (STITCH_PROJECT_ID).",
+          );
+        }
+        const ds = project.designSystem(match.id);
+        const ourSourceIds = new Set(variantScreens.map((s) => s.screenId));
+        const projectData = (await client.callTool("get_project", {
+          name: `projects/${project.projectId}`,
+        })) as { screenInstances?: Array<{ id: string; sourceScreen: string }> };
+        const instances = (projectData.screenInstances ?? [])
+          .filter((si) => ourSourceIds.has(si.sourceScreen))
+          .map((si) => ({ id: si.id, sourceScreen: si.sourceScreen }));
+        if (instances.length > 0) {
+          await ds.apply(instances);
+        }
+      } catch (err) {
+        console.error(
+          `[stitch] failed to apply preset "${request.presetDisplayName}"; using unstyled variants:`,
+          err instanceof Error ? err.message : err,
+        );
+      }
+    }
+
+    return await Promise.all(variantScreens.map((screen, i) => screenToDesignConcept(screen, i, request)));
   } finally {
     await client.close().catch(() => {});
   }

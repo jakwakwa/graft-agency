@@ -1,4 +1,5 @@
 import prisma from "@/lib/db/prisma";
+import { resolveBuildVariant } from "@/lib/engagement/build-variant";
 import { slugFromCompanyName } from "@/lib/engagement/company-slug";
 import { ensureJulesSession } from "@/lib/engagement/idempotency";
 import { transitionStage } from "@/lib/engagement/stage-machine";
@@ -6,12 +7,6 @@ import { inngest } from "@/lib/inngest/client";
 import { defaultJulesGithubSource } from "@/lib/services/jules-github.service";
 import type { BuildVariant, CampaignSop, DesignConcept, ProfiledNeeds } from "@/lib/types/engagement";
 import { makeOnFailure } from "./_shared/on-failure";
-
-/** Resolve the build flavour: per-lead choice from the spec, else env default, else campaign. */
-function resolveBuildVariant(specValue: string | null | undefined): BuildVariant {
-  if (specValue === "landing" || specValue === "campaign") return specValue;
-  return process.env.DEFAULT_BUILD_VARIANT === "landing" ? "landing" : "campaign";
-}
 
 export const julesBuilderHandler = async ({
   event,
