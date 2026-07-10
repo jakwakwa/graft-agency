@@ -235,8 +235,8 @@ Paddle is the Merchant of Record — handles global tax/VAT automatically. `PADD
 |---|---|---|
 | AI Chatbot (monthly) | Subscription | £147/month |
 | AI Chatbot (annual) | Subscription | £1,470/year |
-| Voice add-on | Subscription add-on | £37/month |
-| Booking add-on | Subscription add-on | £27/month |
+| Voice add-on | Subscription add-on | $99/month |
+| Booking add-on | Subscription add-on | $29/month |
 | Landing page build | One-time transaction | £497 |
 | SMB website build | One-time transaction | £997 |
 
