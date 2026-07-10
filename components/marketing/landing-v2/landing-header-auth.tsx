@@ -39,7 +39,6 @@ export function LandingHeaderAuth() {
           </Button>
           <UserButton
             appearance={{
-              baseTheme: "dark",
               elements: {
                 avatarBox: "h-9 w-9 ring-1 ring-white/10",
               },
