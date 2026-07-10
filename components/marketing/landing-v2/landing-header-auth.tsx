@@ -1,6 +1,7 @@
 "use client";
 
 import { Show, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
+import { dark } from '@clerk/ui/themes'
 import Link from "next/link";
 import { Button } from "@/components/ui-v2/button";
 import { LANDING_ROUTES } from "./constants";
@@ -30,7 +31,7 @@ export function LandingHeaderAuth() {
           <Button
             variant="ghost"
             size="sm"
-            className="inline-flex shrink-0 text-xs text-[#acb1d6] hover:bg-white/5 hover:text-white sm:text-sm"
+            className="inline-flex shrink-0 text-xs text-emerald-800 bg-linear-to-tr from-orange-600 to-accent hover:bg-white hover:text-white sm:text-sm"
             asChild
           >
             <Link href={LANDING_ROUTES.dashboard} aria-label="Open your dashboard">
@@ -39,6 +40,7 @@ export function LandingHeaderAuth() {
           </Button>
           <UserButton
             appearance={{
+              theme: dark,
               elements: {
                 avatarBox: "h-9 w-9 ring-1 ring-white/10",
               },

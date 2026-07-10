@@ -196,8 +196,8 @@ export function PricingSectionClient({
     kindFilter === "website"
       ? "grid gap-8 md:grid-cols-2 max-w-4xl mx-auto w-full"
       : kindFilter === "bot"
-        ? "grid gap-6 md:grid-cols-3 w-full"
-        : "grid gap-4 md:grid-cols-2 xl:grid-cols-5 w-full";
+        ? "grid gap-6 md:grid-cols-1 w-full"
+        : "grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 w-full";
 
   return (
     <section id={id} className="relative z-10 px-4 sm:px-6 py-8 sm:py-12 md:py-20">
