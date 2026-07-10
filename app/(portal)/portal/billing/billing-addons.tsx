@@ -53,7 +53,7 @@ export function BillingAddons({
       priceId: prices.voiceMonthly,
       label: "Voice Agent",
       description: "Answer phone-style enquiries automatically, 24/7",
-      price: "$99/mo",
+      price: "£37/mo",
       icon: <Zap className="h-5 w-5 text-violet-500" />,
       comingSoon: !voiceAddonAvailable,
     },
@@ -61,7 +61,7 @@ export function BillingAddons({
       priceId: prices.bookingMonthly,
       label: "Booking Integration",
       description: "Let your chatbot book appointments directly into your calendar",
-      price: "$29/mo",
+      price: "£27/mo",
       icon: <Calendar className="h-5 w-5 text-blue-500" />,
     },
   ].filter((addon) => addon.priceId);
@@ -71,7 +71,7 @@ export function BillingAddons({
       <Typography.H3>Add-ons</Typography.H3>
       <Typography.Muted>
         Extend your bot with additional capabilities. Each add-on is billed on top of your subscription and can be
-        added once. To cancel an add-on (or your subscription), use Manage Subscription below - all cancellations
+        added once. To cancel an add-on (or your subscription), use Manage Subscription below — all cancellations
         happen in the secure Paddle billing portal, never here.
       </Typography.Muted>
       <div className="grid gap-3 sm:grid-cols-2">
@@ -90,7 +90,7 @@ export function BillingAddons({
                       <span className="mt-1 block text-xs font-medium text-gray-700">{addon.price}</span>
                       {isActive ? (
                         <span className="mt-1 block text-xs text-gray-500">
-                          Active - cancel via Manage Subscription below
+                          Active — cancel via Manage Subscription below
                         </span>
                       ) : null}
                     </span>
@@ -135,7 +135,7 @@ export function BillingAddons({
                 </p>
                 <p>
                   An add-on can only be added once. To cancel it later, use the <strong>Manage Subscription</strong>{" "}
-                  button on this page - all cancellations and billing changes happen in the secure Paddle billing
+                  button on this page — all cancellations and billing changes happen in the secure Paddle billing
                   portal, not in this app.
                 </p>
               </div>
