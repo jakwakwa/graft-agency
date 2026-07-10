@@ -60,7 +60,7 @@ Run `bun run build` (not just IDE type-checks) to catch compile-time contract er
 
 - **Clerk Organizations** map 1:1 to **Client** records in Prisma
 - `lib/auth/resolve-client.ts` maps `Clerk userId → clientId`
-- Platform owner (`isPlatformOwner`) and resellers (`isReseller`) have elevated access
+- Platform owner (`isPlatformOwner`) has elevated access
 - All data-access must scope queries by `clientId` — enforce at service layer
 
 ### Core Pipelines

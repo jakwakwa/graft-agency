@@ -27,7 +27,6 @@ describe("getClientEntitlements", () => {
     const { getClientEntitlements } = await import("@/lib/billing/entitlements");
     vi.mocked(prisma.client.findFirst).mockResolvedValue({
       isPlatformOwner: false,
-      isReseller: false,
       subscriptionActive: true,
       subscriptionAddons: ["pri_voice"],
       subscriptionStatus: "active",
@@ -51,7 +50,6 @@ describe("getClientEntitlements", () => {
     const { getClientEntitlements } = await import("@/lib/billing/entitlements");
     vi.mocked(prisma.client.findFirst).mockResolvedValue({
       isPlatformOwner: false,
-      isReseller: false,
       subscriptionActive: true,
       subscriptionAddons: [],
       subscriptionStatus: "canceled",
@@ -63,12 +61,11 @@ describe("getClientEntitlements", () => {
     expect(entitlements?.hasChatbotAccess).toBe(false);
   });
 
-  it("exempts platform owners and resellers from paygating", async () => {
+  it("exempts platform owners from paygating", async () => {
     const { default: prisma } = await import("@/lib/db/prisma");
     const { getClientEntitlements } = await import("@/lib/billing/entitlements");
     vi.mocked(prisma.client.findFirst).mockResolvedValue({
-      isPlatformOwner: false,
-      isReseller: true,
+      isPlatformOwner: true,
       subscriptionActive: false,
       subscriptionAddons: [],
       subscriptionStatus: "inactive",
@@ -100,7 +97,6 @@ describe("requireActiveSubscription", () => {
     const { requireActiveSubscription } = await import("@/lib/billing/entitlements");
     vi.mocked(prisma.client.findFirst).mockResolvedValue({
       isPlatformOwner: false,
-      isReseller: false,
       subscriptionActive: true,
       subscriptionAddons: [],
       subscriptionStatus: "active",
@@ -114,7 +110,6 @@ describe("requireActiveSubscription", () => {
     const { requireActiveSubscription, SUBSCRIPTION_REQUIRED_CODE } = await import("@/lib/billing/entitlements");
     vi.mocked(prisma.client.findFirst).mockResolvedValue({
       isPlatformOwner: false,
-      isReseller: false,
       subscriptionActive: false,
       subscriptionAddons: [],
       subscriptionStatus: "inactive",

@@ -74,7 +74,7 @@ export async function resolveClientIdFromAuth(): Promise<string | null> {
 
 /**
  * Returns true if the current user's Client has platform-level access.
- * Grants access to: isPlatformOwner (Jaco) OR isReseller (white-label owners).
+ * Only the platform owner has elevated dashboard access.
  */
 export async function hasPlatformAccess(): Promise<boolean> {
   const clientId = await resolveClientIdFromAuth();
@@ -82,14 +82,14 @@ export async function hasPlatformAccess(): Promise<boolean> {
 
   const client = await prisma.client.findUnique({
     where: { id: clientId },
-    select: { isPlatformOwner: true, isReseller: true },
+    select: { isPlatformOwner: true },
     cacheStrategy: {
       ttl: 60,
       swr: 300,
       tags: [cacheTags.client(clientId)],
     },
   });
-  return (client?.isPlatformOwner ?? false) || (client?.isReseller ?? false);
+  return client?.isPlatformOwner ?? false;
 }
 
 /**
@@ -114,7 +114,7 @@ export async function hasChatbotAccess(): Promise<boolean> {
 
 /**
  * Returns the resolved clientId for the current user if they have platform access.
- * Platform owners and resellers both get their own clientId (data is scoped per client).
+ * Only the platform owner has elevated dashboard access.
  */
 export async function requirePlatformAccess(): Promise<
   { clientId: string } | { error: "Unauthorized"; status: 401 } | { error: "Forbidden"; status: 403 }
@@ -124,7 +124,7 @@ export async function requirePlatformAccess(): Promise<
 
   const client = await prisma.client.findFirst({
     where: { clerkUserId: userId, deletedAt: null },
-    select: { id: true, isPlatformOwner: true, isReseller: true },
+    select: { id: true, isPlatformOwner: true },
     cacheStrategy: {
       ttl: 60,
       swr: 300,
@@ -133,7 +133,7 @@ export async function requirePlatformAccess(): Promise<
   });
 
   if (!client) return { error: "Unauthorized", status: 401 };
-  if (!client.isPlatformOwner && !client.isReseller) return { error: "Forbidden", status: 403 };
+  if (!client.isPlatformOwner) return { error: "Forbidden", status: 403 };
 
   return { clientId: client.id };
 }

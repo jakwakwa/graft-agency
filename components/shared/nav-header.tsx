@@ -8,11 +8,11 @@ import { ModeToggle } from "@/components/mode-toggle";
 import { Button } from "@/components/ui/button";
 import { Typography } from "@/components/ui/typography";
 
-type ClientFlags = { isPlatformOwner: boolean; isReseller: boolean };
+type ClientFlags = { isPlatformOwner: boolean };
 
 export function NavHeader() {
   const pathname = usePathname();
-  const [flags, setFlags] = useState<ClientFlags>({ isPlatformOwner: false, isReseller: false });
+  const [flags, setFlags] = useState<ClientFlags>({ isPlatformOwner: false });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -25,7 +25,7 @@ export function NavHeader() {
 
   if (pathname?.startsWith("/widget/")) return null;
 
-  const hasPlatformAccess = flags.isPlatformOwner || flags.isReseller;
+  const hasPlatformAccess = flags.isPlatformOwner;
 
   return (
     <header className="flex h-16 items-center justify-between bg-muted/50 px-4 shadow-ambient backdrop-blur-sm md:px-6">
