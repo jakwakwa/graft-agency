@@ -54,6 +54,7 @@ export default async function PortalBillingPage() {
           bookingMonthly: process.env.PADDLE_PRICE_BOOKING_MONTHLY ?? "",
         }}
         voiceAddonAvailable={isVoiceAddonAvailable()}
+        paddleConfig={{ clientToken, environment }}
       />
 
       <PricingSection

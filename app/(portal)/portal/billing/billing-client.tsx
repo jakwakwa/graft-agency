@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import type { PaddleConfig } from "@/components/pricing/pricing-section-client";
 import { BillingAddons } from "./billing-addons";
 import { BillingManagementCard } from "./billing-management-card";
 import { BillingStatusCard, type SubscriptionStatus } from "./billing-status-card";
@@ -16,6 +17,8 @@ interface BillingClientProps {
   };
   /** Feature flag — the Voice Agent add-on shows as "Coming soon" when false. */
   voiceAddonAvailable: boolean;
+  /** Same Paddle client config the pricing section uses for localized prices. */
+  paddleConfig: PaddleConfig;
 }
 
 export function BillingClient({
@@ -25,6 +28,7 @@ export function BillingClient({
   subscriptionAddons,
   prices,
   voiceAddonAvailable,
+  paddleConfig,
 }: BillingClientProps) {
   const [isPending, startTransition] = useTransition();
   const [addonPending, setAddonPending] = useState<string | null>(null);
@@ -82,6 +86,7 @@ export function BillingClient({
           isPending={isPending}
           onAddAddon={addAddon}
           voiceAddonAvailable={voiceAddonAvailable}
+          paddleConfig={paddleConfig}
         />
       )}
 

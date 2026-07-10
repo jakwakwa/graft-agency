@@ -1,7 +1,9 @@
 "use client";
 
-import { Calendar, Check, Loader2, Zap } from "lucide-react";
-import { useState } from "react";
+import { initializePaddle, type Paddle } from "@paddle/paddle-js";
+import { Calendar, Check, Loader2, Plus, Zap } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import type { PaddleConfig } from "@/components/pricing/pricing-section-client";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,6 +17,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Typography } from "@/components/ui/typography";
+import { cn } from "@/lib/utils";
 
 interface BillingAddonsProps {
   prices: {
@@ -27,15 +30,20 @@ interface BillingAddonsProps {
   onAddAddon: (priceId: string, label: string) => void;
   /** Feature flag — the Voice Agent add-on shows as "Coming soon" when false. */
   voiceAddonAvailable: boolean;
+  /** Same Paddle client config the pricing section uses for localized prices. */
+  paddleConfig: PaddleConfig;
 }
 
 interface AddonOffer {
   priceId: string;
   label: string;
   description: string;
-  price: string;
+  fallbackPrice: string;
   icon: React.ReactNode;
   comingSoon?: boolean;
+  /** Colour classes for the price value + plus chip, matching the add-on's icon colour. */
+  priceText: string;
+  priceChip: string;
 }
 
 export function BillingAddons({
@@ -45,26 +53,68 @@ export function BillingAddons({
   isPending,
   onAddAddon,
   voiceAddonAvailable,
+  paddleConfig,
 }: BillingAddonsProps) {
   const [confirmingAddon, setConfirmingAddon] = useState<AddonOffer | null>(null);
+  const [paddle, setPaddle] = useState<Paddle | null>(null);
+  const [localizedPrices, setLocalizedPrices] = useState<Record<string, string>>({});
+
+  // Same localized-pricing mechanism as the pricing cards: paddle-js
+  // PricePreview keyed by price ID. initializePaddle is idempotent — a second
+  // call on this page routes to Paddle.Update and, without an eventCallback in
+  // its options, leaves the pricing section's checkout callback untouched.
+  useEffect(() => {
+    if (!paddleConfig.clientToken) return;
+    initializePaddle({
+      environment: paddleConfig.environment,
+      token: paddleConfig.clientToken,
+    }).then((instance) => {
+      if (instance) setPaddle(instance);
+    });
+  }, [paddleConfig.clientToken, paddleConfig.environment]);
+
+  const previewItems = useMemo(
+    () => [prices.voiceMonthly, prices.bookingMonthly].filter(Boolean).map((priceId) => ({ priceId, quantity: 1 })),
+    [prices.voiceMonthly, prices.bookingMonthly],
+  );
+
+  useEffect(() => {
+    if (!paddle || previewItems.length === 0) return;
+    paddle.PricePreview({ items: previewItems }).then((result) => {
+      const nextPrices = Object.fromEntries(
+        (result.data?.details?.lineItems ?? []).flatMap((item) => {
+          const priceId = item.price?.id;
+          const subtotal = item.formattedTotals?.subtotal ?? item.formattedUnitTotals?.subtotal;
+          return priceId && subtotal ? [[priceId, subtotal]] : [];
+        }),
+      );
+      setLocalizedPrices(nextPrices);
+    });
+  }, [paddle, previewItems]);
 
   const addons: AddonOffer[] = [
     {
       priceId: prices.voiceMonthly,
       label: "Voice Agent",
       description: "Answer phone-style enquiries automatically, 24/7",
-      price: "£37/mo",
+      fallbackPrice: "£37",
       icon: <Zap className="h-5 w-5 text-violet-500" />,
       comingSoon: !voiceAddonAvailable,
+      priceText: "text-violet-600",
+      priceChip: "bg-violet-500/10 text-violet-600 border-violet-500/20",
     },
     {
       priceId: prices.bookingMonthly,
       label: "Booking Integration",
       description: "Let your chatbot book appointments directly into your calendar",
-      price: "£27/mo",
+      fallbackPrice: "£27",
       icon: <Calendar className="h-5 w-5 text-blue-500" />,
+      priceText: "text-blue-600",
+      priceChip: "bg-blue-500/10 text-blue-600 border-blue-500/20",
     },
   ].filter((addon) => addon.priceId);
+
+  const displayPrice = (addon: AddonOffer) => localizedPrices[addon.priceId] ?? addon.fallbackPrice;
 
   return (
     <div className="space-y-3">
@@ -87,7 +137,20 @@ export function BillingAddons({
                     <span>
                       <span className="block text-sm font-semibold">{addon.label}</span>
                       <span className="mt-0.5 block text-xs text-gray-500">{addon.description}</span>
-                      <span className="mt-1 block text-xs font-medium text-gray-700">{addon.price}</span>
+                      <span className="mt-2 flex items-center gap-1.5">
+                        <span
+                          className={cn(
+                            "inline-flex h-5 w-5 items-center justify-center rounded-md border",
+                            addon.priceChip,
+                          )}
+                        >
+                          <Plus className="h-3 w-3 stroke-[3]" />
+                        </span>
+                        <span className={cn("text-xl font-extrabold tracking-tight", addon.priceText)}>
+                          {displayPrice(addon)}
+                        </span>
+                        <span className="self-end pb-0.5 text-[11px] font-medium text-gray-500">/mo</span>
+                      </span>
                       {isActive ? (
                         <span className="mt-1 block text-xs text-gray-500">
                           Active — cancel via Manage Subscription below
@@ -129,7 +192,8 @@ export function BillingAddons({
             <AlertDialogDescription asChild>
               <div className="space-y-2 text-sm">
                 <p>
-                  This adds <strong>{confirmingAddon?.label}</strong> ({confirmingAddon?.price}) to your existing AI
+                  This adds <strong>{confirmingAddon?.label}</strong> (
+                  {confirmingAddon ? `${displayPrice(confirmingAddon)}/mo` : ""}) to your existing AI
                   Chatbot subscription. It is billed <strong>on top of</strong> your current subscription price,
                   prorated to your next billing period.
                 </p>
