@@ -1,19 +1,7 @@
-import { appendFileSync } from "node:fs";
-import { join } from "node:path";
 import { tool } from "ai";
 import { z } from "zod";
 import { agentService } from "@/lib/services/agent.service";
 import { calService } from "@/lib/services/cal.service";
-
-const DEBUG_LOG = join(process.cwd(), ".cursor", "debug-0b2dc2.log");
-const dbg = (loc: string, msg: string, data: object, h: string) => {
-  try {
-    appendFileSync(
-      DEBUG_LOG,
-      `${JSON.stringify({ location: loc, message: msg, data, hypothesisId: h, timestamp: Date.now() })}\n`,
-    );
-  } catch {}
-};
 
 export const createCheckAvailabilityTool = (clientId: string) =>
   tool({
@@ -39,36 +27,15 @@ export const createCheckAvailabilityTool = (clientId: string) =>
       const eventTypeSlug = input.eventTypeSlug ?? config.defaultEventSlug ?? null;
       const eventTypeId = input.eventTypeId;
 
-      // #region agent log
-      dbg(
-        "check-availability:config",
-        "checkAvailability config",
-        {
-          clientId,
-          calComUsername: config.calComUsername,
-          defaultEventSlug: config.defaultEventSlug,
-          username,
-          eventTypeSlug,
-          eventTypeId,
-          hasBoth: !!(username && eventTypeSlug) || !!eventTypeId,
-        },
-        "H1",
-      );
-      // #endregion
-
       if (!eventTypeId && (!username || !eventTypeSlug)) {
-        const err = {
+        return {
           slots: [],
           error:
             "Calendar not configured. The client must set calComUsername and defaultEventSlug in AgentConfig, or you must provide username and eventTypeSlug, or an eventTypeId.",
         };
-        // #region agent log
-        dbg("check-availability:noConfig", "early return", { reason: "missing configuration" }, "H1");
-        // #endregion
-        return err;
       }
 
-      const result = await calService.getAvailability({
+      return calService.getAvailability({
         username: username ?? undefined,
         eventTypeSlug: eventTypeSlug ?? undefined,
         eventTypeId,
@@ -77,16 +44,5 @@ export const createCheckAvailabilityTool = (clientId: string) =>
         end: input.end,
         timeZone: input.timeZone,
       });
-
-      // #region agent log
-      dbg(
-        "check-availability:result",
-        "checkAvailability result",
-        { slotCount: result.slots?.length ?? 0, hasError: !!result.error, errorPreview: result.error?.slice(0, 120) },
-        "H3",
-      );
-      // #endregion
-
-      return result;
     },
   });

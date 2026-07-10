@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { redirectToAccessRequired, requireAuthOrSignIn } from "@/lib/auth/guards";
 import { resolveClientIdFromAuth } from "@/lib/auth/resolve-client";
-import { requireActiveSubscription } from "@/lib/billing/entitlements";
+import { requireBookingAddon } from "@/lib/billing/entitlements";
 import { calService } from "@/lib/services/cal.service";
 
 const cancelBookingSchema = z.object({
@@ -23,7 +23,9 @@ export async function cancelBookingAction(input: unknown): Promise<CancelBooking
   const clientId = await resolveClientIdFromAuth();
   if (!clientId) redirectToAccessRequired();
 
-  const gate = await requireActiveSubscription(clientId);
+  // Booking add-on implies an active base subscription, so this single gate
+  // covers both requirements.
+  const gate = await requireBookingAddon(clientId);
   if (gate) return { success: false, error: gate.error };
 
   const parsed = cancelBookingSchema.safeParse(input);

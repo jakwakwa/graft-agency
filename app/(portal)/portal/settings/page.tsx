@@ -14,6 +14,7 @@ export default async function PortalSettingsPage() {
 
   const [entitlements, config] = await Promise.all([getClientEntitlements(clientId), agentService.getConfig(clientId)]);
   const gated = !entitlements?.hasChatbotAccess;
+  const bookingEnabled = entitlements?.hasBookingAccess ?? false;
 
   const initialData = {
     ...config,
@@ -33,10 +34,10 @@ export default async function PortalSettingsPage() {
           description="Shape your AI assistant's name, tone, brand colours, and knowledge base. Subscribe to the AI Chatbot to start customising."
           highlights={["Custom branding & greeting", "Your own knowledge base", "Calendar booking setup"]}
         >
-          <BotSettingsForm initialData={initialData} />
+          <BotSettingsForm initialData={initialData} bookingEnabled={bookingEnabled} />
         </SubscriptionGate>
       ) : (
-        <BotSettingsForm initialData={initialData} />
+        <BotSettingsForm initialData={initialData} bookingEnabled={bookingEnabled} />
       )}
     </div>
   );

@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { resolveClientIdFromAuth } from "@/lib/auth/resolve-client";
-import { requireActiveSubscription } from "@/lib/billing/entitlements";
+import { getClientEntitlements, requireActiveSubscription } from "@/lib/billing/entitlements";
 import { cacheTags, invalidateCacheTags } from "@/lib/db/cache";
 import prisma from "@/lib/db/prisma";
 
@@ -61,15 +61,26 @@ export async function saveBotSettingsAction(formData: FormData) {
     knowledgeBase,
   });
 
+  // Cal.com booking config is gated by the Booking Integration add-on. When
+  // the workspace doesn't have it, drop the fields from the write entirely —
+  // nothing new can be set, and any previously saved values are preserved in
+  // case the add-on is (re)activated later.
+  const entitlements = await getClientEntitlements(clientId);
+  const { calComUsername, defaultEventSlug, ...baseData } = data;
+  const bookingData = entitlements?.hasBookingAccess ? { calComUsername, defaultEventSlug } : {};
+
   await prisma.agentConfig.upsert({
     where: { clientId },
     create: {
       clientId,
-      ...data,
+      ...baseData,
+      calComUsername: entitlements?.hasBookingAccess ? calComUsername : null,
+      defaultEventSlug: entitlements?.hasBookingAccess ? defaultEventSlug : null,
       knowledgeBase: data.knowledgeBase ?? [],
     },
     update: {
-      ...data,
+      ...baseData,
+      ...bookingData,
       knowledgeBase: data.knowledgeBase ?? [],
     },
   });

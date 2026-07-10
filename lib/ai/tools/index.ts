@@ -13,11 +13,24 @@ import { handoffToHumanTool } from "./handoff-human";
 import { createSearchKnowledgeBaseTool } from "./search-knowledge";
 import { createReserveSlotTool } from "./reserve-slot";
 
-export const createTools = (clientId: string) => ({
+export interface CreateToolsOptions {
+  /**
+   * Gated by the Booking Integration add-on. When false the bot gets no
+   * scheduling tools at all — it is knowledge-only and relies on lead capture
+   * / human handoff so the workspace owner can follow up by email.
+   */
+  bookingEnabled: boolean;
+}
+
+export const createTools = (clientId: string, options: CreateToolsOptions) => ({
   captureLeadDetails: createCaptureLeadDetailsTool(clientId),
-  checkAvailability: createCheckAvailabilityTool(clientId),
-  bookAppointment: createBookAppointmentTool(clientId),
-  reserveSlot: createReserveSlotTool(clientId),
   searchKnowledgeBase: createSearchKnowledgeBaseTool(clientId),
   handoffToHuman: handoffToHumanTool,
+  ...(options.bookingEnabled
+    ? {
+        checkAvailability: createCheckAvailabilityTool(clientId),
+        bookAppointment: createBookAppointmentTool(clientId),
+        reserveSlot: createReserveSlotTool(clientId),
+      }
+    : {}),
 });

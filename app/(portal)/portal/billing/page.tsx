@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { PricingSection } from "@/components/pricing/pricing-section";
 import { Typography } from "@/components/ui/typography";
 import { startOfCurrentMonthUtc } from "@/lib/billing/build-purchases";
+import { isVoiceAddonAvailable } from "@/lib/billing/entitlements";
 import prisma from "@/lib/db/prisma";
 import { BillingClient } from "./billing-client";
 
@@ -52,6 +53,7 @@ export default async function PortalBillingPage() {
           voiceMonthly: process.env.PADDLE_PRICE_VOICE_MONTHLY ?? "",
           bookingMonthly: process.env.PADDLE_PRICE_BOOKING_MONTHLY ?? "",
         }}
+        voiceAddonAvailable={isVoiceAddonAvailable()}
       />
 
       <PricingSection

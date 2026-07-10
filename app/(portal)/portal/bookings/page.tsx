@@ -88,7 +88,10 @@ export default async function BookingsPage({ searchParams }: BookingsPageProps) 
   const monthRange = getMonthRange(month);
 
   const entitlements = await entitlementsPromise;
-  const gated = !entitlements?.hasChatbotAccess;
+  // Bookings require the Booking Integration add-on, not just the base
+  // subscription — without it the bot is knowledge-only and relays leads by
+  // email instead of scheduling.
+  const gated = !entitlements?.hasBookingAccess;
 
   if (gated) {
     return (
@@ -108,12 +111,13 @@ export default async function BookingsPage({ searchParams }: BookingsPageProps) 
           <CardContent>
             <div className="flex flex-col items-center justify-center space-y-4 py-12 text-center">
               <Typography.P className="text-muted-foreground">
-                Bookings appear here once your AI Chatbot is live and taking appointments. Subscribe to activate your
-                workspace's booking flow.
+                {entitlements?.hasChatbotAccess
+                  ? "Bookings require the Booking Integration add-on. Add it from the Billing page to let your chatbot schedule appointments directly into your calendar — until then, it captures visitor contact details and emails them to you."
+                  : "Bookings appear here once your AI Chatbot is live and taking appointments. Subscribe to activate your workspace's booking flow."}
               </Typography.P>
               <Button asChild>
                 <Link href="/portal/billing" className="flex items-center gap-2">
-                  Subscribe
+                  {entitlements?.hasChatbotAccess ? "View add-ons" : "Subscribe"}
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </Button>

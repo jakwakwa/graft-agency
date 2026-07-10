@@ -53,6 +53,7 @@ export function PricingSectionClient({
   const [syncing, setSyncing] = useState(false);
   const [localPurchasedBuilds, setLocalPurchasedBuilds] = useState<string[]>([]);
   const [buildError, setBuildError] = useState<string | null>(null);
+  const [subscribeError, setSubscribeError] = useState<string | null>(null);
   const pollAbortRef = useRef(false);
   // Which kind of offer opened the current overlay checkout, so completion
   // events lock the right card.
@@ -148,17 +149,39 @@ export function PricingSectionClient({
     });
   }, [paddle, previewItems]);
 
-  const handleCheckout = (offer: PricingOffer) => {
+  const handleCheckout = async (offer: PricingOffer) => {
     const price = offer.prices[selectedCycle] ?? offer.prices.oneTime;
     // Hard lock: one base subscription per workspace — never reopen checkout
     // once subscribed (or mid-sync after a completed checkout).
     if (subscribed || !paddle || !customer || !price) return;
-    checkoutKindRef.current = "subscription";
-    paddle.Checkout.open({
-      items: [{ priceId: price.priceId, quantity: 1 }],
-      customer: { email: customer.email },
-      customData: { clientId: customer.clientId },
-    });
+    setSubscribeError(null);
+
+    // Server-created transaction enforces the one-subscription-per-workspace
+    // rule before the overlay ever opens — the browser cannot bypass it.
+    try {
+      const res = await fetch("/api/billing/subscribe/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ priceId: price.priceId }),
+      });
+      const payload = (await res.json()) as { transactionId?: string; error?: string; code?: string };
+      if (res.status === 409) {
+        // Server says a subscription already exists — lock the card and let
+        // the status poll pull in the synced state.
+        setJustSubscribed(true);
+        setSubscribeError(payload.error ?? "This workspace is already subscribed.");
+        void pollUntilSynced();
+        return;
+      }
+      if (!res.ok || !payload.transactionId) {
+        setSubscribeError(payload.error ?? "Unable to start the subscription checkout. Please try again.");
+        return;
+      }
+      checkoutKindRef.current = "subscription";
+      paddle.Checkout.open({ transactionId: payload.transactionId });
+    } catch {
+      setSubscribeError("Unable to start the subscription checkout. Please try again.");
+    }
   };
 
   const handlePurchaseBuild = async (offer: PricingOffer) => {
@@ -230,6 +253,11 @@ export function PricingSectionClient({
         {mode === "portal" && buildError ? (
           <Typography.Muted className="rounded-2xl border border-red-500/20 bg-red-500/5 p-4 text-red-400">
             {buildError}
+          </Typography.Muted>
+        ) : null}
+        {mode === "portal" && subscribeError ? (
+          <Typography.Muted className="rounded-2xl border border-red-500/20 bg-red-500/5 p-4 text-red-400">
+            {subscribeError}
           </Typography.Muted>
         ) : null}
         {mode === "portal" && syncing ? (

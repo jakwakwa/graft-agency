@@ -3,6 +3,8 @@ export type PricingOfferKind = "subscription" | "addon" | "one_time";
 export type BillingCycle = "monthly" | "annual" | "oneTime";
 
 export interface PricingCatalogEnv {
+  /** Feature flag — the Voice Agent add-on is "coming soon" until "true". */
+  FEATURE_VOICE_ADDON?: string;
   PADDLE_PRODUCT_CHATBOT?: string;
   PADDLE_PRODUCT_VOICE?: string;
   PADDLE_PRODUCT_BOOKING?: string;
@@ -31,6 +33,8 @@ export interface PricingOffer {
   description: string;
   kind: PricingOfferKind;
   badge?: string;
+  /** Not purchasable yet — rendered as a disabled "Coming soon" card. */
+  comingSoon?: boolean;
   features: string[];
   prices: Partial<Record<BillingCycle, PricingOption>>;
 }
@@ -57,6 +61,7 @@ const option = (params: Omit<PricingOption, "priceId"> & { priceId?: string }): 
 
 export function getPricingCatalogEnv(): PricingCatalogEnv {
   return {
+    FEATURE_VOICE_ADDON: process.env.FEATURE_VOICE_ADDON,
     PADDLE_PRODUCT_CHATBOT: process.env.PADDLE_PRODUCT_CHATBOT,
     PADDLE_PRODUCT_VOICE: process.env.PADDLE_PRODUCT_VOICE,
     PADDLE_PRODUCT_BOOKING: process.env.PADDLE_PRODUCT_BOOKING,
@@ -105,6 +110,7 @@ export function buildPricingCatalog(env: PricingCatalogEnv = getPricingCatalogEn
         title: "Voice Agent Add-on",
         description: "Upgrade your chatbot with phone-style voice enquiry handling.",
         kind: "addon",
+        ...(env.FEATURE_VOICE_ADDON === "true" ? {} : { badge: "Coming soon", comingSoon: true }),
         features: ["Automatic call-style responses", "Useful for after-hours enquiries", "Subscription add-on"],
         prices: {
           monthly: option({

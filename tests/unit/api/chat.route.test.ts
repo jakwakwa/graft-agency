@@ -13,6 +13,7 @@ const getConfig = vi.fn();
 const saveConversation = vi.fn();
 const authoriseChat = vi.fn();
 const recordAllowedUsage = vi.fn();
+const getClientEntitlements = vi.fn();
 
 vi.mock("ai", () => ({
   convertToModelMessages,
@@ -32,6 +33,10 @@ vi.mock("@/lib/ai/system-prompt", () => ({
 
 vi.mock("@/lib/ai/tools", () => ({
   createTools,
+}));
+
+vi.mock("@/lib/billing/entitlements", () => ({
+  getClientEntitlements,
 }));
 
 vi.mock("@/lib/services/agent.service", () => ({
@@ -173,7 +178,7 @@ describe("POST /api/chat", () => {
         token: undefined,
       }),
     );
-    expect(createTools).toHaveBeenCalledWith("platform-client-uuid");
+    expect(createTools).toHaveBeenCalledWith("platform-client-uuid", { bookingEnabled: false });
     expect(saveConversation).toHaveBeenCalledWith(
       expect.objectContaining({ clientId: "platform-client-uuid", sessionId: "session-1" }),
     );
@@ -225,7 +230,8 @@ describe("POST /api/chat", () => {
     );
 
     expect(response.status).toBe(200);
-    expect(createTools).toHaveBeenCalledWith("client-1");
+    expect(createTools).toHaveBeenCalledWith("client-1", { bookingEnabled: false });
+    expect(buildSystemPrompt).toHaveBeenCalledWith(expect.anything(), { bookingEnabled: false });
     expect(saveConversation).toHaveBeenCalledWith({
       clientId: "client-1",
       messages: [
@@ -243,5 +249,26 @@ describe("POST /api/chat", () => {
       model: "mock-model",
       sessionId: "session-1",
     });
+  });
+
+  it("enables booking tools and prompts when the workspace has the booking add-on", async () => {
+    getClientEntitlements.mockResolvedValueOnce({ hasBookingAccess: true });
+
+    const { POST } = await import("@/app/api/chat/route");
+    const response = await POST(
+      new Request("http://localhost/api/chat", {
+        body: JSON.stringify({
+          clientId: "client-1",
+          messages: [{ id: "u1", parts: [{ text: "Hi", type: "text" }], role: "user" }],
+          sessionId: "session-1",
+        }),
+        headers: { "Content-Type": "application/json" },
+        method: "POST",
+      }),
+    );
+
+    expect(response.status).toBe(200);
+    expect(createTools).toHaveBeenCalledWith("client-1", { bookingEnabled: true });
+    expect(buildSystemPrompt).toHaveBeenCalledWith(expect.anything(), { bookingEnabled: true });
   });
 });

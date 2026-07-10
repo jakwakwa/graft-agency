@@ -7,7 +7,12 @@ interface AgentConfigInput {
   defaultEventSlug?: string | null;
 }
 
-export function buildSystemPrompt(config: AgentConfigInput): string {
+export interface SystemPromptOptions {
+  /** Gated by the Booking Integration add-on — see createTools. */
+  bookingEnabled: boolean;
+}
+
+export function buildSystemPrompt(config: AgentConfigInput, options: SystemPromptOptions): string {
   const parts: string[] = [];
 
   parts.push(config.systemPrompt);
@@ -22,13 +27,20 @@ export function buildSystemPrompt(config: AgentConfigInput): string {
   parts.push("Important behaviour rules:");
   parts.push("- Use UK English spelling (e.g. colour, organisation, behaviour)");
   parts.push("- Be helpful and professional");
-  parts.push(
-    "- When checking availability, always assume the user is in the 'Africa/Johannesburg' time zone unless they specify otherwise. If the user mentions load shedding, suggest slots during times that are generally less affected if the client has provided that info, or simply acknowledge the challenge and offer to book a flexible slot.",
-  );
 
-  if (config.calComUsername && config.defaultEventSlug) {
+  if (options.bookingEnabled) {
     parts.push(
-      "- When asked about availability or booking, use checkAvailability directly. Do not search the knowledge base for calendar config.",
+      "- When checking availability, always assume the user is in the 'Africa/Johannesburg' time zone unless they specify otherwise. If the user mentions load shedding, suggest slots during times that are generally less affected if the client has provided that info, or simply acknowledge the challenge and offer to book a flexible slot.",
+    );
+
+    if (config.calComUsername && config.defaultEventSlug) {
+      parts.push(
+        "- When asked about availability or booking, use checkAvailability directly. Do not search the knowledge base for calendar config.",
+      );
+    }
+  } else {
+    parts.push(
+      "- You cannot book meetings, appointments, or calls, and you cannot check calendar availability — never offer to do so. If a visitor wants to speak to someone, schedule anything, or asks for a callback, ask for their name and an email address or phone number, capture it with captureLeadDetails, and reassure them that a staff member will get back to them shortly.",
     );
   }
 

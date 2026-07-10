@@ -14,6 +14,8 @@ interface BillingClientProps {
     voiceMonthly: string;
     bookingMonthly: string;
   };
+  /** Feature flag — the Voice Agent add-on shows as "Coming soon" when false. */
+  voiceAddonAvailable: boolean;
 }
 
 export function BillingClient({
@@ -22,32 +24,38 @@ export function BillingClient({
   subscriptionActive,
   subscriptionAddons,
   prices,
+  voiceAddonAvailable,
 }: BillingClientProps) {
   const [isPending, startTransition] = useTransition();
   const [addonPending, setAddonPending] = useState<string | null>(null);
   const [localAddons, setLocalAddons] = useState<string[]>(subscriptionAddons);
   const [error, setError] = useState<string | null>(null);
 
-  const toggleAddon = async (priceId: string, label: string) => {
-    const isActive = localAddons.includes(priceId);
+  // Add-only by design: once an add-on is active it can never be removed from
+  // our UI — cancellation happens exclusively in the Paddle portal via Manage
+  // Subscription, and state resyncs from Paddle webhooks.
+  const addAddon = async (priceId: string, label: string) => {
+    if (localAddons.includes(priceId)) return;
     setAddonPending(priceId);
     setError(null);
-    const next = isActive ? localAddons.filter((id) => id !== priceId) : [...localAddons, priceId];
-    setLocalAddons(next);
 
     startTransition(async () => {
       try {
         const res = await fetch("/api/billing/addons", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ priceId, action: isActive ? "remove" : "add" }),
+          body: JSON.stringify({ priceId }),
         });
-        if (!res.ok) throw new Error("Failed to update add-on");
-        const data = (await res.json()) as { activeAddons: string[] };
+        const data = (await res.json()) as { activeAddons?: string[]; error?: string };
+        if (res.status === 409 && data.activeAddons) {
+          // Already on the live subscription — adopt the server's state.
+          setLocalAddons(data.activeAddons);
+          return;
+        }
+        if (!res.ok || !data.activeAddons) throw new Error(data.error ?? "Failed to add add-on");
         setLocalAddons(data.activeAddons);
       } catch {
-        setLocalAddons(localAddons); // revert on failure
-        setError(`Failed to update ${label}. Please try again.`);
+        setError(`Failed to add ${label}. You have not been charged — please try again.`);
       } finally {
         setAddonPending(null);
       }
@@ -72,7 +80,8 @@ export function BillingClient({
           activeAddons={localAddons}
           pendingAddon={addonPending}
           isPending={isPending}
-          onToggleAddon={toggleAddon}
+          onAddAddon={addAddon}
+          voiceAddonAvailable={voiceAddonAvailable}
         />
       )}
 

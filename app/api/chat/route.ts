@@ -10,6 +10,7 @@ import { z } from "zod";
 import { selectModel } from "@/lib/ai/model-router";
 import { buildSystemPrompt } from "@/lib/ai/system-prompt";
 import { createTools } from "@/lib/ai/tools";
+import { getClientEntitlements } from "@/lib/billing/entitlements";
 import { agentService, isSyntheticAgentConfig, PLATFORM_LANDING_WIDGET_DEFAULTS } from "@/lib/services/agent.service";
 import { chatProtectionService } from "@/lib/services/chat-protection.service";
 import { conversationService } from "@/lib/services/conversation.service";
@@ -58,6 +59,7 @@ export async function POST(req: Request) {
   }
 
   const { clientId } = authorisation;
+  const entitlementsPromise = getClientEntitlements(clientId);
   let config = await agentService.getConfig(clientId);
   if (authorisation.isPlatformDemo && isSyntheticAgentConfig(config)) {
     config = {
@@ -66,8 +68,13 @@ export async function POST(req: Request) {
       greetingMessage: PLATFORM_LANDING_WIDGET_DEFAULTS.greetingMessage,
     };
   }
-  const systemPrompt = buildSystemPrompt(config);
-  const tools = createTools(clientId);
+  // Booking Integration add-on gates all scheduling: without it the bot gets
+  // no booking tools and its prompt directs it to capture contact details for
+  // owner follow-up instead.
+  const entitlements = await entitlementsPromise;
+  const bookingEnabled = entitlements?.hasBookingAccess ?? false;
+  const systemPrompt = buildSystemPrompt(config, { bookingEnabled });
+  const tools = createTools(clientId, { bookingEnabled });
 
   const model = selectModel(Object.keys(tools));
   let modelMessages: Awaited<ReturnType<typeof convertToModelMessages>>;

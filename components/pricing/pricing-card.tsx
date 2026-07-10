@@ -125,6 +125,8 @@ export function PricingCard({
   const buildPurchased = buildPurchasable && price ? purchasedBuilds.includes(price.priceId) : false;
 
   const theme = THEMES[offer.id] ?? DEFAULT_THEME;
+  // Feature-flagged offers (e.g. Voice Agent) render disabled in every mode.
+  const comingSoon = Boolean(offer.comingSoon);
 
   return (
     <article
@@ -174,11 +176,22 @@ export function PricingCard({
       </ul>
 
       <div className="mt-auto pt-4">
-        {baseLocked ? (
+        {comingSoon ? (
           <Button
             type="button"
             disabled
             aria-disabled
+            title="This add-on is coming soon and cannot be activated yet"
+            className="w-full cursor-not-allowed rounded-xl border border-white/10 bg-white/5 py-5 text-sm font-semibold uppercase tracking-wider text-on-surface-variant opacity-70"
+          >
+            Coming soon
+          </Button>
+        ) : baseLocked ? (
+          <Button
+            type="button"
+            disabled
+            aria-disabled
+            title="One subscription per workspace — cancel or change it via Manage Subscription"
             className="w-full cursor-not-allowed rounded-xl border border-white/10 bg-white/5 py-5 text-sm font-semibold uppercase tracking-wider text-on-surface-variant opacity-70"
           >
             You&rsquo;re already subscribed
@@ -222,7 +235,7 @@ export function PricingCard({
             aria-disabled
             title={
               subscribed
-                ? "Manage this add-on from the Add-ons section above"
+                ? "Add this add-on from the Add-ons section above — cancel anytime via Manage Subscription"
                 : "Requires an active AI Chatbot subscription"
             }
             className="w-full cursor-not-allowed rounded-xl border border-white/10 bg-white/5 py-5 text-sm font-semibold uppercase tracking-wider text-on-surface-variant opacity-70"

@@ -28,6 +28,8 @@ interface BotSettingsFormProps {
     defaultEventSlug: string | null;
     knowledgeBase: KnowledgeSnippet[] | null;
   };
+  /** Gated by the Booking Integration add-on — hides the Cal.com booking config when false. */
+  bookingEnabled: boolean;
 }
 
 function SubmitButton() {
@@ -40,7 +42,7 @@ function SubmitButton() {
   );
 }
 
-export function BotSettingsForm({ initialData }: BotSettingsFormProps) {
+export function BotSettingsForm({ initialData, bookingEnabled }: BotSettingsFormProps) {
   const [knowledgeBase, setKnowledgeBase] = useState<KnowledgeSnippet[]>(
     Array.isArray(initialData.knowledgeBase)
       ? initialData.knowledgeBase.map((s, i) => ({
@@ -162,35 +164,48 @@ export function BotSettingsForm({ initialData }: BotSettingsFormProps) {
           </CardContent>
         </Card>
 
-        {/* Bookings */}
-        <Card className="md:col-span-2">
-          <CardHeader>
-            <CardTitle>Bookings (Cal.com)</CardTitle>
-            <CardDescription>Let visitors book meetings directly through chat.</CardDescription>
-          </CardHeader>
-          <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="calComUsername">Cal.com username</Label>
-              <Input
-                id="calComUsername"
-                name="calComUsername"
-                defaultValue={initialData.calComUsername ?? ""}
-                placeholder="yourname"
-              />
-              <Typography.Muted>Optional — let visitors book a call directly.</Typography.Muted>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="defaultEventSlug">Booking event</Label>
-              <Input
-                id="defaultEventSlug"
-                name="defaultEventSlug"
-                defaultValue={initialData.defaultEventSlug ?? ""}
-                placeholder="15min"
-              />
-              <Typography.Muted>Optional — Cal.com event type slug.</Typography.Muted>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Bookings — gated by the Booking Integration add-on */}
+        {bookingEnabled ? (
+          <Card className="md:col-span-2">
+            <CardHeader>
+              <CardTitle>Bookings (Cal.com)</CardTitle>
+              <CardDescription>Let visitors book meetings directly through chat.</CardDescription>
+            </CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="calComUsername">Cal.com username</Label>
+                <Input
+                  id="calComUsername"
+                  name="calComUsername"
+                  defaultValue={initialData.calComUsername ?? ""}
+                  placeholder="yourname"
+                />
+                <Typography.Muted>Optional — let visitors book a call directly.</Typography.Muted>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="defaultEventSlug">Booking event</Label>
+                <Input
+                  id="defaultEventSlug"
+                  name="defaultEventSlug"
+                  defaultValue={initialData.defaultEventSlug ?? ""}
+                  placeholder="15min"
+                />
+                <Typography.Muted>Optional — Cal.com event type slug.</Typography.Muted>
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card className="md:col-span-2">
+            <CardHeader>
+              <CardTitle>Bookings (Cal.com)</CardTitle>
+              <CardDescription>
+                Requires the Booking Integration add-on. Without it your bot captures the visitor&rsquo;s contact
+                details and emails them to you to follow up — add the Booking Integration add-on from the Billing page
+                to let visitors book meetings directly through chat.
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        )}
 
         {/* Knowledge Base */}
         <Card className="md:col-span-2">
