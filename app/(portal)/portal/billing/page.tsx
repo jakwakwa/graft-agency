@@ -34,6 +34,12 @@ export default async function PortalBillingPage() {
 
   const clientToken = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN ?? "";
   const environment = process.env.PADDLE_ENVIRONMENT === "production" ? "production" : "sandbox";
+  const paddleConfig = {
+    clientToken,
+    environment,
+    // Paddle Retain identifies the signed-in customer by their Paddle customer ID.
+    customerId: client.paddleCustomerId ?? undefined,
+  } as const;
 
   return (
     <div className="mx-auto w-full max-w-7xl space-y-10 p-8">
@@ -54,7 +60,7 @@ export default async function PortalBillingPage() {
           bookingMonthly: process.env.PADDLE_PRICE_BOOKING_MONTHLY ?? "",
         }}
         voiceAddonAvailable={isVoiceAddonAvailable()}
-        paddleConfig={{ clientToken, environment }}
+        paddleConfig={paddleConfig}
       />
 
       <PricingSection
@@ -62,7 +68,7 @@ export default async function PortalBillingPage() {
         // Subscribed workspaces manage the bot subscription/add-ons above but
         // can still purchase one-time website builds.
         kindFilter={client.subscriptionActive ? "website" : "all"}
-        paddleConfig={{ clientToken, environment }}
+        paddleConfig={paddleConfig}
         customer={{
           clientId: client.id,
           email: client.email ?? "",

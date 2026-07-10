@@ -1,13 +1,31 @@
 import type { NextRequest } from "next/server";
-import { paddle } from "@/lib/paddle";
 import { inngest } from "@/lib/inngest/client";
+import { paddle } from "@/lib/paddle";
 import { webhookReceiptService } from "@/lib/services/webhook-receipt.service";
+import { verifyPaddleSourceIp } from "@/lib/webhooks/paddle-ip-allowlist";
 import type { Prisma } from "../../../../generated/prisma/client";
+
+function getClientIp(req: NextRequest): string | null {
+  return req.headers.get("x-real-ip") ?? req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null;
+}
 
 export async function POST(req: NextRequest) {
   const secret = process.env.PADDLE_WEBHOOK_SECRET;
   if (!secret || secret.length === 0) {
     return Response.json({ error: "Webhook secret not configured" }, { status: 500 });
+  }
+
+  // Only accept deliveries from Paddle's published live IPs. Sandbox is
+  // exempt because local testing goes through tunnels that rewrite the source.
+  if (process.env.PADDLE_ENVIRONMENT === "production") {
+    const verdict = await verifyPaddleSourceIp(getClientIp(req));
+    if (verdict === "denied") {
+      return Response.json({ error: "Source IP not allowed" }, { status: 403 });
+    }
+    if (verdict === "unavailable") {
+      // Allowlist never loaded — 503 so Paddle retries rather than dropping the event.
+      return Response.json({ error: "IP allowlist unavailable" }, { status: 503 });
+    }
   }
 
   const signature = req.headers.get("paddle-signature");

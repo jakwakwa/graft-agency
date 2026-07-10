@@ -68,10 +68,12 @@ export function BillingAddons({
     initializePaddle({
       environment: paddleConfig.environment,
       token: paddleConfig.clientToken,
+      // Retain needs the Paddle customer ID (ctm_...) — never our internal ID or email.
+      ...(paddleConfig.customerId ? { pwCustomer: { id: paddleConfig.customerId } } : {}),
     }).then((instance) => {
       if (instance) setPaddle(instance);
     });
-  }, [paddleConfig.clientToken, paddleConfig.environment]);
+  }, [paddleConfig.clientToken, paddleConfig.environment, paddleConfig.customerId]);
 
   const previewItems = useMemo(
     () => [prices.voiceMonthly, prices.bookingMonthly].filter(Boolean).map((priceId) => ({ priceId, quantity: 1 })),
@@ -120,9 +122,9 @@ export function BillingAddons({
     <div className="space-y-3">
       <Typography.H3>Add-ons</Typography.H3>
       <Typography.Muted>
-        Extend your bot with additional capabilities. Each add-on is billed on top of your subscription and can be
-        added once. To cancel an add-on (or your subscription), use Manage Subscription below — all cancellations
-        happen in the secure Paddle billing portal, never here.
+        Extend your bot with additional capabilities. Each add-on is billed on top of your subscription and can be added
+        once. To cancel an add-on (or your subscription), use Manage Subscription below — all cancellations happen in
+        the secure Paddle billing portal, never here.
       </Typography.Muted>
       <div className="grid gap-3 sm:grid-cols-2">
         {addons.map((addon) => {
@@ -169,12 +171,7 @@ export function BillingAddons({
                   ) : loading ? (
                     <Loader2 className="mt-0.5 h-4 w-4 animate-spin text-gray-400" />
                   ) : (
-                    <Button
-                      type="button"
-                      size="sm"
-                      disabled={isPending}
-                      onClick={() => setConfirmingAddon(addon)}
-                    >
+                    <Button type="button" size="sm" disabled={isPending} onClick={() => setConfirmingAddon(addon)}>
                       Add
                     </Button>
                   )}
@@ -193,9 +190,9 @@ export function BillingAddons({
               <div className="space-y-2 text-sm">
                 <p>
                   This adds <strong>{confirmingAddon?.label}</strong> (
-                  {confirmingAddon ? `${displayPrice(confirmingAddon)}/mo` : ""}) to your existing AI
-                  Chatbot subscription. It is billed <strong>on top of</strong> your current subscription price,
-                  prorated to your next billing period.
+                  {confirmingAddon ? `${displayPrice(confirmingAddon)}/mo` : ""}) to your existing AI Chatbot
+                  subscription. It is billed <strong>on top of</strong> your current subscription price, prorated to
+                  your next billing period.
                 </p>
                 <p>
                   An add-on can only be added once. To cancel it later, use the <strong>Manage Subscription</strong>{" "}

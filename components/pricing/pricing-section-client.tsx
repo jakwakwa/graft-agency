@@ -15,6 +15,8 @@ const SYNC_POLL_MAX_ATTEMPTS = 20;
 export interface PaddleConfig {
   clientToken: string;
   environment: "sandbox" | "production";
+  /** Paddle customer ID (ctm_...) of the signed-in customer — powers Paddle Retain. */
+  customerId?: string;
 }
 
 export interface PricingCustomer {
@@ -115,6 +117,8 @@ export function PricingSectionClient({
     initializePaddle({
       environment: paddleConfig.environment,
       token: paddleConfig.clientToken,
+      // Retain needs the Paddle customer ID (ctm_...) — never our internal ID or email.
+      ...(paddleConfig.customerId ? { pwCustomer: { id: paddleConfig.customerId } } : {}),
       eventCallback: (event) => {
         if (event.name !== CheckoutEventNames.CHECKOUT_COMPLETED) return;
         if (checkoutKindRef.current === "one_time") {
@@ -133,7 +137,7 @@ export function PricingSectionClient({
     }).then((instance) => {
       if (instance) setPaddle(instance);
     });
-  }, [paddleConfig.clientToken, paddleConfig.environment, pollUntilSynced]);
+  }, [paddleConfig.clientToken, paddleConfig.environment, paddleConfig.customerId, pollUntilSynced]);
 
   useEffect(() => {
     if (!paddle || previewItems.length === 0) return;
@@ -230,13 +234,11 @@ export function PricingSectionClient({
             <h2 className="text-3xl md:text-4xl font-black tracking-tight uppercase text-on-surface leading-tight">
               {kindFilter === "website" ? (
                 <>
-                  Bespoke Agency{" "}
-                  <span className="text-secondary">Design &amp; Builds</span>
+                  Bespoke Agency <span className="text-secondary">Design &amp; Builds</span>
                 </>
               ) : (
                 <>
-                  Simple pricing for{" "}
-                  <span className="text-primary">always&#8209;on growth</span>
+                  Simple pricing for <span className="text-primary">always&#8209;on growth</span>
                 </>
               )}
             </h2>
