@@ -1,8 +1,11 @@
-import { CalendarDays } from "lucide-react";
+import { ArrowRight, CalendarDays } from "lucide-react";
+import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui-v2/button";
 import { Typography } from "@/components/ui/typography";
 import { redirectToAccessRequired, requireAuthOrSignIn } from "@/lib/auth/guards";
 import { resolveClientIdFromAuth } from "@/lib/auth/resolve-client";
+import { getClientEntitlements } from "@/lib/billing/entitlements";
 import { agentService } from "@/lib/services/agent.service";
 import { type CalBookingSortOrder, calService, type ListBookingsInput } from "@/lib/services/cal.service";
 import { type BookingSortKey, BookingsTable } from "./_components/bookings-table";
@@ -75,12 +78,51 @@ export default async function BookingsPage({ searchParams }: BookingsPageProps) 
   const clientId = await resolveClientIdFromAuth();
   if (!clientId) redirectToAccessRequired();
 
+  const entitlementsPromise = getClientEntitlements(clientId);
+
   const params = (await searchParams) ?? {};
   const page = parsePage(firstParam(params.page));
   const month = parseMonth(firstParam(params.month));
   const sortKey = parseSortKey(firstParam(params.sort));
   const sortOrder = parseSortOrder(firstParam(params.order));
   const monthRange = getMonthRange(month);
+
+  const entitlements = await entitlementsPromise;
+  const gated = !entitlements?.hasChatbotAccess;
+
+  if (gated) {
+    return (
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 p-8">
+        <div className="flex flex-col gap-2">
+          <Typography.H1>Bookings</Typography.H1>
+          <Typography.Lead>View this month's upcoming bookings.</Typography.Lead>
+        </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <CalendarDays className="text-primary" />
+              {monthRange.label} bookings
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col items-center justify-center space-y-4 py-12 text-center">
+              <Typography.P className="text-muted-foreground">
+                Bookings appear here once your AI Chatbot is live and taking appointments. Subscribe to activate your
+                workspace's booking flow.
+              </Typography.P>
+              <Button asChild>
+                <Link href="/portal/billing" className="flex items-center gap-2">
+                  Subscribe
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   const agentConfigPromise = agentService.getConfig(clientId);
   const bookingsPromise = calService.listBookings({

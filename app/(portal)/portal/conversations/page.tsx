@@ -5,6 +5,7 @@ import { Typography } from "@/components/ui/typography";
 import { Button } from "@/components/ui-v2/button";
 import { redirectToAccessRequired, requireAuthOrSignIn } from "@/lib/auth/guards";
 import { resolveClientIdFromAuth } from "@/lib/auth/resolve-client";
+import { getClientEntitlements } from "@/lib/billing/entitlements";
 import { conversationService } from "@/lib/services/conversation.service";
 
 export default async function ConversationsPage() {
@@ -13,7 +14,10 @@ export default async function ConversationsPage() {
   const clientId = await resolveClientIdFromAuth();
   if (!clientId) redirectToAccessRequired();
 
-  const conversations = await conversationService.listForClient(clientId);
+  const entitlements = await getClientEntitlements(clientId);
+  const gated = !entitlements?.hasChatbotAccess;
+
+  const conversations = gated ? [] : await conversationService.listForClient(clientId);
 
   return (
     <div className="w-full max-w-6xl space-y-8 mx-auto p-8">
@@ -33,11 +37,13 @@ export default async function ConversationsPage() {
           {conversations.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center space-y-4">
               <Typography.P className="text-muted-foreground">
-                No conversations yet. Once your bot is live on your site, transcripts will appear here.
+                {gated
+                  ? "Conversations live here — but your workspace isn't subscribed yet. Subscribe to the AI Chatbot to put your bot to work and start capturing transcripts."
+                  : "No conversations yet. Once your bot is live on your site, transcripts will appear here."}
               </Typography.P>
-              <Button asChild variant="outline">
-                <Link href="/portal/embed" className="flex items-center gap-2">
-                  Get embed code
+              <Button asChild variant={gated ? "default" : "outline"}>
+                <Link href={gated ? "/portal/billing" : "/portal/embed"} className="flex items-center gap-2">
+                  {gated ? "Subscribe" : "Get embed code"}
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </Button>

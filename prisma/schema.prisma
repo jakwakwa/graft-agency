@@ -29,6 +29,7 @@ model Client {
   clerkUserId          String?            @unique @map("clerk_user_id")
   email                String?            @map("email")
   agentConfig          AgentConfig?
+  buildPurchases       BuildPurchase[]
   chatUsages           ChatUsage[]
   conversations        Conversation[]
   emailTemplates       EmailTemplate[]
@@ -43,6 +44,21 @@ model Client {
   @@index([deletedAt])
   @@index([clerkUserId])
   @@map("clients")
+}
+
+/// One-time website build purchases (Landing Page / SMB builds).
+/// Enforces the max-one-per-workspace-per-month quantity rule.
+model BuildPurchase {
+  id                  String   @id @default(uuid())
+  clientId            String   @map("client_id")
+  priceId             String   @map("price_id")
+  paddleTransactionId String   @unique @map("paddle_transaction_id")
+  status              String   @default("completed")
+  createdAt           DateTime @default(now()) @map("created_at")
+  client              Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([clientId, priceId, createdAt])
+  @@map("build_purchases")
 }
 
 model ProspectingConfig {

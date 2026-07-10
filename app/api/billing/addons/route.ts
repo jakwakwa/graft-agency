@@ -1,6 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { type NextRequest } from "next/server";
 import { z } from "zod";
+import { ACTIVE_SUBSCRIPTION_STATUSES, SUBSCRIPTION_REQUIRED_CODE } from "@/lib/billing/entitlements";
 import prisma from "@/lib/db/prisma";
 import { paddle } from "@/lib/paddle";
 
@@ -28,11 +29,24 @@ export async function POST(req: NextRequest) {
 
   const client = await prisma.client.findUnique({ where: { clerkUserId: userId } });
   if (!client) return Response.json({ error: "Client not found" }, { status: 404 });
-  if (!client.paddleSubscriptionId) {
-    return Response.json({ error: "No active subscription" }, { status: 400 });
+
+  // Prerequisite gate: add-ons require an active base AI Chatbot subscription.
+  const paddleSubscriptionId = client.paddleSubscriptionId;
+  const baseActive =
+    Boolean(paddleSubscriptionId) &&
+    client.subscriptionActive &&
+    ACTIVE_SUBSCRIPTION_STATUSES.has(client.subscriptionStatus.toLowerCase());
+  if (!paddleSubscriptionId || !baseActive) {
+    return Response.json(
+      {
+        error: "An active AI Chatbot subscription is required before managing add-ons",
+        code: SUBSCRIPTION_REQUIRED_CODE,
+      },
+      { status: 403 },
+    );
   }
 
-  const subscription = await paddle.subscriptions.get(client.paddleSubscriptionId);
+  const subscription = await paddle.subscriptions.get(paddleSubscriptionId);
 
   const currentItems = (subscription.items ?? []).map((item) => ({
     priceId: item.price!.id,
@@ -44,7 +58,7 @@ export async function POST(req: NextRequest) {
       ? [...currentItems.filter((i) => i.priceId !== priceId), { priceId, quantity: 1 }]
       : currentItems.filter((i) => i.priceId !== priceId);
 
-  await paddle.subscriptions.update(client.paddleSubscriptionId, {
+  await paddle.subscriptions.update(paddleSubscriptionId, {
     items: updatedItems,
     prorationBillingMode: "prorated_next_billing_period",
   });

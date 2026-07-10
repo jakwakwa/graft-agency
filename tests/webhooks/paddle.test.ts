@@ -12,8 +12,12 @@ vi.mock("@/lib/paddle", () => ({
 
 vi.mock("@/lib/db/prisma", () => ({
   default: {
+    buildPurchase: {
+      upsert: vi.fn(),
+    },
     client: {
       findFirst: vi.fn(),
+      findUnique: vi.fn(),
       update: vi.fn(),
     },
     operationalEvent: {
@@ -46,6 +50,10 @@ describe("applyPaddleWebhook", () => {
   it("activates a client subscription and stores the Paddle customer ID", async () => {
     const { default: prisma } = await import("@/lib/db/prisma");
     const { applyPaddleWebhook } = await import("@/lib/webhooks/paddle");
+    vi.mocked(prisma.client.findUnique).mockResolvedValue({
+      paddleSubscriptionId: null,
+      subscriptionActive: false,
+    } as unknown as Client);
     vi.mocked(prisma.client.update).mockResolvedValue({
       id: "client-1",
       paddleCustomerId: "ctm_123",
@@ -78,6 +86,10 @@ describe("applyPaddleWebhook", () => {
   it("updates subscription active state, status, and add-ons from subscription updates", async () => {
     const { default: prisma } = await import("@/lib/db/prisma");
     const { applyPaddleWebhook } = await import("@/lib/webhooks/paddle");
+    vi.mocked(prisma.client.findUnique).mockResolvedValue({
+      paddleSubscriptionId: "sub_123",
+      subscriptionActive: true,
+    } as unknown as Client);
     vi.mocked(prisma.client.update).mockResolvedValue({
       id: "client-1",
       subscriptionActive: true,
@@ -115,6 +127,10 @@ describe("applyPaddleWebhook", () => {
     const { default: prisma } = await import("@/lib/db/prisma");
     const { applyPaddleWebhook } = await import("@/lib/webhooks/paddle");
     vi.mocked(prisma.client.findFirst).mockResolvedValue({ id: "client-1" } as unknown as Client);
+    vi.mocked(prisma.client.findUnique).mockResolvedValue({
+      paddleSubscriptionId: "sub_123",
+      subscriptionActive: true,
+    } as unknown as Client);
     vi.mocked(prisma.client.update).mockResolvedValue({
       id: "client-1",
       subscriptionActive: false,
@@ -143,6 +159,104 @@ describe("applyPaddleWebhook", () => {
       }),
       where: { id: "client-1" },
     });
+  });
+
+  it("rejects a duplicate base subscription for an already-active workspace", async () => {
+    vi.stubEnv("PADDLE_PRICE_CHATBOT_MONTHLY", "pri_chatbot");
+    const { default: prisma } = await import("@/lib/db/prisma");
+    const { applyPaddleWebhook } = await import("@/lib/webhooks/paddle");
+    vi.mocked(prisma.client.findUnique).mockResolvedValue({
+      paddleSubscriptionId: "sub_existing",
+      subscriptionActive: true,
+    } as unknown as Client);
+
+    const result = await applyPaddleWebhook({
+      data: {
+        custom_data: { clientId: "client-1" },
+        customer_id: "ctm_123",
+        id: "sub_duplicate",
+        items: [{ price: { id: "pri_chatbot" }, quantity: 1 }],
+        status: "active",
+      },
+      event_type: "subscription.created",
+    });
+
+    expect(result).toEqual(
+      expect.objectContaining({ skipped: "duplicate-base-subscription", subscriptionId: "sub_duplicate" }),
+    );
+    expect(prisma.client.update).not.toHaveBeenCalled();
+  });
+
+  it("rejects an add-on-only subscription when the workspace has no base subscription", async () => {
+    vi.stubEnv("PADDLE_PRICE_CHATBOT_MONTHLY", "pri_chatbot");
+    const { default: prisma } = await import("@/lib/db/prisma");
+    const { applyPaddleWebhook } = await import("@/lib/webhooks/paddle");
+    vi.mocked(prisma.client.findUnique).mockResolvedValue({
+      paddleSubscriptionId: null,
+      subscriptionActive: false,
+    } as unknown as Client);
+
+    const result = await applyPaddleWebhook({
+      data: {
+        custom_data: { clientId: "client-1" },
+        customer_id: "ctm_123",
+        id: "sub_addon_only",
+        items: [{ price: { id: "pri_voice" }, quantity: 1 }],
+        status: "active",
+      },
+      event_type: "subscription.activated",
+    });
+
+    expect(result).toEqual(
+      expect.objectContaining({ skipped: "addon-without-base-subscription", subscriptionId: "sub_addon_only" }),
+    );
+    expect(prisma.client.update).not.toHaveBeenCalled();
+  });
+
+  it("records a one-time build purchase from transaction.completed", async () => {
+    vi.stubEnv("PADDLE_PRICE_LANDING", "pri_landing");
+    vi.stubEnv("PADDLE_PRICE_SMB", "pri_smb");
+    const { default: prisma } = await import("@/lib/db/prisma");
+    const { applyPaddleWebhook } = await import("@/lib/webhooks/paddle");
+
+    const result = await applyPaddleWebhook({
+      data: {
+        custom_data: { clientId: "client-1" },
+        id: "txn_build_1",
+        items: [{ price: { id: "pri_landing" }, quantity: 1 }],
+        status: "completed",
+      },
+      event_type: "transaction.completed",
+    });
+
+    expect(prisma.buildPurchase.upsert).toHaveBeenCalledWith({
+      create: { clientId: "client-1", paddleTransactionId: "txn_build_1", priceId: "pri_landing" },
+      update: { status: "completed" },
+      where: { paddleTransactionId: "txn_build_1" },
+    });
+    expect(result).toEqual(
+      expect.objectContaining({
+        buildPurchase: { clientId: "client-1", priceId: "pri_landing", transactionId: "txn_build_1" },
+      }),
+    );
+  });
+
+  it("ignores transactions with neither a productSpec nor a build line item", async () => {
+    const { default: prisma } = await import("@/lib/db/prisma");
+    const { applyPaddleWebhook } = await import("@/lib/webhooks/paddle");
+
+    const result = await applyPaddleWebhook({
+      data: {
+        custom_data: { clientId: "client-1" },
+        id: "txn_random",
+        items: [{ price: { id: "pri_unknown" }, quantity: 1 }],
+        status: "completed",
+      },
+      event_type: "transaction.completed",
+    });
+
+    expect(prisma.buildPurchase.upsert).not.toHaveBeenCalled();
+    expect(result).toEqual(expect.objectContaining({ warning: expect.any(String) }));
   });
 
   it("fails subscription events that cannot be mapped to a client", async () => {

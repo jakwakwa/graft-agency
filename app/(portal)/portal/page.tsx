@@ -5,8 +5,10 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Typography } from "@/components/ui/typography";
 import { Button } from "@/components/ui-v2/button";
+import { SubscriptionGate } from "@/components/portal/subscription-gate";
 import { redirectToAccessRequired, requireAuthOrSignIn } from "@/lib/auth/guards";
 import { getPlatformClientId, resolveClientIdFromAuth } from "@/lib/auth/resolve-client";
+import { getClientEntitlements } from "@/lib/billing/entitlements";
 import prisma from "@/lib/db/prisma";
 import type { Prisma } from "../../../generated/prisma/client";
 import { calService } from "@/lib/services/cal.service";
@@ -52,7 +54,9 @@ export default async function PortalDashboardPage() {
     afterStart: new Date().toISOString(),
   });
 
-  const [client, leads, activeBookings, conversationCount, recentConversations, agentConfig] = await Promise.all([
+  const [entitlements, client, leads, activeBookings, conversationCount, recentConversations, agentConfig] =
+    await Promise.all([
+      getClientEntitlements(clientId),
     prisma.client.findUnique({
       where: { id: clientId },
       select: { businessName: true },
@@ -86,23 +90,19 @@ export default async function PortalDashboardPage() {
         },
       },
     }) as unknown as Promise<RecentConversation[]>,
-    prisma.agentConfig.findUnique({
-      where: { clientId },
-      select: { agentName: true },
-    }),
-  ]);
+      prisma.agentConfig.findUnique({
+        where: { clientId },
+        select: { agentName: true },
+      }),
+    ]);
 
   const botName = agentConfig?.agentName || "GraftBot";
 
   const businessName = client?.businessName || "Your";
+  const gated = !entitlements?.hasChatbotAccess;
 
-  return (
-    <div className="w-full max-w-6xl space-y-8 mx-auto p-8">
-      <div className="flex flex-col gap-2">
-        <Typography.H1>{businessName} workspace</Typography.H1>
-        <Typography.Lead>A snapshot of your bot's recent conversations and bookings.</Typography.Lead>
-      </div>
-
+  const dashboardContent = (
+    <>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card className="border-l-4 border-primary">
           <CardHeader className="pb-2">
@@ -215,6 +215,27 @@ export default async function PortalDashboardPage() {
           )}
         </CardContent>
       </Card>
+    </>
+  );
+
+  return (
+    <div className="w-full max-w-6xl space-y-8 mx-auto p-8">
+      <div className="flex flex-col gap-2">
+        <Typography.H1>{businessName} workspace</Typography.H1>
+        <Typography.Lead>A snapshot of your bot's recent conversations and bookings.</Typography.Lead>
+      </div>
+
+      {gated ? (
+        <SubscriptionGate
+          title="Activate your workspace"
+          description="Your dashboard lights up once the AI Chatbot subscription is active — live conversations, captured leads, and bookings in one place."
+          highlights={["Live conversation feed", "Captured lead analytics", "Upcoming booking overview"]}
+        >
+          {dashboardContent}
+        </SubscriptionGate>
+      ) : (
+        dashboardContent
+      )}
     </div>
   );
 }

@@ -8,6 +8,8 @@ interface PricingSectionProps {
   customer?: PricingCustomer;
   kindFilter?: "bot" | "website" | "all";
   id?: string;
+  /** Price IDs of one-time builds already purchased this calendar month. */
+  purchasedBuilds?: string[];
 }
 
 export function PricingSection({
@@ -17,6 +19,7 @@ export function PricingSection({
   customer,
   kindFilter = "all",
   id = "pricing",
+  purchasedBuilds,
 }: PricingSectionProps) {
   return (
     <PricingSectionClient
@@ -26,6 +29,7 @@ export function PricingSection({
       customer={customer}
       kindFilter={kindFilter}
       id={id}
+      purchasedBuilds={purchasedBuilds}
     />
   );
 }

@@ -11,6 +11,14 @@ interface PricingCardProps {
   localizedPrices: Record<string, string>;
   canCheckout: boolean;
   onCheckout: (offer: PricingOffer) => void;
+  /** "portal" enables subscription-state-aware buttons; "landing" keeps marketing links. */
+  mode?: "landing" | "portal";
+  /** Whether the workspace's base AI Chatbot subscription is (or just became) active. */
+  subscribed?: boolean;
+  /** Price IDs of one-time builds already purchased by this workspace this month. */
+  purchasedBuilds?: string[];
+  /** Opens a server-validated one-time build checkout (portal mode only). */
+  onPurchaseBuild?: (offer: PricingOffer) => void;
 }
 
 interface CardTheme {
@@ -90,11 +98,31 @@ const THEMES: Record<string, CardTheme> = {
 
 const DEFAULT_THEME = THEMES["ai-chatbot"]!;
 
-export function PricingCard({ offer, selectedCycle, localizedPrices, canCheckout, onCheckout }: PricingCardProps) {
+export function PricingCard({
+  offer,
+  selectedCycle,
+  localizedPrices,
+  canCheckout,
+  onCheckout,
+  mode = "landing",
+  subscribed = false,
+  purchasedBuilds = [],
+  onPurchaseBuild,
+}: PricingCardProps) {
   const price = offer.prices[selectedCycle] ?? offer.prices.oneTime ?? offer.prices.monthly ?? offer.prices.annual;
   const displayPrice = price ? (localizedPrices[price.priceId] ?? price.fallbackPrice) : "Contact us";
   const isSubscription = offer.kind === "subscription";
+  const isAddon = offer.kind === "addon";
+  const isOneTime = offer.kind === "one_time";
   const action = getActionLabel({ canCheckout, isSubscription });
+
+  // Base subscription lock: max one per workspace — no repeat checkouts.
+  const baseLocked = mode === "portal" && isSubscription && subscribed;
+  // Add-on prerequisite gate: disabled until the base subscription is active.
+  const addonGated = mode === "portal" && isAddon;
+  // One-time build purchase state: max one per workspace per calendar month.
+  const buildPurchasable = mode === "portal" && isOneTime && Boolean(onPurchaseBuild) && Boolean(price);
+  const buildPurchased = buildPurchasable && price ? purchasedBuilds.includes(price.priceId) : false;
 
   const theme = THEMES[offer.id] ?? DEFAULT_THEME;
 
@@ -146,7 +174,16 @@ export function PricingCard({ offer, selectedCycle, localizedPrices, canCheckout
       </ul>
 
       <div className="mt-auto pt-4">
-        {canCheckout && isSubscription ? (
+        {baseLocked ? (
+          <Button
+            type="button"
+            disabled
+            aria-disabled
+            className="w-full cursor-not-allowed rounded-xl border border-white/10 bg-white/5 py-5 text-sm font-semibold uppercase tracking-wider text-on-surface-variant opacity-70"
+          >
+            You&rsquo;re already subscribed
+          </Button>
+        ) : canCheckout && isSubscription ? (
           <Button
             type="button"
             onClick={() => onCheckout(offer)}
@@ -156,6 +193,41 @@ export function PricingCard({ offer, selectedCycle, localizedPrices, canCheckout
             )}
           >
             Subscribe to AI Chatbot
+          </Button>
+        ) : buildPurchased ? (
+          <Button
+            type="button"
+            disabled
+            aria-disabled
+            title="One build of each type per workspace per month"
+            className="w-full cursor-not-allowed rounded-xl border border-white/10 bg-white/5 py-5 text-sm font-semibold uppercase tracking-wider text-on-surface-variant opacity-70"
+          >
+            Purchased this month
+          </Button>
+        ) : buildPurchasable ? (
+          <Button
+            type="button"
+            onClick={() => onPurchaseBuild?.(offer)}
+            className={cn(
+              "w-full rounded-xl py-5 font-semibold text-sm tracking-wider uppercase hover:scale-[1.01] active:scale-[0.99] transition-all",
+              theme.btnPrimary,
+            )}
+          >
+            Purchase build
+          </Button>
+        ) : addonGated ? (
+          <Button
+            type="button"
+            disabled
+            aria-disabled
+            title={
+              subscribed
+                ? "Manage this add-on from the Add-ons section above"
+                : "Requires an active AI Chatbot subscription"
+            }
+            className="w-full cursor-not-allowed rounded-xl border border-white/10 bg-white/5 py-5 text-sm font-semibold uppercase tracking-wider text-on-surface-variant opacity-70"
+          >
+            {subscribed ? "Manage in Add-ons" : "Requires AI Chatbot subscription"}
           </Button>
         ) : (
           <Link

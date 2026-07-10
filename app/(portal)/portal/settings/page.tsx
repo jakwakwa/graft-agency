@@ -1,6 +1,8 @@
+import { SubscriptionGate } from "@/components/portal/subscription-gate";
 import { Typography } from "@/components/ui/typography";
 import { redirectToAccessRequired, requireAuthOrSignIn } from "@/lib/auth/guards";
 import { resolveClientIdFromAuth } from "@/lib/auth/resolve-client";
+import { getClientEntitlements } from "@/lib/billing/entitlements";
 import { agentService } from "@/lib/services/agent.service";
 import { BotSettingsForm, type KnowledgeSnippet } from "./_components/bot-settings-form";
 
@@ -10,7 +12,8 @@ export default async function PortalSettingsPage() {
   const clientId = await resolveClientIdFromAuth();
   if (!clientId) redirectToAccessRequired();
 
-  const config = await agentService.getConfig(clientId);
+  const [entitlements, config] = await Promise.all([getClientEntitlements(clientId), agentService.getConfig(clientId)]);
+  const gated = !entitlements?.hasChatbotAccess;
 
   const initialData = {
     ...config,
@@ -24,7 +27,17 @@ export default async function PortalSettingsPage() {
         <Typography.Lead>Customise how your bot looks, sounds, and what it knows.</Typography.Lead>
       </div>
 
-      <BotSettingsForm initialData={initialData} />
+      {gated ? (
+        <SubscriptionGate
+          title="Unlock your bot settings"
+          description="Shape your AI assistant's name, tone, brand colours, and knowledge base. Subscribe to the AI Chatbot to start customising."
+          highlights={["Custom branding & greeting", "Your own knowledge base", "Calendar booking setup"]}
+        >
+          <BotSettingsForm initialData={initialData} />
+        </SubscriptionGate>
+      ) : (
+        <BotSettingsForm initialData={initialData} />
+      )}
     </div>
   );
 }

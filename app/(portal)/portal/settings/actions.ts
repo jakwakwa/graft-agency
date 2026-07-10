@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { resolveClientIdFromAuth } from "@/lib/auth/resolve-client";
+import { requireActiveSubscription } from "@/lib/billing/entitlements";
 import { cacheTags, invalidateCacheTags } from "@/lib/db/cache";
 import prisma from "@/lib/db/prisma";
 
@@ -36,6 +37,9 @@ function optionalFormString(value: FormDataEntryValue | null): string | null {
 export async function saveBotSettingsAction(formData: FormData) {
   const clientId = await resolveClientIdFromAuth();
   if (!clientId) throw new Error("Unauthorized");
+
+  const gate = await requireActiveSubscription(clientId);
+  if (gate) throw new Error(`${gate.code}: ${gate.error}`);
 
   const rawKnowledgeBase = formData.get("knowledgeBase");
   let knowledgeBase = null;
