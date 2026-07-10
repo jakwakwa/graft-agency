@@ -51,6 +51,12 @@
       "sourceType": "github",
       "computedHash": "c9bd5df74a868b69532b77b205fd7b4e0bb0acc9effde770ff3241a81eaa69fd"
     },
+    "paddle-webhooks": {
+      "source": "hookdeck/webhook-skills",
+      "sourceType": "github",
+      "skillPath": "skills/paddle-webhooks/SKILL.md",
+      "computedHash": "02cba6b60aced3edeb37a866811c1104e4ae0cf775490bde4517a1cd17021ccc"
+    },
     "stitch-design-taste": {
       "source": "Leonxlnx/taste-skill",
       "sourceType": "github",
