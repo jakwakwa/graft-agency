@@ -23,7 +23,6 @@ export interface PricingOption {
   label: string;
   priceId: string;
   productId?: string;
-  fallbackPrice: string;
   suffix: string;
 }
 
@@ -92,7 +91,6 @@ export function buildPricingCatalog(env: PricingCatalogEnv = getPricingCatalogEn
             label: "Monthly",
             priceId: env.PADDLE_PRICE_CHATBOT_MONTHLY,
             productId: configured(env.PADDLE_PRODUCT_CHATBOT),
-            fallbackPrice: "$95",
             suffix: "/month",
           }),
           annual: option({
@@ -100,7 +98,6 @@ export function buildPricingCatalog(env: PricingCatalogEnv = getPricingCatalogEn
             label: "Annual",
             priceId: env.PADDLE_PRICE_CHATBOT_ANNUAL,
             productId: configured(env.PADDLE_PRODUCT_CHATBOT),
-            fallbackPrice: "$900",
             suffix: "/year",
           }),
         },
@@ -118,7 +115,6 @@ export function buildPricingCatalog(env: PricingCatalogEnv = getPricingCatalogEn
             label: "Monthly",
             priceId: env.PADDLE_PRICE_VOICE_MONTHLY,
             productId: configured(env.PADDLE_PRODUCT_VOICE),
-            fallbackPrice: "$190",
             suffix: "/month",
           }),
         },
@@ -135,7 +131,6 @@ export function buildPricingCatalog(env: PricingCatalogEnv = getPricingCatalogEn
             label: "Monthly",
             priceId: env.PADDLE_PRICE_BOOKING_MONTHLY,
             productId: configured(env.PADDLE_PRODUCT_BOOKING),
-            fallbackPrice: "$40",
             suffix: "/month",
           }),
         },
@@ -152,7 +147,6 @@ export function buildPricingCatalog(env: PricingCatalogEnv = getPricingCatalogEn
             label: "One-time",
             priceId: env.PADDLE_PRICE_LANDING,
             productId: configured(env.PADDLE_PRODUCT_LANDING),
-            fallbackPrice: "$197",
             suffix: " once",
           }),
         },
@@ -169,7 +163,6 @@ export function buildPricingCatalog(env: PricingCatalogEnv = getPricingCatalogEn
             label: "One-time",
             priceId: env.PADDLE_PRICE_SMB,
             productId: configured(env.PADDLE_PRODUCT_SMB),
-            fallbackPrice: "$750",
             suffix: " once",
           }),
         },

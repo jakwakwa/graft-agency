@@ -110,7 +110,9 @@ export function PricingCard({
   onPurchaseBuild,
 }: PricingCardProps) {
   const price = offer.prices[selectedCycle] ?? offer.prices.oneTime ?? offer.prices.monthly ?? offer.prices.annual;
-  const displayPrice = price ? (localizedPrices[price.priceId] ?? price.fallbackPrice) : "Contact us";
+  // Only the live Paddle price is ever shown — no hardcoded fallback. Until
+  // PricePreview resolves (or if it fails), the price is simply omitted.
+  const displayPrice = price ? localizedPrices[price.priceId] : undefined;
   const isSubscription = offer.kind === "subscription";
   const isAddon = offer.kind === "addon";
   const isOneTime = offer.kind === "one_time";
@@ -161,10 +163,12 @@ export function PricingCard({
         </div>
       </div>
 
-      <div className="flex items-baseline gap-1 py-2">
-        <span className="font-display text-4xl font-extrabold tracking-tight text-on-surface">{displayPrice}</span>
-        {price ? <span className="ml-1 text-sm font-medium text-on-surface-variant">{price.suffix}</span> : null}
-      </div>
+      {displayPrice ? (
+        <div className="flex items-baseline gap-1 py-2">
+          <span className="font-display text-4xl font-extrabold tracking-tight text-on-surface">{displayPrice}</span>
+          {price ? <span className="ml-1 text-sm font-medium text-on-surface-variant">{price.suffix}</span> : null}
+        </div>
+      ) : null}
 
       <ul className="my-0 space-y-3 text-sm text-on-surface-variant list-none pl-0">
         {offer.features.map((feature) => (

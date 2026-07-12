@@ -38,7 +38,6 @@ interface AddonOffer {
   priceId: string;
   label: string;
   description: string;
-  fallbackPrice: string;
   icon: React.ReactNode;
   comingSoon?: boolean;
   /** Colour classes for the price value + plus chip, matching the add-on's icon colour. */
@@ -99,7 +98,6 @@ export function BillingAddons({
       priceId: prices.voiceMonthly,
       label: "Voice Agent",
       description: "Answer phone-style enquiries automatically, 24/7",
-      fallbackPrice: "£37",
       icon: <Zap className="h-5 w-5 text-violet-500" />,
       comingSoon: !voiceAddonAvailable,
       priceText: "text-violet-600",
@@ -109,14 +107,15 @@ export function BillingAddons({
       priceId: prices.bookingMonthly,
       label: "Booking Integration",
       description: "Let your chatbot book appointments directly into your calendar",
-      fallbackPrice: "£27",
       icon: <Calendar className="h-5 w-5 text-blue-500" />,
       priceText: "text-blue-600",
       priceChip: "bg-blue-500/10 text-blue-600 border-blue-500/20",
     },
   ].filter((addon) => addon.priceId);
 
-  const displayPrice = (addon: AddonOffer) => localizedPrices[addon.priceId] ?? addon.fallbackPrice;
+  // Live Paddle price only — no hardcoded fallback. Returns undefined until
+  // PricePreview resolves (or if it fails), and the price row is then omitted.
+  const displayPrice = (addon: AddonOffer): string | undefined => localizedPrices[addon.priceId];
 
   return (
     <div className="space-y-3">
@@ -139,20 +138,22 @@ export function BillingAddons({
                     <span>
                       <span className="block text-sm font-semibold">{addon.label}</span>
                       <span className="mt-0.5 block text-xs text-gray-500">{addon.description}</span>
-                      <span className="mt-2 flex items-center gap-1.5">
-                        <span
-                          className={cn(
-                            "inline-flex h-5 w-5 items-center justify-center rounded-md border",
-                            addon.priceChip,
-                          )}
-                        >
-                          <Plus className="h-3 w-3 stroke-[3]" />
+                      {displayPrice(addon) ? (
+                        <span className="mt-2 flex items-center gap-1.5">
+                          <span
+                            className={cn(
+                              "inline-flex h-5 w-5 items-center justify-center rounded-md border",
+                              addon.priceChip,
+                            )}
+                          >
+                            <Plus className="h-3 w-3 stroke-[3]" />
+                          </span>
+                          <span className={cn("text-xl font-extrabold tracking-tight", addon.priceText)}>
+                            {displayPrice(addon)}
+                          </span>
+                          <span className="self-end pb-0.5 text-[11px] font-medium text-gray-500">/mo</span>
                         </span>
-                        <span className={cn("text-xl font-extrabold tracking-tight", addon.priceText)}>
-                          {displayPrice(addon)}
-                        </span>
-                        <span className="self-end pb-0.5 text-[11px] font-medium text-gray-500">/mo</span>
-                      </span>
+                      ) : null}
                       {isActive ? (
                         <span className="mt-1 block text-xs text-gray-500">
                           Active — cancel via Manage Subscription below
@@ -189,10 +190,10 @@ export function BillingAddons({
             <AlertDialogDescription asChild>
               <div className="space-y-2 text-sm">
                 <p>
-                  This adds <strong>{confirmingAddon?.label}</strong> (
-                  {confirmingAddon ? `${displayPrice(confirmingAddon)}/mo` : ""}) to your existing AI Chatbot
-                  subscription. It is billed <strong>on top of</strong> your current subscription price, prorated to
-                  your next billing period.
+                  This adds <strong>{confirmingAddon?.label}</strong>
+                  {confirmingAddon && displayPrice(confirmingAddon) ? ` (${displayPrice(confirmingAddon)}/mo)` : ""} to
+                  your existing AI Chatbot subscription. It is billed <strong>on top of</strong> your current
+                  subscription price, prorated to your next billing period.
                 </p>
                 <p>
                   An add-on can only be added once. To cancel it later, use the <strong>Manage Subscription</strong>{" "}

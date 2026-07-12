@@ -75,7 +75,9 @@ export function computeAnnualSavings(monthly?: string, annual?: string): string 
 
 function priceLabel(option: PricingOption | undefined, localizedPrices: Record<string, string>): string | null {
   if (!option) return null;
-  return localizedPrices[option.priceId] ?? option.fallbackPrice;
+  // Live Paddle price only — no hardcoded fallback. Callers already render
+  // nothing when this returns null.
+  return localizedPrices[option.priceId] ?? null;
 }
 
 export function SubscriptionConfirmDialog({
