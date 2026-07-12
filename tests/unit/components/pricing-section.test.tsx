@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { PricingSection } from "@/components/pricing/pricing-section";
 import { buildPricingCatalog } from "@/lib/billing/pricing-catalog";
 
@@ -8,6 +8,7 @@ const paddleMocks = vi.hoisted(() => ({
 }));
 
 vi.mock("@paddle/paddle-js", () => ({
+  CheckoutEventNames: { CHECKOUT_COMPLETED: "checkout.completed" },
   initializePaddle: vi.fn().mockResolvedValue({
     Checkout: {
       open: paddleMocks.checkoutOpen,
@@ -20,6 +21,10 @@ vi.mock("@paddle/paddle-js", () => ({
       },
     }),
   }),
+}));
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ refresh: vi.fn(), push: vi.fn(), replace: vi.fn() }),
 }));
 
 const catalogue = buildPricingCatalog({
@@ -46,15 +51,27 @@ describe("PricingSection", () => {
     paddleMocks.checkoutOpen.mockClear();
   });
 
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
   it("renders the landing section as information only", () => {
     render(<PricingSection catalogue={catalogue} mode="landing" paddleConfig={paddleConfig} />);
 
-    expect(screen.getByRole("heading", { name: "Simple pricing for always-on growth" })).toBeInTheDocument();
+    // The heading uses a non-breaking hyphen (&#8209;) in "always‑on"; match loosely.
+    expect(screen.getByRole("heading", { name: /Simple pricing for always.on growth/ })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "View portal billing" })).toHaveAttribute("href", "/portal/billing");
     expect(screen.queryByRole("button", { name: "Subscribe to AI Chatbot" })).not.toBeInTheDocument();
   });
 
-  it("opens subscription checkout in the portal when there is no active subscription", async () => {
+  it("confirms via the modal before opening subscription checkout in the portal", async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ transactionId: "txn_123" }),
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
     render(
       <PricingSection
         catalogue={catalogue}
@@ -64,15 +81,31 @@ describe("PricingSection", () => {
       />,
     );
 
+    // Clicking Subscribe opens the confirmation modal — it does NOT open Paddle yet.
     fireEvent.click(await screen.findByRole("button", { name: "Subscribe to AI Chatbot" }));
 
+    const dialogTitle = await screen.findByText("Are you sure you want to subscribe to AI Chatbot?");
+    expect(dialogTitle).toBeInTheDocument();
+    expect(paddleMocks.checkoutOpen).not.toHaveBeenCalled();
+
+    // The modal surfaces the refund/cancellation and other legal links.
+    expect(screen.getByRole("link", { name: "Refund & Cancellation Policy" })).toHaveAttribute("href", "/refunds");
+    expect(screen.getByRole("link", { name: "Terms of Use" })).toHaveAttribute("href", "/terms");
+    expect(screen.getByRole("link", { name: "Privacy Policy" })).toHaveAttribute("href", "/privacy");
+
+    // "Continue to payment" runs the server-transaction flow, then opens Paddle.
+    fireEvent.click(screen.getByRole("button", { name: "Continue to payment" }));
+
     await waitFor(() => {
-      expect(paddleMocks.checkoutOpen).toHaveBeenCalledWith({
-        items: [{ priceId: "pri_chatbot_monthly", quantity: 1 }],
-        customer: { email: "owner@graft.today" },
-        customData: { clientId: "client_123" },
-      });
+      expect(fetchMock).toHaveBeenCalledWith(
+        "/api/billing/subscribe/checkout",
+        expect.objectContaining({ method: "POST" }),
+      );
+      expect(paddleMocks.checkoutOpen).toHaveBeenCalledWith({ transactionId: "txn_123" });
     });
+
+    const requestBody = JSON.parse((fetchMock.mock.calls[0]?.[1] as RequestInit).body as string);
+    expect(requestBody).toEqual({ priceId: "pri_chatbot_monthly" });
   });
 
   it("keeps portal pricing information-only when a subscription is active", () => {
