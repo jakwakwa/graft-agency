@@ -30,6 +30,14 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Typography } from "@/components/ui/typography";
 import { cn } from "@/lib/utils";
 import {
+  asRecord,
+  conceptHtmlHref,
+  conceptLink,
+  conceptProjectId,
+  conceptScreenId,
+  parseDesignConcepts,
+} from "@/lib/utils/design-concepts";
+import {
   formatStageLabel,
   getCompletionPercent,
   getStepStatus,
@@ -134,30 +142,8 @@ function stageBadgeVariant(isFailed: boolean, isRunning: boolean): "destructive"
   return "secondary";
 }
 
-function asRecord(v: unknown): Record<string, unknown> | null {
-  if (typeof v !== "object" || v === null || Array.isArray(v)) return null;
-  return v as Record<string, unknown>;
-}
-
-function parseDesignConcepts(raw: unknown): Array<Record<string, unknown>> {
-  if (!Array.isArray(raw)) return [];
-  return raw
-    .map((c) => asRecord(c) ?? {})
-    .filter((c) => Object.keys(c).length > 0 && typeof c.projectId === "string" && c.projectId.length > 0);
-}
-
 function conceptName(c: Record<string, unknown>): string {
   return typeof c.name === "string" && c.name.length > 0 ? c.name : "Concept";
-}
-
-function conceptLink(c: Record<string, unknown>): string | undefined {
-  for (const k of ["htmlUrl"]) {
-    const v = c[k];
-    if (typeof v === "string" && (v.startsWith("http://") || v.startsWith("https://"))) {
-      return v;
-    }
-  }
-  return undefined;
 }
 
 function conceptStitchProjectUrl(c: Record<string, unknown>): string | undefined {
@@ -169,23 +155,6 @@ function conceptStitchProjectUrl(c: Record<string, unknown>): string | undefined
 function conceptImage(c: Record<string, unknown>): string | undefined {
   const img = c.screenshotUrl ?? c.previewImageUrl ?? c.imageUrl ?? c.image ?? c.thumbnailUrl;
   return typeof img === "string" && (img.startsWith("http://") || img.startsWith("https://")) ? img : undefined;
-}
-
-function conceptScreenId(c: Record<string, unknown>): string | undefined {
-  const v = c.screenId;
-  return typeof v === "string" && v.length > 0 ? v : undefined;
-}
-
-function conceptProjectId(c: Record<string, unknown>): string | undefined {
-  const v = c.projectId;
-  return typeof v === "string" && v.length > 0 ? v : undefined;
-}
-
-function conceptHtmlHref(pId?: string, sId?: string, link?: string): string | undefined {
-  if (sId && pId) {
-    return `/api/engagement/stitch-html?projectId=${encodeURIComponent(pId)}&screenId=${encodeURIComponent(sId)}`;
-  }
-  return link;
 }
 
 /**

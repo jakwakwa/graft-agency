@@ -1,8 +1,8 @@
 "use client";
 
-import { Check, ExternalLink, FileText, Globe, Loader2, Mail, Save, Send, Trash2 } from "lucide-react";
+import { Check, ExternalLink, FileText, Loader2, Mail, Save, Send, Trash2 } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { MarketingShell } from "@/components/layout/marketing-shell";
 import { Button } from "@/components/ui/button";
@@ -10,23 +10,19 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Typography } from "@/components/ui/typography";
+import { getStageCategory } from "@/lib/utils/engagement-stages";
+import { getLeadPipelineStatus } from "@/lib/utils/lead-pipeline-status";
+import { PipelineStatusBadge } from "../_components/status-badges";
+import { DraftLinkSelector } from "./_components/draft-link-selector";
+import { LeadCard } from "./_components/lead-card";
+import { LeadStatusFilter, type LeadStatusFilterValue } from "./_components/lead-status-filter";
+import { ListPagination } from "./_components/list-pagination";
+import type { LeadItem } from "./_components/types";
 
-interface LeadItem {
-  id: string;
-  customerName: string | null;
-  status: string;
-  scrapedData: {
-    websiteUrl?: string;
-    draftSubject?: string;
-    draftBody?: string;
-    hasChatbot?: boolean;
-    hasVoiceAgent?: boolean;
-    businessDescription?: string;
-    coreServices?: Array<{ name: string; description: string }>;
-    painPoints?: string[];
-    targetOutreachAngle?: string;
-    [key: string]: any;
-  } | null;
+const PAGE_SIZE = 5;
+
+function pipelineStatusOf(lead: LeadItem) {
+  return getLeadPipelineStatus({ leadStatus: lead.status, engagementStage: lead.engagement?.stage ?? null });
 }
 
 interface LeadsPageClientProps {
@@ -41,6 +37,19 @@ export default function LeadsPageClient({ initialLeads }: LeadsPageClientProps) 
   const [saving, setSaving] = useState(false);
   const [approving, setApprove] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<LeadStatusFilterValue>("all");
+  const [page, setPage] = useState(1);
+
+  const filteredLeads = useMemo(
+    () => (statusFilter === "all" ? leads : leads.filter((l) => pipelineStatusOf(l) === statusFilter)),
+    [leads, statusFilter],
+  );
+  const pageCount = Math.max(1, Math.ceil(filteredLeads.length / PAGE_SIZE));
+  const currentPage = Math.min(page, pageCount);
+  const visibleLeads = filteredLeads.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+
+  const draftCount = useMemo(() => leads.filter((l) => pipelineStatusOf(l) === "draft").length, [leads]);
 
   useEffect(() => {
     if (editingLead) {
@@ -52,17 +61,43 @@ export default function LeadsPageClient({ initialLeads }: LeadsPageClientProps) 
     }
   }, [editingLead?.id, editingLead?.scrapedData?.draftSubject, editingLead?.scrapedData?.draftBody, editingLead]);
 
+  function handleFilterChange(next: LeadStatusFilterValue) {
+    setStatusFilter(next);
+    setPage(1);
+    const nextLeads = next === "all" ? leads : leads.filter((l) => pipelineStatusOf(l) === next);
+    if (!nextLeads.some((l) => l.id === editingLead?.id)) {
+      setEditingLead(nextLeads[0] ?? null);
+    }
+  }
+
   async function handleApprove(id: string) {
     setApprove(true);
     try {
       const res = await fetch(`/api/leads/${id}/approve`, { method: "POST" });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Approve failed");
-      toast.success("Lead approved and email sent successfully.");
+      toast.success("Lead approved — engagement pipeline started.");
 
-      const updatedLeads = leads.filter((l) => l.id !== id);
+      // Keep the lead in the queue with its pipeline now running.
+      const updatedLeads = leads.map((l) =>
+        l.id === id
+          ? {
+              ...l,
+              status: "CONTACTED",
+              engagement: l.engagement ?? {
+                stage: (data.stage as string) ?? "PENDING",
+                failedStage: null,
+                deploymentUrl: null,
+                designConcepts: null,
+                chosenDesign: null,
+                offerSentAt: null,
+              },
+            }
+          : l,
+      );
       setLeads(updatedLeads);
-      setEditingLead(updatedLeads[0] ?? null);
+      const updatedLead = updatedLeads.find((l) => l.id === id);
+      if (updatedLead && editingLead?.id === id) setEditingLead(updatedLead);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to approve lead.");
     } finally {
@@ -98,6 +133,24 @@ export default function LeadsPageClient({ initialLeads }: LeadsPageClientProps) 
       toast.error("Failed to save draft.");
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function handleSendEmail(id: string) {
+    setSending(true);
+    try {
+      const res = await fetch(`/api/leads/${id}/send-email`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ subject, body }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Send failed");
+      toast.success("Outreach email sent successfully.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to send email.");
+    } finally {
+      setSending(false);
     }
   }
 
@@ -142,6 +195,16 @@ export default function LeadsPageClient({ initialLeads }: LeadsPageClientProps) 
     );
   }
 
+  const matchIndustries = editingLead?.scrapedData?.industries;
+  const matchLocations = editingLead?.scrapedData?.locations;
+  const formatMatchList = (value: unknown) => (Array.isArray(value) ? value.join(", ") : String(value));
+
+  const editingPipelineStatus = editingLead ? pipelineStatusOf(editingLead) : null;
+  const editingStageCategory = getStageCategory(editingLead?.engagement?.stage ?? "NOT_STARTED");
+  const canApprove = editingPipelineStatus === "draft";
+  const canSendEmail = editingStageCategory === "complete";
+  const actionPending = saving || approving || deleting || sending;
+
   return (
     <MarketingShell>
       <div className="mx-auto max-w-7xl space-y-8 p-8">
@@ -166,11 +229,11 @@ export default function LeadsPageClient({ initialLeads }: LeadsPageClientProps) 
                   Approval Action Progress
                 </span>
                 <span className="text-lg font-bold text-secondary-foreground">
-                  {leads.length > 0 ? "Pending Decision" : "Queue Fully Audited"}
+                  {draftCount > 0 ? "Pending Decision" : "Queue Fully Audited"}
                 </span>
               </div>
               <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
-                <div className="h-full bg-chart-3" style={{ width: leads.length > 0 ? "50%" : "100%" }} />
+                <div className="h-full bg-chart-3" style={{ width: draftCount > 0 ? "50%" : "100%" }} />
               </div>
             </div>
             <div className="pointer-events-none absolute right-0 top-0 h-full w-1/2 opacity-20">
@@ -184,7 +247,7 @@ export default function LeadsPageClient({ initialLeads }: LeadsPageClientProps) 
                 Pending Drafts
               </span>
               <span className="mt-1 font-headline text-4xl font-bold text-foreground gap-2 flex items-center">
-                {leads.length}
+                {draftCount}
                 <span className="text-xs text-secondary-foreground/70">Drafts</span>
               </span>
             </div>
@@ -202,59 +265,30 @@ export default function LeadsPageClient({ initialLeads }: LeadsPageClientProps) 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 xl:items-stretch">
           {/* Left Column: Drafts Queue (col-span-5) */}
           <div className="lg:col-span-5 flex flex-col gap-4">
-            <Typography.H4 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
-              Inbox Queue
-            </Typography.H4>
-            <div className="space-y-3 max-h-[70vh] overflow-y-auto pr-2 scrollbar-thin">
-              {leads.map((lead) => {
-                const isSelected = editingLead?.id === lead.id;
-                return (
-                  <button
-                    key={lead.id}
-                    type="button"
-                    onClick={() => setEditingLead(lead)}
-                    className={`w-full text-left p-6 transition-all duration-300 rounded-xl border border-outline-ghost/10 backdrop-blur-md cursor-pointer ${
-                      isSelected
-                        ? "border-l-4 border-l-primary bg-card/75 shadow-md scale-[1.01]"
-                        : "border-l-4 border-l-muted/30 bg-card/25 hover:border-l-primary/40 hover:bg-card/50"
-                    }`}
-                  >
-                    <div className="space-y-3">
-                      <div className="flex justify-between items-start gap-2">
-                        <div className="space-y-0.5">
-                          <h4 className="text-sm font-bold text-foreground leading-tight">
-                            {lead.customerName ?? "Unknown Lead"}
-                          </h4>
-                          <p className="text-[10.5px] text-muted-foreground truncate max-w-[24ch]">
-                            {lead.scrapedData?.websiteUrl || "No website audit"}
-                          </p>
-                        </div>
-                        <span
-                          className={`text-[9px] font-bold uppercase tracking-widest border px-2 py-0.5 rounded transition-all duration-300 ${
-                            isSelected
-                              ? "bg-primary/20 text-primary border-primary/30"
-                              : "bg-muted/10 text-muted-foreground border-outline-ghost/10"
-                          }`}
-                        >
-                          Decision
-                        </span>
-                      </div>
-
-                      <div className="flex items-center gap-4 text-[10px] text-muted-foreground border-t border-outline-ghost/10 pt-2.5">
-                        <span className="flex items-center gap-1">
-                          <Globe className="h-3.5 w-3.5 text-secondary" />
-                          {lead.scrapedData?.hasChatbot ? "Has Chatbot" : "No Chatbot"}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Mail className="h-3.5 w-3.5 text-accent" />
-                          {lead.scrapedData?.hasVoiceAgent ? "Has Voice" : "No Voice"}
-                        </span>
-                      </div>
-                    </div>
-                  </button>
-                );
-              })}
+            <div className="flex items-center justify-between gap-3">
+              <Typography.H4 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                Inbox Queue
+              </Typography.H4>
+              <LeadStatusFilter value={statusFilter} onChange={handleFilterChange} />
             </div>
+            <div className="space-y-3">
+              {visibleLeads.map((lead) => (
+                <LeadCard
+                  key={lead.id}
+                  lead={lead}
+                  isSelected={editingLead?.id === lead.id}
+                  onSelect={setEditingLead}
+                />
+              ))}
+              {visibleLeads.length === 0 && (
+                <div className="rounded-xl border border-dashed border-outline-ghost/20 bg-card/10 p-10 text-center">
+                  <p className="text-[11px] text-muted-foreground/60 leading-relaxed">
+                    No leads match this status filter.
+                  </p>
+                </div>
+              )}
+            </div>
+            <ListPagination page={currentPage} pageCount={pageCount} onPageChange={setPage} />
           </div>
 
           {/* Right Column: Audit Panel & Email Editor (col-span-7) */}
@@ -311,37 +345,21 @@ export default function LeadsPageClient({ initialLeads }: LeadsPageClientProps) 
 
                         <div className="bg-muted border-2 border-primary/10 rounded-xl p-4 flex items-center justify-between">
                           <span className="text-xs font-semibold text-foreground">Decision State</span>
-                          <span className="bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest shadow-md">
-                            Pending Review
-                          </span>
+                          {editingPipelineStatus && <PipelineStatusBadge status={editingPipelineStatus} />}
                         </div>
                       </div>
 
-                      {(editingLead.scrapedData?.industries || editingLead.scrapedData?.locations) && (
+                      {Boolean(matchIndustries || matchLocations) && (
                         <div className="p-4 rounded-xl border border-outline-ghost/10 bg-muted/10 text-xs text-muted-foreground space-y-1">
                           <p className="font-semibold text-foreground text-[11px]">Match Context:</p>
-                          {editingLead.scrapedData?.industries && (
-                            <p>
-                              • Industries:{" "}
-                              {Array.isArray(editingLead.scrapedData.industries)
-                                ? editingLead.scrapedData.industries.join(", ")
-                                : String(editingLead.scrapedData.industries)}
-                            </p>
-                          )}
-                          {editingLead.scrapedData?.locations && (
-                            <p>
-                              • Locations:{" "}
-                              {Array.isArray(editingLead.scrapedData.locations)
-                                ? editingLead.scrapedData.locations.join(", ")
-                                : String(editingLead.scrapedData.locations)}
-                            </p>
-                          )}
+                          {Boolean(matchIndustries) && <p>• Industries: {formatMatchList(matchIndustries)}</p>}
+                          {Boolean(matchLocations) && <p>• Locations: {formatMatchList(matchLocations)}</p>}
                         </div>
                       )}
                     </div>
 
                     {/* Email Compose Area */}
-                    <div className="space-y-4 hidden border-t border-outline-ghost/10 pt-6">
+                    <div className="space-y-4 border-t border-outline-ghost/10 pt-6">
                       <div className="space-y-2">
                         <Label htmlFor="subject" className="text-xs font-bold text-foreground">
                           Email Subject Line
@@ -368,6 +386,17 @@ export default function LeadsPageClient({ initialLeads }: LeadsPageClientProps) 
                           className="bg-background border-outline-ghost/20 focus-visible:ring-primary text-sm leading-relaxed resize-none"
                         />
                       </div>
+
+                      {editingLead.engagement && (
+                        <DraftLinkSelector
+                          key={editingLead.id}
+                          engagement={editingLead.engagement}
+                          onInsert={(href) => {
+                            setBody((prev) => (prev.trim() ? `${prev}\n\n${href}` : href));
+                            toast.success("Prototype link inserted into draft.");
+                          }}
+                        />
+                      )}
                     </div>
 
                     {/* Action Panel Buttons (Bento Style row) */}
@@ -377,7 +406,7 @@ export default function LeadsPageClient({ initialLeads }: LeadsPageClientProps) 
                         size="lg"
                         className="sm:flex-1 h-11 text-xs font-bold uppercase tracking-wider active:scale-[0.98] transition-all duration-300"
                         onClick={() => handleSave(editingLead.id)}
-                        disabled={saving || approving || deleting}
+                        disabled={actionPending}
                       >
                         {saving ? (
                           <>
@@ -392,32 +421,56 @@ export default function LeadsPageClient({ initialLeads }: LeadsPageClientProps) 
                         )}
                       </Button>
 
-                      <Button
-                        variant="default"
-                        size="lg"
-                        className="sm:flex-1 h-11 bg-primary text-primary-foreground font-bold uppercase tracking-wider shadow-neon active:scale-[0.98] transition-all duration-300"
-                        onClick={() => handleApprove(editingLead.id)}
-                        disabled={saving || approving || deleting}
-                      >
-                        {approving ? (
-                          <>
-                            <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                            Approving...
-                          </>
-                        ) : (
-                          <>
-                            <Send className="h-4 w-4 mr-2" />
-                            Approve Engagement
-                          </>
-                        )}
-                      </Button>
+                      {canApprove && (
+                        <Button
+                          variant="default"
+                          size="lg"
+                          className="sm:flex-1 h-11 bg-primary text-primary-foreground font-bold uppercase tracking-wider shadow-neon active:scale-[0.98] transition-all duration-300"
+                          onClick={() => handleApprove(editingLead.id)}
+                          disabled={actionPending}
+                        >
+                          {approving ? (
+                            <>
+                              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                              Approving...
+                            </>
+                          ) : (
+                            <>
+                              <Send className="h-4 w-4 mr-2" />
+                              Approve Engagement
+                            </>
+                          )}
+                        </Button>
+                      )}
+
+                      {canSendEmail && (
+                        <Button
+                          variant="default"
+                          size="lg"
+                          className="sm:flex-1 h-11 bg-primary text-primary-foreground font-bold uppercase tracking-wider shadow-neon active:scale-[0.98] transition-all duration-300"
+                          onClick={() => handleSendEmail(editingLead.id)}
+                          disabled={actionPending}
+                        >
+                          {sending ? (
+                            <>
+                              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                              Sending...
+                            </>
+                          ) : (
+                            <>
+                              <Mail className="h-4 w-4 mr-2" />
+                              Send Email
+                            </>
+                          )}
+                        </Button>
+                      )}
 
                       <Button
                         variant="ghost"
                         size="icon"
                         className="h-11 w-11 rounded-lg border border-destructive/20 text-destructive hover:bg-destructive/10 hover:text-destructive active:scale-[0.95] transition-all duration-300"
                         onClick={() => handleDelete(editingLead.id)}
-                        disabled={saving || approving || deleting}
+                        disabled={actionPending}
                         title="Delete and Decline"
                       >
                         {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
