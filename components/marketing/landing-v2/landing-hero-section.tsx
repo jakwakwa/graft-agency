@@ -1,10 +1,23 @@
 "use client";
 
+import { SignUpButton } from "@clerk/nextjs";
 import { Zap } from "lucide-react";
 import { motion, useScroll, useTransform, type Variants } from "motion/react";
 import { useRef } from "react";
 import { HeroFloatingCards } from "./hero-floating-cards";
 import { HeroVideoBackground } from "./hero-video-background";
+
+function scrollToPricing() {
+  const target = document.getElementById("bot-pricing");
+  if (!target) return;
+  const offset = 150; // Leave space for sticky header & tab switcher
+  const bodyRect = document.body.getBoundingClientRect().top;
+  const elementRect = target.getBoundingClientRect().top;
+  const elementPosition = elementRect - bodyRect;
+  const offsetPosition = elementPosition - offset;
+  window.scrollTo({ top: offsetPosition, behavior: "smooth" });
+  window.history.replaceState(null, "", "#bot-pricing");
+}
 
 const HEADLINE_VARIANTS: Variants = {
   hidden: {},
@@ -100,11 +113,13 @@ export function LandingHeroSection() {
 
             {/* CTA buttons */}
             <motion.div className="hero-cta-group" variants={FADE_UP} initial="hidden" animate="visible" custom={0.9}>
-              <button type="button" className="hero-cta hero-cta--primary">
-                <span className="hero-cta__shimmer" />
-                Hire Graft Bot
-              </button>
-              <button type="button" className="hero-cta hero-cta--ghost">
+              <SignUpButton mode="modal">
+                <button type="button" className="hero-cta hero-cta--primary">
+                  <span className="hero-cta__shimmer" />
+                  Hire Graft Bot
+                </button>
+              </SignUpButton>
+              <button type="button" className="hero-cta hero-cta--ghost" onClick={scrollToPricing}>
                 View Pricing
               </button>
             </motion.div>
