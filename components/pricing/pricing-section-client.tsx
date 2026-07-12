@@ -8,6 +8,7 @@ import type { PricingCatalog, PricingMode, PricingOffer } from "@/lib/billing/pr
 import { getPreviewItems } from "@/lib/billing/pricing-catalog";
 import { BillingCycleToggle } from "./billing-cycle-toggle";
 import { PricingCard } from "./pricing-card";
+import { SubscriptionConfirmDialog } from "./subscription-confirm-dialog";
 
 const SYNC_POLL_INTERVAL_MS = 3_000;
 const SYNC_POLL_MAX_ATTEMPTS = 20;
@@ -56,6 +57,10 @@ export function PricingSectionClient({
   const [localPurchasedBuilds, setLocalPurchasedBuilds] = useState<string[]>([]);
   const [buildError, setBuildError] = useState<string | null>(null);
   const [subscribeError, setSubscribeError] = useState<string | null>(null);
+  // Pre-checkout confirmation modal — gates the subscribe button so customers see
+  // the plan, price, and refund/cancellation terms before the Paddle overlay opens.
+  const [confirmOffer, setConfirmOffer] = useState<PricingOffer | null>(null);
+  const [confirmPending, setConfirmPending] = useState(false);
   const pollAbortRef = useRef(false);
   // Which kind of offer opened the current overlay checkout, so completion
   // events lock the right card.
@@ -188,6 +193,27 @@ export function PricingSectionClient({
     }
   };
 
+  // The subscribe button opens the confirmation modal first; the actual Paddle
+  // checkout only fires from the modal's "Continue to payment" action.
+  const handleRequestCheckout = (offer: PricingOffer) => {
+    if (subscribed) return;
+    setSubscribeError(null);
+    setConfirmOffer(offer);
+  };
+
+  const handleConfirmCheckout = async () => {
+    if (!confirmOffer) return;
+    setConfirmPending(true);
+    try {
+      await handleCheckout(confirmOffer);
+    } finally {
+      setConfirmPending(false);
+      // Close the modal so the Paddle overlay (success) or the error banner
+      // below the cards (failure) is visible.
+      setConfirmOffer(null);
+    }
+  };
+
   const handlePurchaseBuild = async (offer: PricingOffer) => {
     const price = offer.prices.oneTime;
     if (!paddle || !customer || !price || allPurchasedBuilds.includes(price.priceId)) return;
@@ -280,7 +306,7 @@ export function PricingSectionClient({
               selectedCycle={selectedCycle}
               localizedPrices={localizedPrices}
               canCheckout={canCheckout}
-              onCheckout={handleCheckout}
+              onCheckout={handleRequestCheckout}
               mode={mode}
               subscribed={subscribed}
               purchasedBuilds={allPurchasedBuilds}
@@ -289,6 +315,20 @@ export function PricingSectionClient({
           ))}
         </div>
       </div>
+      {confirmOffer ? (
+        <SubscriptionConfirmDialog
+          open={Boolean(confirmOffer)}
+          onOpenChange={(next) => {
+            if (!next) setConfirmOffer(null);
+          }}
+          offer={confirmOffer}
+          selectedCycle={selectedCycle}
+          onSelectCycle={setSelectedCycle}
+          localizedPrices={localizedPrices}
+          onConfirm={handleConfirmCheckout}
+          pending={confirmPending}
+        />
+      ) : null}
     </section>
   );
 }
