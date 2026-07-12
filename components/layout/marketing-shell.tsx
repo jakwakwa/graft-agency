@@ -56,7 +56,7 @@ export function MarketingShell({ children }: MarketingShellProps) {
         <div className="flex items-center gap-8">
           <Link
             href="/dashboard/automation"
-            className="font-headline text-2xl font-black italic tracking-tighter text-secondary-foreground uppercase"
+            className="font-headline text-2xl font-bold italic tracking-tighter text-secondary-foreground uppercase"
           >
             GRAFT TODAY
           </Link>

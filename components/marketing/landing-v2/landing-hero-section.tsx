@@ -102,10 +102,10 @@ export function LandingHeroSection() {
             <motion.div className="hero-cta-group" variants={FADE_UP} initial="hidden" animate="visible" custom={0.9}>
               <button type="button" className="hero-cta hero-cta--primary">
                 <span className="hero-cta__shimmer" />
-                Initialize Graft
+                Hire Graft Bot
               </button>
               <button type="button" className="hero-cta hero-cta--ghost">
-                View Schematics
+                View Pricing
               </button>
             </motion.div>
 

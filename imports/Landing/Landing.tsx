@@ -86,9 +86,11 @@ function Button() {
           "linear-gradient(90deg, rgba(32, 19, 215, 0.07) 0%, rgba(32, 19, 215, 0.07) 100%), linear-gradient(130.253deg, rgba(104, 85, 229, 0.71) 2.2187%, rgba(98, 201, 238, 0.29) 11.126%, rgba(76, 115, 216, 0.29) 23.71%, rgba(255, 26, 240, 0.184) 84.392%, rgba(235, 163, 54, 0.71) 103.81%)",
       }}
     >
+
       <div className="flex flex-col font-['Inter:Semi_Bold',sans-serif] font-semibold h-[28px] justify-center leading-[0] not-italic relative shrink-0 text-[#d4dcde] text-[16px] text-center text-shadow-[3px_3px_4.6px_rgba(0,0,0,0.26)] w-[214.14px]">
-        <p className="leading-[28px]">Hire Your AI Receptionist</p>
+        <p className="leading-[28px]">Hire a AI Receptionist</p>
       </div>
+     
       <Container4 />
     </div>
   );
@@ -1380,7 +1382,7 @@ function Button1() {
       }}
     >
       <div className="flex flex-col font-['Inter:Semi_Bold',sans-serif] font-semibold h-[28px] justify-center leading-[0] not-italic relative shrink-0 text-[#d4dcde] text-[16px] text-center text-shadow-[3px_3px_4.6px_rgba(0,0,0,0.26)] w-[214.14px]">
-        <p className="leading-[28px]">Hire Your AI Receptionist</p>
+        <p className="leading-[28px]">Hire your own AI Receptionist</p>
       </div>
       <Container64 />
     </div>

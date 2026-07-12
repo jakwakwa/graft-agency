@@ -229,7 +229,7 @@ export default function QueuePage() {
                   className="group relative flex items-center gap-6 overflow-hidden border-l-2 border-chart-5/40 bg-card p-5 transition-all duration-200 hover:bg-muted/80"
                 >
                   <div className="absolute right-0 top-0 h-full w-1/4 bg-linear-to-l from-chart-3/10 to-transparent" />
-                  <div className="flex h-12 w-12 items-center justify-center rounded-sm bg-muted text-xl font-black text-secondary-foreground">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-sm bg-muted text-xl font-bold text-secondary-foreground">
                     {initialsFromName(lead.customerName)}
                   </div>
                   <div className="flex-1">

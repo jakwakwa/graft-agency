@@ -4,7 +4,7 @@
   --font-size: 16px;
   --background: #ffffff;
   --foreground: oklch(0.145 0 0);
-  --card: hsl(0, 0%, 100%);
+  --card: hsl(0, 0%, 10%);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: hsl(28, 93%, 73%);

@@ -17,7 +17,7 @@ export default async function PortalEmbedPage() {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://graft.today";
 
   return (
-    <div className="w-full max-w-6xl space-y-8 mx-auto p-8">
+    <div className="w-full max-w-6xl space-y-8 mx-auto p-8 z-0">
       <div className="flex flex-col gap-2">
         <Typography.H1>Embed code</Typography.H1>
         <Typography.Lead>

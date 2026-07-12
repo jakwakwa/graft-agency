@@ -8,7 +8,7 @@ const TypographyH1 = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<H
     <span
       ref={ref}
       className={cn(
-        "scroll-m-20 font-display text-[3.5rem] leading-none font-bold text-balance",
+        "scroll-m-20 font-display text-[2.5rem] leading-none font-bold text-balance",
         displayTracking,
         className,
       )}
@@ -70,7 +70,7 @@ TypographyBlockquote.displayName = "TypographyBlockquote";
 
 const TypographyLead = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
   ({ className, ...props }, ref) => (
-    <p ref={ref} className={cn("font-sans text-xl text-muted-foreground", className)} {...props} />
+    <p ref={ref} className={cn("font-sans text-lg text-muted-foreground", className)} {...props} />
   ),
 );
 TypographyLead.displayName = "TypographyLead";

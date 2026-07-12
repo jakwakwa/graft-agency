@@ -30,7 +30,7 @@ export default async function ConversationDetailPage({ params }: ConversationDet
   const messages = conversation.messages as unknown as UIMessage[];
 
   return (
-    <div className="w-full max-w-6xl space-y-8 mx-auto p-8">
+    <div className="w-full max-w-6xl space-y-8 mx-auto p-8 z-0">
       <div className="flex items-center gap-4">
         <Button asChild variant="ghost" size="sm">
           <Link href="/portal/conversations" className="flex items-center gap-2">

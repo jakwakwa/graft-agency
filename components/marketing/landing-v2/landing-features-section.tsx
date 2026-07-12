@@ -1,11 +1,13 @@
-import { BrainCircuit, IdCard, Radar } from "lucide-react";
+import { Shimmer } from "@/components/ai-elements/shimmer";
+import { Bot } from "@hugeicons/core-free-icons";
+import { BotIcon, BrainCircuit, IdCard, Radar } from "lucide-react";
 import Image from "next/image";
 
 export function LandingFeaturesSection() {
   return (
     <section className="py-10 px-4 sm:py-16 sm:px-6 md:py-24 md:px-10 max-w-7xl mx-auto relative">
       <div className="mb-8 md:mb-16 text-center space-y-2">
-        <h2 className="text-3xl md:text-5xl font-black tracking-tight text-on-surface uppercase">
+        <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-on-surface uppercase">
           The Graft <span className="text-primary">Ecosystem</span>
         </h2>
         <p className="text-on-surface-variant text-sm tracking-normal sm:tracking-[0.2em] uppercase font-semibold">
@@ -13,12 +15,12 @@ export function LandingFeaturesSection() {
         </p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6 h-auto md:h-[600px]">
-        <div id="lead-capture" className="md:col-span-8 glass-panel rounded-xl p-4 sm:p-6 md:p-8 relative overflow-hidden group hover:border-primary/40 transition-colors">
+        <div id="lead-capture" className="glass-card  md:col-span-8 glass-panel rounded-xl p-4 sm:p-6 md:p-8 relative overflow-hidden transition-colors">
           <div className="absolute top-0 right-0 w-1/2 h-full opacity-10 group-hover:opacity-20 transition-opacity">
             <div className="relative h-full w-full">
               <Image
                 alt="Data Visualization"
-                className="object-cover"
+                className="object-cover animate-pulse opacity-80"
                 data-alt="Complex 3D digital data streams and glowing nodes connecting in a neural network style visualization with vibrant pink and purple lights"
                 fill
                 sizes="(max-width: 768px) 100vw, 33vw"
@@ -28,11 +30,11 @@ export function LandingFeaturesSection() {
           </div>
           <div className="relative z-10 flex flex-col h-full justify-between">
             <div>
-              <div className="mb-3 inline-flex items-center justify-center w-8 h-8 rounded-lg bg-primary/15">
-                <BrainCircuit className="h-4 w-4 text-primary" />
+              <div className="mb-3 inline-flex items-center justify-center w-8 h-8 rounded-lg bg-secondary/5">
+                <BotIcon className="h-8 w-8 text-chart-1 " />
               </div>
-              <h3 className="text-xl md:text-2xl font-bold text-on-surface mb-2">Lead Capture Genius</h3>
-              <p className="text-on-surface-variant max-w-md">
+              <h3 className="text-xl font-serif md:text-2xl font-bold text-on-surface mb-2">Lead Capture Genius</h3>
+              <p className="text-on-surface-variant text-lg font-light max-w-md">
                 Our neural engine qualifies every visitor using semantic analysis. We don't just capture emails; we
                 capture intent and readiness.
               </p>
@@ -42,68 +44,68 @@ export function LandingFeaturesSection() {
         <div id="midnight-prospector" className="md:col-span-4 glass-panel rounded-xl p-4 sm:p-6 md:p-8 border-l-4 border-secondary flex flex-col justify-between group">
           <div>
             <div className="mb-3 inline-flex items-center justify-center w-8 h-8 rounded-lg bg-secondary/15">
-              <Radar className="h-4 w-4 text-secondary" />
+              <Radar className="h-8 w-8 text-secondary" />
             </div>
-            <h3 className="text-xl font-bold text-on-surface mb-2">Midnight Prospector</h3>
+            <h3 className="text-2xl font-serif font-bold text-on-surface mb-2">Midnight Prospector</h3>
             <p className="text-on-surface-variant text-sm">
               While you sleep, Graft hunts. Automated outreach that sounds human because it's trained on your unique
               brand voice.
             </p>
           </div>
-          <div className="bg-surface-container-lowest p-4 rounded-lg mt-4 border border-outline-variant/20">
-            <div className="text-[10px] uppercase tracking-widest text-secondary font-bold mb-2">Active Hunt Log</div>
+          <div className="glass-card p-4 rounded-lg mt-4 border border-outline-variant/20">
+            <div className="text-[10px] uppercase tracking-widest font-bold mb-2">Hunter Agent Log</div>
             <div className="space-y-1 opacity-60">
-              <div className="text-[9px] font-mono">Found prospect @TechCorp</div>
-              <div className="text-[9px] font-mono">Sent tailored brief...</div>
+              <Shimmer className="text-[11px] font-mono">Searching prospects... </Shimmer>
+              <div>          <div className="text-[10px] text-emerald-300 animate-pulse font-mono">Found @ZenSpa. Sent tailored brief...</div>  
+              </div>
+    
             </div>
           </div>
         </div>
         <div id="white-label" className="md:col-span-4 glass-panel rounded-xl p-4 sm:p-6 md:p-8 border-r-4 border-primary flex flex-col justify-between">
           <div>
-            <div className="mb-3 inline-flex items-center justify-center w-8 h-8 rounded-lg bg-primary/15">
-              <IdCard className="h-4 w-4 text-primary" />
+            <div className="mb-3 inline-flex items-center justify-center w-8 h-8 rounded-lg bg-primary/5">
+              <IdCard className="h-8 w-8 text-indigo-400" />
             </div>
-            <h3 className="text-xl font-bold text-on-surface mb-2">White-Label Wonder</h3>
+            <h3 className="text-2xl font-serif font-bold text-on-surface mb-2">White-Label Wonder</h3>
             <p className="text-on-surface-variant text-sm">
               Resell our infrastructure under your own banner. Full CSS control and API-first architecture.
             </p>
           </div>
           <div className="mt-6">
-            <div className="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold mb-2">Any brand identity</div>
+            <div className="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold font-serif mb-2">Any brand identity</div>
             <div className="flex gap-2">
               <div className="w-5 h-5 rounded-full bg-[#ff3c6e] ring-1 ring-white/10" />
               <div className="w-5 h-5 rounded-full bg-[#38bdf8] ring-1 ring-white/10" />
               <div className="w-5 h-5 rounded-full bg-[#a78bfa] ring-1 ring-white/10" />
-              <div className="w-5 h-5 rounded-full bg-[#4ade80] ring-1 ring-white/10" />
-              <div className="w-5 h-5 rounded-full bg-[#fb923c] ring-1 ring-white/10" />
-              <div className="w-5 h-5 rounded-full bg-[#f0e040] ring-1 ring-white/10" />
+            
             </div>
           </div>
         </div>
         <div className="md:col-span-8 glass-panel rounded-xl p-4 sm:p-6 md:p-8 relative overflow-hidden flex flex-col items-center justify-center text-center">
-          <div className="absolute inset-0 opacity-5">
-            <div className="w-full h-full bg-[radial-gradient(#fff_1px,transparent_1px)] bg-size-[20px_20px]"></div>
+          <div className="absolute inset-0 opacity-7">
+            <div className="w-full h-full bg-[radial-gradient(#ffffff90_1px,#00000020_1px)] bg-size-[10px_10px]"></div>
           </div>
           <div className="relative z-10">
-            <h3 className="text-xl font-bold text-on-surface mb-6 uppercase tracking-widest">Built for Resilience</h3>
+            <h3 className="text-3xl font-display font-bold text-on-surface mb-6 uppercase  tracking-[4px] opacity-80 ">Built for Resilience</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-5 md:gap-8">
               <div className="space-y-1">
-                <div className="text-2xl md:text-4xl font-black text-on-surface">100%</div>
-                <div className="text-[9px] uppercase tracking-widest text-on-surface-variant font-bold">
+                <div className="text-lg md:text-xl font-mono text-on-surface">100%</div>
+                <span className="text-[9px] uppercase  tracking-[4px] opacity-40   font-bold">
                   Stateless Arch
-                </div>
+                </span>
               </div>
               <div className="space-y-1">
-                <div className="text-2xl md:text-4xl font-black text-on-surface">99.99</div>
-                <div className="text-[9px] uppercase tracking-widest text-on-surface-variant font-bold">Uptime %</div>
+                <div className="text-lg md:text-xl font-mono text-on-surface">99.99%</div>
+                <span className="text-[9px] uppercase  tracking-[4px] opacity-20   font-bold animate-pulse">Uptime</span>
               </div>
               <div className="space-y-1">
-                <div className="text-2xl md:text-4xl font-black text-on-surface">Global</div>
-                <div className="text-[9px] uppercase tracking-widest text-on-surface-variant font-bold">Node Mesh</div>
+                <div className="text-lg md:text-xl font-mono text-on-surface">Global</div>
+                <span className="text-[9px] uppercase tracking-[4px] opacity-30 animate-pulse font-bold">Node Mesh</span>
               </div>
               <div className="space-y-1">
-                <div className="text-2xl md:text-4xl font-black text-on-surface">Encrypted</div>
-                <div className="text-[9px] uppercase tracking-widest text-on-surface-variant font-bold">End-to-End</div>
+                <div className="text-lg md:text-xl font-mono text-on-surface">Encrypted</div>
+                <span className="text-[9px] uppercase  tracking-[4px] opacity-40   font-bold">End-to-End</span>
               </div>
             </div>
           </div>

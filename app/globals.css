@@ -46,8 +46,8 @@
   --ring: oklch(0.708 0 0);
   --outline-ghost: color-mix(in srgb, #4b4a4b 15%, transparent);
   --surface-container-high: oklch(0.94 0.01 280);
-  --surface-highest: oklch(0.73 0.05 284.96 / 0.75);
-  --surface-variant: oklch(0.81 0.03 281.84);
+  --surface-highest: rgba(164, 164, 199, 0.75);
+  --on-surface-variant: oklch(80.966% 0.02957 281.365 / 0.585);
   --chart-1: oklch(0.38 0.18 283.75);
   --chart-2: oklch(0.606 0.25 292.717);
   --chart-3: oklch(0.541 0.281 293.009);
@@ -126,7 +126,7 @@ body {
   /* Surface tiers for cards/chips */
   --surface-container-high: color-mix(in srgb, #e0b432 58%, #cd4078);
   --surface-highest: color-mix(in srgb, #0156c4c4 12%, #d45f3f);
-  --surface-variant: color-mix(in srgb, #f51857 15%, oklch(71.496% 0.15601 46.804));
+  --on-surface-variant: color-mix(in srgb, #b1caeb 15%, oklch(93.293% 0.02702 226.929 / 0.522));
 
   /* Charts */
   --chart-1: oklch(79.786% 0.127 60.915);
@@ -152,7 +152,7 @@ body {
   --shadow-neon-secondary: 0 0 16px rgba(95, 118, 247, 0.81);
 
   /* Glass surfaces */
-  --glass-background: rgba(35, 53, 253, 0.64);
+  --glass-background: rgba(116, 124, 216, 0.64);
   --glass-border: #798ef75e;
 }
 
@@ -200,7 +200,7 @@ body {
   --color-outline-ghost: var(--outline-ghost);
   --color-surface-container-high: var(--surface-container-high);
   --color-surface-highest: var(--surface-highest);
-  --color-surface-variant: var(--surface-variant);
+  --color-on-surface-variant: var(--on-surface-variant);
   --spacing-section: 5rem;
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
@@ -233,9 +233,9 @@ body {
   }
 
   .glass-panel {
-    background: rgba(30 28 28 / 0.11);
-    backdrop-filter: blur(110px) !important;
-    border: 1px solid rgba(153 148 148 / 0.49);
+    background: rgba(30 28 28 / 0.09);
+    backdrop-filter: blur(70px) !important;
+    border: 1px solid rgba(99, 117, 131, 0.241);
     box-shadow: inset 0 1px 1px rgba(69 77 79 / 0.64);
   }
 
@@ -288,16 +288,16 @@ body {
 
   .glass-card {
     background: var(--glass-background);
-    -webkit-backdrop-filter: blur(1.2px) !important;
+    -webkit-backdrop-filter: blur(25px) !important;
 
-    backdrop-filter: blur(5px);
+    backdrop-filter: blur(25px);
     padding: 30px !important;
-    background: linear-gradient(310deg, #db707224 -20%, rgba(67 83 108 / 0.17) 30%, oklch(0.32 0.01 261.72 / 0.3) 117%) !important;
+    background: linear-gradient(310deg, #db707224 -20%, rgba(8, 19, 33, 0.685) 30%, oklch(0.32 0.01 261.72 / 0.3) 117%) !important;
     border-radius: 30px !important;
     border: 1px solid oklch(0.22 0 17.28 / 0.55);
     box-shadow:
       inset -1px -2px 1px 0px var(--glass-border),
-      inset 0px 2px 3px -2px oklch(0.66 0.15 240.71 / 0.55);
+      inset 0px 2px 3px -2px oklch(24.092% 0.01834 234.927 / 0.55),  0px 2px 23px -2px oklch(20.155% 0.03625 232.498 / 0.602);
   }
 
   .bg-ethereal-gradient {
@@ -307,6 +307,10 @@ body {
   .grid-overlay {
     background-image: radial-gradient(rgba(121 121 121 / 0.99) 1px, transparent 1px);
     background-size: 32px 32px;
+  }
+
+  .bg-card {
+    background: #000;
   }
 
   .status-pulse {

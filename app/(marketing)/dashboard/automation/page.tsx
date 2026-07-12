@@ -157,7 +157,7 @@ export default async function AutomationHubPage() {
                   </Typography.Small>
                 </CardHeader>
                 <CardContent className="p-4 pt-0 flex items-baseline gap-2">
-                  <Typography.H2 className="text-4xl font-black pb-0">{leadsCount.toLocaleString()}</Typography.H2>
+                  <Typography.H2 className="text-4xl font-bold pb-0">{leadsCount.toLocaleString()}</Typography.H2>
                   <span className="text-xs text-primary font-bold font-data">Total</span>
                 </CardContent>
               </Card>
@@ -169,7 +169,7 @@ export default async function AutomationHubPage() {
                   </Typography.Small>
                 </CardHeader>
                 <CardContent className="p-4 pt-0 flex items-baseline gap-2">
-                  <Typography.H2 className="text-4xl font-black pb-0">
+                  <Typography.H2 className="text-4xl font-bold pb-0">
                     {activeConversationsCount.toLocaleString()}
                   </Typography.H2>
                   {activeConversationsCount > 0 && (
@@ -185,7 +185,7 @@ export default async function AutomationHubPage() {
                   </Typography.Small>
                 </CardHeader>
                 <CardContent className="p-4 pt-0 flex items-baseline gap-2">
-                  <Typography.H2 className="text-4xl font-black pb-0">{conversionVelocity}%</Typography.H2>
+                  <Typography.H2 className="text-4xl font-bold pb-0">{conversionVelocity}%</Typography.H2>
                   <span className="text-[10px] text-accent font-data uppercase tracking-tighter">
                     {Number(conversionVelocity) > 80 ? "Elite Level" : "Standard"}
                   </span>

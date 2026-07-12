@@ -20,7 +20,7 @@ export default async function ConversationsPage() {
   const conversations = gated ? [] : await conversationService.listForClient(clientId);
 
   return (
-    <div className="w-full max-w-6xl space-y-8 mx-auto p-8">
+    <div className="w-full max-w-6xl space-y-8 mx-auto p-8 z-0">
       <div className="flex flex-col gap-2">
         <Typography.H1>Conversations</Typography.H1>
         <Typography.Lead>View all chat transcripts from your embedded bots.</Typography.Lead>

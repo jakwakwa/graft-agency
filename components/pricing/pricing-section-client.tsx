@@ -257,7 +257,7 @@ export function PricingSectionClient({
       <div className="mx-auto flex max-w-7xl flex-col gap-10">
         <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
           <div className="max-w-2xl space-y-3">
-            <h2 className="text-3xl md:text-4xl font-black tracking-tight uppercase text-on-surface leading-tight">
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight uppercase text-on-surface leading-tight">
               {kindFilter === "website" ? (
                 <>
                   Bespoke Agency <span className="text-secondary">Design &amp; Builds</span>

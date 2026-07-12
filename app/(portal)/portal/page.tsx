@@ -111,7 +111,7 @@ export default async function PortalDashboardPage() {
             </Typography.Small>
           </CardHeader>
           <CardContent>
-            <Typography.H2 className="text-4xl font-black">{activeBookings.count}</Typography.H2>
+            <Typography.H2 className="text-4xl font-bold">{activeBookings.count}</Typography.H2>
           </CardContent>
         </Card>
         <Card className="border-l-4 border-secondary">
@@ -121,7 +121,7 @@ export default async function PortalDashboardPage() {
             </Typography.Small>
           </CardHeader>
           <CardContent>
-            <Typography.H2 className="text-4xl font-black">{conversationCount ?? 0}</Typography.H2>
+            <Typography.H2 className="text-4xl font-bold">{conversationCount ?? 0}</Typography.H2>
           </CardContent>
         </Card>
         <Card className="border-l-4 border-accent">
@@ -131,7 +131,7 @@ export default async function PortalDashboardPage() {
             </Typography.Small>
           </CardHeader>
           <CardContent>
-            <Typography.H2 className="text-4xl font-black">{leads?.length ?? 0}</Typography.H2>
+            <Typography.H2 className="text-4xl font-bold">{leads?.length ?? 0}</Typography.H2>
           </CardContent>
         </Card>
         <Card className="border-l-4 border-green-500">
@@ -219,7 +219,7 @@ export default async function PortalDashboardPage() {
   );
 
   return (
-    <div className="w-full max-w-6xl space-y-8 mx-auto p-8">
+    <div className="absolute w-full max-w-6xl space-y-8 mx-auto p-8 -z-1">
       <div className="flex flex-col gap-2">
         <Typography.H1>{businessName} workspace</Typography.H1>
         <Typography.Lead>A snapshot of your bot's recent conversations and bookings.</Typography.Lead>
