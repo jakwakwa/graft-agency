@@ -35,7 +35,7 @@ The members admin page crashed for the platform master owner when it called Cler
 
 ## Solution
 
-Resolve the organisation from the authenticated platform or reseller client's persisted `clerkOrganizationId`, then pass that ID to every members-admin Clerk call.
+Resolve the organisation from the authenticated platform client's persisted `clerkOrganizationId`, then pass that ID to every members-admin Clerk call.
 
 ```ts
 export async function resolvePlatformOrganizationForClient(clientId: string): Promise<PlatformOrganizationResolution> {

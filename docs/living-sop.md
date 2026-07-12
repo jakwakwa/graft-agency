@@ -63,15 +63,14 @@ tests/                  Unit (Vitest) and E2E (Playwright)
 | Role | DB flags | Access |
 |---|---|---|
 | Platform Owner | `isPlatformOwner: true` | Full dashboard — chatbot config, automation, prospecting, members |
-| Reseller | `isReseller: true` | Dashboard access — automation, prospecting, scoped to own data |
-| Regular Member | Both `false` | Portal only — billing, conversations, embed code, bot settings |
+| Regular Member | `isPlatformOwner: false` | Portal only — billing, conversations, embed code, bot settings |
 
 ### Auth flow
 
 1. User signs in via Clerk.
 2. Clerk middleware (`proxy.ts`) protects all routes except explicitly public ones (`/`, `/privacy`, `/terms`, `/api/chat`, `/api/embed/*`, `/api/webhooks/*`, `/api/cron/*`, `/api/inngest`, `/widget/*`).
 3. `resolveClientIdFromAuth()` maps `clerkUserId` → `Client.id`. If no row exists for an org member, it auto-provisions one via `provisionClientFromPlatformMembership()`.
-4. Dashboard routes call `requirePlatformAccess()` (gates on `isPlatformOwner || isReseller`).
+4. Dashboard routes call `requirePlatformAccess()` (gates on `isPlatformOwner`).
 5. Portal routes use `resolveClientIdFromAuth()` directly — any authenticated client can access their portal.
 
 ### Client provisioning
@@ -80,13 +79,6 @@ tests/                  Unit (Vitest) and E2E (Playwright)
 - **Login recovery**: If a member was invited but the webhook was missed, `resolveClientIdFromAuth()` detects platform org membership and provisions on-the-fly.
 - **Soft delete**: `organizationMembership.deleted` → sets `deletedAt` on the Client row. `organization.deleted` → soft-deletes all clients in that org.
 - **Bootstrap (dev only)**: When `CLERK_WEBHOOK_BOOTSTRAP_PLATFORM=true`, the first `organization.created` event auto-creates the platform owner client.
-
-### Reseller provisioning
-
-Manual via CLI:
-```bash
-bun scripts/provision-reseller.ts <clerkOrgId> <businessName>
-```
 
 ---
 
@@ -328,7 +320,7 @@ All provider webhook routes verify signatures, persist a `WebhookReceipt`, ACK q
 
 | Model | Table | Purpose |
 |---|---|---|
-| `Client` | `clients` | Tenant record — links to Clerk (userId, orgId), Paddle (customerId, subscriptionId), flags (isPlatformOwner, isReseller) |
+| `Client` | `clients` | Tenant record — links to Clerk (userId, orgId), Paddle (customerId, subscriptionId), flags (isPlatformOwner) |
 | `AgentConfig` | `agent_configs` | 1:1 with Client — bot personality, knowledge base, Cal.com settings, widget color |
 | `Lead` | `leads` | Inbound (chat) or outbound (prospecting) lead. Status: SCRAPED → DRAFT_PENDING → CONTACTED → REPLIED → BOOKED → CLOSED |
 | `Conversation` | `conversations` | Chat transcript. Links to Client + Lead. Keyed by `sessionId`. |
@@ -579,7 +571,7 @@ bunx tsc --noEmit
 |---|---|---|---|---|
 | Platform client provisioning | Clerk webhooks (automated) | Platform Owner | — | New member |
 | Outbound prospecting runs | Inngest cron (automated) | Platform Owner | — | — |
-| Lead approval → engagement pipeline | Platform Owner / Reseller | Platform Owner | — | Lead (via offer email) |
+| Lead approval → engagement pipeline | Platform Owner | Platform Owner | — | Lead (via offer email) |
 | Subscription billing | Paddle (automated) | Platform Owner | — | Client |
 | Bot configuration | Client (self-service) | Client | — | — |
 | Cal.com booking | Visitor (via chatbot) | Client | — | Client (Cal.com notification) |

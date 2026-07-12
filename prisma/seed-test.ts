@@ -25,25 +25,7 @@ async function main() {
   });
   console.log(`Seed (Test): Platform Owner created/updated: ${platformOwner.id}`);
 
-  // 2. Ensure a Reseller exists
-  const reseller = await prisma.client.upsert({
-    where: { subdomain: "reseller-test" },
-    update: {
-      isReseller: true,
-      businessName: "Test Reseller Agency",
-      deletedAt: null,
-    },
-    create: {
-      clerkUserId: "user_reseller_test_123",
-      clerkOrganizationId: "org_reseller_test_123",
-      businessName: "Test Reseller Agency",
-      subdomain: "reseller-test",
-      isReseller: true,
-    },
-  });
-  console.log(`Seed (Test): Reseller created/updated: ${reseller.id}`);
-
-  // 3. Ensure an Active Agency exists
+  // 2. Ensure an Active Agency exists
   const activeAgency = await prisma.client.upsert({
     where: { subdomain: "active-agency" },
     update: {

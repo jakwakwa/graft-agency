@@ -35,7 +35,7 @@ export interface ClientEntitlements {
   subscriptionActive: boolean;
   subscriptionStatus: string;
   subscriptionAddons: string[];
-  /** Platform owner / reseller bypass — never paygated. */
+  /** Platform owner bypass — never paygated. */
   exempt: boolean;
   /** Active subscription OR exempt. Use this for gating decisions. */
   hasChatbotAccess: boolean;
@@ -59,7 +59,6 @@ export async function getClientEntitlements(clientId: string): Promise<ClientEnt
     where: { id: clientId, deletedAt: null },
     select: {
       isPlatformOwner: true,
-      isReseller: true,
       subscriptionActive: true,
       subscriptionStatus: true,
       subscriptionAddons: true,
@@ -74,7 +73,7 @@ export async function getClientEntitlements(clientId: string): Promise<ClientEnt
 
   const subscriptionActive =
     client.subscriptionActive && ACTIVE_SUBSCRIPTION_STATUSES.has(client.subscriptionStatus.toLowerCase());
-  const exempt = client.isPlatformOwner || client.isReseller;
+  const exempt = client.isPlatformOwner;
 
   const bookingPriceId = getAddonPriceId("booking");
   const bookingAddonActive =

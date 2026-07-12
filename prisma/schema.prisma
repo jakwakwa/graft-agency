@@ -24,7 +24,6 @@ model Client {
   updatedAt            DateTime           @updatedAt @map("updated_at")
   allowedDomains       String[]           @default([]) @map("allowed_domains")
   isPlatformOwner      Boolean            @default(false) @map("is_platform_owner")
-  isReseller           Boolean            @default(false) @map("is_reseller")
   deletedAt            DateTime?          @map("deleted_at")
   clerkUserId          String?            @unique @map("clerk_user_id")
   email                String?            @map("email")

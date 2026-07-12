@@ -50,7 +50,6 @@ describe("resolveClientIdFromAuth", () => {
         email: "test.member@example.com",
         clerkOrganizationId: orgId,
         isPlatformOwner: false,
-        isReseller: false,
         deletedAt: null,
       });
     } finally {
@@ -66,18 +65,6 @@ describe("requirePlatformAccess", () => {
     const clerkUserId = `user-rpa-owner-${Date.now()}`;
     const client = await prisma.client.create({
       data: { clerkUserId, businessName: "Owner", isPlatformOwner: true, clerkOrganizationId: "org-1" },
-    });
-    mockAuth.mockResolvedValue({ userId: clerkUserId });
-    const { requirePlatformAccess } = await import("@/lib/auth/resolve-client");
-    const result = await requirePlatformAccess();
-    expect(result).toEqual({ clientId: client.id });
-    await prisma.client.delete({ where: { id: client.id } });
-  });
-
-  it("returns clientId for isReseller client", async () => {
-    const clerkUserId = `user-rpa-reseller-${Date.now()}`;
-    const client = await prisma.client.create({
-      data: { clerkUserId, businessName: "Reseller", isReseller: true, clerkOrganizationId: "org-1" },
     });
     mockAuth.mockResolvedValue({ userId: clerkUserId });
     const { requirePlatformAccess } = await import("@/lib/auth/resolve-client");
@@ -138,17 +125,6 @@ describe("hasPlatformAccess", () => {
     await prisma.client.delete({ where: { id: client.id } });
   });
 
-  it("returns true for isReseller", async () => {
-    const clerkUserId = `user-hpa-reseller-${Date.now()}`;
-    const client = await prisma.client.create({
-      data: { clerkUserId, businessName: "Reseller", isReseller: true, clerkOrganizationId: "org-1" },
-    });
-    mockAuth.mockResolvedValue({ userId: clerkUserId });
-    const { hasPlatformAccess } = await import("@/lib/auth/resolve-client");
-    expect(await hasPlatformAccess()).toBe(true);
-    await prisma.client.delete({ where: { id: client.id } });
-  });
-
   it("returns false for chatbot-only client", async () => {
     const clerkUserId = `user-hpa-chatbot-${Date.now()}`;
     const client = await prisma.client.create({
@@ -172,17 +148,6 @@ describe("hasChatbotAccess", () => {
     mockAuth.mockResolvedValue({ userId: clerkUserId });
     const { hasChatbotAccess } = await import("@/lib/auth/resolve-client");
     expect(await hasChatbotAccess()).toBe(true);
-    await prisma.client.delete({ where: { id: client.id } });
-  });
-
-  it("returns false for isReseller", async () => {
-    const clerkUserId = `user-hca-reseller-${Date.now()}`;
-    const client = await prisma.client.create({
-      data: { clerkUserId, businessName: "Reseller", isReseller: true, clerkOrganizationId: "org-1" },
-    });
-    mockAuth.mockResolvedValue({ userId: clerkUserId });
-    const { hasChatbotAccess } = await import("@/lib/auth/resolve-client");
-    expect(await hasChatbotAccess()).toBe(false);
     await prisma.client.delete({ where: { id: client.id } });
   });
 });
