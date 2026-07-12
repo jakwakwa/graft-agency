@@ -1,6 +1,8 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+# PRs and Commit Repo rules
+
+The user / operator prefers and expects autonomous workflows from the coding agent. Best judgement are preferred over asking questions to the user. therefore use the sleep function when asking clarification questions. wait 60 seconds, if the user did not answer you need to carry on with the recommended options in the questions. unless the there are any security risks like credential keys involved.
 
 ## Paddle integration
 
@@ -161,5 +163,7 @@ const [config, data] = await Promise.all([configPromise, fetchData(session.user.
 ## Testing
 
 Unit tests use **Vitest** with `jsdom` (`tests/unit/`). E2E uses **Playwright** Chromium (`tests/e2e/`). Tests import from `bun:test` in standalone scripts, but use `vitest` imports inside the `tests/` tree.
+
+
 
 Always verify tests actually pass after writing them — don't assume a green IDE means green CI.
