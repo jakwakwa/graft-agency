@@ -58,5 +58,6 @@
   "[biome_syntax_tree]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "editor.fontFamily": "Dank Mono, Monaco, 'Courier New', monospace"
+  "editor.fontFamily": "Dank Mono, Monaco, 'Courier New', monospace",
+  "bun.test.enable": false
 }
