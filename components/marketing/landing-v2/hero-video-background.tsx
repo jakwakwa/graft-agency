@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useIsMobile } from "@/components/ui/use-mobile";
-
+import Image from "next/image"
 interface HeroVideoBackgroundProps {
   src: string;
   poster?: string;
@@ -53,23 +53,11 @@ export function HeroVideoBackground({ src, poster }: HeroVideoBackgroundProps) {
       <div className="hero-chromatic-edge" />
 
       {!isMobile && (
-        <video
-          ref={videoRef}
-          className="hero-video"
-          autoPlay
-          muted
-          playsInline
-          loop
-          preload="auto"
-          poster={poster}
-          style={{
-            opacity: isLoaded ? 1 : 0,
-            transition: "opacity 2s cubic-bezier(0.22, 1, 0.36, 1)",
-          }}
-        >
-          <source src={src} type="video/mp4" />
-        </video>
-      )}
+        <img
+         className="hero-video"
+         src={ 'Robot_concierge.jpg' }/>
+          
+            )}
     </div>
   );
 }
