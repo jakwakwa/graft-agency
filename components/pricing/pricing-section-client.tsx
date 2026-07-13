@@ -247,20 +247,20 @@ export function PricingSectionClient({
 
   const gridClass =
     kindFilter === "website"
-      ? "grid gap-8 md:grid-cols-2 max-w-4xl mx-auto w-full"
+      ? "grid gap-8 md:grid-cols-2 max-w-4xl grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 mx-auto w-full"
       : kindFilter === "bot"
-        ? "grid gap-6 md:grid-cols-1 w-full"
-        : "grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 w-full";
+        ? "grid gap-6 md:grid-cols-2 lg:grid-cols-3 w-full"
+        : "grid gap-4 grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2  2 xl:grid-cols-3 w-full";
 
   return (
     <section id={id} className="relative z-10 px-4 sm:px-6 py-8 sm:py-12 md:py-20">
       <div className="mx-auto flex max-w-7xl flex-col gap-10">
         <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
           <div className="max-w-2xl space-y-3">
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight uppercase text-on-surface leading-tight">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-normal tracking-tight text-on-surface leading-tight">
               {kindFilter === "website" ? (
                 <>
-                  Bespoke Agency <span className="text-secondary">Design &amp; Builds</span>
+                  Bespoke Agency <span className="text-primary">Design &amp; Builds</span>
                 </>
               ) : (
                 <>

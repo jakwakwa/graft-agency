@@ -153,7 +153,7 @@ export function PricingCard({
         </div>
         <div>
           <h3>
-            <Typography.H3 className="m-0 text-xl font-bold text-on-surface tracking-tight">
+            <Typography.H3 className="m-0 text-4xl font-bold text-on-surface tracking-tight">
               {offer.title}
             </Typography.H3>
           </h3>
@@ -165,7 +165,7 @@ export function PricingCard({
 
       {displayPrice ? (
         <div className="flex items-baseline gap-1 py-2">
-          <span className="font-display text-4xl font-extrabold tracking-tight text-on-surface">{displayPrice}</span>
+          <span className="font-extrabold font-sans text-4xl tracking-tight text-on-surface">{displayPrice}</span>
           {price ? <span className="ml-1 text-sm font-medium text-on-surface-variant">{price.suffix}</span> : null}
         </div>
       ) : null}
