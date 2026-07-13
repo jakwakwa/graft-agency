@@ -7,8 +7,8 @@ export function LandingFeaturesSection() {
   return (
     <section className="py-10 px-4 sm:py-16 sm:px-6 md:py-24 md:px-10 max-w-7xl mx-auto relative">
       <div className="mb-8 md:mb-16 text-center space-y-2">
-        <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-on-surface uppercase">
-          The Graft <span className="text-primary">Ecosystem</span>
+        <h2 className="text-5xl font-display md:text-5xl font-bold tracking-tight text-on-surface uppercase">
+          The Graft <span className="text-chart-3">Service Ecosystem</span>
         </h2>
         <p className="text-on-surface-variant text-sm tracking-normal sm:tracking-[0.2em] uppercase font-semibold">
           Autonomous operations for the elite.
@@ -33,7 +33,7 @@ export function LandingFeaturesSection() {
               <div className="mb-3 inline-flex items-center justify-center w-8 h-8 rounded-lg bg-secondary/5">
                 <BotIcon className="h-8 w-8 text-chart-1 " />
               </div>
-              <h3 className="text-xl font-serif md:text-2xl font-bold text-on-surface mb-2">Lead Capture Genius</h3>
+              <h3 className="text-xl font-display md:text-2xl font-bold text-on-surface mb-2">Lead Capture Genius</h3>
               <p className="text-on-surface-variant text-lg font-light max-w-md">
                 Our neural engine qualifies every visitor using semantic analysis. We don't just capture emails; we
                 capture intent and readiness.
@@ -46,7 +46,7 @@ export function LandingFeaturesSection() {
             <div className="mb-3 inline-flex items-center justify-center w-8 h-8 rounded-lg bg-secondary/15">
               <Radar className="h-8 w-8 text-secondary" />
             </div>
-            <h3 className="text-2xl font-serif font-bold text-on-surface mb-2">Midnight Prospector</h3>
+            <h3 className="text-2xl font-display font-normal text-on-surface mb-2">Midnight Prospector</h3>
             <p className="text-on-surface-variant text-sm">
               While you sleep, Graft hunts. Automated outreach that sounds human because it's trained on your unique
               brand voice.
@@ -67,13 +67,13 @@ export function LandingFeaturesSection() {
             <div className="mb-3 inline-flex items-center justify-center w-8 h-8 rounded-lg bg-primary/5">
               <IdCard className="h-8 w-8 text-indigo-400" />
             </div>
-            <h3 className="text-2xl font-serif font-bold text-on-surface mb-2">White-Label Wonder</h3>
+            <h3 className="text-2xl font-display font-normal text-on-surface mb-2">White-Label Wonder</h3>
             <p className="text-on-surface-variant text-sm">
               Resell our infrastructure under your own banner. Full CSS control and API-first architecture.
             </p>
           </div>
           <div className="mt-6">
-            <div className="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold font-serif mb-2">Any brand identity</div>
+            <div className="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold font-display mb-2">Any brand identity</div>
             <div className="flex gap-2">
               <div className="w-5 h-5 rounded-full bg-[#ff3c6e] ring-1 ring-white/10" />
               <div className="w-5 h-5 rounded-full bg-[#38bdf8] ring-1 ring-white/10" />
@@ -87,7 +87,7 @@ export function LandingFeaturesSection() {
             <div className="w-full h-full bg-[radial-gradient(#ffffff90_1px,#00000020_1px)] bg-size-[10px_10px]"></div>
           </div>
           <div className="relative z-10">
-            <h3 className="text-3xl font-display font-bold text-on-surface mb-6 uppercase  tracking-[4px] opacity-80 ">Built for Resilience</h3>
+            <h3 className="text-3xl font-display font-normal text-on-surface mb-6 uppercase  tracking-[4px] opacity-80 ">Built for Resilience</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-5 md:gap-8">
               <div className="space-y-1">
                 <div className="text-lg md:text-xl font-mono text-on-surface">100%</div>
