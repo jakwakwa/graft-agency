@@ -2,7 +2,6 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "./styles/hero.css";
-
 @custom-variant dark (&:is(.dark *));
 
 /*
@@ -18,7 +17,6 @@
   - tertiary container #ff571a → --accent (gradient stop)
   - outline_variant #605F60 @ 15% → --outline-ghost (accessible ghost edge)
 */
-
 :root {
   color: #111827;
   background-color: #121111;
@@ -87,7 +85,6 @@ body {
   /* Base */
   --background: hsl(260, 10%, 6%);
   --foreground: #f6f3f1;
-
   /* Surfaces — tonal depth, no hard borders */
   --card: #4d88da1a;
   --card-foreground: #aab0da;
@@ -95,46 +92,37 @@ body {
   --popover-foreground: #ffd7d7;
   --muted: #717ecb1e;
   --muted-foreground: #b1aeae;
-
   --primary: #006aebf7;
   --primary-container: #e7435c;
   --primary-kinetic: hsla(256, 94%, 54%, 0.813);
   --primary-foreground: #c4c7ef;
-
   /* Secondary — soft blossom */
   --secondary: #28daf9;
   --secondary-container: #09a5ee;
   --secondary-foreground: #f46346;
-
   /* Accent — tangerine */
   --accent: #0688d4ed;
   --accent-foreground: #7f9bf7;
-
   /* Semantic */
   --destructive: #de4a59;
   --destructive-foreground: #f4c6c9;
-  
   --border: transparent;
   --input: color-mix(in srgb, #7272f4eb 30%, #3c2ff1);
   --input-background: color-mix(in srgb, #c2cbce8c 10%, #0606089a);
   --input-background-hover: color-mix(in srgb, #08192d 20%, #4f4f4f);
   --ring: #e74123;
-
   /* Ghost outline — outline-variant at 15% */
   --outline-ghost: color-mix(in srgb, #8777f9 15%, transparent);
-
   /* Surface tiers for cards/chips */
   --surface-container-high: color-mix(in srgb, #e0b432 58%, #cd4078);
   --surface-highest: color-mix(in srgb, #0156c4c4 12%, #d45f3f);
   --on-surface-variant: color-mix(in srgb, #b1caeb 15%, oklch(93.293% 0.02702 226.929 / 0.522));
-
   /* Charts */
   --chart-1: oklch(79.786% 0.127 60.915);
   --chart-2: hsl(199, 89%, 55%);
   --chart-3: hsla(0, 94%, 68%, 0.97);
   --chart-4: #c300c3;
   --chart-5: #1d6fc6;
-
   /* Sidebar */
   --sidebar: #7048d4;
   --sidebar-foreground: #c4c4c4;
@@ -144,13 +132,11 @@ body {
   --sidebar-accent-foreground: #3f3f3f;
   --sidebar-border: color-mix(in srgb, #3c3c3c 8%, transparent);
   --sidebar-ring: #eae086;
-
   /* Shadows & glow */
   --shadow-ambient: 0 24px 48px -12px rgba(61, 158, 255, 0.147);
   --shadow-neon: 0 0 26px -5px #0c53fbd8;
   --shadow-neon-primary: 0 0 20px #1748fa7f;
   --shadow-neon-secondary: 0 0 16px rgba(95, 118, 247, 0.81);
-
   /* Glass surfaces */
   --glass-background: rgba(116, 124, 216, 0.64);
   --glass-border: #798ef75e;
@@ -269,6 +255,7 @@ body {
   .shadow-neon {
     box-shadow: var(--shadow-neon);
   }
+
   select,
   input,
   textarea {
@@ -289,7 +276,6 @@ body {
   .glass-card {
     background: var(--glass-background);
     -webkit-backdrop-filter: blur(25px) !important;
-
     backdrop-filter: blur(25px);
     padding: 30px !important;
     background: linear-gradient(310deg, #db707224 -20%, rgba(8, 19, 33, 0.685) 30%, oklch(0.32 0.01 261.72 / 0.3) 117%) !important;
@@ -297,7 +283,7 @@ body {
     border: 1px solid oklch(0.22 0 17.28 / 0.55);
     box-shadow:
       inset -1px -2px 1px 0px var(--glass-border),
-      inset 0px 2px 3px -2px oklch(24.092% 0.01834 234.927 / 0.55),  0px 2px 23px -2px oklch(20.155% 0.03625 232.498 / 0.602);
+      inset 0px 2px 3px -2px oklch(24.092% 0.01834 234.927 / 0.55), 0px 2px 23px -2px oklch(20.155% 0.03625 232.498 / 0.602);
   }
 
   .bg-ethereal-gradient {
@@ -348,10 +334,12 @@ body {
 }
 
 @keyframes status-pulse-glow {
+
   0%,
   100% {
     box-shadow: 0 0 0 0 rgba(3 237 214 / 0.68);
   }
+
   50% {
     box-shadow: 0 0 20px 6px rgba(76 151 222 / 0.68);
   }
@@ -362,10 +350,12 @@ body {
     box-shadow: 0 0 0 0 rgba(105 248 227 / 0.12);
     transform: scale(0.95);
   }
+
   70% {
     box-shadow: 0 0 0 8px rgb(248 146 105 / 0);
     transform: scale(1);
   }
+
   100% {
     box-shadow: 0 0 0 0 rgba(181 14 247 / 0.36);
     transform: scale(0.95);
@@ -376,9 +366,11 @@ body {
   0% {
     transform: scaleX(0);
   }
+
   50% {
     transform: scaleX(0.7);
   }
+
   100% {
     transform: scaleX(1);
   }
@@ -390,6 +382,7 @@ body {
     opacity: 0;
     transform: translate3d(0, 1.25rem, 0);
   }
+
   to {
     opacity: 1;
     transform: translate3d(0, 0, 0);
@@ -397,6 +390,7 @@ body {
 }
 
 @layer base {
+
   *,
   ::before,
   ::after {
@@ -413,12 +407,12 @@ body {
   }
 
   a {
-    font-size: 12px ;
+    font-size: 12px;
     color: #bfc3fb !important;
   }
 
   a:hover {
-    color: hsl(351, 87%, 54%) ;
+    color: hsl(351, 87%, 54%);
   }
 
   @media (prefers-reduced-motion: no-preference) {
