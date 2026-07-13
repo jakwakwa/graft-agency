@@ -100,7 +100,7 @@ export default async function AutomationHubPage() {
           <div className="w-10 h-10 rounded-full border-2 border-primary bg-primary/10 flex items-center justify-center text-primary font-bold shadow-neon-primary transition-all duration-300">
             ✓
           </div>
-          <span className="text-[10px] font-data uppercase tracking-widest text-primary font-bold">{label}</span>
+          <span className="text-[10px] font-data capitalize tracking-widest text-primary font-bold">{label}</span>
         </div>
       );
     }
@@ -110,7 +110,7 @@ export default async function AutomationHubPage() {
           <div className="w-10 h-10 rounded-full border-2 border-primary bg-background flex items-center justify-center text-primary font-bold animate-pulse shadow-neon transition-all duration-300">
             {stepIndex}
           </div>
-          <span className="text-[10px] font-data uppercase tracking-widest text-primary font-medium">{label}</span>
+          <span className="text-[10px] font-data capitalize tracking-widest text-primary font-medium">{label}</span>
         </div>
       );
     }
@@ -119,7 +119,7 @@ export default async function AutomationHubPage() {
         <div className="w-10 h-10 rounded-full border-2 border-outline-ghost flex items-center justify-center text-muted-foreground font-medium">
           {stepIndex}
         </div>
-        <span className="text-[10px] font-data uppercase tracking-widest text-muted-foreground">{label}</span>
+        <span className="text-[10px] font-data capitalize tracking-widest text-muted-foreground">{label}</span>
       </div>
     );
   };
@@ -152,7 +152,7 @@ export default async function AutomationHubPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
               <Card className="border-l-4 border-primary bg-card/40 backdrop-blur-md">
                 <CardHeader className="p-4 pb-1">
-                  <Typography.Small className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                  <Typography.Small className="text-[10px] capitalize tracking-widest text-muted-foreground">
                     Leads Orchestrated
                   </Typography.Small>
                 </CardHeader>
@@ -164,7 +164,7 @@ export default async function AutomationHubPage() {
 
               <Card className="border-l-4 border-secondary bg-card/40 backdrop-blur-md">
                 <CardHeader className="p-4 pb-1">
-                  <Typography.Small className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                  <Typography.Small className="text-[10px] capitalize tracking-widest text-muted-foreground">
                     Active Conversations
                   </Typography.Small>
                 </CardHeader>
@@ -180,13 +180,13 @@ export default async function AutomationHubPage() {
 
               <Card className="border-l-4 border-accent bg-card/40 backdrop-blur-md">
                 <CardHeader className="p-4 pb-1">
-                  <Typography.Small className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                  <Typography.Small className="text-[10px] capitalize tracking-widest text-muted-foreground">
                     Conversion Rate
                   </Typography.Small>
                 </CardHeader>
                 <CardContent className="p-4 pt-0 flex items-baseline gap-2">
                   <Typography.H2 className="text-4xl font-bold pb-0">{conversionVelocity}%</Typography.H2>
-                  <span className="text-[10px] text-accent font-data uppercase tracking-tighter">
+                  <span className="text-[10px] text-accent font-data capitalize tracking-tighter">
                     {Number(conversionVelocity) > 80 ? "Elite Level" : "Standard"}
                   </span>
                 </CardContent>
@@ -275,7 +275,7 @@ export default async function AutomationHubPage() {
                             className={`flex gap-3 text-[11px] border-l-2 pl-3 py-1 transition-all duration-300 ${statusColorClass}`}
                           >
                             <span className="text-muted-foreground whitespace-nowrap">{timeStr}</span>
-                            <span className="font-bold uppercase tracking-wider">{log.category}:</span>
+                            <span className="font-bold capitalize tracking-wider">{log.category}:</span>
                             <span className="text-foreground/80 leading-relaxed break-words">
                               {log.message || log.eventType}
                             </span>
