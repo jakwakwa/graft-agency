@@ -15,7 +15,7 @@ export function LandingHero() {
         aria-hidden
       />
       <div className="relative mx-auto max-w-4xl text-center">
-        <Typography.H1 className="font-serif text-4xl tracking-tight md:text-5xl md:leading-tight">
+        <Typography.H1 className="font-display text-4xl tracking-tight md:text-5xl md:leading-tight">
           AI agency automation, built for growth teams
         </Typography.H1>
         <Typography.Lead className="mx-auto mt-6 max-w-2xl text-muted-foreground">

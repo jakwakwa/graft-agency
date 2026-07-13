@@ -85,13 +85,13 @@ export function LandingHeroSection() {
 
             {/* Headline */}
             <motion.h1 className="hero-headline" variants={HEADLINE_VARIANTS} initial="hidden" animate="visible">
-              {["THE ASSISTANT"].map((word) => (
+              {["The Assistant"].map((word) => (
                 <motion.span key={word} className="hero-headline__word" variants={WORD_VARIANTS}>
                   {word}{" "}
                 </motion.span>
               ))}
               <br />
-              {["THAT NEVER"].map((word) => (
+              {["That Never"].map((word) => (
                 <motion.span
                   key={word}
                   className="hero-headline__word hero-headline__word--gradient"
@@ -101,7 +101,7 @@ export function LandingHeroSection() {
                 </motion.span>
               ))}
               <motion.span className="hero-headline__word hero-headline__word--gradient" variants={WORD_VARIANTS}>
-                SLEEPS.
+                Sleeps.
               </motion.span>
             </motion.h1>
 
@@ -125,15 +125,15 @@ export function LandingHeroSection() {
             </motion.div>
 
             {/* Stats */}
-            <motion.div className="hero-stats" variants={FADE_UP} initial="hidden" animate="visible" custom={1.1}>
+            <motion.div className="hero-stats font-display text-sm" variants={FADE_UP} initial="hidden" animate="visible" custom={1.1}>
               {[
-                { value: "0ms", label: "Latency" },
-                { value: "99.9%", label: "Reliance" },
+                { value: "Ai Chatbots", label: "Instant Setup" },
+                { value: "Scheduler", label: "Reliance" },
                 { value: "24/7", label: "Up-Time" },
               ].map((stat) => (
                 <div key={stat.label} className="hero-stat">
-                  <span className="hero-stat__value">{stat.value}</span>
-                  <span className="hero-stat__label">{stat.label}</span>
+                  <span className="hero-stat__value text-sm">{stat.value}</span>
+                  <span className="hero-stat__label text-xs" >{stat.label}</span>
                 </div>
               ))}
             </motion.div>
