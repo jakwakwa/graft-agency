@@ -67,16 +67,17 @@ describe("julesBuilderHandler", () => {
     prdContent: "## PRD Content",
   };
 
-  const sampleConcepts: DesignConcept[] = [
-    {
-      index: 0,
-      name: "Concept 1",
-      description: "A super clean look",
-      colorScheme: { primary: "#fff", background: "#000", text: "#ccc" },
-      components: ["Hero"],
-      styleKeywords: ["modern"],
-    } as unknown as DesignConcept,
-  ];
+  const sampleConcept: DesignConcept = {
+    index: 0,
+    name: "Concept 1",
+    description: "A super clean look",
+    colorScheme: { primary: "#fff", background: "#000", text: "#ccc" },
+    components: ["Hero"],
+    styleKeywords: ["modern"],
+    screenId: "screen-1",
+    projectId: "project-1",
+  };
+  const sampleConcepts: DesignConcept[] = [sampleConcept];
 
   const testMatrix = [
     // 1. STITCH_TEMP_DISABLE is set (should bypass regardless of designConcepts)
@@ -147,7 +148,7 @@ describe("julesBuilderHandler", () => {
       }
 
       const mockStep = {
-        run: vi.fn(async <T>(_id: string, fn: () => T | Promise<T>) => await fn()),
+        run: async <T>(_id: string, fn: () => T | Promise<T>): Promise<T> => await fn(),
         sendEvent: vi.fn(async (_id: string, _event: { name: string; data: Record<string, unknown> }) =>
           Promise.resolve(undefined),
         ),
@@ -196,7 +197,7 @@ describe("julesBuilderHandler", () => {
 
     it("should fallback to designConcepts[0] when chosenDesignIndex is out of bounds", async () => {
       const mockStep = {
-        run: vi.fn(async <T>(_id: string, fn: () => T | Promise<T>) => await fn()),
+        run: async <T>(_id: string, fn: () => T | Promise<T>): Promise<T> => await fn(),
         sendEvent: vi.fn(async (_id: string, _event: { name: string; data: Record<string, unknown> }) =>
           Promise.resolve(undefined),
         ),
@@ -219,7 +220,7 @@ describe("julesBuilderHandler", () => {
 
     it("should fallback to designConcepts[0] when chosenDesignIndex is undefined", async () => {
       const mockStep = {
-        run: vi.fn(async <T>(_id: string, fn: () => T | Promise<T>) => await fn()),
+        run: async <T>(_id: string, fn: () => T | Promise<T>): Promise<T> => await fn(),
         sendEvent: vi.fn(async (_id: string, _event: { name: string; data: Record<string, unknown> }) =>
           Promise.resolve(undefined),
         ),
@@ -242,14 +243,14 @@ describe("julesBuilderHandler", () => {
 
     it("should throw if designConcepts has non-empty length but no element at 0 (sparse array scenario)", async () => {
       const mockStep = {
-        run: vi.fn(async <T>(_id: string, fn: () => T | Promise<T>) => await fn()),
+        run: async <T>(_id: string, fn: () => T | Promise<T>): Promise<T> => await fn(),
         sendEvent: vi.fn(async (_id: string, _event: { name: string; data: Record<string, unknown> }) =>
           Promise.resolve(undefined),
         ),
       };
 
       const sparseConcepts: DesignConcept[] = [];
-      sparseConcepts[1] = sampleConcepts[0]; // index 0 is undefined, index 1 is defined
+      sparseConcepts[1] = sampleConcept; // index 0 is undefined, index 1 is defined
       sparseConcepts.length = 2;
 
       await expect(
@@ -284,7 +285,7 @@ describe("julesBuilderHandler", () => {
       };
 
       const mockStep = {
-        run: vi.fn(async <T>(_id: string, fn: () => T | Promise<T>) => await fn()),
+        run: async <T>(_id: string, fn: () => T | Promise<T>): Promise<T> => await fn(),
         sendEvent: vi.fn(async () => Promise.resolve(undefined)),
       };
 

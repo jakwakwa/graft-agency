@@ -7,6 +7,9 @@ const { runProspectingScheduledJob } = vi.hoisted(() => ({
 vi.mock("@/lib/services/prospecting-scheduler.service", () => ({
   runProspectingScheduledJob,
 }));
+vi.mock("@/lib/auth/resolve-client", () => ({
+  getPlatformClientId: vi.fn().mockResolvedValue("platform-client-id"),
+}));
 
 describe("GET /api/cron/prospecting", () => {
   const originalEnv = process.env;
