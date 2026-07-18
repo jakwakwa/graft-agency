@@ -14,7 +14,8 @@ export function LandingHardenedGrid() {
           </h2>
           <p className="text-on-surface-variant leading-relaxed">
             Our platform is engineered on top of a globally distributed edge network. Every request is handled by the
-            nearest data center, ensuring the <span className="text-chart-1">low latency</span> experience your premium clients expect.
+            nearest data center, ensuring the <span className="text-chart-1">low latency</span> experience your premium
+            clients expect.
           </p>
           <div className="space-y-4">
             <div className="flex items-start gap-4 p-4 rounded-lg bg-surface-container-highest/50">

@@ -70,9 +70,7 @@ describe("POST /api/billing/builds/checkout", () => {
     const res = await POST(makeRequest({ priceId: "pri_landing" }));
 
     expect(res.status).toBe(409);
-    expect(await res.json()).toEqual(
-      expect.objectContaining({ code: "BUILD_ALREADY_PURCHASED" }),
-    );
+    expect(await res.json()).toEqual(expect.objectContaining({ code: "BUILD_ALREADY_PURCHASED" }));
     expect(createTransaction).not.toHaveBeenCalled();
   });
 

@@ -15,7 +15,7 @@ const workSans = Work_Sans({
 
 const beVietnamPro = Playfair({
   subsets: ["latin"],
-  weight: ["300","400", "500"],
+  weight: ["300", "400", "500"],
   variable: "--font-display",
   display: "swap",
 });
