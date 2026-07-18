@@ -86,11 +86,10 @@ function Button() {
           "linear-gradient(90deg, rgba(32, 19, 215, 0.07) 0%, rgba(32, 19, 215, 0.07) 100%), linear-gradient(130.253deg, rgba(104, 85, 229, 0.71) 2.2187%, rgba(98, 201, 238, 0.29) 11.126%, rgba(76, 115, 216, 0.29) 23.71%, rgba(255, 26, 240, 0.184) 84.392%, rgba(235, 163, 54, 0.71) 103.81%)",
       }}
     >
-
       <div className="flex flex-col font-['Inter:Semi_Bold',sans-serif] font-semibold h-[28px] justify-center leading-[0] not-italic relative shrink-0 text-[#d4dcde] text-[16px] text-center text-shadow-[3px_3px_4.6px_rgba(0,0,0,0.26)] w-[214.14px]">
         <p className="leading-[28px]">Hire a AI Receptionist</p>
       </div>
-     
+
       <Container4 />
     </div>
   );
@@ -1414,65 +1413,79 @@ function Container60() {
   );
 }
 
+function CtaDecorativeElement1() {
+  return (
+    <div
+      className="-translate-x-1/2 -translate-y-1/2 absolute h-[383px] left-[calc(50%+246.5px)] top-[calc(50%+270px)] w-[825px]"
+      data-name="Decorative Elements"
+    >
+      <div className="absolute inset-[-31.33%_-14.55%]">
+        <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 1065 623">
+          <title>Decorative Elements 1</title>
+          <g filter="url(#filter0_f_1_353)" id="Decorative Elements">
+            <path d={svgPaths.p9436980} fill="var(--fill-0, #5810C4)" fillOpacity="0.05" />
+            <path d={svgPaths.p9436980} fill="var(--fill-1, #612FF5)" fillOpacity="0.05" />
+          </g>
+          <defs>
+            <filter
+              colorInterpolationFilters="sRGB"
+              filterUnits="userSpaceOnUse"
+              height="623"
+              id="filter0_f_1_353"
+              width="1065"
+              x="0"
+              y="0"
+            >
+              <feFlood floodOpacity="0" result="BackgroundImageFix" />
+              <feBlend in="SourceGraphic" in2="BackgroundImageFix" mode="normal" result="shape" />
+              <feGaussianBlur result="effect1_foregroundBlur_1_353" stdDeviation="60" />
+            </filter>
+          </defs>
+        </svg>
+      </div>
+    </div>
+  );
+}
+
+function CtaDecorativeElement2() {
+  return (
+    <div className="absolute h-[400px] left-[-138.5px] top-[40px] w-[800px]" data-name="Decorative Elements">
+      <div className="absolute inset-[-30%_-15%]">
+        <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 1040 640">
+          <title>Decorative Elements 2</title>
+          <g filter="url(#filter0_f_1_309)" id="Decorative Elements">
+            <path d="M120 120H920V520H120V120Z" fill="#2F71F5" fillOpacity="0.05" />
+            <path d="M120 120H920V520H120V120Z" fill="#EE1809" fillOpacity="0.05" />
+          </g>
+          <defs>
+            <filter
+              colorInterpolationFilters="sRGB"
+              filterUnits="userSpaceOnUse"
+              height="640"
+              id="filter0_f_1_309"
+              width="1040"
+              x="0"
+              y="0"
+            >
+              <feFlood floodOpacity="0" result="BackgroundImageFix" />
+              <feBlend in="SourceGraphic" in2="BackgroundImageFix" mode="normal" result="shape" />
+              <feGaussianBlur result="effect1_foregroundBlur_1_309" stdDeviation="60" />
+            </filter>
+          </defs>
+        </svg>
+      </div>
+    </div>
+  );
+}
+
 function CtaSectionTheForge() {
   return (
     <div className="relative shrink-0 w-full" data-name="CTA Section: The Forge">
       <div className="overflow-clip rounded-[inherit] size-full">
         <div className="content-stretch flex flex-col items-start px-[192px] py-[96px] relative w-full">
           <Container60 />
-          <div
-            className="-translate-x-1/2 -translate-y-1/2 absolute h-[383px] left-[calc(50%+246.5px)] top-[calc(50%+270px)] w-[825px]"
-            data-name="Decorative Elements"
-          >
-            <div className="absolute inset-[-31.33%_-14.55%]">
-              <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 1065 623">
-                <g filter="url(#filter0_f_1_353)" id="Decorative Elements">
-                  <path d={svgPaths.p9436980} fill="var(--fill-0, #5810C4)" fillOpacity="0.05" />
-                  <path d={svgPaths.p9436980} fill="var(--fill-1, #612FF5)" fillOpacity="0.05" />
-                </g>
-                <defs>
-                  <filter
-                    colorInterpolationFilters="sRGB"
-                    filterUnits="userSpaceOnUse"
-                    height="623"
-                    id="filter0_f_1_353"
-                    width="1065"
-                    x="0"
-                    y="0"
-                  >
-                    <feFlood floodOpacity="0" result="BackgroundImageFix" />
-                    <feBlend in="SourceGraphic" in2="BackgroundImageFix" mode="normal" result="shape" />
-                    <feGaussianBlur result="effect1_foregroundBlur_1_353" stdDeviation="60" />
-                  </filter>
-                </defs>
-              </svg>
-            </div>
-          </div>
-          <div className="absolute h-[400px] left-[-138.5px] top-[40px] w-[800px]" data-name="Decorative Elements">
-            <div className="absolute inset-[-30%_-15%]">
-              <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 1040 640">
-                <g filter="url(#filter0_f_1_309)" id="Decorative Elements">
-                  <path d="M120 120H920V520H120V120Z" fill="#2F71F5" fillOpacity="0.05" />
-                  <path d="M120 120H920V520H120V120Z" fill="#EE1809" fillOpacity="0.05" />
-                </g>
-                <defs>
-                  <filter
-                    colorInterpolationFilters="sRGB"
-                    filterUnits="userSpaceOnUse"
-                    height="640"
-                    id="filter0_f_1_309"
-                    width="1040"
-                    x="0"
-                    y="0"
-                  >
-                    <feFlood floodOpacity="0" result="BackgroundImageFix" />
-                    <feBlend in="SourceGraphic" in2="BackgroundImageFix" mode="normal" result="shape" />
-                    <feGaussianBlur result="effect1_foregroundBlur_1_309" stdDeviation="60" />
-                  </filter>
-                </defs>
-              </svg>
-            </div>
-          </div>
+          <CtaDecorativeElement1 />
+          <CtaDecorativeElement2 />
         </div>
       </div>
     </div>
