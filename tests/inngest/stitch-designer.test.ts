@@ -52,16 +52,17 @@ describe("stitchDesignerHandler", () => {
     prdContent: "## Design Direction\n### Visual Effects\nModern look\n### Section Layout\n- Hero: text",
   };
 
-  const sampleConcepts: DesignConcept[] = [
-    {
-      index: 0,
-      name: "Concept 1",
-      description: "A super clean look",
-      colorScheme: { primary: "#fff", background: "#000", text: "#ccc" },
-      components: ["Hero"],
-      styleKeywords: ["modern"],
-    } as unknown as DesignConcept,
-  ];
+  const sampleConcept: DesignConcept = {
+    index: 0,
+    name: "Concept 1",
+    description: "A super clean look",
+    colorScheme: { primary: "#fff", background: "#000", text: "#ccc" },
+    components: ["Hero"],
+    styleKeywords: ["modern"],
+    screenId: "screen-1",
+    projectId: "project-1",
+  };
+  const sampleConcepts: DesignConcept[] = [sampleConcept];
 
   const testMatrix = [
     { value: "1", expectedBypass: true, desc: "string '1'" },
@@ -87,7 +88,7 @@ describe("stitchDesignerHandler", () => {
 
       it(`correctly handles bypass state: expectedBypass=${t.expectedBypass}`, async () => {
         const mockStep = {
-          run: vi.fn(async <T>(_id: string, fn: () => T | Promise<T>) => await fn()),
+          run: async <T>(_id: string, fn: () => T | Promise<T>): Promise<T> => await fn(),
           sendEvent: vi.fn(async (_id: string, _event: { name: string; data: Record<string, unknown> }) =>
             Promise.resolve(undefined),
           ),

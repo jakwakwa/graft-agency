@@ -11,6 +11,14 @@ vi.mock("@/lib/auth/resolve-client", () => ({
 
 vi.mock("@/lib/db/prisma", () => ({
   default: {
+    client: {
+      findFirst: vi.fn().mockResolvedValue({
+        isPlatformOwner: true,
+        subscriptionActive: false,
+        subscriptionStatus: "inactive",
+        subscriptionAddons: [],
+      }),
+    },
     agentConfig: {
       upsert: vi.fn(),
     },

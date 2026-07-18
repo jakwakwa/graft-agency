@@ -58,8 +58,7 @@ describe("PricingSection", () => {
   it("renders the landing section as information only", () => {
     render(<PricingSection catalogue={catalogue} mode="landing" paddleConfig={paddleConfig} />);
 
-    // The heading uses a non-breaking hyphen (&#8209;) in "always‑on"; match loosely.
-    expect(screen.getByRole("heading", { name: /Simple pricing for always.on growth/ })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Simple pricing for faster growth" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "View portal billing" })).toHaveAttribute("href", "/portal/billing");
     expect(screen.queryByRole("button", { name: "Subscribe to AI Chatbot" })).not.toBeInTheDocument();
   });
@@ -119,6 +118,10 @@ describe("PricingSection", () => {
     );
 
     expect(screen.queryByRole("button", { name: "Subscribe to AI Chatbot" })).not.toBeInTheDocument();
-    expect(screen.getByText("Included in your active subscription")).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "If you want us to integrate the AI assistant into a new website, opt for one of these build packages",
+      ),
+    ).toBeInTheDocument();
   });
 });

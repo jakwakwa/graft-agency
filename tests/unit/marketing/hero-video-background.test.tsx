@@ -1,27 +1,24 @@
-import { fireEvent, render } from "@testing-library/react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { render } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { HeroVideoBackground } from "@/components/marketing/landing-v2/hero-video-background";
 
-function getRenderedVideo() {
-  const video = document.querySelector("video");
-  if (!video) {
-    throw new Error("Expected hero video to render");
+function getRenderedBackgroundImage() {
+  const image = document.querySelector("img.hero-video");
+  if (!image) {
+    throw new Error("Expected hero background image to render");
   }
 
-  return video;
+  return image;
 }
 
 describe("HeroVideoBackground", () => {
   beforeEach(() => {
-    vi.spyOn(window.HTMLMediaElement.prototype, "play").mockResolvedValue(undefined);
     Object.defineProperty(window, "matchMedia", {
       writable: true,
       value: vi.fn().mockImplementation((query) => ({
         matches: false,
         media: query,
         onchange: null,
-        addListener: vi.fn(), // deprecated
-        removeListener: vi.fn(), // deprecated
         addEventListener: vi.fn(),
         removeEventListener: vi.fn(),
         dispatchEvent: vi.fn(),
@@ -29,24 +26,15 @@ describe("HeroVideoBackground", () => {
     });
   });
 
-  afterEach(() => {
-    vi.restoreAllMocks();
-  });
-
-  it("reveals the video when first frame data is loaded", () => {
+  it("renders the static hero background image on desktop", () => {
     render(<HeroVideoBackground src="/Robot_concierge.mp4" />);
 
-    const video = getRenderedVideo();
-    expect(video).toHaveStyle({ opacity: "0" });
-
-    fireEvent.loadedData(video);
-
-    expect(video).toHaveStyle({ opacity: "1" });
+    expect(getRenderedBackgroundImage()).toHaveAttribute("src", "Robot_concierge.jpg");
   });
 
-  it("loops the background video playback", () => {
+  it("does not render the retired video element", () => {
     render(<HeroVideoBackground src="/Robot_concierge.mp4" />);
 
-    expect(getRenderedVideo()).toHaveAttribute("loop");
+    expect(document.querySelector("video")).not.toBeInTheDocument();
   });
 });
