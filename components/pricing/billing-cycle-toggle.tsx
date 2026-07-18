@@ -18,7 +18,9 @@ export function BillingCycleToggle({ selectedCycle, onSelectCycle }: BillingCycl
           onClick={() => onSelectCycle(cycle)}
           className={cn(
             "rounded-full px-4 py-2 text-xs font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",
-            selectedCycle === cycle ? "bg-primary text-blue-200 shadow-indigo-950 border-1 border-blue-400 text-shadow-md font-bold tracking-wide shadow-md shadow-black" : "text-on-surface-variant hover:text-on-surface",
+            selectedCycle === cycle
+              ? "bg-primary text-blue-200 shadow-indigo-950 border-1 border-blue-400 text-shadow-md font-bold tracking-wide shadow-md shadow-black"
+              : "text-on-surface-variant hover:text-on-surface",
           )}
         >
           {cycle === "monthly" ? "Monthly" : "Annual"}
