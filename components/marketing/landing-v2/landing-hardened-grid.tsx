@@ -10,11 +10,11 @@ export function LandingHardenedGrid() {
         <div className="lg:w-1/2 space-y-6">
           <h2 className="text-lg md:text-6xl font-normal font-display text-on-surface tracking-tight">
             Grid-Hardened <br />
-            <span className="text-chart-5">Engineered Software</span>
+            <span className="text-chart-1">Engineered Software</span>
           </h2>
           <p className="text-on-surface-variant leading-relaxed">
             Our platform is engineered on top of a globally distributed edge network. Every request is handled by the
-            nearest node, ensuring the 0ms latency experience your premium clients expect.
+            nearest data center, ensuring the <span className="text-chart-1">low latency</span> experience your premium clients expect.
           </p>
           <div className="space-y-4">
             <div className="flex items-start gap-4 p-4 rounded-lg bg-surface-container-highest/50">

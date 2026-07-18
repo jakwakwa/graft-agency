@@ -108,7 +108,7 @@ export function LandingHeroSection() {
             {/* Subtitle */}
             <motion.p className="hero-subtitle" variants={FADE_UP} initial="hidden" animate="visible" custom={0.7}>
               While you and your competitors close for the night, your GRAFT white-labelled AI assistant can tirelessly answer customer questions, capture leads, and book
-              appointments with unmatched reliability and affordability - while also triaging more complex customer queries to you or your teams in your GRAFT.TODAY assistant</motion.p>
+              appointments with unmatched reliability and affordability - while also triaging more complex customer queries to you or your teams in your GRAFT.TODAY assistant dashboard</motion.p>
           
 
             {/* CTA buttons */}
