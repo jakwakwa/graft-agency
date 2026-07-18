@@ -36,7 +36,7 @@ const DESIGN_DIRECTION_SPEC = `**Design Direction** — A comprehensive, structu
    - Outline: rgba(X, X, X, X)
 
    ### Typography
-   Name a specific headline font (serif or display, e.g. "Playfair Display") and a specific body font (sans-serif, e.g. "Inter"). Include the font category.
+   Name a specific, tailored headline font (e.g. "Newsreader" or "Cabinet Grotesk") and a distinctive body font (e.g. "Geist", "Outfit", or "DM Sans"). Do NOT default to "Inter" or "Playfair Display". Be creative and match the fonts to the project's vibe. Include the font category.
 
    ### Theme Mode
    State "dark" or "light".`;

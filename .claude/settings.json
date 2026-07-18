@@ -36,9 +36,7 @@
     ]
   },
   "worktree": {
-    "symlinkDirectories": [
-      ".claude"
-    ],
+    "symlinkDirectories": [".claude"],
     "baseRef": "head",
     "bgIsolation": "none"
   },

@@ -15,7 +15,10 @@ export function LandingFeaturesSection() {
         </p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6 h-auto md:h-[600px]">
-        <div id="lead-capture" className="glass-card  md:col-span-8 glass-panel rounded-xl p-4 sm:p-6 md:p-8 relative overflow-hidden transition-colors">
+        <div
+          id="lead-capture"
+          className="glass-card  md:col-span-8 glass-panel rounded-xl p-4 sm:p-6 md:p-8 relative overflow-hidden transition-colors"
+        >
           <div className="absolute top-0 right-0 w-1/2 h-full opacity-10 group-hover:opacity-20 transition-opacity">
             <div className="relative h-full w-full">
               <Image
@@ -41,7 +44,10 @@ export function LandingFeaturesSection() {
             </div>
           </div>
         </div>
-        <div id="smart-triage" className="md:col-span-4 glass-panel rounded-xl p-4 sm:p-6 md:p-8 border-l-4 border-secondary flex flex-col justify-between group">
+        <div
+          id="smart-triage"
+          className="md:col-span-4 glass-panel rounded-xl p-4 sm:p-6 md:p-8 border-l-4 border-secondary flex flex-col justify-between group"
+        >
           <div>
             <div className="mb-3 inline-flex items-center justify-center w-8 h-8 rounded-lg bg-secondary/15">
               <CalendarClock className="h-8 w-8 text-secondary" />
@@ -56,13 +62,19 @@ export function LandingFeaturesSection() {
             <div className="text-[10px] uppercase tracking-widest font-bold mb-2">Triage Agent Log</div>
             <div className="space-y-1 opacity-60">
               <Shimmer className="text-[11px] font-mono">Visitor asking about pricing... </Shimmer>
-              <div>          <div className="text-[10px] text-emerald-300 animate-pulse font-mono">Qualified. Demo booked for Tue 09:00.</div>
+              <div>
+                {" "}
+                <div className="text-[10px] text-emerald-300 animate-pulse font-mono">
+                  Qualified. Demo booked for Tue 09:00.
+                </div>
               </div>
-
             </div>
           </div>
         </div>
-        <div id="white-label" className="md:col-span-4 glass-panel rounded-xl p-4 sm:p-6 md:p-8 border-r-4 border-primary flex flex-col justify-between">
+        <div
+          id="white-label"
+          className="md:col-span-4 glass-panel rounded-xl p-4 sm:p-6 md:p-8 border-r-4 border-primary flex flex-col justify-between"
+        >
           <div>
             <div className="mb-3 inline-flex items-center justify-center w-8 h-8 rounded-lg bg-primary/5">
               <IdCard className="h-8 w-8 text-indigo-400" />
@@ -73,12 +85,13 @@ export function LandingFeaturesSection() {
             </p>
           </div>
           <div className="mt-6">
-            <div className="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold font-display mb-2">Any brand identity</div>
+            <div className="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold font-display mb-2">
+              Any brand identity
+            </div>
             <div className="flex gap-2">
               <div className="w-5 h-5 rounded-full bg-[#ff3c6e] ring-1 ring-white/10" />
               <div className="w-5 h-5 rounded-full bg-[#38bdf8] ring-1 ring-white/10" />
               <div className="w-5 h-5 rounded-full bg-[#a78bfa] ring-1 ring-white/10" />
-            
             </div>
           </div>
         </div>
@@ -87,21 +100,25 @@ export function LandingFeaturesSection() {
             <div className="w-full h-full bg-[radial-gradient(#ffffff90_1px,#00000020_1px)] bg-size-[10px_10px]"></div>
           </div>
           <div className="relative z-10">
-            <h3 className="text-3xl font-display font-normal text-on-surface mb-6 uppercase  tracking-[4px] opacity-80 ">Built for Resilience</h3>
+            <h3 className="text-3xl font-display font-normal text-on-surface mb-6 uppercase  tracking-[4px] opacity-80 ">
+              Built for Resilience
+            </h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-5 md:gap-8">
               <div className="space-y-1">
                 <div className="text-lg md:text-xl font-mono text-on-surface">100%</div>
-                <span className="text-[9px] uppercase  tracking-[4px] opacity-40   font-bold">
-                  Stateless Arch
-                </span>
+                <span className="text-[9px] uppercase  tracking-[4px] opacity-40   font-bold">Stateless Arch</span>
               </div>
               <div className="space-y-1">
                 <div className="text-lg md:text-xl font-mono text-on-surface">99.99%</div>
-                <span className="text-[9px] uppercase  tracking-[4px] opacity-20   font-bold animate-pulse">Uptime</span>
+                <span className="text-[9px] uppercase  tracking-[4px] opacity-20   font-bold animate-pulse">
+                  Uptime
+                </span>
               </div>
               <div className="space-y-1">
                 <div className="text-lg md:text-xl font-mono text-on-surface">Global</div>
-                <span className="text-[9px] uppercase tracking-[4px] opacity-30 animate-pulse font-bold">Node Mesh</span>
+                <span className="text-[9px] uppercase tracking-[4px] opacity-30 animate-pulse font-bold">
+                  Node Mesh
+                </span>
               </div>
               <div className="space-y-1">
                 <div className="text-lg md:text-xl font-mono text-on-surface">Encrypted</div>

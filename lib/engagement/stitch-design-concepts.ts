@@ -165,9 +165,7 @@ Avoid these signatures
   sections.push(designSystemBlock.join("\n"));
 
   // ── FINAL INSTRUCTION ─────────────────────────────────────────────────────
-  sections.push(
-    `Target audience: ${request.targetAudience}.`,
-  );
+  sections.push(`Target audience: ${request.targetAudience}.`);
 
   return sections.join("\n\n");
 }
@@ -303,7 +301,9 @@ export async function generateDesignConcepts(request: StitchDesignRequest): Prom
     if (request.presetDisplayName) {
       try {
         const systems = await project.listDesignSystems();
-        const match = systems.find((d) => (d.data as { displayName?: string } | undefined)?.displayName === request.presetDisplayName);
+        const match = systems.find(
+          (d) => (d.data as { displayName?: string } | undefined)?.displayName === request.presetDisplayName,
+        );
         if (!match) {
           throw new Error(
             `preset "${request.presetDisplayName}" not found in project ${project.projectId}; ` +

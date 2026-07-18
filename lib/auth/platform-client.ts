@@ -51,10 +51,10 @@ export async function getPlatformClientId(): Promise<string | null> {
     return client?.id ?? null;
   } catch (error) {
     // Empty / unmigrated DBs (e.g. brand-new Prisma Postgres) must not fail SSG of `/`.
-      if (isMissingTableError(error)) {
-        console.warn("[resolve-client] clients table missing — returning null until migrations are applied.");
-        return null;
-      }
+    if (isMissingTableError(error)) {
+      console.warn("[resolve-client] clients table missing — returning null until migrations are applied.");
+      return null;
+    }
     throw error;
   }
 }
