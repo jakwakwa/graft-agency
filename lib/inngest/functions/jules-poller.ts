@@ -333,9 +333,7 @@ export const julesPollerFunction = inngest.createFunction(
     // is idempotent per leadId, so a duplicate emit from the reconciler is safe.
     if (deploymentUrl) {
       const clientId = await step.run("load-client-id", () =>
-        prisma.productSpec
-          .findUnique({ where: { leadId }, select: { clientId: true } })
-          .then((s) => s?.clientId ?? ""),
+        prisma.productSpec.findUnique({ where: { leadId }, select: { clientId: true } }).then((s) => s?.clientId ?? ""),
       );
       await step.sendEvent("emit-deployment-ready", {
         name: "engagement/deployment.ready",

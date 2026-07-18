@@ -1,9 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import {
-  createWebsiteBuildTransaction,
-  sendCampaignDraftToOwner,
-  sendOfferEmail,
-} from "@/lib/services/offer.service";
+import { createWebsiteBuildTransaction, sendCampaignDraftToOwner, sendOfferEmail } from "@/lib/services/offer.service";
 
 vi.mock("@/lib/paddle", () => ({
   paddle: {

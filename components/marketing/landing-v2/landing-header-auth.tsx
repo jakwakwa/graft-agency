@@ -1,7 +1,7 @@
 "use client";
 
 import { Show, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
-import { dark } from '@clerk/ui/themes'
+import { dark } from "@clerk/ui/themes";
 import Link from "next/link";
 import { Button } from "@/components/ui-v2/button";
 import { LANDING_ROUTES } from "./constants";

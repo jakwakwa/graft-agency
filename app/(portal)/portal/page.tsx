@@ -57,39 +57,39 @@ export default async function PortalDashboardPage() {
   const [entitlements, client, leads, activeBookings, conversationCount, recentConversations, agentConfig] =
     await Promise.all([
       getClientEntitlements(clientId),
-    prisma.client.findUnique({
-      where: { id: clientId },
-      select: { businessName: true },
-    }),
-    prisma.lead.findMany({
-      where: { clientId, source: "INBOUND" },
-      orderBy: { createdAt: "desc" },
-      take: 20,
-      select: {
-        id: true,
-        customerName: true,
-        email: true,
-        status: true,
-        createdAt: true,
-      },
-    }),
-    activeBookingsPromise,
-    prisma.conversation.count({
-      where: { clientId },
-    }),
-    prisma.conversation.findMany({
-      where: { clientId },
-      orderBy: { updatedAt: "desc" },
-      take: 3,
-      include: {
-        lead: {
-          select: {
-            customerName: true,
-            email: true,
+      prisma.client.findUnique({
+        where: { id: clientId },
+        select: { businessName: true },
+      }),
+      prisma.lead.findMany({
+        where: { clientId, source: "INBOUND" },
+        orderBy: { createdAt: "desc" },
+        take: 20,
+        select: {
+          id: true,
+          customerName: true,
+          email: true,
+          status: true,
+          createdAt: true,
+        },
+      }),
+      activeBookingsPromise,
+      prisma.conversation.count({
+        where: { clientId },
+      }),
+      prisma.conversation.findMany({
+        where: { clientId },
+        orderBy: { updatedAt: "desc" },
+        take: 3,
+        include: {
+          lead: {
+            select: {
+              customerName: true,
+              email: true,
+            },
           },
         },
-      },
-    }) as unknown as Promise<RecentConversation[]>,
+      }) as unknown as Promise<RecentConversation[]>,
       prisma.agentConfig.findUnique({
         where: { clientId },
         select: { agentName: true },

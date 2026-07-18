@@ -29,14 +29,14 @@ export type ProspectingRunResult = {
   rejected: number;
 };
 
-function formatCrmExclusionBlock(leads: { customerName: string | null; scrapedData: unknown }[]): string {
+function formatCrmExclusionBlock(leads: { customerName: string | null; websiteUrl: string | null }[]): string {
   const lines: string[] = [];
   let stoppedEarly = false;
   for (let i = 0; i < leads.length; i++) {
     const lead = leads[i];
     if (!lead) continue;
     const name = lead.customerName?.trim() ?? "";
-    const url = scrapedDataWebsiteUrl(lead.scrapedData) ?? "";
+    const url = lead.websiteUrl ?? "";
     if (!name && !url) continue;
     lines.push(`- ${name || "(unknown name)"}${url ? ` | ${url}` : ""}`);
     if (lines.length >= MAX_EXCLUSIONS_IN_PROMPT) {
@@ -54,12 +54,13 @@ function formatCrmExclusionBlock(leads: { customerName: string | null; scrapedDa
 async function loadCrmExclusionSets(clientId: string): Promise<{
   excludedNameKeys: Set<string>;
   excludedUrlKeys: Set<string>;
-  leads: { customerName: string | null; scrapedData: unknown }[];
+  leads: { customerName: string | null; websiteUrl: string | null }[];
 }> {
-  const leads = await prisma.lead.findMany({
-    where: { clientId },
-    select: { customerName: true, scrapedData: true },
-  });
+  const leads = await prisma.$queryRaw<{ customerName: string | null; websiteUrl: string | null }[]>`
+    SELECT customer_name as "customerName", scraped_data->>'websiteUrl' as "websiteUrl"
+    FROM "Lead"
+    WHERE client_id = ${clientId}
+  `;
 
   const excludedNameKeys = new Set<string>();
   const excludedUrlKeys = new Set<string>();
@@ -69,7 +70,7 @@ async function loadCrmExclusionSets(clientId: string): Promise<{
       const nk = normalizeProspectCompanyName(lead.customerName);
       if (nk) excludedNameKeys.add(nk);
     }
-    const url = scrapedDataWebsiteUrl(lead.scrapedData);
+    const url = lead.websiteUrl;
     if (url) {
       const uk = normalizeProspectWebsiteUrl(url);
       if (uk) excludedUrlKeys.add(uk);

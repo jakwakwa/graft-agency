@@ -107,9 +107,11 @@ export function LandingHeroSection() {
 
             {/* Subtitle */}
             <motion.p className="hero-subtitle" variants={FADE_UP} initial="hidden" animate="visible" custom={0.7}>
-              While you and your competitors close for the night, your GRAFT white-labelled AI assistant can tirelessly answer customer questions, capture leads, and book
-              appointments with unmatched reliability and affordability - while also triaging more complex customer queries to you or your teams in your GRAFT.TODAY assistant dashboard</motion.p>
-          
+              While you and your competitors close for the night, your GRAFT white-labelled AI assistant can tirelessly
+              answer customer questions, capture leads, and book appointments with unmatched reliability and
+              affordability - while also triaging more complex customer queries to you or your teams in your GRAFT.TODAY
+              assistant dashboard
+            </motion.p>
 
             {/* CTA buttons */}
             <motion.div className="hero-cta-group" variants={FADE_UP} initial="hidden" animate="visible" custom={0.9}>
@@ -125,7 +127,13 @@ export function LandingHeroSection() {
             </motion.div>
 
             {/* Stats */}
-            <motion.div className="hero-stats font-display text-sm" variants={FADE_UP} initial="hidden" animate="visible" custom={1.1}>
+            <motion.div
+              className="hero-stats font-display text-sm"
+              variants={FADE_UP}
+              initial="hidden"
+              animate="visible"
+              custom={1.1}
+            >
               {[
                 { value: "Ai Chatbots", label: "Instant Setup" },
                 { value: "Scheduler", label: "Reliance" },
@@ -133,7 +141,7 @@ export function LandingHeroSection() {
               ].map((stat) => (
                 <div key={stat.label} className="hero-stat">
                   <span className="hero-stat__value text-sm">{stat.value}</span>
-                  <span className="hero-stat__label text-xs" >{stat.label}</span>
+                  <span className="hero-stat__label text-xs">{stat.label}</span>
                 </div>
               ))}
             </motion.div>
