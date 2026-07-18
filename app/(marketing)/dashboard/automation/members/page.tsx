@@ -11,16 +11,12 @@ import { requirePlatformAccess } from "@/lib/auth/resolve-client";
 import prisma from "@/lib/db/prisma";
 import { InviteForm } from "./_components/invite-form";
 import { removeMemberAction, revokeInvitationAction } from "./actions";
+import { AccessDenied } from "@/components/shared/access-denied";
 
 export default async function MembersAdminPage() {
   const access = await requirePlatformAccess();
   if ("error" in access) {
-    return (
-      <div className="p-8">
-        <Typography.H2>Access Denied</Typography.H2>
-        <Typography.P>{access.error}</Typography.P>
-      </div>
-    );
+    return <AccessDenied error={access.error} />;
   }
 
   const platformOrganization = await resolvePlatformOrganizationForClient(access.clientId);

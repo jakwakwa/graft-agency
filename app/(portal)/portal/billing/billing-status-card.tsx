@@ -11,7 +11,10 @@ interface BillingStatusCardProps {
 }
 
 const STATUS_CONFIG: Record<SubscriptionStatus, { label: string; color: string }> = {
-  inactive: { label: "No subscription", color: "bg-gray-950 text-gray-100 border-2 border-gray-700 shadow-black shadow-sm min-w-30" },
+  inactive: {
+    label: "No subscription",
+    color: "bg-gray-950 text-gray-100 border-2 border-gray-700 shadow-black shadow-sm min-w-30",
+  },
   active: { label: "Active", color: "bg-green-100 text-green-700" },
   paused: { label: "Paused", color: "bg-yellow-100 text-yellow-700" },
   canceled: { label: "Cancelled", color: "bg-red-100 text-red-600" },

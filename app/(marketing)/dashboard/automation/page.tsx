@@ -9,32 +9,12 @@ import { Typography } from "@/components/ui/typography";
 import { requirePlatformAccess } from "@/lib/auth/resolve-client";
 import prisma from "@/lib/db/prisma";
 import { AutomationHubClient } from "./_components/automation-hub-client";
+import { AccessDenied } from "@/components/shared/access-denied";
 
 export default async function AutomationHubPage() {
   const access = await requirePlatformAccess();
   if ("error" in access) {
-    return (
-      <DashboardWrapper>
-        <AutomationWrapper>
-          <MarketingShell>
-            <div className="w-full max-w-6xl p-8 mx-auto flex flex-col items-center justify-center min-h-[50dvh]">
-              <div className="bg-destructive/10 border border-destructive/20 rounded-2xl p-8 max-w-md text-center space-y-4">
-                <div className="w-12 h-12 rounded-full bg-destructive/10 border border-destructive/20 flex items-center justify-center mx-auto">
-                  <AlertTriangle className="h-6 w-6 text-destructive" />
-                </div>
-                <Typography.H3 className="mt-0 text-foreground">Access Denied</Typography.H3>
-                <Typography.P className="text-sm text-muted-foreground leading-relaxed">{access.error}</Typography.P>
-                <Link href="/dashboard">
-                  <Button variant="outline" className="w-full mt-2">
-                    Back to Dashboard
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          </MarketingShell>
-        </AutomationWrapper>
-      </DashboardWrapper>
-    );
+    return <AccessDenied error={access.error} />;
   }
 
   const clientId = access.clientId;

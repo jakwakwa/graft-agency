@@ -82,8 +82,7 @@ export const offerDispatcherFunction = inngest.createFunction(
     const refinedSubject =
       sop?.refinedEmail?.subject ??
       (typeof scraped.draftSubject === "string" ? scraped.draftSubject : `A quick idea for ${companyName}`);
-    const refinedBody =
-      sop?.refinedEmail?.body ?? (typeof scraped.draftBody === "string" ? scraped.draftBody : "");
+    const refinedBody = sop?.refinedEmail?.body ?? (typeof scraped.draftBody === "string" ? scraped.draftBody : "");
 
     await step.run("send-campaign-draft", () =>
       sendCampaignDraftToOwner({
