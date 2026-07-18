@@ -33,7 +33,11 @@ const prismaClientSingleton = () => {
   }
 
   const log: Prisma.PrismaClientOptions["log"] = process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"];
-  const directConnectionString = process.env.DIRECT_DATABASE_URL;
+  // On Vercel, always use DATABASE_URL (Accelerate / pooled). DIRECT_DATABASE_URL is
+  // for migrate CI only — preferring it here causes serverless connection exhaustion
+  // and can point builds at an unmigrated direct host while Accelerate still works.
+  const directConnectionString =
+    process.env.VERCEL || process.env.VERCEL_ENV ? undefined : process.env.DIRECT_DATABASE_URL;
 
   if (directConnectionString) {
     const adapter = new PrismaPg({
