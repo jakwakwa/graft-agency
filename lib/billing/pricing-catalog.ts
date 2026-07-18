@@ -84,7 +84,7 @@ export function buildPricingCatalog(env: PricingCatalogEnv = getPricingCatalogEn
         description: "AI-powered chatbot embedded on your website for enquiries, lead capture, and 24/7 response.",
         kind: "subscription",
         badge: "Core subscription",
-        features: ["Website embed included", "Lead capture workflow", "Works around the clock"],
+        features: ["Website embed included", "Deterministic lead triage", "24/7 Availability", "Global CDN", "Fast Setup to Go-Live (under 1 hour)"],
         prices: {
           monthly: option({
             cycle: "monthly",
@@ -108,7 +108,7 @@ export function buildPricingCatalog(env: PricingCatalogEnv = getPricingCatalogEn
         description: "Upgrade your chatbot with phone-style voice enquiry handling.",
         kind: "addon",
         ...(env.FEATURE_VOICE_ADDON === "true" ? {} : { badge: "Coming soon", comingSoon: true }),
-        features: ["Automatic call-style responses", "Useful for after-hours enquiries", "Subscription add-on"],
+        features: ["Voice-first Enquiry Response", "Always available to take calls", "Monthly subscription only add-on", "Eliminates missed calls", "Natural voice conversations", "Works alongside your existing chatbot"],
         prices: {
           monthly: option({
             cycle: "monthly",
@@ -122,9 +122,9 @@ export function buildPricingCatalog(env: PricingCatalogEnv = getPricingCatalogEn
       {
         id: "booking-integration",
         title: "Booking Integration Add-on",
-        description: "Let your chatbot book appointments directly into your calendar.",
+        description: "Let your chatbot book appointments directly, scanning availability and scheduling into your pre-selected synced calendar slots.",
         kind: "addon",
-        features: ["Calendar booking flow", "Reduces manual follow-up", "Subscription add-on"],
+        features: ["Calendar Integrated booking flow with Cal.com or Calendly","Ai Schedules Appointments  during conversations", "Reduces manual follow-up and fress up time", "Montly Subscription-only add-on"],
         prices: {
           monthly: option({
             cycle: "monthly",

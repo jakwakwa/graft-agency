@@ -66,13 +66,17 @@ export default function TermsPage() {
             powered by AI that engages your website visitors, captures leads, and answers queries on your behalf
           </li>
           <li>
-            <strong className="text-foreground">Prospecting and engagement pipeline:</strong> An automated system
-            that researches prospects, generates personalised outreach drafts, and manages lead engagement
-            workflows
+            <strong className="text-foreground">Lead management and appointment booking:</strong> Tools for
+            reviewing leads captured by your chatbot, managing conversations, and booking appointments through
+            the Cal.com integration
+          </li>
+          <li>
+            <strong className="text-foreground">Custom website builds:</strong> Design and delivery of websites
+            with the GraftBot assistant pre-installed, as described on our pricing page
           </li>
           <li>
             <strong className="text-foreground">Subscriber dashboard:</strong> A management interface for
-            conversations, automation, leads, billing, and settings
+            conversations, leads, billing, and settings
           </li>
         </ul>
         <Typography.P>
@@ -166,8 +170,8 @@ export default function TermsPage() {
             Use the services to process personal data you do not have a lawful right or basis to process
           </li>
           <li>
-            Use prospecting or email features to send unsolicited communications in violation of applicable laws
-            (including POPIA Section 69 in South Africa, CAN-SPAM in the US, or the GDPR in the EU)
+            Use the services to send unsolicited communications in violation of applicable laws (including POPIA
+            Section 69 in South Africa, CAN-SPAM in the US, or the GDPR in the EU)
           </li>
           <li>
             Reverse-engineer, decompile, disassemble, or attempt to extract the source code of the platform
@@ -184,7 +188,7 @@ export default function TermsPage() {
           <li>Violate any applicable local, national, or international law or regulation</li>
         </ul>
         <Typography.P>
-          Automated features (AI pipeline runs, prospecting jobs, API calls) are subject to the fair-use limits
+          Automated features (AI chatbot responses, engagement jobs, API calls) are subject to the fair-use limits
           defined in your subscription plan. Excessive use that materially impacts platform performance for other
           users may result in throttling or account suspension.
         </Typography.P>
@@ -194,7 +198,7 @@ export default function TermsPage() {
       <Section id="ai-content" title="6. AI-Generated Content">
         <Typography.P>
           GRAFT.TODAY uses AI models (including Google Gemini and Anthropic Claude) to generate content such as
-          email drafts, chatbot responses, engagement copy, and lead analyses. You acknowledge and agree that:
+          chatbot responses, engagement copy, and lead analyses. You acknowledge and agree that:
         </Typography.P>
         <ul className="list-disc list-inside space-y-2 text-sm text-muted-foreground mt-2">
           <li>
@@ -260,8 +264,8 @@ export default function TermsPage() {
           <li>The services will be uninterrupted, error-free, or available at all times</li>
           <li>AI-generated content will be accurate, complete, or fit for any particular purpose</li>
           <li>
-            Results from the prospecting or engagement pipeline will meet your business objectives or generate
-            any particular outcome
+            Results from the chatbot or engagement features will meet your business objectives or generate any
+            particular outcome
           </li>
           <li>The services will be free from bugs, vulnerabilities, or data loss</li>
         </ul>

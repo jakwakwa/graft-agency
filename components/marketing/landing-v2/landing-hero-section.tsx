@@ -1,7 +1,7 @@
 "use client";
 
 import { SignUpButton } from "@clerk/nextjs";
-import { Zap } from "lucide-react";
+import { Link, Zap } from "lucide-react";
 import { motion, useScroll, useTransform, type Variants } from "motion/react";
 import { useRef } from "react";
 import { HeroFloatingCards } from "./hero-floating-cards";
@@ -107,9 +107,9 @@ export function LandingHeroSection() {
 
             {/* Subtitle */}
             <motion.p className="hero-subtitle" variants={FADE_UP} initial="hidden" animate="visible" custom={0.7}>
-              While your competitors close for the night, GRAFT continues to capture leads, qualify prospects, and scale
-              your brand with zero-latency precision.
-            </motion.p>
+              While you and your competitors close for the night, your GRAFT white-labelled AI assistant can tirelessly answer customer questions, capture leads, and book
+              appointments with unmatched reliability and affordability - while also triaging more complex customer queries to you or your teams in your GRAFT.TODAY assistant dashboard</motion.p>
+          
 
             {/* CTA buttons */}
             <motion.div className="hero-cta-group" variants={FADE_UP} initial="hidden" animate="visible" custom={0.9}>

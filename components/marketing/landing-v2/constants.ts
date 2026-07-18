@@ -1,8 +1,6 @@
-/** In-app destinations for marketing navigation (aligned with `components/marketing/landing-footer.tsx`). */
+/** In-app destinations for marketing navigation. */
 export const LANDING_ROUTES = {
   home: "/",
-  leadCapture: "/dashboard/automation/leads",
-  midnightProspector: "/dashboard/automation/queue",
   whiteLabel: "/portal/embed",
   dashboard: "/dashboard/automation",
   portal: "/portal",
@@ -18,7 +16,7 @@ export const LANDING_ROUTES = {
  */
 export const LANDING_HEADER_SECTIONS = [
   { id: "lead-capture", label: "Lead Capture" },
-  { id: "midnight-prospector", label: "Midnight Prospector" },
+  { id: "smart-triage", label: "Smart Triage" },
   { id: "white-label", label: "White-Label" },
   { id: "bot-pricing", label: "Bot Pricing" },
   { id: "website-pricing", label: "Website Builds" },

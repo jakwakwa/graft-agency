@@ -178,7 +178,7 @@ export default function SecurityPage() {
       {/* ─── AI data handling ─── */}
       <Section id="ai" icon={Bot} title="AI models and your data">
         <Typography.P>
-          GRAFT.TODAY uses AI models to power the chatbot, prospecting pipeline, and engagement features. We
+          GRAFT.TODAY uses AI models to power the chatbot and engagement features. We
           want to be fully transparent about which providers receive your data and under what conditions.
         </Typography.P>
 
@@ -189,8 +189,8 @@ export default function SecurityPage() {
               <Pill>AI inference</Pill>
             </div>
             <p className="text-sm text-muted-foreground">
-              Used for prospecting analysis (auditing websites, generating outreach drafts) and chatbot responses.
-              Data sent to Gemini includes website content being audited, conversation messages, and lead context.
+              Used for chatbot responses and engagement analysis. Data sent to Gemini includes conversation
+              messages and lead context.
               Google&rsquo;s API terms state that data submitted via the API is not used to train Google&rsquo;s
               models by default. See{" "}
               <a
@@ -234,7 +234,7 @@ export default function SecurityPage() {
             <p className="text-sm text-muted-foreground">
               Used during the engagement pipeline to generate design concepts and prototype code for approved
               leads. These are Google Cloud services accessed via a dedicated service account. Data sent is
-              limited to the engagement brief and approved prospect context.
+              limited to the engagement brief and approved lead context.
             </p>
           </div>
         </div>
@@ -328,8 +328,8 @@ export default function SecurityPage() {
             it
           </li>
           <li>
-            Treating AI-generated outreach drafts as drafts — review them before sending to ensure they are
-            accurate and appropriate
+            Treating AI-generated content as a draft — review it for accuracy and appropriateness before relying
+            on it
           </li>
           <li>
             Reporting any suspicious activity on your account to us immediately at{" "}

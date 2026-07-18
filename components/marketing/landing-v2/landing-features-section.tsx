@@ -1,6 +1,6 @@
 import { Shimmer } from "@/components/ai-elements/shimmer";
 import { Bot } from "@hugeicons/core-free-icons";
-import { BotIcon, BrainCircuit, IdCard, Radar } from "lucide-react";
+import { BotIcon, BrainCircuit, CalendarClock, IdCard } from "lucide-react";
 import Image from "next/image";
 
 export function LandingFeaturesSection() {
@@ -41,24 +41,24 @@ export function LandingFeaturesSection() {
             </div>
           </div>
         </div>
-        <div id="midnight-prospector" className="md:col-span-4 glass-panel rounded-xl p-4 sm:p-6 md:p-8 border-l-4 border-secondary flex flex-col justify-between group">
+        <div id="smart-triage" className="md:col-span-4 glass-panel rounded-xl p-4 sm:p-6 md:p-8 border-l-4 border-secondary flex flex-col justify-between group">
           <div>
             <div className="mb-3 inline-flex items-center justify-center w-8 h-8 rounded-lg bg-secondary/15">
-              <Radar className="h-8 w-8 text-secondary" />
+              <CalendarClock className="h-8 w-8 text-secondary" />
             </div>
-            <h3 className="text-2xl font-display font-normal text-on-surface mb-2">Midnight Prospector</h3>
+            <h3 className="text-2xl font-display font-normal text-on-surface mb-2">Night-Shift Triage</h3>
             <p className="text-on-surface-variant text-sm">
-              While you sleep, Graft hunts. Automated outreach that sounds human because it's trained on your unique
-              brand voice.
+              While you sleep, Graft answers. Every visitor is greeted, qualified, and booked into your calendar — in
+              your brand voice.
             </p>
           </div>
           <div className="glass-card p-4 rounded-lg mt-4 border border-outline-variant/20">
-            <div className="text-[10px] uppercase tracking-widest font-bold mb-2">Hunter Agent Log</div>
+            <div className="text-[10px] uppercase tracking-widest font-bold mb-2">Triage Agent Log</div>
             <div className="space-y-1 opacity-60">
-              <Shimmer className="text-[11px] font-mono">Searching prospects... </Shimmer>
-              <div>          <div className="text-[10px] text-emerald-300 animate-pulse font-mono">Found @ZenSpa. Sent tailored brief...</div>  
+              <Shimmer className="text-[11px] font-mono">Visitor asking about pricing... </Shimmer>
+              <div>          <div className="text-[10px] text-emerald-300 animate-pulse font-mono">Qualified. Demo booked for Tue 09:00.</div>
               </div>
-    
+
             </div>
           </div>
         </div>

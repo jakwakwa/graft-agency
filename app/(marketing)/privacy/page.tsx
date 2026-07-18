@@ -114,8 +114,8 @@ export default function PrivacyPage() {
           <div className="rounded-lg border border-border px-4 py-3">
             <p className="font-semibold text-sm mb-1">Operator (for your customers&rsquo; data)</p>
             <p className="text-sm text-muted-foreground">
-              When your customers interact with your embedded chatbot widget, or are included in your prospecting
-              pipeline, <em>you</em> are the responsible party for their personal information and GRAFT.TODAY acts
+              When your customers interact with your embedded chatbot widget, <em>you</em> are the responsible
+              party for their personal information and GRAFT.TODAY acts
               as your operator (processor), handling that data only on your instructions. Your end-users&rsquo;
               rights are primarily exercised through you. If you deploy GRAFT.TODAY services to your own customers,
               you should disclose GRAFT.TODAY as a sub-processor in your own privacy notices.
@@ -182,8 +182,8 @@ export default function PrivacyPage() {
             (name, email, contact details, queries).
           </li>
           <li>
-            <strong className="text-foreground">Leads and prospects:</strong> Contact details, website URLs, and
-            AI-generated engagement data collected through your prospecting pipeline.
+            <strong className="text-foreground">Leads:</strong> Contact details and engagement data your
+            end-users share through your deployed GraftBot widget.
           </li>
           <li>
             <strong className="text-foreground">Appointment data:</strong> Booking information integrated via
@@ -419,10 +419,10 @@ export default function PrivacyPage() {
           .
         </Typography.P>
         <Typography.P>
-          <strong>Note for GRAFT.TODAY subscribers:</strong> If you use the outbound prospecting and email
-          features to contact third parties on your own behalf, you are responsible for ensuring your outreach
-          complies with applicable electronic direct marketing laws in your jurisdiction (including POPIA Section
-          69 in South Africa, CAN-SPAM in the United States, and the GDPR in the European Union).
+          <strong>Note for GRAFT.TODAY subscribers:</strong> If you use the services to communicate with your own
+          customers or leads, you are responsible for ensuring those communications comply with applicable
+          electronic direct marketing laws in your jurisdiction (including POPIA Section 69 in South Africa,
+          CAN-SPAM in the United States, and the GDPR in the European Union).
         </Typography.P>
       </Section>
 

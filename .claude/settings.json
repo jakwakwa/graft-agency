@@ -36,11 +36,13 @@
     ]
   },
   "worktree": {
-    "path": ".claude/worktrees",
     "symlinkDirectories": [
       ".claude"
     ],
     "baseRef": "head",
     "bgIsolation": "none"
+  },
+  "enabledPlugins": {
+    "claude-code-setup@claude-plugins-official": true
   }
 }

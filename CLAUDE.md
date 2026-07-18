@@ -1,28 +1,40 @@
 # CLAUDE.md
 
+
+before doing any work run a full test suite using haiku subagents then synthesize the baseline. This will ensure you know what regressions were introduced without guessing.
+
 # PRs and Commit Repo rules
 
 The user / operator prefers and expects autonomous workflows from the coding agent. Best judgement are preferred over asking questions to the user. therefore use the sleep function when asking clarification questions. wait 60 seconds, if the user did not answer you need to carry on with the recommended options in the questions. unless the there are any security risks like credential keys involved.
 
-## Paddle integration
 
-When writing or modifying code that integrates with Paddle:
+## Discipline:
 
-- Always check current Paddle documentation via the `paddle-docs` MCP server before suggesting code. The Paddle API and SDKs evolve frequently — do not rely on training data alone.
-- Use the official Paddle SDK for the language in use:
-  - Node.js → `@paddle/paddle-node-sdk`
-  - Python → `paddle-python-sdk` (imports as `paddle_billing`)
-  - Go → `github.com/PaddleHQ/paddle-go-sdk/v5`
-  - PHP → `paddlehq/paddle-php-sdk`
-- All development uses the sandbox environment. Sandbox API keys contain `_sdbx`; sandbox client-side tokens are prefixed with `test_`.
-- Always verify webhook signatures before acting on the payload:
-  - Node: `paddle.webhooks.unmarshal()`
-  - Python: `Verifier().verify(request, secret)`
-  - Go: `paddle.NewWebhookVerifier()` with `Middleware`
-  - PHP: `(new Verifier())->verify($request, $secret)`
-- For destructive account changes (updating prices, archiving products, cancelling subscriptions), ask for explicit confirmation before calling the `paddle-sandbox` or `paddle-live` MCP server.
-- Use `paddle-sandbox` by default. Only call `paddle-live` when the prompt explicitly mentions live, production, or real customer data.
-- API keys and webhook secrets live in environment variables — never inline credentials into code.
+## Testing
+
+**Do NOT run `bun run test:all`** in a sandboxed/CI environment. `test:all` includes Playwright E2E tests that require:
+- A live `DATABASE_URL` pointing to a real Postgres instance
+- External service credentials (Paddle, Clerk, Inngest, Cal.com, etc.)
+ting 
+
+This is primarily a TypeScript project. Run type checks/builds after edits and verify against the actual SDK types before 
+
+Unit tests use **Vitest** with `jsdom` (`tests/unit/`). E2E uses **Playwright** Chromium (`tests/e2e/`). Tests import from `bun:test` in standalone scripts, but use `vitest` imports inside the `tests/` tree.
+
+Always verify tests actually pass after writing them — don't assume a green IDE means green CI.
+
+Never present inferences as confirmed facts. Distinguish clearly between what is verified from evidence (logs, code, test output) and what is a hypothesis. If a claim about an SDK, deployment state, or root cause is unverified, say so explicitly.
+
+### Debugging Discipline
+
+Never present inferences as confirmed facts. Distinguish clearly between what is verified from evidence (logs, code, test output) and what is a hypothesis. If a claim about an SDK, deployment state, or root cause is unverified, say so explicitly.
+
+Before diagnosing a deployment or infra issue, confirm the current deployed state and which control plane the user manages 
+claiming a config or migration is correct.
+
+### Scope & Changes
+
+When the user says not to ask questions, do not pause to consult an advisor or seek confirmation — proceed with the stated task.
 
 ## Runtime: Bun First
 
@@ -54,8 +66,6 @@ bun run build                 # prisma generate + next build
 
 # Code quality
 bun run lint                  # Biome check
-bun run format                # Biome format --write
-
 # Testing
 bun run test                  # Vitest unit tests (run once)
 bun run test:watch            # Vitest watch mode
@@ -69,7 +79,7 @@ bun run db:migrate:status     # Check migration status
 bun run db:seed               # Run prisma/seed.ts
 
 # Inngest (run separately)
-inngest dev                   # Local Inngest dev server
+bunx inngest dev                   # Local Inngest dev server
 ```
 
 Run `bun run build` (not just IDE type-checks) to catch compile-time contract errors — several TypeScript/Prisma bugs only surface there.
@@ -160,10 +170,3 @@ const session = await sessionPromise
 const [config, data] = await Promise.all([configPromise, fetchData(session.user.id)])
 ```
 
-## Testing
-
-Unit tests use **Vitest** with `jsdom` (`tests/unit/`). E2E uses **Playwright** Chromium (`tests/e2e/`). Tests import from `bun:test` in standalone scripts, but use `vitest` imports inside the `tests/` tree.
-
-
-
-Always verify tests actually pass after writing them — don't assume a green IDE means green CI.
