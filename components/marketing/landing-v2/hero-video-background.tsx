@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useIsMobile } from "@/components/ui/use-mobile";
-import Image from "next/image"
+import Image from "next/image";
 interface HeroVideoBackgroundProps {
   src: string;
   poster?: string;
@@ -52,13 +52,7 @@ export function HeroVideoBackground({ src, poster }: HeroVideoBackgroundProps) {
       {/* Chromatic edge glow */}
       <div className="hero-chromatic-edge" />
 
-      {!isMobile && (
-        <img
-         className="hero-video"
-         src={ 'Robot_concierge.jpg' }/>
-          
-            )}
+      {!isMobile && <img className="hero-video" src={"Robot_concierge.jpg"} />}
     </div>
   );
 }
-

@@ -47,7 +47,7 @@ function parseColourLines(text: string | undefined): Record<string, string> {
 
 /** Parse typography section: looks for headline and body font names */
 function parseTypography(text: string | undefined): { headline: string; body: string } {
-  const defaults = { headline: "Playfair Display, serif", body: "Inter, sans-serif" };
+  const defaults = { headline: "Newsreader, serif", body: "Geist, sans-serif" };
   if (!text) return defaults;
 
   const headlineMatch = text.match(/headline[s]?.*?:\s*(.+)/i) ?? text.match(/display.*?:\s*(.+)/i);
