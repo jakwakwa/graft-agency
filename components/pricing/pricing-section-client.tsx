@@ -260,18 +260,18 @@ export function PricingSectionClient({
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-normal tracking-tight text-on-surface leading-tight">
               {kindFilter === "website" ? (
                 <>
-                  Bespoke Agency <span className="text-primary">Design &amp; Builds</span>
+                  Bespoke Agency <span className="text-primary">Websites</span>
                 </>
               ) : (
                 <>
-                  Simple pricing for <span className="text-primary">always&#8209;on growth</span>
+                  Simple pricing for <span className="text-primary">faster growth</span>
                 </>
               )}
             </h2>
             <p className="text-on-surface-variant text-sm sm:text-base leading-relaxed">
               {kindFilter === "website"
                 ? "High-converting, hand-crafted landing pages and multi-page websites with your AI chatbot pre-configured and installed."
-                : "Localised Paddle pricing for the chatbot subscription and add-ons."}
+                : "Simple, up-front monthly pricing for your whitelabelled AI Support and Triage assistant. No surprises. No hidden costs."}
             </p>
           </div>
           {kindFilter !== "website" && (
@@ -295,7 +295,7 @@ export function PricingSectionClient({
         ) : null}
         {mode === "portal" && customer?.subscriptionActive ? (
           <Typography.Muted className="rounded-2xl border border-white/10 bg-white/5 p-4 text-on-surface-variant">
-            Included in your active subscription
+            If you want us to integrate the AI assistant into a new website, opt for one of these build packages
           </Typography.Muted>
         ) : null}
         <div className={gridClass}>

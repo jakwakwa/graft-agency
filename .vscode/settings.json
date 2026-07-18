@@ -20,7 +20,7 @@
   "scm.diffDecorationsGutterVisibility": "hover",
   "tailwindCSS.hovers": false,
   "editor.defaultFormatter": "biomejs.biome",
-  "editor.formatOnSave": true,
+  "editor.formatOnSave": false,
   "[typescript]": {
     "editor.defaultFormatter": "biomejs.biome",
     "editor.codeActionsOnSave": {
@@ -49,15 +49,13 @@
       "source.fixAll.biome": "never"
     }
   },
-  "gradle.autoDetect": "off",
   "biome.enabled": true,
   "biome.configurationPath": "biome.json",
   "[json]": {
-    "editor.defaultFormatter": "vscode.json-language-features"
-  },
-  "[biome_syntax_tree]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": ""
   },
   "editor.fontFamily": "Dank Mono, Monaco, 'Courier New', monospace",
-  "bun.test.enable": false
+  "[jsonc]": {
+    "editor.defaultFormatter": ""
+  }
 }

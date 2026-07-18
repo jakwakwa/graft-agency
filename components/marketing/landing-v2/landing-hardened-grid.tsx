@@ -22,7 +22,7 @@ export function LandingHardenedGrid() {
               <div>
                 <div className="text-sm font-bold text-on-surface">Military-Grade Encryption</div>
                 <div className="text-xs text-on-surface-variant">
-                  All prospect data is AES-256 encrypted at rest and in transit.
+                  All customer data is AES-256 encrypted at rest and in transit.
                 </div>
               </div>
             </div>
