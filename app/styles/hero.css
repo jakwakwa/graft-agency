@@ -75,7 +75,11 @@
   left: -139vw;
   transform: scale(1.1);
   pointer-events: none;
-  background: radial-gradient(ellipse 50% 40% at 10% 21%, rgba(225, 105, 62, 0.667) 10%, rgba(106, 122, 207, 0.294) 20%);
+  background: radial-gradient(
+    ellipse 50% 40% at 10% 21%,
+    rgba(225, 105, 62, 0.667) 10%,
+    rgba(106, 122, 207, 0.294) 20%
+  );
 }
 
 /* Chromatic edge glow */
@@ -109,7 +113,7 @@
   width: 300px;
   height: 200px;
   top: -25%;
-  left:30%;
+  left: 30%;
   background: radial-gradient(circle, rgba(225, 110, 16, 0.907) 0%, rgba(26, 37, 99, 0.812) 29%);
   animation-delay: 0s;
 }
@@ -241,12 +245,12 @@
   display: inline-block;
   margin-right: 0.3em;
   font-size: 5.3rem;
-    font-weight: 300 !important;
+  font-weight: 300 !important;
   will-change: transform, opacity, filter;
 }
 
 .hero-headline__word--gradient {
-  background: linear-gradient(135deg, #ee5b41 0%, #fdb49a 40%,#fdb49a 70%, #214aec 100%);
+  background: linear-gradient(135deg, #ee5b41 0%, #fdb49a 40%, #fdb49a 70%, #214aec 100%);
   font-weight: 200 !important;
   background-clip: text;
   font-size: 5.3rem;
