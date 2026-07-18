@@ -39,39 +39,27 @@ export default async function AutomationHubPage() {
 
   const clientId = access.clientId;
 
-  // 1. Fetch dynamic metrics
-  const leadsCount = await prisma.lead.count({ where: { clientId } });
-
-  const activeConversationsCount = await prisma.conversation.count({
-    where: { clientId },
-  });
-
-  const conversionCount = await prisma.lead.count({
-    where: { clientId, status: { in: ["BOOKED", "CLOSED"] } },
-  });
+  // 1. Fetch dynamic metrics and configurations concurrently
+  const [leadsCount, activeConversationsCount, conversionCount, agentConfig, prospectingConfig, logs] =
+    await Promise.all([
+      prisma.lead.count({ where: { clientId } }),
+      prisma.conversation.count({ where: { clientId } }),
+      prisma.lead.count({ where: { clientId, status: { in: ["BOOKED", "CLOSED"] } } }),
+      prisma.agentConfig.findUnique({ where: { clientId } }),
+      prisma.prospectingConfig.findUnique({ where: { clientId } }),
+      prisma.operationalEvent.findMany({
+        where: { clientId },
+        orderBy: { createdAt: "desc" },
+        take: 6,
+      }),
+    ]);
 
   const conversionVelocity = leadsCount > 0 ? ((conversionCount / leadsCount) * 100).toFixed(1) : "0.0";
-
-  // 2. Fetch Agent & Prospecting configuration to compute real setup steps
-  const agentConfig = await prisma.agentConfig.findUnique({
-    where: { clientId },
-  });
-
-  const prospectingConfig = await prisma.prospectingConfig.findUnique({
-    where: { clientId },
-  });
 
   const isPersonaConfigured = !!agentConfig?.systemPrompt;
   const isKnowledgeBaseConfigured = !!agentConfig?.knowledgeBase;
   const isIntegrationConfigured = !!(agentConfig?.calComUsername || agentConfig?.defaultEventSlug);
   const isDeployed = !!prospectingConfig?.cronEnabled;
-
-  // 3. Fetch real operational event logs
-  const logs = await prisma.operationalEvent.findMany({
-    where: { clientId },
-    orderBy: { createdAt: "desc" },
-    take: 6,
-  });
 
   // Calculate dynamic stepper state classes
   const getStepStatus = (stepIndex: number) => {
