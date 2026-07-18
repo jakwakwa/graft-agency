@@ -11,8 +11,7 @@ export type AddonFeature = "voice" | "booking";
 
 /** Maps an add-on feature to its Paddle price ID (undefined when unconfigured). */
 export function getAddonPriceId(feature: AddonFeature): string | undefined {
-  const value =
-    feature === "voice" ? process.env.PADDLE_PRICE_VOICE_MONTHLY : process.env.PADDLE_PRICE_BOOKING_MONTHLY;
+  const value = feature === "voice" ? process.env.PADDLE_PRICE_VOICE_MONTHLY : process.env.PADDLE_PRICE_BOOKING_MONTHLY;
   const trimmed = value?.trim();
   return trimmed ? trimmed : undefined;
 }
