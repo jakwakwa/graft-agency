@@ -4,6 +4,7 @@ import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 import type { ReactNode } from "react";
+import { BrandLogo } from "@/components/shared/brand-logo";
 
 interface MarketingShellProps {
   children: ReactNode;
@@ -56,9 +57,10 @@ export function MarketingShell({ children }: MarketingShellProps) {
         <div className="flex items-center gap-8">
           <Link
             href="/dashboard/automation"
-            className="font-headline text-2xl font-bold italic tracking-tighter text-secondary-foreground uppercase"
+            className="inline-flex items-center transition-opacity hover:opacity-90"
+            aria-label="GRAFT.TODAY"
           >
-            GRAFT TODAY
+            <BrandLogo height={28} />
           </Link>
           <nav className="hidden items-center gap-6 md:flex">
             {topNavLinks.map((link) => {

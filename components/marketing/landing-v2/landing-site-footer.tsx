@@ -1,9 +1,11 @@
-import { Asterisk, AtSign, Globe } from "lucide-react";
+import { Asterisk, AtSign, Globe, XIcon } from "lucide-react";
 import Link from "next/link";
 import { Typography } from "@/components/ui/typography";
 import { LANDING_HEADER_SECTIONS, LANDING_ROUTES, landingContainerClassName } from "./constants";
 import { LandingSectionLink } from "./landing-section-link";
-
+import { Button } from "@/components/ui-v2/button";
+import { XingIcon } from "@hugeicons/core-free-icons";
+import Image from "next/image"
 const footerLinkClass = "text-sm text-[#a5a9c4] transition-colors hover:text-white";
 
 export function LandingSiteFooter() {
@@ -64,9 +66,11 @@ export function LandingSiteFooter() {
         <div className="flex flex-col items-center justify-between gap-4 border-t border-white/5 pt-8 text-sm text-[#a5a9c4] md:flex-row md:gap-0">
           <p>© 2026 GRAFT.TODAY</p>
           <div className="flex items-center gap-6">
-            <Globe className="h-4 w-4 cursor-pointer transition-colors hover:text-white" aria-hidden />
-            <AtSign className="h-4 w-4 cursor-pointer transition-colors hover:text-white" aria-hidden />
-            <Asterisk className="h-4 w-4 cursor-pointer transition-colors hover:text-white" aria-hidden />
+           <Button className="m-0 p-0 w-8 h-8 bg-transparent hover:bg-white/15">
+            <Link href={"https://x.com/graft2day"} target="_blank">
+            <Image src={`XLogo.svg`} alt="X Logo" width={48} height={48} className="h-8 w-8 p-1 cursor-pointer transition-colors hover:text-white" aria-hidden />
+        
+            </Link></Button>
           </div>
         </div>
       </div>

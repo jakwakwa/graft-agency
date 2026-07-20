@@ -5,8 +5,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ModeToggle } from "@/components/mode-toggle";
+import { BrandLogo } from "@/components/shared/brand-logo";
 import { Button } from "@/components/ui/button";
-import { Typography } from "@/components/ui/typography";
 
 type ClientFlags = { isPlatformOwner: boolean };
 
@@ -30,8 +30,12 @@ export function NavHeader() {
   return (
     <header className="flex h-16 items-center justify-between bg-muted/50 px-4 shadow-ambient backdrop-blur-sm md:px-6">
       <nav className="flex items-center gap-6">
-        <Link href="/" className="text-foreground transition-colors hover:text-secondary">
-          <Typography.Large>GRAFT TODAY</Typography.Large>
+        <Link
+          href="/"
+          className="inline-flex items-center transition-opacity hover:opacity-90"
+          aria-label="GRAFT.TODAY home"
+        >
+          <BrandLogo height={28} />
         </Link>
 
         {loading ? (

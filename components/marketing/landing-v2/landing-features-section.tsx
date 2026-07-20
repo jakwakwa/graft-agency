@@ -9,7 +9,7 @@ export function LandingFeaturesSection() {
         <h2 className="text-5xl font-display md:text-5xl font-bold tracking-tight text-on-surface uppercase">
           The Graft <span className="text-chart-3">Service Ecosystem</span>
         </h2>
-        <p className="text-on-surface-variant text-sm tracking-normal sm:tracking-[0.2em] uppercase font-semibold">
+        <p className="text-on-surface-variant text-base tracking-normal sm:tracking-[0.2em] uppercase font-semibold">
           Visitor-initiated enquiries, consent-based capture, booking on request.
         </p>
       </div>
@@ -54,7 +54,7 @@ export function LandingFeaturesSection() {
               <CalendarClock className="h-8 w-8 text-secondary" />
             </div>
             <h3 className="text-2xl font-display font-normal text-on-surface mb-2">Enquiry Triage &amp; Booking</h3>
-            <p className="text-on-surface-variant text-sm">
+            <p className="text-on-surface-variant text-base">
               When a visitor asks, GraftBot can answer in your brand voice, offer a booking if they request one, and
               hand off complex questions to your team.
             </p>
@@ -81,7 +81,7 @@ export function LandingFeaturesSection() {
               <IdCard className="h-8 w-8 text-indigo-400" />
             </div>
             <h3 className="text-2xl font-display font-normal text-on-surface mb-2">White-Label Wonder</h3>
-            <p className="text-on-surface-variant text-sm">
+            <p className="text-on-surface-variant text-base">
               Resell our infrastructure under your own banner. Full CSS control and API-first architecture.
             </p>
           </div>

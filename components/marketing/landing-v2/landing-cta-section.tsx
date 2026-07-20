@@ -8,7 +8,7 @@ export function LandingCtaSection() {
         <h2 className="text-4xl sm:text-5xl md:text-6xl font-headline font-bold tracking-tighter text-on-surface leading-none">
           ANSWER EVERY <span className="text-primary italic">ENQUIRY.</span>
         </h2>
-        <p className="text-on-surface-variant text-sm sm:text-base md:text-xl max-w-2xl mx-auto leading-relaxed">
+        <p className="text-on-surface-variant text-base sm:text-base md:text-xl max-w-2xl mx-auto leading-relaxed">
           Give website visitors an assistant they can open when they want help — answer questions, capture leads with
           consent, book appointments on request, and hand off to a human when needed.
         </p>

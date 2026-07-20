@@ -268,7 +268,7 @@ export function PricingSectionClient({
                 </>
               )}
             </h2>
-            <p className="text-on-surface-variant text-sm sm:text-base leading-relaxed">
+            <p className="text-on-surface-variant text-base sm:text-base leading-relaxed">
               {kindFilter === "website"
                 ? "High-converting, hand-crafted landing pages and multi-page websites with your AI chatbot pre-configured and installed."
                 : "Simple, up-front monthly pricing for your whitelabelled AI Support and Triage assistant. No surprises. No hidden costs."}

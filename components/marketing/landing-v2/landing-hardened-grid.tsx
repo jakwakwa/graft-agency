@@ -21,7 +21,7 @@ export function LandingHardenedGrid() {
               <Shield className="text-primary h-10" />
               <div>
                 <div className="text-sm font-bold text-on-surface">HTTPS/TLS Transport</div>
-                <div className="text-xs text-on-surface-variant">
+                <div className="text-sm mt-4 text-on-surface-variant">
                   Chat traffic and dashboard access use encrypted HTTPS — there is no HTTP fallback.
                 </div>
               </div>
@@ -30,7 +30,7 @@ export function LandingHardenedGrid() {
               <Cloud className="text-violet-400 h-10" />
               <div>
                 <div className="text-sm font-bold text-on-surface">Isolated Widget &amp; Tenant Scope</div>
-                <div className="text-xs text-on-surface-variant">
+                <div className="text-sm mt-4 text-on-surface-variant">
                   The embed runs in an isolated iframe and cannot access your page&apos;s DOM or cookies. Data stays
                   tenant-scoped so other organisations cannot see yours.
                 </div>

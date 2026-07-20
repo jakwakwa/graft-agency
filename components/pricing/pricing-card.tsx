@@ -157,7 +157,7 @@ export function PricingCard({
               {offer.title}
             </Typography.H3>
           </h3>
-          <Typography.Muted className="mt-2 text-sm text-on-surface-variant leading-relaxed">
+          <Typography.Muted className="mt-2 text-sm mt-4 text-on-surface-variant leading-relaxed">
             {offer.description}
           </Typography.Muted>
         </div>
@@ -170,7 +170,7 @@ export function PricingCard({
         </div>
       ) : null}
 
-      <ul className="my-0 space-y-3 text-sm text-on-surface-variant list-none pl-0">
+      <ul className="my-0 space-y-3 text-sm mt-4 text-on-surface-variant list-none pl-0">
         {offer.features.map((feature) => (
           <li key={feature} className="flex items-start gap-3">
             <Check className={cn("h-4 w-4 shrink-0 mt-0.5", theme.checkText)} />

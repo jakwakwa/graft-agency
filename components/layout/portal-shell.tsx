@@ -5,6 +5,7 @@ import { CalendarDays, Code, CreditCard, LayoutDashboard, MessageSquare, Setting
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
+import { BrandLogo } from "@/components/shared/brand-logo";
 
 interface PortalShellProps {
   children: ReactNode;
@@ -29,9 +30,10 @@ export function PortalShell({ children }: PortalShellProps) {
         <div className="flex items-center gap-8">
           <Link
             href="/portal"
-            className="font-headline text-2xl font-bold italic tracking-tighter text-secondary-foreground uppercase"
+            className="inline-flex items-center transition-opacity hover:opacity-90"
+            aria-label="GRAFT.TODAY portal"
           >
-            GRAFT PORTAL
+            <BrandLogo height={28} />
           </Link>
         </div>
         <div className="flex items-center gap-4">

@@ -157,7 +157,7 @@ export function SubscriptionConfirmDialog({
                         ) : null}
                       </span>
                       {price ? (
-                        <span className="mt-1 block text-sm text-on-surface-variant">
+                        <span className="mt-1 block text-sm mt-4 text-on-surface-variant">
                           {price}
                           <span className="text-on-surface-variant/70">{option.suffix}</span>
                         </span>
@@ -177,7 +177,7 @@ export function SubscriptionConfirmDialog({
           </div>
 
           {/* Feature list */}
-          <ul className="space-y-3 text-sm text-on-surface-variant list-none pl-0">
+          <ul className="space-y-3 text-sm mt-4 text-on-surface-variant list-none pl-0">
             {offer.features.map((feature) => (
               <li key={feature} className="flex items-start gap-3">
                 <Check className="mt-0.5 h-4 w-4 shrink-0 text-blue-400" />
