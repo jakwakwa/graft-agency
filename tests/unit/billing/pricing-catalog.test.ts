@@ -31,6 +31,22 @@ describe("pricing catalogue", () => {
     expect(catalogue.offers[3]?.prices.oneTime?.priceId).toBe("pri_landing");
   });
 
+  it("positions one-time offers as GraftBot implementation packages", () => {
+    const catalogue = buildPricingCatalog(completeEnv);
+    const landing = catalogue.offers.find((offer) => offer.id === "landing-page-build");
+    const smb = catalogue.offers.find((offer) => offer.id === "small-business-website-build");
+    const chatbot = catalogue.offers.find((offer) => offer.id === "ai-chatbot");
+
+    expect(landing?.title).toBe("GraftBot Landing Page Setup");
+    expect(landing?.description).toMatch(/implementation package/i);
+    expect(landing?.description).toMatch(/GraftBot/i);
+    expect(smb?.title).toBe("GraftBot Multi-Page Website Setup");
+    expect(smb?.description).toMatch(/implementation package/i);
+    expect(chatbot?.features).toContain("Visitor-initiated conversations");
+    expect(chatbot?.features).toContain("Consent-based lead capture");
+    expect(chatbot?.features).not.toContain("Fast Setup to Go-Live (under 1 hour)");
+  });
+
   it("excludes missing Paddle price IDs from preview requests without dropping the offer", () => {
     const catalogue = buildPricingCatalog({
       ...completeEnv,

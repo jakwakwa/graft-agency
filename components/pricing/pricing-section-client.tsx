@@ -295,7 +295,7 @@ export function PricingSectionClient({
         ) : null}
         {mode === "portal" && customer?.subscriptionActive ? (
           <Typography.Muted className="rounded-2xl border border-white/10 bg-white/5 p-4 text-on-surface-variant">
-            If you want us to integrate the AI assistant into a new website, opt for one of these build packages
+            If you want GraftBot installed on a new site, choose one of these fixed-scope website setup packages
           </Typography.Muted>
         ) : null}
         <div className={gridClass}>

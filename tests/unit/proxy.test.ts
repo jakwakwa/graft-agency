@@ -57,6 +57,15 @@ describe("Clerk proxy", () => {
 
     expect(clerkMocks.protect).toHaveBeenCalledTimes(1);
   });
+
+  it("does not protect signed-out /refunds requests", async () => {
+    const { default: proxy } = await import("@/proxy");
+    const event = { waitUntil: vi.fn() } as unknown as Parameters<typeof proxy>[1];
+
+    await proxy(new NextRequest("https://graft.today/refunds"), event);
+
+    expect(clerkMocks.protect).not.toHaveBeenCalled();
+  });
 });
 
 let proxyConfig: { matcher: string[] };

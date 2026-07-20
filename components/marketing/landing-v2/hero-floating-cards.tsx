@@ -23,10 +23,10 @@ interface StatusLine {
 }
 
 const STATUS_LINES: StatusLine[] = [
-  { label: "NEURAL_CORE", value: "ACTIVE", color: "#4ade80" },
-  { label: "RESPONSE_μs", value: "< 200", color: "#38bdf8" },
-  { label: "THREAT_VECTOR", value: "NONE", color: "#4ade80" },
-  { label: "ENCRYPTION", value: "AES-256-GCM", color: "#a78bfa" },
+  { label: "WIDGET", value: "EMBEDDED", color: "#4ade80" },
+  { label: "TRANSPORT", value: "HTTPS/TLS", color: "#38bdf8" },
+  { label: "SCOPE", value: "TENANT", color: "#4ade80" },
+  { label: "HANDOFF", value: "DASHBOARD", color: "#a78bfa" },
 ];
 
 export function HeroFloatingCards() {
@@ -42,7 +42,7 @@ export function HeroFloatingCards() {
       >
         <div className="hero-float-card__header">
           <span className="hero-float-card__pulse" />
-          <span className="hero-float-card__title">SYSTEM DIAGNOSTICS</span>
+          <span className="hero-float-card__title">PRODUCT MECHANICS</span>
         </div>
         {STATUS_LINES.map((line) => (
           <div key={line.label} className="hero-float-card__row">
@@ -64,24 +64,24 @@ export function HeroFloatingCards() {
       >
         <div className="hero-float-card__header">
           <span className="hero-float-card__pulse hero-float-card__pulse--blue" />
-          <span className="hero-float-card__title">LIVE PERFORMANCE</span>
+          <span className="hero-float-card__title">WHAT IT DOES</span>
         </div>
         <div className="hero-float-card__metric-grid">
           <div className="hero-float-card__metric">
-            <span className="hero-float-card__metric-value">2.4k</span>
-            <span className="hero-float-card__metric-label">LEADS / MO</span>
+            <span className="hero-float-card__metric-value">Ask</span>
+            <span className="hero-float-card__metric-label">VISITOR STARTS</span>
           </div>
           <div className="hero-float-card__metric">
-            <span className="hero-float-card__metric-value">99.9%</span>
-            <span className="hero-float-card__metric-label">UPTIME</span>
+            <span className="hero-float-card__metric-value">Lead</span>
+            <span className="hero-float-card__metric-label">OPT-IN ONLY</span>
           </div>
           <div className="hero-float-card__metric">
-            <span className="hero-float-card__metric-value">0ms</span>
-            <span className="hero-float-card__metric-label">LATENCY</span>
+            <span className="hero-float-card__metric-value">Book</span>
+            <span className="hero-float-card__metric-label">ON REQUEST</span>
           </div>
           <div className="hero-float-card__metric">
-            <span className="hero-float-card__metric-value">24/7</span>
-            <span className="hero-float-card__metric-label">ACTIVE</span>
+            <span className="hero-float-card__metric-value">Hand</span>
+            <span className="hero-float-card__metric-label">TO YOUR TEAM</span>
           </div>
         </div>
       </motion.div>

@@ -120,8 +120,10 @@ describe("PricingSection", () => {
     expect(screen.queryByRole("button", { name: "Subscribe to AI Chatbot" })).not.toBeInTheDocument();
     expect(
       screen.getByText(
-        "If you want us to integrate the AI assistant into a new website, opt for one of these build packages",
+        "If you want GraftBot installed on a new site, choose one of these fixed-scope website setup packages",
       ),
     ).toBeInTheDocument();
+    expect(screen.getByText("GraftBot Landing Page Setup")).toBeInTheDocument();
+    expect(screen.getByText("GraftBot Multi-Page Website Setup")).toBeInTheDocument();
   });
 });

@@ -83,7 +83,7 @@ export function MarketingShell({ children }: MarketingShellProps) {
             <span className="text-xs text-secondary-foreground">AI Active</span>
             <div className="h-1 w-1 animate-pulse rounded-full bg-primary-kinetic" />
             <div className="h-4 w-px bg-outline-ghost" />
-            <span className="text-xs text-muted-foreground">0ms Latency</span>
+            <span className="text-xs text-muted-foreground">HTTPS/TLS</span>
           </div>
           <UserButton />
         </div>

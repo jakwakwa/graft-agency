@@ -81,10 +81,17 @@ export function buildPricingCatalog(env: PricingCatalogEnv = getPricingCatalogEn
       {
         id: "ai-chatbot",
         title: "AI Chatbot",
-        description: "AI-powered chatbot embedded on your website for enquiries, lead capture, and 24/7 response.",
+        description:
+          "Embeddable GraftBot widget for visitor-initiated enquiries, consent-based lead capture, and optional booking.",
         kind: "subscription",
         badge: "Core subscription",
-        features: ["Website embed included", "Deterministic lead triage", "24/7 Availability", "Global CDN", "Fast Setup to Go-Live (under 1 hour)"],
+        features: [
+          "Website embed included",
+          "Visitor-initiated conversations",
+          "Consent-based lead capture",
+          "Human handoff to your dashboard",
+          "Tenant-scoped data isolation",
+        ],
         prices: {
           monthly: option({
             cycle: "monthly",
@@ -108,7 +115,14 @@ export function buildPricingCatalog(env: PricingCatalogEnv = getPricingCatalogEn
         description: "Upgrade your chatbot with phone-style voice enquiry handling.",
         kind: "addon",
         ...(env.FEATURE_VOICE_ADDON === "true" ? {} : { badge: "Coming soon", comingSoon: true }),
-        features: ["Voice-first Enquiry Response", "Always available to take calls", "Monthly subscription only add-on", "Eliminates missed calls", "Natural voice conversations", "Works alongside your existing chatbot"],
+        features: [
+          "Voice-first Enquiry Response",
+          "Always available to take calls",
+          "Monthly subscription only add-on",
+          "Eliminates missed calls",
+          "Natural voice conversations",
+          "Works alongside your existing chatbot",
+        ],
         prices: {
           monthly: option({
             cycle: "monthly",
@@ -122,9 +136,15 @@ export function buildPricingCatalog(env: PricingCatalogEnv = getPricingCatalogEn
       {
         id: "booking-integration",
         title: "Booking Integration Add-on",
-        description: "Let your chatbot book appointments directly, scanning availability and scheduling into your pre-selected synced calendar slots.",
+        description:
+          "Let your chatbot book appointments directly, scanning availability and scheduling into your pre-selected synced calendar slots.",
         kind: "addon",
-        features: ["Calendar Integrated booking flow with Cal.com or Calendly","Ai Schedules Appointments  during conversations", "Reduces manual follow-up and fress up time", "Montly Subscription-only add-on"],
+        features: [
+          "Calendar Integrated booking flow with Cal.com or Calendly",
+          "Ai Schedules Appointments  during conversations",
+          "Reduces manual follow-up and fress up time",
+          "Montly Subscription-only add-on",
+        ],
         prices: {
           monthly: option({
             cycle: "monthly",
@@ -137,10 +157,15 @@ export function buildPricingCatalog(env: PricingCatalogEnv = getPricingCatalogEn
       },
       {
         id: "landing-page-build",
-        title: "Landing Page Build",
-        description: "A single-page website designed to convert visitors into enquiries.",
+        title: "GraftBot Landing Page Setup",
+        description:
+          "Fixed-scope implementation package: a single-page site configured to host and showcase your GraftBot widget.",
         kind: "one_time",
-        features: ["Conversion-focused page", "Mobile-optimised build", "One-time project"],
+        features: [
+          "Single-page site for GraftBot embed",
+          "Widget install and brand styling",
+          "One-time software implementation",
+        ],
         prices: {
           oneTime: option({
             cycle: "oneTime",
@@ -153,10 +178,15 @@ export function buildPricingCatalog(env: PricingCatalogEnv = getPricingCatalogEn
       },
       {
         id: "small-business-website-build",
-        title: "Small Business Website Build",
-        description: "A multi-page website with your AI chatbot pre-installed.",
+        title: "GraftBot Multi-Page Website Setup",
+        description:
+          "Fixed-scope implementation package: a multi-page site with GraftBot installed and configured for your business.",
         kind: "one_time",
-        features: ["Up to five pages", "Mobile-optimised design", "Chatbot installed"],
+        features: [
+          "Up to five pages with GraftBot embedded",
+          "Widget install and brand styling",
+          "One-time software implementation",
+        ],
         prices: {
           oneTime: option({
             cycle: "oneTime",

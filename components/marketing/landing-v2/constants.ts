@@ -9,6 +9,7 @@ export const LANDING_ROUTES = {
   privacy: "/privacy",
   terms: "/terms",
   security: "/security",
+  refunds: "/refunds",
 } as const;
 
 /**
@@ -19,7 +20,7 @@ export const LANDING_HEADER_SECTIONS = [
   { id: "smart-triage", label: "Smart Triage" },
   { id: "white-label", label: "White-Label" },
   { id: "bot-pricing", label: "Bot Pricing" },
-  { id: "website-pricing", label: "Website Builds" },
+  { id: "website-pricing", label: "GraftBot Website Setup" },
 ] as const;
 
 export const landingShellClassName =

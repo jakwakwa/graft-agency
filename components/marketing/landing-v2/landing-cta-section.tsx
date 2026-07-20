@@ -6,11 +6,11 @@ export function LandingCtaSection() {
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] md:w-[800px] md:h-[400px] bg-primary/20 blur-[120px] rounded-full pointer-events-none" />
       <div className="max-w-4xl mx-auto text-center space-y-6 md:space-y-10 relative z-10">
         <h2 className="text-4xl sm:text-5xl md:text-6xl font-headline font-bold tracking-tighter text-on-surface leading-none">
-          STOP MISSING <span className="text-primary italic">OPPORTUNITIES.</span>
+          ANSWER EVERY <span className="text-primary italic">ENQUIRY.</span>
         </h2>
         <p className="text-on-surface-variant text-sm sm:text-base md:text-xl max-w-2xl mx-auto leading-relaxed">
-          Transition from static lead forms to real-time semantic qualifying. Turn traffic into structured appointments
-          with zero manual effort.
+          Give website visitors an assistant they can open when they want help — answer questions, capture leads with
+          consent, book appointments on request, and hand off to a human when needed.
         </p>
         <div className="flex justify-center items-center">
           <LandingSectionLink

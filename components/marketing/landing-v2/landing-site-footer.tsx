@@ -14,8 +14,8 @@ export function LandingSiteFooter() {
           <div className="col-span-2 md:col-span-1">
             <span className="mb-4 block text-lg font-bold tracking-wider text-white">GRAFT.TODAY</span>
             <Typography.P className="max-w-[250px] text-sm leading-relaxed">
-              High-performance AI orchestration for elite sales teams. Engineered for the South African business
-              landscape.
+              An inbound website assistant that answers visitor enquiries, captures leads with consent, and books
+              appointments — so your team can follow up when it matters.
             </Typography.P>
           </div>
 
@@ -50,6 +50,11 @@ export function LandingSiteFooter() {
               <li>
                 <Link href={LANDING_ROUTES.security} className={footerLinkClass}>
                   Security
+                </Link>
+              </li>
+              <li>
+                <Link href={LANDING_ROUTES.refunds} className={footerLinkClass}>
+                  Refund &amp; cancellation policy
                 </Link>
               </li>
             </ul>
