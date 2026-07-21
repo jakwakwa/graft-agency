@@ -85,7 +85,7 @@ export function LandingFeaturesSection() {
             </div>
             <h3 className="text-2xl font-display font-light text-on-surface mb-2">White-Labeled</h3>
             <p className="text-on-surface-variant text-base">
-              Use our infrastructure under your banner. Full CSS control and API-first architecture.
+              Use our infrastructure under your banner.
             </p>
           </div>
           <div className="mt-6">
@@ -109,20 +109,20 @@ export function LandingFeaturesSection() {
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-5 md:gap-8">
               <div className="space-y-1">
-                <div className="text-lg md:text-xl font-mono text-on-surface">Ask</div>
-                <span className="text-[9px] uppercase  tracking-[4px] opacity-40   font-bold">Visitor Starts</span>
+                <div className="text-lg md:text-xl font-display text-on-surface">Ask</div>
+                <span className="text-[8px] uppercase leading-[1px] tracking-[3px] opacity-50   font-bold">User initated</span>
               </div>
               <div className="space-y-1">
-                <div className="text-lg md:text-xl font-mono text-on-surface">Share</div>
-                <span className="text-[9px] uppercase  tracking-[4px] opacity-40   font-bold">Opt-In Lead</span>
+                <div className="text-lg md:text-xl font-display text-on-surface">Share</div>
+                <span className="text-[8px] uppercase leading-[1px] tracking-[3px] opacity-50   font-bold">Opt-In Lead</span>
               </div>
               <div className="space-y-1">
-                <div className="text-lg md:text-xl font-mono text-on-surface">Book</div>
-                <span className="text-[9px] uppercase tracking-[4px] opacity-40 font-bold">On Request</span>
+                <div className="text-lg md:text-xl font-display text-on-surface">Book</div>
+                <span className="text-[8px] uppercase leading-[1px] tracking-[3px] opacity-50   font-bold">On Request</span>
               </div>
               <div className="space-y-1">
-                <div className="text-lg md:text-xl font-mono text-on-surface">Hand Off</div>
-                <span className="text-[9px] uppercase  tracking-[4px] opacity-40   font-bold">To Your Team</span>
+                <div className="text-lg md:text-xl font-display text-on-surface">Hand Off</div>
+                <span className="text-[8px] uppercase leading-[1px] tracking-[3px] opacity-50   font-bold">To Your Team</span>
               </div>
             </div>
           </div>

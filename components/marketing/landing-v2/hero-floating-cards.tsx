@@ -69,19 +69,19 @@ export function HeroFloatingCards() {
         <div className="hero-float-card__metric-grid">
           <div className="hero-float-card__metric">
             <span className="hero-float-card__metric-value">Ask</span>
-            <span className="hero-float-card__metric-label">VISITOR STARTS</span>
+            <span className="hero-float-card__metric-label">VISITOR INITIATED</span>
           </div>
           <div className="hero-float-card__metric">
-            <span className="hero-float-card__metric-value">Lead</span>
+            <span className="hero-float-card__metric-value">Leads</span>
             <span className="hero-float-card__metric-label">OPT-IN ONLY</span>
           </div>
           <div className="hero-float-card__metric">
-            <span className="hero-float-card__metric-value">Book</span>
+            <span className="hero-float-card__metric-value">Bookings</span>
             <span className="hero-float-card__metric-label">ON REQUEST</span>
           </div>
           <div className="hero-float-card__metric">
-            <span className="hero-float-card__metric-value">Hand</span>
-            <span className="hero-float-card__metric-label">TO YOUR TEAM</span>
+            <span className="hero-float-card__metric-value">Hand-off</span>
+            <span className="hero-float-card__metric-label">TO YOUR HUMAN TEAM</span>
           </div>
         </div>
       </motion.div>

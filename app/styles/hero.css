@@ -503,15 +503,15 @@
 }
 
 .hero-float-card__metric-value {
-  font-size: 1.25rem;
-  font-weight: 900;
+  font-size: 1.1rem;
+  font-weight: 500;
   color: #e5e0ed;
 }
 
 .hero-float-card__metric-label {
-  font-size: 0.5rem;
+  font-size: 0.6rem;
   letter-spacing: 0.15em;
-  color: rgba(255 255 255 / 0.3);
+  color: rgba(255 255 255 / 0.6);
 }
 
 /* ── Scroll indicator ── */
