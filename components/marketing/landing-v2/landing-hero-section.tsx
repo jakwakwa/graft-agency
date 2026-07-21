@@ -96,7 +96,7 @@ export function LandingHeroSection() {
               {["That Never"].map((word) => (
                 <motion.span
                   key={word}
-                  className="hero-headline__word hero-headline__word--gradient"
+                  className="hero-headline__word hero-headline__word--gradient text-sm"
                   variants={WORD_VARIANTS}
                 >
                   {word}{" "}

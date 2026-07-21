@@ -28,11 +28,19 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ cli
   c.appendChild(btn);
   document.body.appendChild(c);
   var open=false;
-  btn.addEventListener('click',function(){
-    open=!open;
+  function setOpen(next){
+    open=next;
     frame.style.display=open?'block':'none';
-    btn.textContent=open?'✕':'💬';
-    btn.setAttribute('aria-label',open?'Close chat':'Open chat');
+    btn.style.display=open?'none':'flex';
+    btn.setAttribute('aria-label','Open chat');
+  }
+  btn.addEventListener('click',function(){
+    setOpen(!open);
+  });
+  window.addEventListener('message',function(event){
+    if(!event.data||event.data.type!=='graft-today:close') return;
+    if(event.source!==frame.contentWindow) return;
+    setOpen(false);
   });
 })();
 `.trim();

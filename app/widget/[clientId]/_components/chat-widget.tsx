@@ -1,7 +1,7 @@
 "use client";
 
 import { useChat } from "@ai-sdk/react";
-import {  BotFreeIcons } from "@hugeicons/core-free-icons";
+import { BotFreeIcons, BubbleChatAddIcon, Cancel01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import type { UIMessage } from "ai";
 import { DefaultChatTransport } from "ai";
@@ -10,6 +10,14 @@ import { Streamdown } from "streamdown";
 import { TypographySmall } from "@/components/ui/typography";
 import { ChatInput } from "./chat-input";
 import { ToolStatus } from "./tool-status";
+import {
+  clearWidgetSession,
+  loadMessagesFromStorage,
+  persistMessagesToStorage,
+  readOrCreateSessionId,
+} from "./widget-session";
+
+export const WIDGET_CLOSE_MESSAGE_TYPE = "graft-today:close";
 
 interface ChatWidgetProps {
   clientId: string;
@@ -18,30 +26,38 @@ interface ChatWidgetProps {
   greetingMessage: string;
   primaryColour: string;
   widgetToken: string | null;
+  /** When provided (e.g. landing dialog), closes the host shell. */
+  onClose?: () => void;
 }
 
-function generateSessionId() {
-  return `graft-today-${Date.now()}-${crypto.randomUUID()}`;
+export function ChatWidget(props: ChatWidgetProps) {
+  const [sessionKey, setSessionKey] = useState(0);
+
+  const startNewSession = useCallback(() => {
+    clearWidgetSession(props.clientId);
+    setSessionKey((key) => key + 1);
+  }, [props.clientId]);
+
+  return <ChatSession key={sessionKey} {...props} onNewSession={startNewSession} />;
 }
 
-export function ChatWidget({
+interface ChatSessionProps extends ChatWidgetProps {
+  onNewSession: () => void;
+}
+
+function ChatSession({
   clientId,
   agentName,
   embedOrigin,
   greetingMessage,
   primaryColour,
   widgetToken,
-}: ChatWidgetProps) {
-  const [sessionId] = useState(() => {
-    if (typeof window === "undefined") return generateSessionId();
-    const stored = sessionStorage.getItem(`graft-today-session-${clientId}`);
-    if (stored) return stored;
-    const id = generateSessionId();
-    sessionStorage.setItem(`graft-today-session-${clientId}`, id);
-    return id;
-  });
-
+  onClose,
+  onNewSession,
+}: ChatSessionProps) {
+  const [sessionId] = useState(() => readOrCreateSessionId(clientId));
   const [inputValue, setInputValue] = useState("");
+  const [isEmbedded, setIsEmbedded] = useState(false);
 
   const { messages, sendMessage, status } = useChat({
     transport: new DefaultChatTransport({
@@ -52,19 +68,31 @@ export function ChatWidget({
   });
 
   const bottomRef = useRef<HTMLDivElement>(null);
+  const isLoading = status === "streaming" || status === "submitted";
+  const hasMessages = messages.length > 0;
+  const showClose = Boolean(onClose) || isEmbedded;
 
-  // Persist messages to sessionStorage
   useEffect(() => {
-    if (messages.length > 0) {
-      sessionStorage.setItem(`graft-today-chat-${clientId}`, JSON.stringify(messages));
-    }
+    setIsEmbedded(window.parent !== window);
+  }, []);
+
+  useEffect(() => {
+    persistMessagesToStorage(clientId, messages);
   }, [messages, clientId]);
 
-  // Auto-scroll to bottom when messages change
-  const _messageCount = messages.length;
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []);
+
+  const handleClose = useCallback(() => {
+    if (onClose) {
+      onClose();
+      return;
+    }
+    if (window.parent !== window) {
+      window.parent.postMessage({ type: WIDGET_CLOSE_MESSAGE_TYPE }, "*");
+    }
+  }, [onClose]);
 
   const handleSend = useCallback(
     async (text: string) => {
@@ -77,29 +105,48 @@ export function ChatWidget({
 
   return (
     <div className="flex h-full flex-col">
-      {/* Header */}
-      <header className="flex items-center gap-2 px-4 bg-primary py-3" style={{ backgroundColor: primaryColour }} >
+      <header className="flex items-center gap-2 px-4 bg-primary py-3" style={{ backgroundColor: primaryColour }}>
         <div
-          className="flex size-8 items-center justify-center rounded-full text-sm font-bold "
+          className="flex size-8 items-center justify-center rounded-full text-sm font-bold"
           style={{
-            color:  `${primaryColour }`,
+            color: `${primaryColour}`,
             backgroundColor: "hsl(35.71 100% 11.76%)",
           }}
         >
-          {agentName.charAt(0).toUpperCase()} 
+          {agentName.charAt(0).toUpperCase()}
         </div>
-        <TypographySmall className="font-semibold text-black">{agentName} ASSISTANT</TypographySmall>
+        <TypographySmall className="font-semibold text-black flex-1">{agentName} ASSISTANT</TypographySmall>
+        <div className="flex shrink-0 items-center gap-1">
+          {hasMessages ? (
+            <button
+              type="button"
+              onClick={onNewSession}
+              disabled={isLoading}
+              aria-label="Start new chat"
+              className="flex size-8 items-center justify-center rounded-full text-black/80 transition-opacity hover:bg-black/10 disabled:opacity-40"
+            >
+              <HugeiconsIcon icon={BubbleChatAddIcon} className="size-5" />
+            </button>
+          ) : null}
+          {showClose ? (
+            <button
+              type="button"
+              onClick={handleClose}
+              aria-label="Close chat"
+              className="flex size-8 items-center justify-center rounded-full text-black/80 transition-opacity hover:bg-black/10"
+            >
+              <HugeiconsIcon icon={Cancel01Icon} className="size-5" />
+            </button>
+          ) : null}
+        </div>
       </header>
 
-      {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
-        {/* Greeting */}
         {messages.length === 0 && (
           <div className="flex justify-start">
-     
-            <div className="max-w-[80%] flex gap-2 font-display outline-1 outline-white/10 rounded-bl-0 rounded-tr-lg rounded-br-lg rounded-tl-lg shadow-[0_7px_10px] shadow-black   bg-stone-800 px-4 py-2 text-white/70 text-xs">
-                 <HugeiconsIcon icon={BotFreeIcons} className="size-6" />
-                 {greetingMessage}
+            <div className="max-w-[80%] flex gap-2 font-display outline-1 outline-white/10 rounded-bl-0 rounded-tr-lg rounded-br-lg rounded-tl-lg shadow-[0_7px_10px] shadow-black bg-stone-800 px-4 py-2 text-white/70 text-xs">
+              <HugeiconsIcon icon={BotFreeIcons} className="size-6" />
+              {greetingMessage}
             </div>
           </div>
         )}
@@ -111,12 +158,11 @@ export function ChatWidget({
         <div ref={bottomRef} />
       </div>
 
-      {/* Input */}
       <ChatInput
         input={inputValue}
         onChange={setInputValue}
         onSend={handleSend}
-        isLoading={status === "streaming" || status === "submitted"}
+        isLoading={isLoading}
         primaryColour={primaryColour}
       />
     </div>
@@ -161,15 +207,4 @@ function MessageBubble({ message }: { message: UIMessage }) {
       </div>
     </div>
   );
-}
-
-function loadMessagesFromStorage(clientId: string): UIMessage[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const stored = sessionStorage.getItem(`graft-today-chat-${clientId}`);
-    if (!stored) return [];
-    return JSON.parse(stored) as UIMessage[];
-  } catch {
-    return [];
-  }
 }

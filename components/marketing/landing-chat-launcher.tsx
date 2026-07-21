@@ -2,6 +2,7 @@
 
 import { MessageUser01FreeIcons } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { useState } from "react";
 import { ChatWidget } from "@/app/widget/[clientId]/_components/chat-widget";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -25,12 +26,14 @@ export function LandingChatLauncher({
   greetingMessage,
   primaryColour,
 }: LandingChatLauncherProps) {
+  const [open, setOpen] = useState(false);
+
   if (!shouldShowLandingChat(platformClientId)) {
     return null;
   }
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger
         render={
           <Button
@@ -46,7 +49,7 @@ export function LandingChatLauncher({
       </DialogTrigger>
       <DialogContent
         className="max-h-[min(96vh,640px)] w-[calc(100vw-3rem)] max-w-full gap-0 overflow-hidden p-0 sm:max-w-2xl"
-        showCloseButton
+        showCloseButton={false}
       >
         <DialogTitle className="sr-only">Chat with {agentName}</DialogTitle>
         <div className="h-[min(80vh,660px)] w-full">
@@ -57,6 +60,7 @@ export function LandingChatLauncher({
             greetingMessage={greetingMessage}
             primaryColour={primaryColour}
             widgetToken={null}
+            onClose={() => setOpen(false)}
           />
         </div>
       </DialogContent>
