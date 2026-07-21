@@ -61,10 +61,6 @@ export async function saveBotSettingsAction(formData: FormData) {
     knowledgeBase,
   });
 
-  // Cal.com booking config is gated by the Booking Integration add-on. When
-  // the workspace doesn't have it, drop the fields from the write entirely —
-  // nothing new can be set, and any previously saved values are preserved in
-  // case the add-on is (re)activated later.
   const entitlements = await getClientEntitlements(clientId);
   const { calComUsername, defaultEventSlug, ...baseData } = data;
   const bookingData = entitlements?.hasBookingAccess ? { calComUsername, defaultEventSlug } : {};
@@ -89,7 +85,5 @@ export async function saveBotSettingsAction(formData: FormData) {
 
   revalidatePath("/portal/settings");
   revalidatePath("/portal/embed");
-  // Also revalidate the widget route if possible, though it's an API/iframe
-
   return { success: true };
 }

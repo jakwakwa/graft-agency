@@ -45,7 +45,7 @@ vi.mock("@/lib/services/agent.service", () => ({
   },
   isSyntheticAgentConfig: () => false,
   PLATFORM_LANDING_WIDGET_DEFAULTS: {
-    agentName: "GRAFT",
+    agentName: "GRAFT Assistant",
     greetingMessage: "Hello!",
   },
 }));
@@ -121,7 +121,7 @@ describe("POST /api/chat", () => {
       new Request("http://localhost/api/chat", {
         body: JSON.stringify({
           clientId: "client-1",
-          messages: [{ id: "u1", parts: [{ text: "Hi", type: "text" }], role: "user" }],
+          messages: [{ id: "u1", parts: [{ text: "Hey", type: "text" }], role: "user" }],
           sessionId: "session-1",
         }),
         headers: { "Content-Type": "application/json", Origin: "https://graft.today" },
@@ -163,7 +163,7 @@ describe("POST /api/chat", () => {
       new Request("http://localhost/api/chat", {
         body: JSON.stringify({
           clientId: "platform",
-          messages: [{ id: "u1", parts: [{ text: "Hi", type: "text" }], role: "user" }],
+          messages: [{ id: "u1", parts: [{ text: "Hey", type: "text" }], role: "user" }],
           sessionId: "session-1",
         }),
         headers: { "Content-Type": "application/json" },
@@ -259,7 +259,7 @@ describe("POST /api/chat", () => {
       new Request("http://localhost/api/chat", {
         body: JSON.stringify({
           clientId: "client-1",
-          messages: [{ id: "u1", parts: [{ text: "Hi", type: "text" }], role: "user" }],
+          messages: [{ id: "u1", parts: [{ text: "Hello!", type: "text" }], role: "user" }],
           sessionId: "session-1",
         }),
         headers: { "Content-Type": "application/json" },

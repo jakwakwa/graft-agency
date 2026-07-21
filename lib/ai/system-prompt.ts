@@ -25,7 +25,6 @@ export function buildSystemPrompt(config: AgentConfigInput, options: SystemPromp
 
   parts.push("");
   parts.push("Important behaviour rules:");
-  parts.push("- Use UK English spelling (e.g. colour, organisation, behaviour)");
   parts.push("- Be helpful and professional");
 
   if (options.bookingEnabled) {
