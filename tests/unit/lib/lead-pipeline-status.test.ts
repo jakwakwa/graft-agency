@@ -22,7 +22,7 @@ describe("getLeadPipelineStatus", () => {
     expect(getLeadPipelineStatus({ leadStatus: "CONTACTED", engagementStage: "FAILED" })).toBe("failed");
   });
 
-  it("returns denied for closed leads, even over a failed pipeline", () => {
+  it("returns denied for closedtriaged initiated enquiries  even over a failed pipeline", () => {
     expect(getLeadPipelineStatus({ leadStatus: "CLOSED", engagementStage: null })).toBe("denied");
     expect(getLeadPipelineStatus({ leadStatus: "CLOSED", engagementStage: "FAILED" })).toBe("denied");
   });

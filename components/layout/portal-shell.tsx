@@ -75,7 +75,7 @@ export function PortalShell({ children }: PortalShellProps) {
       </aside>
 
       {/* Main Content */}
-      <main className="min-h-screen w-full pt-16 md:pl-64 bg-background/50">{children}</main>
+      <main className="fixed overflow-y-scroll h-full w-full pt-16 md:pl-64 bg-background/50">{children}</main>
     </div>
   );
 }

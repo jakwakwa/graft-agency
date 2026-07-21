@@ -101,7 +101,7 @@ Run `bun run build` (not just IDE type-checks) to catch compile-time contract er
 Triggered by cron or manually: scrapes websites → Google Gemini audit (AI presence, pain points) → generates personalized cold email drafts → enters approval queue before dispatch.
 
 **2. Engagement Pipeline** (`lib/inngest/functions/`)
-Full solution delivery for approved leads via 8 Inngest functions chained by events:
+Full solution delivery for approved prospects  via 8 Inngest functions chained by events:
 `lead-profiler` → `prd-writer` → `stitch-designer` → `jules-builder` → `jules-poller` → `engagement-reconciler` → `offer-dispatcher`
 
 Each stage writes to `ProductSpec.stage` (enum `EngagementStage`). Reconciler handles retries and failures. Dry-run mode stubs Vercel/Paddle/Resend calls (`ENGAGEMENT_DRY_RUN=true`).
@@ -111,9 +111,9 @@ Tenant-embedded iframe chatbot streaming via Vercel AI SDK. Model router selects
 
 ### Key Directories
 
-- `app/api/` — Route handlers (chat, leads, webhooks, billing, engagement, inngest)
+- `app/api/` — Route handlers (chat,triaged initiated enquiries  webhooks, billing, engagement, inngest)
 - `app/(portal)/` — Authenticated tenant portal (billing, conversations, settings, embed)
-- `lib/services/` — Business logic layer (agent, lead, conversation, email, prospecting)
+- `lib/services/` — Business logic layer (agent, query, conversation, email, prospecting)
 - `lib/inngest/functions/` — All 8 engagement pipeline Inngest functions
 - `lib/ai/tools/` — AI tool definitions (one factory per tool, close over `clientId`)
 - `lib/auth/` — Clerk→Client resolution and access guards

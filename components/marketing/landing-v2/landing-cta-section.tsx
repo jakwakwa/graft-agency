@@ -9,7 +9,7 @@ export function LandingCtaSection() {
           ANSWER EVERY <span className="text-primary italic">ENQUIRY.</span>
         </h2>
         <p className="text-on-surface-variant text-base sm:text-base md:text-xl max-w-2xl mx-auto leading-relaxed">
-          Give website visitors an assistant they can open when they want help — answer questions, capture leads with
+          Give website visitors an assistant they can open when they want help — answer questions, triaging  with
           consent, book appointments on request, and hand off to a human when needed.
         </p>
         <div className="flex justify-center items-center">

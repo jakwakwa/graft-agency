@@ -1,5 +1,5 @@
-import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowRight01Icon, BotIcon, Calendar01Icon, Message01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { SubscriptionGate } from "@/components/portal/subscription-gate";
@@ -128,7 +128,7 @@ export default async function PortalDashboardPage() {
         <Card className="border-l-4 border-accent">
           <CardHeader className="pb-2">
             <Typography.Small className="text-[10px] uppercase tracking-widest text-muted-foreground">
-              Total Leads
+              Total Triaged
             </Typography.Small>
           </CardHeader>
           <CardContent>
@@ -184,7 +184,7 @@ export default async function PortalDashboardPage() {
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <span className="font-bold group-hover:text-primary transition-colors text-sm text-primary-kinetic">
+                      <span className="font-bold group-hover:text-primary transition-colors text-sm text-chart-4">
                         {convo.lead?.customerName || "Anonymous Visitor"}
                       </span>
                       <Badge variant="default" className="gap-1.5">
@@ -229,7 +229,7 @@ export default async function PortalDashboardPage() {
       {gated ? (
         <SubscriptionGate
           title="Activate your workspace"
-          description="Your dashboard lights up once the AI Chatbot subscription is active — live conversations, captured leads, and bookings in one place."
+          description="Your dashboard lights up once the AI Chatbot subscription is active — live conversations, capturedtriaged initiated enquiries  and bookings in one place."
           highlights={["Live conversation feed", "Captured lead analytics", "Upcoming booking overview"]}
         >
           {dashboardContent}

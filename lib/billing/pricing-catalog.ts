@@ -82,7 +82,7 @@ export function buildPricingCatalog(env: PricingCatalogEnv = getPricingCatalogEn
         id: "ai-chatbot",
         title: "GRAFT AI Assistant",
         description:
-          "Embeddable GRAFT AI Assistant widget for visitor-initiated enquiries, consent-based traging, and optional booking.",
+          "Embeddable GRAFT AI Assistant widget for visitor-initiated enquiries, traging, and optional booking.",
         kind: "subscription",
         badge: "Core subscription",
         features: [

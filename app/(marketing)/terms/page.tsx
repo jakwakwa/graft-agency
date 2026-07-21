@@ -61,11 +61,11 @@ export default function TermsPage() {
         <ul className="list-disc list-inside space-y-2 text-sm text-muted-foreground mt-2">
           <li>
             <strong className="text-foreground">AI chatbot widget (GRAFT AI Assistant):</strong> An embeddable chatbot powered by
-            AI that engages your website visitors, captures leads, and answers queries on your behalf
+            AI that engages your website visitors, triaging initiated enquiries, and answers queries on your behalf
           </li>
           <li>
-            <strong className="text-foreground">Lead management and appointment booking:</strong> Tools for reviewing
-            leads captured by your chatbot, managing conversations, and booking appointments through the Cal.com
+            <strong className="text-foreground">Triage enquiry management and appointment booking:</strong> Tools for reviewing
+            triaging initiated enquiries by your chatbot, managing conversations, and booking appointments through the Cal.com
             integration
           </li>
           <li>
@@ -75,7 +75,7 @@ export default function TermsPage() {
           </li>
           <li>
             <strong className="text-foreground">Subscriber dashboard:</strong> A management interface for conversations,
-            leads, billing, and settings
+           triaged initiated enquiries  billing, and settings
           </li>
         </ul>
         <Typography.P>
@@ -189,7 +189,7 @@ export default function TermsPage() {
       <Section id="ai-content" title="6. AI-Generated Content">
         <Typography.P>
           GRAFT.TODAY uses AI models (including Google Gemini and Anthropic Claude) to generate content such as chatbot
-          responses, engagement copy, and lead analyses. You acknowledge and agree that:
+          responses, engagement copy. You acknowledge and agree that:
         </Typography.P>
         <ul className="list-disc list-inside space-y-2 text-sm text-muted-foreground mt-2">
           <li>

@@ -68,9 +68,7 @@ export async function POST(req: Request) {
       greetingMessage: PLATFORM_LANDING_WIDGET_DEFAULTS.greetingMessage,
     };
   }
-  // Booking Integration add-on gates all scheduling: without it the bot gets
-  // no booking tools and its prompt directs it to capture contact details for
-  // owner follow-up instead.
+
   const entitlements = await entitlementsPromise;
   const bookingEnabled = entitlements?.hasBookingAccess ?? false;
   const systemPrompt = buildSystemPrompt(config, { bookingEnabled });

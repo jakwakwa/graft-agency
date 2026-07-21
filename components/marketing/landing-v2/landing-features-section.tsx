@@ -1,6 +1,13 @@
+import {
+  BotIcon,
+  Calendar01Icon,
+  Clock01Icon,
+  Clock03Icon,
+  Robot,
+  RobotFreeIcons,
+  RobotIcon,
+} from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { BotIcon, Calendar01Icon, Clock01Icon } from "@hugeicons/core-free-icons";
-import { Clock03Icon, Robot, RobotFreeIcons, RobotIcon } from "@hugeicons/core-free-icons";
 import { IdCard } from "lucide-react";
 import Image from "next/image";
 import { Shimmer } from "@/components/ai-elements/shimmer";
@@ -13,7 +20,7 @@ export function LandingFeaturesSection() {
           The Graft <span className="text-chart-3">Service Ecosystem</span>
         </h2>
         <p className="text-on-surface-variant text-base tracking-normal sm:tracking-[0.2em] uppercase font-semibold">
-          Visitor-initiated enquiries, consent-based capture, booking on request.
+          Visitor-initiated enquiries,booking scheduler on request.
         </p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6 h-auto md:h-[600px]">
@@ -41,8 +48,7 @@ export function LandingFeaturesSection() {
               <h3 className="text-xl font-display md:text-2xl font-bold text-on-surface mb-2">24-Hour Omnipresence</h3>
               <p className="text-on-surface-variant text-lg font-light max-w-md">
                 Our AI manages the quiet hours with the same elegance as your busiest afternoons. Visitors start the
-                conversation. GRAFT AI Assistant answers their questions and only collects contact details when they choose to
-                share them — no mass outreach, no harvested lists.
+                conversation. GRAFT AI Assistant answers questions, triage issues, and schedule bookings with your human staff.
               </p>
             </div>
           </div>
@@ -86,9 +92,7 @@ export function LandingFeaturesSection() {
               <IdCard className="h-8 w-8 text-indigo-400" />
             </div>
             <h3 className="text-2xl font-display font-light text-on-surface mb-2">White-Labeled</h3>
-            <p className="text-on-surface-variant text-base">
-              Use our infrastructure under your banner.
-            </p>
+            <p className="text-on-surface-variant text-base">Use our infrastructure under your banner.</p>
           </div>
           <div className="mt-6">
             <div className="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold font-display mb-2">
@@ -112,19 +116,27 @@ export function LandingFeaturesSection() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-5 md:gap-8">
               <div className="space-y-1">
                 <div className="text-lg md:text-xl font-display text-on-surface">Ask</div>
-                <span className="text-[8px] uppercase leading-[1px] tracking-[3px] opacity-50   font-bold">User initated</span>
+                <span className="text-[8px] uppercase leading-[1px] tracking-[3px] opacity-50   font-bold">
+                  User initated
+                </span>
               </div>
               <div className="space-y-1">
-                <div className="text-lg md:text-xl font-display text-on-surface">Share</div>
-                <span className="text-[8px] uppercase leading-[1px] tracking-[3px] opacity-50   font-bold">Opt-In Lead</span>
+                <div className="text-lg md:text-xl font-display text-on-surface">Triage</div>
+                <span className="text-[8px] uppercase leading-[1px] tracking-[3px] opacity-50   font-bold">
+                 enquiries
+                </span>
               </div>
               <div className="space-y-1">
                 <div className="text-lg md:text-xl font-display text-on-surface">Book</div>
-                <span className="text-[8px] uppercase leading-[1px] tracking-[3px] opacity-50   font-bold">On Request</span>
+                <span className="text-[8px] uppercase leading-[1px] tracking-[3px] opacity-50   font-bold">
+                  On Request
+                </span>
               </div>
               <div className="space-y-1">
                 <div className="text-lg md:text-xl font-display text-on-surface">Hand Off</div>
-                <span className="text-[8px] uppercase leading-[1px] tracking-[3px] opacity-50   font-bold">To Your Team</span>
+                <span className="text-[8px] uppercase leading-[1px] tracking-[3px] opacity-50   font-bold">
+                  To Your Team
+                </span>
               </div>
             </div>
           </div>

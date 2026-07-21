@@ -142,7 +142,7 @@ mutate or read tenant data before authenticating, or that trust a clientId from 
     prompt: `${REPO_CONTEXT}
 LENS: Unauthenticated route handlers & privilege escalation.
 Audit app/api/**/route.ts. Distinguish intentionally-public routes (widget/embed, chat, inbound
-webhooks) from privileged ones (app/api/admin/*, app/api/ops/*, app/api/automation/*, leads,
+webhooks) from privileged ones (app/api/admin/*, app/api/ops/*, app/api/automation/*,triaged initiated enquiries 
 prospect-queue). Flag any privileged route missing an auth check, and any route using
 platform/owner capabilities without requirePlatformAccess()/requirePlatformOwnerAccess().`,
   },

@@ -72,7 +72,7 @@ export function HeroFloatingCards() {
             <span className="hero-float-card__metric-label">VISITOR INITIATED</span>
           </div>
           <div className="hero-float-card__metric">
-            <span className="hero-float-card__metric-value">Leads</span>
+            <span className="hero-float-card__metric-value">Triaged Equiries</span>
             <span className="hero-float-card__metric-label">OPT-IN ONLY</span>
           </div>
           <div className="hero-float-card__metric">

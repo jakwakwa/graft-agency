@@ -15,11 +15,11 @@ function Section({
 }) {
   return (
     <section id={id} className="mt-10 scroll-mt-8">
-      <div className="flex items-center gap-3 mb-4">
+      <div className="flex items-center gap-3 mb-4 h-8">
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted">
-          <Icon className="h-4 w-4 text-foreground" aria-hidden />
+          <Icon className="h-4 w-4  mt-6 text-foreground" aria-hidden />
         </div>
-        <Typography.H3 className="block text-foreground">{title}</Typography.H3>
+        <Typography.H3 className="block h-8 text-foreground">{title}</Typography.H3>
       </div>
       <div className="space-y-3 pl-11">{children}</div>
     </section>
@@ -36,7 +36,7 @@ function Pill({ children }: { children: React.ReactNode }) {
 
 export const metadata = {
   title: "Security — GRAFT.TODAY",
-  description: "How GRAFT.TODAY keeps your data, your chatbot, and your customers safe.",
+  description: "How GRAFT.TODAY keeps your data, your Ai Assistant, and your customers safe.",
 };
 
 export default function SecurityPage() {
@@ -56,7 +56,7 @@ export default function SecurityPage() {
 
       <Typography.Lead className="mt-8">
         We built GRAFT.TODAY to handle sensitive business conversations and customer data. This page explains exactly
-        how we protect your data, your customers&rsquo; data, and your chatbot — in plain language, not marketing copy.
+        how we protect your data, your customers&rsquo; data, and your Ai Assistant — in plain language, not marketing copy.
       </Typography.Lead>
 
       {/* ─── Infrastructure ─── */}
@@ -112,7 +112,7 @@ export default function SecurityPage() {
         </ul>
         <Typography.P>
           Access to your organisation&rsquo;s data within the platform is scoped to your Clerk organisation. No other
-          tenant can access your leads, conversations, or settings — this is enforced at the data-query layer, not just
+          tenant can access yourtriaged initiated enquiries  conversations, or settings — this is enforced at the data-query layer, not just
           the UI.
         </Typography.P>
       </Section>
@@ -137,7 +137,7 @@ export default function SecurityPage() {
           <li>The platform owner account has elevated access for support purposes only; access is logged</li>
         </ul>
         <Typography.P>
-          If you use GRAFT.TODAY to serve your own customers (e.g. deploying a chatbot widget on your site), your
+          If you use GRAFT.TODAY to serve your own customers (e.g. deploying a Ai Assistant widget on your site), your
           customers&rsquo; data is similarly isolated under your organisation and is not visible to other GRAFT.TODAY
           tenants.
         </Typography.P>
@@ -156,7 +156,7 @@ export default function SecurityPage() {
             Paddle
           </a>{" "}
           as our Merchant of Record.{" "}
-          <strong>GRAFT.TODAY never sees, handles, or stores your payment card details.</strong> This means:
+          <span className="font-semibold">GRAFT.TODAY never sees, handles, or stores your payment card details.</span> This means:
         </Typography.P>
         <ul className="list-disc list-inside space-y-2 text-sm text-muted-foreground mt-2">
           <li>Your card number, CVV, and expiry date go directly to Paddle&rsquo;s PCI-DSS compliant infrastructure</li>
@@ -174,19 +174,19 @@ export default function SecurityPage() {
       {/* ─── AI data handling ─── */}
       <Section id="ai" icon={Bot} title="AI models and your data">
         <Typography.P>
-          GRAFT.TODAY uses AI models to power the chatbot and engagement features. We want to be fully transparent about
+          GRAFT.TODAY uses AI models to power the Ai Assistant and engagement features. We want to be fully transparent about
           which providers receive your data and under what conditions.
         </Typography.P>
 
         <div className="mt-4 space-y-4">
           <div className="rounded-lg border border-border px-4 py-3">
             <div className="flex items-center gap-2 mb-2">
-              <p className="font-semibold text-sm text-foreground">Google Gemini</p>
+              <p className="font-medium text-sm text-foreground">Google Gemini</p>
               <Pill>AI inference</Pill>
             </div>
             <p className="text-sm text-muted-foreground">
-              Used for chatbot responses and engagement analysis. Data sent to Gemini includes conversation messages and
-              lead context. Google&rsquo;s API terms state that data submitted via the API is not used to train
+              Used for Ai Assistant responses and engagement analysis. Data sent to Gemini includes conversation messages and
+              contact context. Google&rsquo;s API terms state that data submitted via the API is not used to train
               Google&rsquo;s models by default. See{" "}
               <a
                 href="https://ai.google.dev/gemini-api/terms"
@@ -202,11 +202,11 @@ export default function SecurityPage() {
 
           <div className="rounded-lg border border-border px-4 py-3">
             <div className="flex items-center gap-2 mb-2">
-              <p className="font-semibold text-sm text-foreground">Anthropic Claude</p>
+              <p className="font-medium text-sm text-foreground">Anthropic Claude</p>
               <Pill>AI inference</Pill>
             </div>
             <p className="text-sm text-muted-foreground">
-              Used as an alternative model for chatbot responses. Data sent includes conversation history and relevant
+              Used as an alternative model for Ai Assistant responses. Data sent includes conversation history and relevant
               context. Anthropic&rsquo;s API policy states that API inputs and outputs are not used to train their
               models. See{" "}
               <a
@@ -221,18 +221,8 @@ export default function SecurityPage() {
             </p>
           </div>
 
-          <div className="rounded-lg border border-border px-4 py-3">
-            <div className="flex items-center gap-2 mb-2">
-              <p className="font-semibold text-sm text-foreground">Google Stitch &amp; Jules</p>
-              <Pill>Design &amp; code generation</Pill>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              Used during the engagement pipeline to generate design concepts and prototype code for approved leads.
-              These are Google Cloud services accessed via a dedicated service account. Data sent is limited to the
-              engagement brief and approved lead context.
-            </p>
-          </div>
-        </div>
+         
+        </div>  
 
         <Typography.P>
           We apply data minimisation: AI calls receive only the context necessary for the specific task. We do not send
@@ -241,8 +231,8 @@ export default function SecurityPage() {
         </Typography.P>
       </Section>
 
-      {/* ─── Chatbot widget ─── */}
-      <Section id="widget" icon={ShieldCheck} title="Chatbot widget security">
+      {/* ─── Ai Assistant widget ─── */}
+      <Section id="widget" icon={ShieldCheck} title="Ai Assistant widget security">
         <Typography.P>
           When you embed the GRAFT AI Assistant widget on your website, a script loads an iframe served from
           GRAFT.TODAY. Here is what that means for your site&rsquo;s security:
@@ -252,7 +242,7 @@ export default function SecurityPage() {
             The widget runs in an isolated iframe — it cannot access your page&rsquo;s DOM, cookies, or local storage
           </li>
           <li>
-            Your GRAFT.TODAY client ID is used to identify your chatbot configuration. It is a non-secret public
+            Your GRAFT.TODAY client ID is used to identify your Ai Assistant configuration. It is a non-secret public
             identifier — possessing it does not grant access to your dashboard or data
           </li>
           <li>Chat conversations are transmitted over HTTPS and stored in your account&rsquo;s isolated data scope</li>
@@ -269,7 +259,7 @@ export default function SecurityPage() {
         <Typography.P>To be explicit about our data practices:</Typography.P>
         <ul className="list-disc list-inside space-y-2 text-sm text-muted-foreground mt-2">
           <li>We do not sell your data or your customers&rsquo; data to third parties</li>
-          <li>We do not use your conversation data or leads for advertising targeting</li>
+          <li>We do not use your conversation  data or visitor context  for advertising targeting</li>
           <li>We do not allow any AI provider to train on your data via API calls (per their respective policies)</li>
           <li>We do not share your data between tenants</li>
           <li>We do not store payment card details — ever</li>
@@ -283,7 +273,7 @@ export default function SecurityPage() {
           disclosure. We take all reports seriously and will respond promptly.
         </Typography.P>
         <div className="mt-3 rounded-lg border border-border px-4 py-3 text-sm">
-          <p className="font-semibold text-foreground mb-1">Responsible disclosure contact</p>
+          <p className="font-medium text-foreground mb-1">Responsible disclosure contact</p>
           <p className="text-muted-foreground">
             Email{" "}
             <a
@@ -329,7 +319,7 @@ export default function SecurityPage() {
 
       {/* ─── More ─── */}
       <div className="mt-12 rounded-lg border border-border bg-muted/30 px-5 py-4 text-sm">
-        <p className="font-semibold text-foreground mb-2">More information</p>
+        <p className="font-medium text-foreground mb-2">More information</p>
         <ul className="space-y-1 text-muted-foreground">
           <li>
             <Link href="/privacy" className="underline underline-offset-4 text-foreground hover:text-muted-foreground">

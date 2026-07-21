@@ -1,6 +1,8 @@
 "use client";
 
 import { SignUpButton } from "@clerk/nextjs";
+import { Brain01FreeIcons } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { Zap } from "lucide-react";
 import { motion, useScroll, useTransform, type Variants } from "motion/react";
 import { useRef } from "react";
@@ -79,8 +81,8 @@ export function LandingHeroSection() {
             {/* Pill badge */}
             <motion.div className="hero-badge" variants={FADE_UP} initial="hidden" animate="visible" custom={0}>
               <span className="hero-badge__glow" />
-              <Zap className="hero-badge__icon" />
-              <span>Hyper-Performance AI Engine</span>
+              <HugeiconsIcon icon={Brain01FreeIcons} className="w-5 h-5 text-pink-300" />
+              <span className="text-indigo-300">Intelligently Harnessed Agents</span>
             </motion.div>
 
             {/* Headline */}
@@ -107,9 +109,9 @@ export function LandingHeroSection() {
 
             {/* Subtitle */}
             <motion.p className="hero-subtitle" variants={FADE_UP} initial="hidden" animate="visible" custom={0.7}>
-              When a visitor opens your Graft AI Agents widget, it can answer their questions, capture contact details if they
-              choose to share them, and book appointments on request — while routing complex queries to your team in the
-              GRAFT.TODAY dashboard.
+              When a visitor opens your Graft AI Agents widget, it can answer their questions, triage potential customer
+              queries, and book appointments on request — while routing complex queries to your team in the GRAFT.TODAY
+              dashboard.
             </motion.p>
 
             {/* CTA buttons */}

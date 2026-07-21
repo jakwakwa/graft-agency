@@ -182,7 +182,7 @@ export default function PrivacyPage() {
             (name, email, contact details, queries).
           </li>
           <li>
-            <strong className="text-foreground">Leads:</strong> Contact details and engagement data your
+            <strong className="text-foreground">Triaged Detail</strong> Contact details and engagement data your
             end-users share through your deployed GRAFT AI Assistant widget.
           </li>
           <li>
@@ -420,7 +420,7 @@ export default function PrivacyPage() {
         </Typography.P>
         <Typography.P>
           <strong>Note for GRAFT.TODAY subscribers:</strong> If you use the services to communicate with your own
-          customers or leads, you are responsible for ensuring those communications comply with applicable
+          customers ortriaged initiated enquiries  you are responsible for ensuring those communications comply with applicable
           electronic direct marketing laws in your jurisdiction (including POPIA Section 69 in South Africa,
           CAN-SPAM in the United States, and the GDPR in the European Union).
         </Typography.P>
