@@ -60,4 +60,30 @@ describe("getPlatformClientId", () => {
     const id = await getPlatformClientId();
     expect(id).toBe(c.id);
   });
+
+  it("prefers isPlatformOwner when PLATFORM_CLERK_ORG_ID matches multiple Clients", async () => {
+    const orgId = `test-gpc-org-${Date.now()}`;
+    const member = await prisma.client.create({
+      data: {
+        clerkOrganizationId: orgId,
+        businessName: "Member (created first)",
+        isPlatformOwner: false,
+      },
+    });
+    const owner = await prisma.client.create({
+      data: {
+        clerkOrganizationId: orgId,
+        businessName: "Platform Owner",
+        isPlatformOwner: true,
+      },
+    });
+    createdIds.push(member.id, owner.id);
+
+    vi.stubEnv("PLATFORM_CLIENT_ID", "");
+    vi.stubEnv("PLATFORM_CLERK_ORG_ID", orgId);
+
+    const { getPlatformClientId } = await import("@/lib/auth/platform-client");
+    const id = await getPlatformClientId();
+    expect(id).toBe(owner.id);
+  });
 });

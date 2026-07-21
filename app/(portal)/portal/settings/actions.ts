@@ -12,6 +12,7 @@ const botSettingsSchema = z.object({
   greetingMessage: z.string().min(1, "Greeting message is required"),
   systemPrompt: z.string().min(1, "Instructions are required"),
   widgetPrimaryColour: z.string().regex(/^#[0-9A-F]{6}$/i, "Invalid color format"),
+  widgetSecondaryColour: z.string().regex(/^#[0-9A-F]{6}$/i, "Invalid color format"),
   calComUsername: z.string().optional().nullable(),
   defaultEventSlug: z.string().optional().nullable(),
   knowledgeBase: z
@@ -56,6 +57,7 @@ export async function saveBotSettingsAction(formData: FormData) {
     greetingMessage: formData.get("greetingMessage"),
     systemPrompt: formData.get("systemPrompt"),
     widgetPrimaryColour: formData.get("widgetPrimaryColour") || "#7c3aed",
+    widgetSecondaryColour: formData.get("widgetSecondaryColour") || "#1e1b4b",
     calComUsername: optionalFormString(formData.get("calComUsername")),
     defaultEventSlug: optionalFormString(formData.get("defaultEventSlug")),
     knowledgeBase,
@@ -85,5 +87,8 @@ export async function saveBotSettingsAction(formData: FormData) {
 
   revalidatePath("/portal/settings");
   revalidatePath("/portal/embed");
+  // Platform owner settings drive the marketing landing widget.
+  revalidatePath("/");
+
   return { success: true };
 }

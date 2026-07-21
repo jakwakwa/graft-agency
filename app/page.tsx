@@ -8,6 +8,7 @@ export default async function Home() {
   let agentName: string = PLATFORM_LANDING_WIDGET_DEFAULTS.agentName;
   let greetingMessage: string = PLATFORM_LANDING_WIDGET_DEFAULTS.greetingMessage;
   let primaryColour: string = PLATFORM_LANDING_WIDGET_DEFAULTS.widgetPrimaryColour;
+  let secondaryColour: string = PLATFORM_LANDING_WIDGET_DEFAULTS.widgetSecondaryColour;
 
   if (platformClientId) {
     const config = await agentService.getConfig(platformClientId);
@@ -17,6 +18,7 @@ export default async function Home() {
       agentName = config.agentName ?? agentName;
       greetingMessage = config.greetingMessage ?? greetingMessage;
       primaryColour = config.widgetPrimaryColour ?? primaryColour;
+      secondaryColour = config.widgetSecondaryColour ?? secondaryColour;
     }
   }
 
@@ -31,6 +33,7 @@ export default async function Home() {
         agentName={agentName}
         greetingMessage={greetingMessage}
         primaryColour={primaryColour}
+        secondaryColour={secondaryColour}
       />
     </div>
   );

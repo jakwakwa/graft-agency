@@ -15,6 +15,7 @@ export default async function WidgetPage({ params }: WidgetPageProps) {
   let agentName = "AI Assistant";
   let greetingMessage = "Hello! How can I help you today?";
   let primaryColour = "#5F75F4";
+  let secondaryColour: string | null = "#1e1b4b";
   let widgetToken: string | null = null;
 
   try {
@@ -22,6 +23,7 @@ export default async function WidgetPage({ params }: WidgetPageProps) {
     agentName = config.agentName ?? agentName;
     greetingMessage = config.greetingMessage ?? greetingMessage;
     primaryColour = config.widgetPrimaryColour ?? primaryColour;
+    secondaryColour = config.widgetSecondaryColour ?? secondaryColour;
   } catch {
     // Use defaults if config not found
   }
@@ -42,6 +44,7 @@ export default async function WidgetPage({ params }: WidgetPageProps) {
         embedOrigin={embedOrigin}
         greetingMessage={greetingMessage}
         primaryColour={primaryColour}
+        secondaryColour={secondaryColour}
         widgetToken={widgetToken}
       />
     </main>

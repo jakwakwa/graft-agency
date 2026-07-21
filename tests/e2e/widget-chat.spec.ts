@@ -33,7 +33,7 @@ test.describe("Chat Widget", () => {
     await expect(page.getByText("Hello, I need help")).toBeVisible();
 
     // Should get an assistant response (may take a moment for streaming)
-    const assistantMessages = page.locator('[class*="rounded-bl-sm"][class*="bg-muted"]');
+    const assistantMessages = page.locator('[data-role="assistant"]');
     await expect(assistantMessages.first()).toBeVisible({ timeout: 30000 });
   });
 
@@ -68,6 +68,33 @@ test.describe("Chat Widget", () => {
     });
   });
 
+  test("starts a new session from the New chat control", async ({ page }) => {
+    await page.goto(`/widget/${TEST_CLIENT_ID}`);
+
+    const input = page.getByLabel("Chat message");
+    await input.fill("First session message");
+    await page.getByLabel("Send message").click();
+    await expect(page.getByText("First session message")).toBeVisible();
+
+    const newChat = page.getByLabel("Start new chat");
+    await expect(newChat).toBeVisible();
+    await newChat.click();
+
+    // Prior thread cleared; greeting returns
+    await expect(page.getByText("First session message")).toHaveCount(0);
+    await expect(page.locator("text=How can I help you today")).toBeVisible();
+    await expect(newChat).toHaveCount(0);
+
+    await input.fill("Second session message");
+    await page.getByLabel("Send message").click();
+    await expect(page.getByText("Second session message")).toBeVisible();
+  });
+
+  test("does not show close on standalone widget page", async ({ page }) => {
+    await page.goto(`/widget/${TEST_CLIENT_ID}`);
+    await expect(page.getByLabel("Close chat")).toHaveCount(0);
+  });
+
   test("responds to 'When are you free?' with availability or helpful message", async ({ page }) => {
     await page.goto(`/widget/${TEST_CLIENT_ID}`);
 
@@ -80,7 +107,7 @@ test.describe("Chat Widget", () => {
     await expect(page.getByText("When are you free?")).toBeVisible();
 
     // Graft should respond — either with slot suggestions or a message about calendar config
-    const assistantMessages = page.locator('[class*="rounded-bl-sm"][class*="bg-muted"]');
+    const assistantMessages = page.locator('[data-role="assistant"]');
     await expect(assistantMessages.first()).toBeVisible({ timeout: 30000 });
 
     // Response should mention availability, slots, or calendar (or explain config is needed)
