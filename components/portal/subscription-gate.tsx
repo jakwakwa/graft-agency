@@ -2,8 +2,8 @@ import { Lock, Sparkles } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui-v2/button";
 import { Typography } from "@/components/ui/typography";
+import { Button } from "@/components/ui-v2/button";
 
 interface SubscriptionGateProps {
   /** Feature-specific headline, e.g. "Unlock your bot settings". */
@@ -18,7 +18,7 @@ interface SubscriptionGateProps {
 /**
  * Category A paygate: renders the underlying screen for context but makes it
  * inert (no clicks, no selection, no focus) and overlays a dialogue card with
- * a single "Subscribe to AI Chatbot" call to action.
+ * a single "Subscribe to Graft AI Agent" call to action.
  */
 export function SubscriptionGate({ title, description, highlights, children }: SubscriptionGateProps) {
   return (
@@ -46,7 +46,7 @@ export function SubscriptionGate({ title, description, highlights, children }: S
               </ul>
             ) : null}
             <Button asChild size="lg" className="mt-2 w-full font-semibold">
-              <Link href="/portal/billing">Subscribe to AI Chatbot</Link>
+              <Link href="/portal/billing">Subscribe to Graft AI Agent</Link>
             </Button>
           </CardContent>
         </Card>

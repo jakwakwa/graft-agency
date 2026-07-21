@@ -80,15 +80,15 @@ export function buildPricingCatalog(env: PricingCatalogEnv = getPricingCatalogEn
     offers: [
       {
         id: "ai-chatbot",
-        title: "AI Chatbot",
+        title: "GRAFT AI Assistant",
         description:
-          "Embeddable GraftBot widget for visitor-initiated enquiries, consent-based lead capture, and optional booking.",
+          "Embeddable GRAFT AI Assistant widget for visitor-initiated enquiries, consent-based traging, and optional booking.",
         kind: "subscription",
         badge: "Core subscription",
         features: [
           "Website embed included",
           "Visitor-initiated conversations",
-          "Consent-based lead capture",
+          "Consent-based traging",
           "Human handoff to your dashboard",
           "Tenant-scoped data isolation",
         ],
@@ -157,12 +157,12 @@ export function buildPricingCatalog(env: PricingCatalogEnv = getPricingCatalogEn
       },
       {
         id: "landing-page-build",
-        title: "GraftBot Landing Page Setup",
+        title: "GRAFT AI Assistant Landing Page Setup",
         description:
-          "Fixed-scope implementation package: a single-page site configured to host and showcase your GraftBot widget.",
+          "Fixed-scope implementation package: a single-page site configured to host and showcase your GRAFT AI Assistant widget.",
         kind: "one_time",
         features: [
-          "Single-page site for GraftBot embed",
+          "Single-page site for GRAFT AI Assistant setup",
           "Widget install and brand styling",
           "One-time software implementation",
         ],
@@ -178,12 +178,12 @@ export function buildPricingCatalog(env: PricingCatalogEnv = getPricingCatalogEn
       },
       {
         id: "small-business-website-build",
-        title: "GraftBot Multi-Page Website Setup",
+        title: "GRAFT AI Assistant Multi-Page Website Setup",
         description:
-          "Fixed-scope implementation package: a multi-page site with GraftBot installed and configured for your business.",
+          "Fixed-scope implementation package: a multi-page site with GRAFT AI Assistant installed and configured for your business.",
         kind: "one_time",
         features: [
-          "Up to five pages with GraftBot embedded",
+          "Up to five pages with GRAFT AI Assistant setup",
           "Widget install and brand styling",
           "One-time software implementation",
         ],

@@ -69,7 +69,7 @@ export function PricingTabs({ className }: PricingTabsProps) {
 
   const tabs = [
     { id: "bot-pricing", label: "AI Assistant Suite" },
-    { id: "website-pricing", label: "GraftBot Website Setup" },
+    { id: "website-pricing", label: "Graft AI Agents Website Setup" },
   ] as const;
 
   return (

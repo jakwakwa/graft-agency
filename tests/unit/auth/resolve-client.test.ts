@@ -73,10 +73,10 @@ describe("requirePlatformAccess", () => {
     await prisma.client.delete({ where: { id: client.id } });
   });
 
-  it("returns 403 for chatbot-only client", async () => {
-    const clerkUserId = `user-rpa-chatbot-${Date.now()}`;
+  it("returns 403 for Graft AI Agent-only client", async () => {
+    const clerkUserId = `user-rpa-Graft AI Agent-${Date.now()}`;
     const client = await prisma.client.create({
-      data: { clerkUserId, businessName: "Chatbot Client", clerkOrganizationId: "org-1" },
+      data: { clerkUserId, businessName: "Graft AI Agent Client", clerkOrganizationId: "org-1" },
     });
     mockAuth.mockResolvedValue({ userId: clerkUserId });
     const { requirePlatformAccess } = await import("@/lib/auth/resolve-client");
@@ -125,10 +125,10 @@ describe("hasPlatformAccess", () => {
     await prisma.client.delete({ where: { id: client.id } });
   });
 
-  it("returns false for chatbot-only client", async () => {
-    const clerkUserId = `user-hpa-chatbot-${Date.now()}`;
+  it("returns false for Graft AI Agent-only client", async () => {
+    const clerkUserId = `user-hpa-Graft AI Agent-${Date.now()}`;
     const client = await prisma.client.create({
-      data: { clerkUserId, businessName: "Chatbot", clerkOrganizationId: "org-1" },
+      data: { clerkUserId, businessName: "Graft AI Agent", clerkOrganizationId: "org-1" },
     });
     mockAuth.mockResolvedValue({ userId: clerkUserId });
     const { hasPlatformAccess } = await import("@/lib/auth/resolve-client");
@@ -137,7 +137,7 @@ describe("hasPlatformAccess", () => {
   });
 });
 
-describe("hasChatbotAccess", () => {
+describe("ChatbotAccess", () => {
   afterEach(() => vi.clearAllMocks());
 
   it("returns true only for isPlatformOwner", async () => {
@@ -146,8 +146,8 @@ describe("hasChatbotAccess", () => {
       data: { clerkUserId, businessName: "Owner", isPlatformOwner: true, clerkOrganizationId: "org-1" },
     });
     mockAuth.mockResolvedValue({ userId: clerkUserId });
-    const { hasChatbotAccess } = await import("@/lib/auth/resolve-client");
-    expect(await hasChatbotAccess()).toBe(true);
+    const { ChatbotAccess } = await import("@/lib/auth/resolve-client");
+    expect(await ChatbotAccess()).toBe(true);
     await prisma.client.delete({ where: { id: client.id } });
   });
 });

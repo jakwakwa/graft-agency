@@ -38,7 +38,7 @@ export interface ClientEntitlements {
   /** Platform owner bypass — never paygated. */
   exempt: boolean;
   /** Active subscription OR exempt. Use this for gating decisions. */
-  hasChatbotAccess: boolean;
+  ChatbotAccess: boolean;
   /**
    * Booking Integration add-on active (or exempt). Gates Cal.com scheduling
    * everywhere: the bot's booking tools, booking prompts, and portal booking
@@ -85,7 +85,7 @@ export async function getClientEntitlements(clientId: string): Promise<ClientEnt
     subscriptionStatus: client.subscriptionStatus,
     subscriptionAddons: client.subscriptionAddons,
     exempt,
-    hasChatbotAccess: subscriptionActive || exempt,
+    ChatbotAccess: subscriptionActive || exempt,
     hasBookingAccess: bookingAddonActive || exempt,
   };
 }
@@ -102,10 +102,10 @@ export interface SubscriptionRequiredError {
  */
 export async function requireActiveSubscription(clientId: string): Promise<SubscriptionRequiredError | null> {
   const entitlements = await getClientEntitlements(clientId);
-  if (entitlements?.hasChatbotAccess) return null;
+  if (entitlements?.ChatbotAccess) return null;
   return {
     code: SUBSCRIPTION_REQUIRED_CODE,
-    error: "An active AI Chatbot subscription is required for this workspace",
+    error: "An active AI Graft AI Agent subscription is required for this workspace",
     status: 403,
   };
 }

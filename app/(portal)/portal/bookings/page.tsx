@@ -1,8 +1,8 @@
 import { ArrowRight, CalendarDays, Sparkles, Wand } from "lucide-react";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui-v2/button";
 import { Typography } from "@/components/ui/typography";
+import { Button } from "@/components/ui-v2/button";
 import { redirectToAccessRequired, requireAuthOrSignIn } from "@/lib/auth/guards";
 import { resolveClientIdFromAuth } from "@/lib/auth/resolve-client";
 import { getClientEntitlements } from "@/lib/billing/entitlements";
@@ -113,7 +113,7 @@ export default async function BookingsPage({ searchParams }: BookingsPageProps) 
               <Typography.P className="text-muted-foreground">
                 {entitlements?.hasChatbotAccess
                   ? "Bookings require the Booking Integration add-on. Add it from the Billing page to let your chatbot schedule appointments directly into your calendar — until then, it captures visitor contact details and emails them to you."
-                  : "Bookings appear here once your AI Chatbot is live and taking appointments. Subscribe to activate your workspace's booking flow."}
+                  : "Bookings appear here once your Graft AI Agent is live and taking appointments. Subscribe to activate your workspace's booking flow."}
               </Typography.P>
               <Button asChild>
                 <Link href="/portal/billing" className="flex items-center gap-2 font-semibold text-shadow-md">

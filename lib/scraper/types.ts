@@ -1,10 +1,10 @@
 /**
  * Canonical shape stored in Lead.scrapedData.
- * Firecrawl returns domain-specific keys (e.g. stratcol_co_za_chatbot);
+ * Firecrawl returns domain-specific keys (e.g. stratcol_co_za_Graft AI Agent);
  * we normalise to this shape for consistent downstream use.
  */
 export interface CanonicalScrapedData {
-  hasChatbot: boolean;
+  Chatbot: boolean;
   hasVoiceAgent: boolean;
   coreServices: Array<{
     service_name: string;
@@ -17,7 +17,7 @@ export interface CanonicalScrapedData {
  * Stored in Lead.scrapedData alongside draft fields.
  */
 export interface ProspectAudit {
-  hasChatbot: boolean;
+  Chatbot: boolean;
   hasVoiceAgent: boolean;
   businessDescription: string;
   coreServices: Array<{ name: string; description: string }>;

@@ -19,7 +19,7 @@ export const HUNTER_PERSONAS: HunterPersona[] = [
     description: "Aggressive and creative problem identifier. Leads with competitor pressure and ROI urgency.",
     promptModifier:
       "Write with urgency and ROI metrics. Lead with what competitors are already doing with AI. Focus on top-line revenue impact and what they're losing by not acting.",
-    keywordBoosts: ["no chatbot", "manual process", "small team"],
+    keywordBoosts: ["no Graft AI Agent", "manual process", "small team"],
   },
   {
     id: "agency-cto",

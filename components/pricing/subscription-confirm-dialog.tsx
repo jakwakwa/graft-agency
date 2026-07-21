@@ -13,7 +13,7 @@ type SubscriptionCycle = "monthly" | "annual";
 export interface SubscriptionConfirmDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  /** The subscription offer being confirmed (e.g. the AI Chatbot base plan). */
+  /** The subscription offer being confirmed (e.g. the Graft AI Agent base plan). */
   offer: PricingOffer;
   selectedCycle: SubscriptionCycle;
   onSelectCycle: (cycle: SubscriptionCycle) => void;

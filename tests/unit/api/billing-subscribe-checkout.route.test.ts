@@ -49,8 +49,8 @@ describe("POST /api/billing/subscribe/checkout", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.resetModules();
-    vi.stubEnv("PADDLE_PRICE_CHATBOT_MONTHLY", "pri_chatbot_monthly");
-    vi.stubEnv("PADDLE_PRICE_CHATBOT_ANNUAL", "pri_chatbot_annual");
+    vi.stubEnv("PADDLE_PRICE_Graft AI Agent_MONTHLY", "pri_Graft AI Agent_monthly");
+    vi.stubEnv("PADDLE_PRICE_Graft AI Agent_ANNUAL", "pri_Graft AI Agent_annual");
     auth.mockResolvedValue({ userId: "user-1" });
     findFirstClient.mockResolvedValue(unsubscribedClient);
   });
@@ -59,14 +59,14 @@ describe("POST /api/billing/subscribe/checkout", () => {
     const { POST } = await import("@/app/api/billing/subscribe/checkout/route");
     createTransaction.mockResolvedValue({ id: "txn_new" });
 
-    const res = await POST(makeRequest({ priceId: "pri_chatbot_monthly" }));
+    const res = await POST(makeRequest({ priceId: "pri_Graft AI Agent_monthly" }));
 
     expect(res.status).toBe(200);
     expect(await res.json()).toEqual({ transactionId: "txn_new" });
     expect(createTransaction).toHaveBeenCalledWith({
       customData: { clientId: "client-1" },
       customerId: "ctm_123",
-      items: [{ priceId: "pri_chatbot_monthly", quantity: 1 }],
+      items: [{ priceId: "pri_Graft AI Agent_monthly", quantity: 1 }],
     });
   });
 
@@ -79,7 +79,7 @@ describe("POST /api/billing/subscribe/checkout", () => {
       subscriptionStatus: "active",
     });
 
-    const res = await POST(makeRequest({ priceId: "pri_chatbot_monthly" }));
+    const res = await POST(makeRequest({ priceId: "pri_Graft AI Agent_monthly" }));
 
     expect(res.status).toBe(409);
     expect(await res.json()).toEqual(expect.objectContaining({ code: "SUBSCRIPTION_ALREADY_ACTIVE" }));
@@ -96,7 +96,7 @@ describe("POST /api/billing/subscribe/checkout", () => {
     });
     getSubscription.mockResolvedValue({ status: "paused" });
 
-    const res = await POST(makeRequest({ priceId: "pri_chatbot_monthly" }));
+    const res = await POST(makeRequest({ priceId: "pri_Graft AI Agent_monthly" }));
 
     expect(res.status).toBe(409);
     expect(await res.json()).toEqual(expect.objectContaining({ code: "SUBSCRIPTION_ALREADY_ACTIVE" }));
@@ -114,7 +114,7 @@ describe("POST /api/billing/subscribe/checkout", () => {
     getSubscription.mockResolvedValue({ status: "canceled" });
     createTransaction.mockResolvedValue({ id: "txn_new" });
 
-    const res = await POST(makeRequest({ priceId: "pri_chatbot_annual" }));
+    const res = await POST(makeRequest({ priceId: "pri_Graft AI Agent_annual" }));
 
     expect(res.status).toBe(200);
     expect(await res.json()).toEqual({ transactionId: "txn_new" });
@@ -133,7 +133,7 @@ describe("POST /api/billing/subscribe/checkout", () => {
     const { POST } = await import("@/app/api/billing/subscribe/checkout/route");
     auth.mockResolvedValue({ userId: null });
 
-    const res = await POST(makeRequest({ priceId: "pri_chatbot_monthly" }));
+    const res = await POST(makeRequest({ priceId: "pri_Graft AI Agent_monthly" }));
 
     expect(res.status).toBe(401);
   });

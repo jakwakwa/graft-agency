@@ -93,10 +93,10 @@ export async function hasPlatformAccess(): Promise<boolean> {
 }
 
 /**
- * Returns true if the current user's Client has chatbot access.
- * Only the platform owner (Jaco) can configure chatbot agents.
+ * Returns true if the current user's Client has Graft AI Agent access.
+ * Only the platform owner (Jaco) can configure Graft AI Agent agents.
  */
-export async function hasChatbotAccess(): Promise<boolean> {
+export async function ChatbotAccess(): Promise<boolean> {
   const clientId = await resolveClientIdFromAuth();
   if (!clientId) return false;
 

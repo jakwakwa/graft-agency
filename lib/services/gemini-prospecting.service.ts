@@ -1,6 +1,5 @@
 import { GoogleGenAI, ThinkingLevel, Type } from "@google/genai";
 import prisma from "@/lib/db/prisma";
-import type { Prisma } from "../../generated/prisma/client";
 import {
   normalizeProspectCompanyName,
   normalizeProspectWebsiteUrl,
@@ -8,6 +7,7 @@ import {
   scrapedDataWebsiteUrl,
 } from "@/lib/utils/prospect-dedupe";
 import { SsrfRejectedError, safeFetch, toAbsoluteUrl } from "@/lib/utils/safe-fetch";
+import type { Prisma } from "../../generated/prisma/client";
 
 interface ProspectResult {
   companyName: string;
@@ -236,7 +236,7 @@ ${businessesFound}
 ${exclusionInstructions}
 
 For each of these businesses (only those not in the CRM list):
-1. Use Google Search to find their actual website URL if not provided, and audit their online presence to determine if they are currently using visible AI technologies (like chatbots, AI agents, or voice agents).
+1. Use Google Search to find their actual website URL if not provided, and audit their online presence to determine if they are currently using visible AI technologies (like Graft AI Agents, AI agents, or voice agents).
 2. Identify 2-3 potential pain points based on their industry and online presence.
 3. Draft a highly personalised cold outreach email offering this value proposition: "${valueProposition}". The email should mention a specific pain point and how our solution helps. Keep it concise and professional.
 
@@ -258,7 +258,7 @@ Omit any business that matches the CRM list by name or website. Return the resul
               websiteUrl: { type: Type.STRING },
               aiPresence: {
                 type: Type.BOOLEAN,
-                description: "True if they already have AI/chatbots visible on their site",
+                description: "True if they already have AI/Graft AI Agents visible on their site",
               },
               painPoints: { type: Type.ARRAY, items: { type: Type.STRING } },
               auditSummary: {
@@ -335,7 +335,7 @@ Omit any business that matches the CRM list by name or website. Return the resul
           draftSubject: prospect.draftSubject,
           draftBody: prospect.draftBody,
           businessDescription: prospect.auditSummary,
-          hasChatbot: prospect.aiPresence,
+          Chatbot: prospect.aiPresence,
           hasVoiceAgent: false,
           painPoints: prospect.painPoints,
           targetOutreachAngle: "",

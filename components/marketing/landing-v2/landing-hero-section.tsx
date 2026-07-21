@@ -107,7 +107,7 @@ export function LandingHeroSection() {
 
             {/* Subtitle */}
             <motion.p className="hero-subtitle" variants={FADE_UP} initial="hidden" animate="visible" custom={0.7}>
-              When a visitor opens your GraftBot widget, it can answer their questions, capture contact details if they
+              When a visitor opens your Graft AI Agents widget, it can answer their questions, capture contact details if they
               choose to share them, and book appointments on request — while routing complex queries to your team in the
               GRAFT.TODAY dashboard.
             </motion.p>
@@ -134,13 +134,13 @@ export function LandingHeroSection() {
               custom={1.1}
             >
               {[
-                { value: "Visitor", label: "Initiated" },
-                { value: "Consent", label: "Lead Capture" },
+                { value: "Synchronized", label: "Scheduling" },
+                { value: "Consented", label: "Visitor Triage" },
                 { value: "Human", label: "Handoff" },
               ].map((stat) => (
                 <div key={stat.label} className="hero-stat">
-                  <span className="hero-stat__value text-sm">{stat.value}</span>
-                  <span className="hero-stat__label text-xs">{stat.label}</span>
+                  <span className=" text-base italic font-light">{stat.value}</span>
+                  <span className=" font-sans font-light text-sm text-white/70 tracking-widest">{stat.label}</span>
                 </div>
               ))}
             </motion.div>

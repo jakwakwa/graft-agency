@@ -28,8 +28,8 @@ export default async function PortalEmbedPage() {
       {gated ? (
         <SubscriptionGate
           title="Your embed code is one step away"
-          description="Put your AI assistant live on any website with a single snippet. Subscribe to the AI Chatbot to reveal your workspace's embed code."
-          highlights={["One-line website install", "Works on any stack", "24/7 lead capture"]}
+          description="Put your AI assistant live on any website with a single snippet. Subscribe to the Graft AI Agent to reveal your workspace's embed code."
+          highlights={["One-line website install", "Works on any stack", "24/7traging"]}
         >
           {/* Do not leak the real embed snippet into gated markup */}
           <IntegrationGuide clientId="subscription-required" baseUrl={baseUrl} />

@@ -178,12 +178,12 @@ export default function PrivacyPage() {
         <ul className="list-disc list-inside space-y-2 text-sm text-muted-foreground mt-2">
           <li>
             <strong className="text-foreground">Chatbot conversations:</strong> Messages exchanged between your
-            end-users and your deployed GraftBot widget, including personal information they voluntarily share
+            end-users and your deployed GRAFT AI Assistant widget, including personal information they voluntarily share
             (name, email, contact details, queries).
           </li>
           <li>
             <strong className="text-foreground">Leads:</strong> Contact details and engagement data your
-            end-users share through your deployed GraftBot widget.
+            end-users share through your deployed GRAFT AI Assistant widget.
           </li>
           <li>
             <strong className="text-foreground">Appointment data:</strong> Booking information integrated via

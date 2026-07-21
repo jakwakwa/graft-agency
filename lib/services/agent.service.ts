@@ -8,7 +8,7 @@ const FALLBACK_AGENT_CONFIG_ID = "00000000-0000-4000-8000-000000000001";
 /** Public site / `clientId=platform` launcher when no `agent_configs` row exists yet. */
 export const PLATFORM_LANDING_WIDGET_DEFAULTS = {
   agentName: "GRAFT",
-  greetingMessage: "Hi! I'm GraftBot — how can I help you today?",
+  greetingMessage: "Hi! I'm GRAFT AI Assistant — how can I help you today?",
   widgetPrimaryColour: "#E49B57",
 } as const;
 

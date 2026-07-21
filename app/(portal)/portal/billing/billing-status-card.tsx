@@ -30,7 +30,7 @@ export function BillingStatusCard({
       <CardHeader>
         <div className="flex items-center justify-between gap-4">
           <div>
-            <CardTitle>AI Chatbot Subscription</CardTitle>
+            <CardTitle>Graft AI Agent Subscription</CardTitle>
             <CardDescription>Your bot, embedded on your website, always on</CardDescription>
           </div>
           <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${status.color}`}>{status.label}</span>

@@ -22,7 +22,7 @@ describe("getClientEntitlements", () => {
     vi.resetModules();
   });
 
-  it("grants chatbot access for an active subscription", async () => {
+  it("grants Graft AI Agent access for an active subscription", async () => {
     const { default: prisma } = await import("@/lib/db/prisma");
     const { getClientEntitlements } = await import("@/lib/billing/entitlements");
     vi.mocked(prisma.client.findFirst).mockResolvedValue({
@@ -38,7 +38,7 @@ describe("getClientEntitlements", () => {
       expect.objectContaining({
         clientId: "client-1",
         exempt: false,
-        hasChatbotAccess: true,
+        ChatbotAccess: true,
         subscriptionActive: true,
         subscriptionAddons: ["pri_voice"],
       }),
@@ -58,7 +58,7 @@ describe("getClientEntitlements", () => {
     const entitlements = await getClientEntitlements("client-1");
 
     expect(entitlements?.subscriptionActive).toBe(false);
-    expect(entitlements?.hasChatbotAccess).toBe(false);
+    expect(entitlements?.ChatbotAccess).toBe(false);
   });
 
   it("exempts platform owners from paygating", async () => {
@@ -74,7 +74,7 @@ describe("getClientEntitlements", () => {
     const entitlements = await getClientEntitlements("client-1");
 
     expect(entitlements?.exempt).toBe(true);
-    expect(entitlements?.hasChatbotAccess).toBe(true);
+    expect(entitlements?.ChatbotAccess).toBe(true);
   });
 
   it("returns null for unknown or soft-deleted clients", async () => {

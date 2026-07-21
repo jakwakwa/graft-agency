@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Prisma } from "@/generated/prisma/client";
-import { agentService, PLATFORM_LANDING_WIDGET_DEFAULTS, isSyntheticAgentConfig } from "@/lib/services/agent.service";
+import { agentService, isSyntheticAgentConfig, PLATFORM_LANDING_WIDGET_DEFAULTS } from "@/lib/services/agent.service";
 
 vi.mock("@/lib/db/prisma", () => ({
   default: {
@@ -37,7 +37,7 @@ describe("agentService", () => {
     it("contains expected default values", () => {
       expect(PLATFORM_LANDING_WIDGET_DEFAULTS).toEqual({
         agentName: "GRAFT",
-        greetingMessage: "Hi! I'm GraftBot — how can I help you today?",
+        greetingMessage: "Hi! I'm GRAFT AI Assistant — how can I help you today?",
         widgetPrimaryColour: "#E49B57",
       });
     });

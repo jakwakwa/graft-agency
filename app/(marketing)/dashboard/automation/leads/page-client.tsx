@@ -339,7 +339,7 @@ export default function LeadsPageClient({ initialLeads }: LeadsPageClientProps) 
                           <span
                             className={`text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full border-2 shadow-md ${editingLead.scrapedData?.websiteUrl ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-primary/10 text-primary border-primary/20"}`}
                           >
-                            {editingLead.scrapedData?.websiteUrl ? "None detected" : "AI Chatbot Present"}
+                            {editingLead.scrapedData?.websiteUrl ? "None detected" : "Graft AI Agent Present"}
                           </span>
                         </div>
 

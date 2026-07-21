@@ -79,7 +79,7 @@ describe("POST /api/billing/builds/checkout", () => {
   it("rejects price IDs that are not one-time builds", async () => {
     const { POST } = await import("@/app/api/billing/builds/checkout/route");
 
-    const res = await POST(makeRequest({ priceId: "pri_chatbot_monthly" }));
+    const res = await POST(makeRequest({ priceId: "pri_Graft AI Agent_monthly" }));
 
     expect(res.status).toBe(400);
     expect(createTransaction).not.toHaveBeenCalled();

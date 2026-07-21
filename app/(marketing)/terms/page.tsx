@@ -60,7 +60,7 @@ export default function TermsPage() {
         <Typography.P>GRAFT.TODAY provides the following services to subscribers:</Typography.P>
         <ul className="list-disc list-inside space-y-2 text-sm text-muted-foreground mt-2">
           <li>
-            <strong className="text-foreground">AI chatbot widget (GraftBot):</strong> An embeddable chatbot powered by
+            <strong className="text-foreground">AI chatbot widget (GRAFT AI Assistant):</strong> An embeddable chatbot powered by
             AI that engages your website visitors, captures leads, and answers queries on your behalf
           </li>
           <li>
@@ -69,8 +69,8 @@ export default function TermsPage() {
             integration
           </li>
           <li>
-            <strong className="text-foreground">GraftBot website setup packages:</strong> Fixed-scope software
-            implementation packages that deliver a landing page or multi-page site with the GraftBot widget installed
+            <strong className="text-foreground">GRAFT AI Assistant website setup packages:</strong> Fixed-scope software
+            implementation packages that deliver a landing page or multi-page site with the GRAFT AI Assistant widget installed
             and configured, as described on our pricing page — not standalone design or marketing agency services
           </li>
           <li>

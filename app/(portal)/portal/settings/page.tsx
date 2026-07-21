@@ -31,7 +31,7 @@ export default async function PortalSettingsPage() {
       {gated ? (
         <SubscriptionGate
           title="Unlock your bot settings"
-          description="Shape your AI assistant's name, tone, brand colours, and knowledge base. Subscribe to the AI Chatbot to start customising."
+          description="Shape your AI assistant's name, tone, brand colours, and knowledge base. Subscribe to the Graft AI Agent to start customising."
           highlights={["Custom branding & greeting", "Your own knowledge base", "Calendar booking setup"]}
         >
           <BotSettingsForm initialData={initialData} bookingEnabled={bookingEnabled} />

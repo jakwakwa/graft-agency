@@ -260,17 +260,17 @@ export function PricingSectionClient({
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-normal tracking-tight text-on-surface leading-tight">
               {kindFilter === "website" ? (
                 <>
-                  Bespoke Agency <span className="text-primary">Websites</span>
+                  Bespoke Agency <span className="text-orange-200">Websites</span>
                 </>
               ) : (
                 <>
-                  Simple pricing for <span className="text-primary">faster growth</span>
+                  Simple pricing for <span className="text-indigo-300">faster growth</span>
                 </>
               )}
             </h2>
             <p className="text-on-surface-variant text-base sm:text-base leading-relaxed">
               {kindFilter === "website"
-                ? "High-converting, hand-crafted landing pages and multi-page websites with your AI chatbot pre-configured and installed."
+                ? "High-converting, hand-crafted landing pages and multi-page websites with your Graft AI Agent pre-configured and installed."
                 : "Simple, up-front monthly pricing for your whitelabelled AI Support and Triage assistant. No surprises. No hidden costs."}
             </p>
           </div>
@@ -295,7 +295,7 @@ export function PricingSectionClient({
         ) : null}
         {mode === "portal" && customer?.subscriptionActive ? (
           <Typography.Muted className="rounded-2xl border border-white/10 bg-white/5 p-4 text-on-surface-variant">
-            If you want GraftBot installed on a new site, choose one of these fixed-scope website setup packages
+            If you want Graft AI Agents installed on a new site, choose one of these fixed-scope website setup packages
           </Typography.Muted>
         ) : null}
         <div className={gridClass}>

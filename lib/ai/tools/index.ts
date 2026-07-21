@@ -2,21 +2,21 @@ export { createBookAppointmentTool } from "./book-appointment";
 export { createCaptureLeadDetailsTool } from "./capture-lead";
 export { createCheckAvailabilityTool } from "./check-availability";
 export { handoffToHumanTool } from "./handoff-human";
-export { createSearchKnowledgeBaseTool } from "./search-knowledge";
-export { createReserveSlotTool } from "./reserve-slot";
 export { createListEventTypesTool } from "./list-event-types";
+export { createReserveSlotTool } from "./reserve-slot";
+export { createSearchKnowledgeBaseTool } from "./search-knowledge";
 
 import { createBookAppointmentTool } from "./book-appointment";
 import { createCaptureLeadDetailsTool } from "./capture-lead";
 import { createCheckAvailabilityTool } from "./check-availability";
 import { handoffToHumanTool } from "./handoff-human";
-import { createSearchKnowledgeBaseTool } from "./search-knowledge";
 import { createReserveSlotTool } from "./reserve-slot";
+import { createSearchKnowledgeBaseTool } from "./search-knowledge";
 
 export interface CreateToolsOptions {
   /**
    * Gated by the Booking Integration add-on. When false the bot gets no
-   * scheduling tools at all — it is knowledge-only and relies on lead capture
+   * scheduling tools at all — it is knowledge-only and relies ontraging
    * / human handoff so the workspace owner can follow up by email.
    */
   bookingEnabled: boolean;

@@ -13,7 +13,7 @@ interface PricingCardProps {
   onCheckout: (offer: PricingOffer) => void;
   /** "portal" enables subscription-state-aware buttons; "landing" keeps marketing links. */
   mode?: "landing" | "portal";
-  /** Whether the workspace's base AI Chatbot subscription is (or just became) active. */
+  /** Whether the workspace's base Graft AI Agent subscription is (or just became) active. */
   subscribed?: boolean;
   /** Price IDs of one-time builds already purchased by this workspace this month. */
   purchasedBuilds?: string[];
@@ -209,7 +209,7 @@ export function PricingCard({
               theme.btnPrimary,
             )}
           >
-            Subscribe to AI Chatbot
+            Subscribe to Graft AI Agent
           </Button>
         ) : buildPurchased ? (
           <Button
@@ -240,11 +240,11 @@ export function PricingCard({
             title={
               subscribed
                 ? "Add this add-on from the Add-ons section above — cancel anytime via Manage Subscription"
-                : "Requires an active AI Chatbot subscription"
+                : "Requires an active Graft AI Agent subscription"
             }
             className="w-full cursor-not-allowed rounded-xl border border-white/10 bg-white/5 py-5 text-sm font-semibold uppercase tracking-wider text-on-surface-variant opacity-70"
           >
-            {subscribed ? "Manage in Add-ons" : "Requires AI Chatbot subscription"}
+            {subscribed ? "Manage in Add-ons" : "Requires Graft AI Agent subscription"}
           </Button>
         ) : (
           <Link

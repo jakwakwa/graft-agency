@@ -100,7 +100,7 @@ export function BotSettingsForm({ initialData, bookingEnabled }: BotSettingsForm
                 id="agentName"
                 name="agentName"
                 defaultValue={initialData.agentName ?? ""}
-                placeholder="e.g. Sam, Helper, GraftBot"
+                placeholder="e.g. Sam, Helper, Graft AI Agent"
                 required
               />
               <Typography.Muted>Shown above the chat.</Typography.Muted>

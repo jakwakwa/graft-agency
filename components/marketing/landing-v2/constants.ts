@@ -20,7 +20,7 @@ export const LANDING_HEADER_SECTIONS = [
   { id: "smart-triage", label: "Smart Triage" },
   { id: "white-label", label: "White-Label" },
   { id: "bot-pricing", label: "Bot Pricing" },
-  { id: "website-pricing", label: "GraftBot Website Setup" },
+  { id: "website-pricing", label: "GRAFT AI Assistant Website Setup" },
 ] as const;
 
 export const landingShellClassName =

@@ -1,5 +1,5 @@
 import { auth } from "@clerk/nextjs/server";
-import { type NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 import { z } from "zod";
 import {
   ACTIVE_SUBSCRIPTION_STATUSES,
@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
   const client = await prisma.client.findUnique({ where: { clerkUserId: userId } });
   if (!client) return Response.json({ error: "Client not found" }, { status: 404 });
 
-  // Prerequisite gate: add-ons require an active base AI Chatbot subscription.
+  // Prerequisite gate: add-ons require an active base AI Graft AI Agent subscription.
   const paddleSubscriptionId = client.paddleSubscriptionId;
   const baseActive =
     Boolean(paddleSubscriptionId) &&
@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
   if (!paddleSubscriptionId || !baseActive) {
     return Response.json(
       {
-        error: "An active AI Chatbot subscription is required before adding add-ons",
+        error: "An active AI Graft AI Agent subscription is required before adding add-ons",
         code: SUBSCRIPTION_REQUIRED_CODE,
       },
       { status: 403 },

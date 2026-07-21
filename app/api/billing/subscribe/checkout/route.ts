@@ -10,7 +10,7 @@ const bodySchema = z.object({
 });
 
 function getBaseSubscriptionPriceIds() {
-  return [process.env.PADDLE_PRICE_CHATBOT_MONTHLY, process.env.PADDLE_PRICE_CHATBOT_ANNUAL].filter(
+  return [process.env.PADDLE_PRICE_Graft AI Agent_MONTHLY, process.env.PADDLE_PRICE_Graft AI Agent_ANNUAL].filter(
     Boolean,
   ) as string[];
 }
@@ -19,7 +19,7 @@ function getBaseSubscriptionPriceIds() {
 const BLOCKING_PADDLE_STATUSES = new Set(["active", "trialing", "paused", "past_due"]);
 
 /**
- * Creates a server-side Paddle transaction for the base AI Chatbot
+ * Creates a server-side Paddle transaction for the base AI Graft AI Agent
  * subscription. The overlay checkout is opened against the returned
  * transaction ID, so the one-subscription-per-workspace rule is enforced
  * here — it cannot be bypassed by invoking Paddle checkout from the browser
@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
   if (alreadySubscribed) {
     return Response.json(
       {
-        error: "This workspace already has an active AI Chatbot subscription",
+        error: "This workspace already has an active AI Graft AI Agent subscription",
         code: SUBSCRIPTION_ALREADY_ACTIVE_CODE,
       },
       { status: 409 },
@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
     if (BLOCKING_PADDLE_STATUSES.has(subscription.status)) {
       return Response.json(
         {
-          error: "This workspace already has an AI Chatbot subscription — manage it via Manage Subscription",
+          error: "This workspace already has an AI Graft AI Agent subscription — manage it via Manage Subscription",
           code: SUBSCRIPTION_ALREADY_ACTIVE_CODE,
         },
         { status: 409 },

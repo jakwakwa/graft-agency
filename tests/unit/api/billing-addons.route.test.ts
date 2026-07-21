@@ -57,7 +57,7 @@ describe("POST /api/billing/addons", () => {
   it("adds an add-on that is not yet on the live subscription", async () => {
     const { POST } = await import("@/app/api/billing/addons/route");
     getSubscription.mockResolvedValue({
-      items: [{ price: { id: "pri_chatbot_monthly" }, quantity: 1 }],
+      items: [{ price: { id: "pri_Graft AI Agent_monthly" }, quantity: 1 }],
     });
     updateSubscription.mockResolvedValue({});
     updateClient.mockResolvedValue({});
@@ -68,7 +68,7 @@ describe("POST /api/billing/addons", () => {
     expect(await res.json()).toEqual({ ok: true, activeAddons: ["pri_booking"] });
     expect(updateSubscription).toHaveBeenCalledWith("sub_123", {
       items: [
-        { priceId: "pri_chatbot_monthly", quantity: 1 },
+        { priceId: "pri_Graft AI Agent_monthly", quantity: 1 },
         { priceId: "pri_booking", quantity: 1 },
       ],
       prorationBillingMode: "prorated_next_billing_period",
@@ -79,7 +79,7 @@ describe("POST /api/billing/addons", () => {
     const { POST } = await import("@/app/api/billing/addons/route");
     getSubscription.mockResolvedValue({
       items: [
-        { price: { id: "pri_chatbot_monthly" }, quantity: 1 },
+        { price: { id: "pri_Graft AI Agent_monthly" }, quantity: 1 },
         { price: { id: "pri_booking" }, quantity: 1 },
       ],
     });
@@ -98,7 +98,7 @@ describe("POST /api/billing/addons", () => {
     const { POST } = await import("@/app/api/billing/addons/route");
     getSubscription.mockResolvedValue({
       items: [
-        { price: { id: "pri_chatbot_monthly" }, quantity: 1 },
+        { price: { id: "pri_Graft AI Agent_monthly" }, quantity: 1 },
         { price: { id: "pri_booking" }, quantity: 1 },
       ],
     });
@@ -127,7 +127,7 @@ describe("POST /api/billing/addons", () => {
     vi.stubEnv("FEATURE_VOICE_ADDON", "true");
     const { POST } = await import("@/app/api/billing/addons/route");
     getSubscription.mockResolvedValue({
-      items: [{ price: { id: "pri_chatbot_monthly" }, quantity: 1 }],
+      items: [{ price: { id: "pri_Graft AI Agent_monthly" }, quantity: 1 }],
     });
     updateSubscription.mockResolvedValue({});
     updateClient.mockResolvedValue({});
@@ -154,7 +154,7 @@ describe("POST /api/billing/addons", () => {
   it("rejects price IDs that are not allowed add-ons", async () => {
     const { POST } = await import("@/app/api/billing/addons/route");
 
-    const res = await POST(makeRequest({ priceId: "pri_chatbot_monthly" }));
+    const res = await POST(makeRequest({ priceId: "pri_Graft AI Agent_monthly" }));
 
     expect(res.status).toBe(400);
   });

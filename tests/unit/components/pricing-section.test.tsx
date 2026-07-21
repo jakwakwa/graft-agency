@@ -60,7 +60,7 @@ describe("PricingSection", () => {
 
     expect(screen.getByRole("heading", { name: "Simple pricing for faster growth" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "View portal billing" })).toHaveAttribute("href", "/portal/billing");
-    expect(screen.queryByRole("button", { name: "Subscribe to AI Chatbot" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Subscribe to Graft AI Agent" })).not.toBeInTheDocument();
   });
 
   it("confirms via the modal before opening subscription checkout in the portal", async () => {
@@ -81,9 +81,9 @@ describe("PricingSection", () => {
     );
 
     // Clicking Subscribe opens the confirmation modal — it does NOT open Paddle yet.
-    fireEvent.click(await screen.findByRole("button", { name: "Subscribe to AI Chatbot" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Subscribe to Graft AI Agent" }));
 
-    const dialogTitle = await screen.findByText("Are you sure you want to subscribe to AI Chatbot?");
+    const dialogTitle = await screen.findByText("Are you sure you want to subscribe to Graft AI Agent?");
     expect(dialogTitle).toBeInTheDocument();
     expect(paddleMocks.checkoutOpen).not.toHaveBeenCalled();
 
@@ -117,13 +117,13 @@ describe("PricingSection", () => {
       />,
     );
 
-    expect(screen.queryByRole("button", { name: "Subscribe to AI Chatbot" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Subscribe to Graft AI Agent" })).not.toBeInTheDocument();
     expect(
       screen.getByText(
-        "If you want GraftBot installed on a new site, choose one of these fixed-scope website setup packages",
+        "If you want Graft AI Agents installed on a new site, choose one of these fixed-scope website setup packages",
       ),
     ).toBeInTheDocument();
-    expect(screen.getByText("GraftBot Landing Page Setup")).toBeInTheDocument();
-    expect(screen.getByText("GraftBot Multi-Page Website Setup")).toBeInTheDocument();
+    expect(screen.getByText("Graft AI Agents Landing Page Setup")).toBeInTheDocument();
+    expect(screen.getByText("Graft AI Agents Multi-Page Website Setup")).toBeInTheDocument();
   });
 });

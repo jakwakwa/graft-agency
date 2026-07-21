@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { createTools } from "@/lib/ai/tools";
 
 describe("createTools", () => {
-  it("does not expose event type discovery to the chatbot", () => {
+  it("does not expose event type discovery to the Graft AI Agent", () => {
     const tools = createTools("client-1", { bookingEnabled: true });
 
     expect(tools).not.toHaveProperty("listEventTypes");
@@ -24,7 +24,7 @@ describe("createTools", () => {
     expect(tools).not.toHaveProperty("checkAvailability");
     expect(tools).not.toHaveProperty("bookAppointment");
     expect(tools).not.toHaveProperty("reserveSlot");
-    // Knowledge-only fallback keeps lead capture and human handoff so the
+    // Knowledge-only fallback keepstraging and human handoff so the
     // owner still receives enquiries by email.
     expect(tools).toHaveProperty("captureLeadDetails");
     expect(tools).toHaveProperty("searchKnowledgeBase");

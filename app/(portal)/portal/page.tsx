@@ -1,17 +1,17 @@
 import { ArrowRight, Bot, Calendar, MessageSquare } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { SubscriptionGate } from "@/components/portal/subscription-gate";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Typography } from "@/components/ui/typography";
 import { Button } from "@/components/ui-v2/button";
-import { SubscriptionGate } from "@/components/portal/subscription-gate";
 import { redirectToAccessRequired, requireAuthOrSignIn } from "@/lib/auth/guards";
 import { getPlatformClientId, resolveClientIdFromAuth } from "@/lib/auth/resolve-client";
 import { getClientEntitlements } from "@/lib/billing/entitlements";
 import prisma from "@/lib/db/prisma";
-import type { Prisma } from "../../../generated/prisma/client";
 import { calService } from "@/lib/services/cal.service";
+import type { Prisma } from "../../../generated/prisma/client";
 
 type RecentConversation = Prisma.ConversationGetPayload<{
   include: { lead: { select: { customerName: true; email: true } } };
@@ -57,46 +57,46 @@ export default async function PortalDashboardPage() {
   const [entitlements, client, leads, activeBookings, conversationCount, recentConversations, agentConfig] =
     await Promise.all([
       getClientEntitlements(clientId),
-    prisma.client.findUnique({
-      where: { id: clientId },
-      select: { businessName: true },
-    }),
-    prisma.lead.findMany({
-      where: { clientId, source: "INBOUND" },
-      orderBy: { createdAt: "desc" },
-      take: 20,
-      select: {
-        id: true,
-        customerName: true,
-        email: true,
-        status: true,
-        createdAt: true,
-      },
-    }),
-    activeBookingsPromise,
-    prisma.conversation.count({
-      where: { clientId },
-    }),
-    prisma.conversation.findMany({
-      where: { clientId },
-      orderBy: { updatedAt: "desc" },
-      take: 3,
-      include: {
-        lead: {
-          select: {
-            customerName: true,
-            email: true,
+      prisma.client.findUnique({
+        where: { id: clientId },
+        select: { businessName: true },
+      }),
+      prisma.lead.findMany({
+        where: { clientId, source: "INBOUND" },
+        orderBy: { createdAt: "desc" },
+        take: 20,
+        select: {
+          id: true,
+          customerName: true,
+          email: true,
+          status: true,
+          createdAt: true,
+        },
+      }),
+      activeBookingsPromise,
+      prisma.conversation.count({
+        where: { clientId },
+      }),
+      prisma.conversation.findMany({
+        where: { clientId },
+        orderBy: { updatedAt: "desc" },
+        take: 3,
+        include: {
+          lead: {
+            select: {
+              customerName: true,
+              email: true,
+            },
           },
         },
-      },
-    }) as unknown as Promise<RecentConversation[]>,
+      }) as unknown as Promise<RecentConversation[]>,
       prisma.agentConfig.findUnique({
         where: { clientId },
         select: { agentName: true },
       }),
     ]);
 
-  const botName = agentConfig?.agentName || "GraftBot";
+  const botName = agentConfig?.agentName || "GRAFT AI Assistant";
 
   const businessName = client?.businessName || "Your";
   const gated = !entitlements?.hasChatbotAccess;

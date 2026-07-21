@@ -1,4 +1,5 @@
-import { BotIcon, CalendarClock, IdCard } from "lucide-react";
+import { Clock03Icon, Robot, RobotFreeIcons, RobotIcon } from "@hugeicons/core-free-icons";
+import { Bot, BotIcon, CalendarClock, ClockIcon, IdCard } from "lucide-react";
 import Image from "next/image";
 import { Shimmer } from "@/components/ai-elements/shimmer";
 
@@ -16,7 +17,7 @@ export function LandingFeaturesSection() {
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6 h-auto md:h-[600px]">
         <div
           id="lead-capture"
-          className="glass-card  md:col-span-8 glass-panel rounded-xl p-4 sm:p-6 md:p-8 relative overflow-hidden transition-colors"
+          className="glass-card  md:col-span-4 h-full glass-panel rounded-xl p-4 sm:p-6 md:p-8 relative overflow-hidden transition-colors"
         >
           <div className="absolute top-0 right-0 w-1/2 h-full opacity-10 group-hover:opacity-20 transition-opacity">
             <div className="relative h-full w-full">
@@ -32,41 +33,43 @@ export function LandingFeaturesSection() {
           </div>
           <div className="relative z-10 flex flex-col h-full justify-between">
             <div>
-              <div className="mb-3 inline-flex items-center justify-center w-8 h-8 rounded-lg bg-secondary/5">
-                <BotIcon className="h-8 w-8 text-chart-1 " />
+              <div className="mb-3 inline-flex items-center justify-center w-10 h-10 rounded-lg bg-secondary/5">
+                <Bot className="h-10 w-10 text-xl text-chart-3 " />
               </div>
-              <h3 className="text-xl font-display md:text-2xl font-bold text-on-surface mb-2">
-                Consent-Based Lead Capture
-              </h3>
+              <h3 className="text-xl font-display md:text-2xl font-bold text-on-surface mb-2">24-Hour Omnipresence</h3>
               <p className="text-on-surface-variant text-lg font-light max-w-md">
-                Visitors start the conversation. GraftBot answers their questions and only collects contact details when
-                they choose to share them — no mass outreach, no harvested lists.
+                Our AI manages the quiet hours with the same elegance as your busiest afternoons. Visitors start the
+                conversation. GRAFT AI Assistant answers their questions and only collects contact details when they choose to
+                share them — no mass outreach, no harvested lists.
               </p>
             </div>
           </div>
         </div>
         <div
           id="smart-triage"
-          className="md:col-span-4 glass-panel rounded-xl p-4 sm:p-6 md:p-8 border-l-4 border-secondary flex flex-col justify-between group"
+          className="md:col-span-8 glass-panel rounded-xl p-4 sm:p-6 md:p-8 border-l-4 border-secondary flex flex-col justify-between group"
         >
           <div>
             <div className="mb-3 inline-flex items-center justify-center w-8 h-8 rounded-lg bg-secondary/15">
               <CalendarClock className="h-8 w-8 text-secondary" />
             </div>
-            <h3 className="text-2xl font-display font-normal text-on-surface mb-2">Enquiry Triage &amp; Booking</h3>
-            <p className="text-on-surface-variant text-base">
-              When a visitor asks, GraftBot can answer in your brand voice, offer a booking if they request one, and
-              hand off complex questions to your team.
+            <h3 className="text-2xl font-display font-normal text-on-surface mb-2">
+              Seamless Enquiry Triage Synchronization &amp; Scheduling
+            </h3>
+            <p className="text-on-surface-variant text-lg font-light max-w-xl">
+              Total integration with your digital ecosystem. When a visitor request booking times, or schedule to meet
+              with a manager, Graft's AI Assistant will handle the conversation naturally and appointments materialize
+              in your calendar with absolute fluidity.
             </p>
           </div>
           <div className="glass-card p-4 rounded-lg mt-4 border border-outline-variant/20">
-            <div className="text-[10px] uppercase tracking-widest font-bold mb-2">Triage Agent Log</div>
-            <div className="space-y-1 opacity-60">
-              <Shimmer className="text-[11px] font-mono">Visitor asking about pricing... </Shimmer>
+            <div className="text-[10px] uppercase tracking-widest font-bold mb-2"> Agent Streaming</div>
+            <div className="space-y-1 opacity-80">
+              <Shimmer className="text-[14px] font-mono">Visitor requested a live demo... </Shimmer>
               <div>
                 {" "}
-                <div className="text-[10px] text-emerald-300 animate-pulse font-mono">
-                  Qualified. Demo booked for Tue 09:00.
+                <div className="text-[14px] text-emerald-300 animate-pulse font-mono">
+                  Opening Found. Demo booked for Tue 09:00.
                 </div>
               </div>
             </div>
@@ -74,29 +77,29 @@ export function LandingFeaturesSection() {
         </div>
         <div
           id="white-label"
-          className="md:col-span-4 glass-panel rounded-xl p-4 sm:p-6 md:p-8 border-r-4 border-primary flex flex-col justify-between"
+          className="md:col-span-6 glass-panel rounded-xl p-4 sm:p-6 md:p-8 border-r-4 border-primary flex flex-col justify-between"
         >
           <div>
             <div className="mb-3 inline-flex items-center justify-center w-8 h-8 rounded-lg bg-primary/5">
               <IdCard className="h-8 w-8 text-indigo-400" />
             </div>
-            <h3 className="text-2xl font-display font-normal text-on-surface mb-2">White-Label Wonder</h3>
+            <h3 className="text-2xl font-display font-light text-on-surface mb-2">White-Labeled</h3>
             <p className="text-on-surface-variant text-base">
-              Resell our infrastructure under your own banner. Full CSS control and API-first architecture.
+              Use our infrastructure under your banner. Full CSS control and API-first architecture.
             </p>
           </div>
           <div className="mt-6">
             <div className="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold font-display mb-2">
-              Any brand identity
+              Add brand identity
             </div>
             <div className="flex gap-2">
-              <div className="w-5 h-5 rounded-full bg-[#ff3c6e] ring-1 ring-white/10" />
-              <div className="w-5 h-5 rounded-full bg-[#38bdf8] ring-1 ring-white/10" />
+              <div className="w-5 h-5  rounded-full bg-[#ff3c6e] ring-1 ring-white/10" />
+              <div className="w-5 h-5 rounded-xs bg-[#38bdf8] ring-1 ring-white/10" />
               <div className="w-5 h-5 rounded-full bg-[#a78bfa] ring-1 ring-white/10" />
             </div>
           </div>
         </div>
-        <div className="md:col-span-8 glass-panel rounded-xl p-4 sm:p-6 md:p-8 relative overflow-hidden flex flex-col items-center justify-center text-center">
+        <div className="md:col-span-6 glass-panel rounded-xl p-4 sm:p-6 md:p-8 relative overflow-hidden flex flex-col items-center justify-center text-center">
           <div className="absolute inset-0 opacity-7">
             <div className="w-full h-full bg-[radial-gradient(#ffffff90_1px,#00000020_1px)] bg-size-[10px_10px]"></div>
           </div>

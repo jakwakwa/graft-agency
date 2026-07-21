@@ -4,7 +4,7 @@ import { emailService } from "@/lib/services/email.service";
 /**
  * Relays a chat-captured lead to the widget owner by email so they can follow
  * up — this is the bot's default fallback whenever booking isn't available.
- * Best-effort: a failed email must never fail the lead capture itself.
+ * Best-effort: a failed email must never fail thetraging itself.
  */
 async function notifyOwnerOfChatLead(input: {
   clientId: string;
@@ -21,7 +21,7 @@ async function notifyOwnerOfChatLead(input: {
     if (!client?.email) return;
 
     const lines = [
-      `Your GraftBot just captured a new lead from your website chat${client.businessName ? ` for ${client.businessName}` : ""}.`,
+      `Your GRAFT AI Assistant just captured a new lead from your website chat${client.businessName ? ` for ${client.businessName}` : ""}.`,
       "",
       `Name: ${input.name}`,
       input.email ? `Email: ${input.email}` : null,

@@ -38,7 +38,7 @@ export default async function ConversationsPage() {
             <div className="flex flex-col items-center justify-center py-12 text-center space-y-4">
               <Typography.P className="text-muted-foreground">
                 {gated
-                  ? "Conversations live here — but your workspace isn't subscribed yet. Subscribe to the AI Chatbot to put your bot to work and start capturing transcripts."
+                  ? "Conversations live here — but your workspace isn't subscribed yet. Subscribe to the Graft AI Agent to put your bot to work and start capturing transcripts."
                   : "No conversations yet. Once your bot is live on your site, transcripts will appear here."}
               </Typography.P>
               <Button asChild variant={gated ? "default" : "outline"}>
