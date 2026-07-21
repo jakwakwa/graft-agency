@@ -13,7 +13,7 @@ export default async function PortalSettingsPage() {
   if (!clientId) redirectToAccessRequired();
 
   const [entitlements, config] = await Promise.all([getClientEntitlements(clientId), agentService.getConfig(clientId)]);
-  const gated = !entitlements?.hasChatbotAccess;
+  const gated = !entitlements?.ChatbotAccess;
   const bookingEnabled = entitlements?.hasBookingAccess ?? false;
 
   const initialData = {

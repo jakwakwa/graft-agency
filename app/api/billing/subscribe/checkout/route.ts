@@ -10,7 +10,7 @@ const bodySchema = z.object({
 });
 
 function getBaseSubscriptionPriceIds() {
-  return [process.env.PADDLE_PRICE_Graft AI Agent_MONTHLY, process.env.PADDLE_PRICE_Graft AI Agent_ANNUAL].filter(
+  return [process.env.PADDLE_PRICE_CHATBOT_MONTHLY, process.env.PADDLE_PRICE_CHATBOT_ANNUAL].filter(
     Boolean,
   ) as string[];
 }

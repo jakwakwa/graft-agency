@@ -15,7 +15,7 @@ export default async function ConversationsPage() {
   if (!clientId) redirectToAccessRequired();
 
   const entitlements = await getClientEntitlements(clientId);
-  const gated = !entitlements?.hasChatbotAccess;
+  const gated = !entitlements?.ChatbotAccess;
 
   const conversations = gated ? [] : await conversationService.listForClient(clientId);
 

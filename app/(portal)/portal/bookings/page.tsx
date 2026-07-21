@@ -111,13 +111,13 @@ export default async function BookingsPage({ searchParams }: BookingsPageProps) 
           <CardContent>
             <div className="flex flex-col items-center justify-center space-y-4 py-12 text-center max-w-xl   mx-auto">
               <Typography.P className="text-muted-foreground">
-                {entitlements?.hasChatbotAccess
+                {entitlements?.hasBookingAccess
                   ? "Bookings require the Booking Integration add-on. Add it from the Billing page to let your chatbot schedule appointments directly into your calendar — until then, it captures visitor contact details and emails them to you."
                   : "Bookings appear here once your Graft AI Agent is live and taking appointments. Subscribe to activate your workspace's booking flow."}
               </Typography.P>
               <Button asChild>
                 <Link href="/portal/billing" className="flex items-center gap-2 font-semibold text-shadow-md">
-                  {entitlements?.hasChatbotAccess ? "View add-ons" : "Upgrade Now"}
+                  {entitlements?.hasBookingAccess ? "View add-ons" : "Upgrade Now"}
                   <Sparkles className="h-4 w-4 opacity-60" />
                 </Link>
               </Button>

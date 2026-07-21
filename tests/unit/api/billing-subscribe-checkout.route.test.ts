@@ -49,8 +49,8 @@ describe("POST /api/billing/subscribe/checkout", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.resetModules();
-    vi.stubEnv("PADDLE_PRICE_Graft AI Agent_MONTHLY", "pri_Graft AI Agent_monthly");
-    vi.stubEnv("PADDLE_PRICE_Graft AI Agent_ANNUAL", "pri_Graft AI Agent_annual");
+    vi.stubEnv("PADDLE_PRICE_CHATBOT_MONTHLY", "pri_Graft AI Agent_monthly");
+    vi.stubEnv("PADDLE_PRICE_CHATBOT_ANNUAL", "pri_Graft AI Agent_annual");
     auth.mockResolvedValue({ userId: "user-1" });
     findFirstClient.mockResolvedValue(unsubscribedClient);
   });

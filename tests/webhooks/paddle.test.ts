@@ -162,7 +162,7 @@ describe("applyPaddleWebhook", () => {
   });
 
   it("rejects a duplicate base subscription for an already-active workspace", async () => {
-    vi.stubEnv("PADDLE_PRICE_Graft AI Agent_MONTHLY", "pri_Graft AI Agent");
+    vi.stubEnv("PADDLE_PRICE_CHATBOT_MONTHLY", "pri_Graft AI Agent");
     const { default: prisma } = await import("@/lib/db/prisma");
     const { applyPaddleWebhook } = await import("@/lib/webhooks/paddle");
     vi.mocked(prisma.client.findUnique).mockResolvedValue({
@@ -188,7 +188,7 @@ describe("applyPaddleWebhook", () => {
   });
 
   it("rejects an add-on-only subscription when the workspace has no base subscription", async () => {
-    vi.stubEnv("PADDLE_PRICE_Graft AI Agent_MONTHLY", "pri_Graft AI Agent");
+    vi.stubEnv("PADDLE_PRICE_CHATBOT_MONTHLY", "pri_Graft AI Agent");
     const { default: prisma } = await import("@/lib/db/prisma");
     const { applyPaddleWebhook } = await import("@/lib/webhooks/paddle");
     vi.mocked(prisma.client.findUnique).mockResolvedValue({

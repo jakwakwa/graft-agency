@@ -12,7 +12,7 @@ export default async function PortalEmbedPage() {
   if (!clientId) redirectToAccessRequired();
 
   const entitlements = await getClientEntitlements(clientId);
-  const gated = !entitlements?.hasChatbotAccess;
+  const gated = !entitlements?.ChatbotAccess;
 
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://graft.today";
 

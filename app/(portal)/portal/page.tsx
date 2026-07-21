@@ -99,7 +99,7 @@ export default async function PortalDashboardPage() {
   const botName = agentConfig?.agentName || "GRAFT AI Assistant";
 
   const businessName = client?.businessName || "Your";
-  const gated = !entitlements?.hasChatbotAccess;
+  const gated = !entitlements?.ChatbotAccess;
 
   const dashboardContent = (
     <>
