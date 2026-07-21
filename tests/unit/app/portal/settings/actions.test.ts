@@ -31,6 +31,7 @@ function createSettingsForm(overrides: Record<string, string> = {}) {
   formData.set("greetingMessage", overrides.greetingMessage ?? "Hello");
   formData.set("systemPrompt", overrides.systemPrompt ?? "Help visitors book calls.");
   formData.set("widgetPrimaryColour", overrides.widgetPrimaryColour ?? "#7c3aed");
+  formData.set("widgetSecondaryColour", overrides.widgetSecondaryColour ?? "#1e1b4b");
   formData.set("knowledgeBase", overrides.knowledgeBase ?? "[]");
   formData.set("calComUsername", overrides.calComUsername ?? "client-user");
   formData.set("defaultEventSlug", overrides.defaultEventSlug ?? "client-slug");
@@ -44,6 +45,7 @@ describe("saveBotSettingsAction", () => {
 
   it("persists client Cal.com username and event slug to AgentConfig", async () => {
     const { default: prisma } = await import("@/lib/db/prisma");
+    const { revalidatePath } = await import("next/cache");
 
     await saveBotSettingsAction(createSettingsForm());
 
@@ -61,6 +63,7 @@ describe("saveBotSettingsAction", () => {
         }),
       }),
     );
+    expect(revalidatePath).toHaveBeenCalledWith("/");
   });
 
   it("stores blank Cal.com settings as null so environment fallback can apply", async () => {

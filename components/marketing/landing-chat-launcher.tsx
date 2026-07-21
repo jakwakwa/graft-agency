@@ -6,6 +6,7 @@ import { useState } from "react";
 import { ChatWidget } from "@/app/widget/[clientId]/_components/chat-widget";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { buildWidgetTheme } from "@/lib/utils/widget-theme";
 
 export function shouldShowLandingChat(platformClientId: string | null | undefined): boolean {
   return Boolean(platformClientId?.trim());
@@ -17,6 +18,7 @@ interface LandingChatLauncherProps {
   agentName: string;
   greetingMessage: string;
   primaryColour: string;
+  secondaryColour: string;
 }
 
 export function LandingChatLauncher({
@@ -25,12 +27,15 @@ export function LandingChatLauncher({
   agentName,
   greetingMessage,
   primaryColour,
+  secondaryColour,
 }: LandingChatLauncherProps) {
   const [open, setOpen] = useState(false);
 
   if (!shouldShowLandingChat(platformClientId)) {
     return null;
   }
+
+  const theme = buildWidgetTheme(primaryColour, secondaryColour);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -40,7 +45,12 @@ export function LandingChatLauncher({
             type="button"
             variant="default"
             size="icon"
-            className={`fixed bottom-6 right-6 z-50 size-12 rounded-full outline-1 outline-[${primaryColour}] shadow-lg shadow-indigo-700 ring-3 ring-indigo-500`}
+            className="fixed bottom-6 right-6 z-50 size-12 rounded-full"
+            style={{
+              background: `linear-gradient(145deg, ${theme.primarySoft} 0%, ${theme.primary} 55%, ${theme.secondary} 120%)`,
+              color: theme.onPrimary,
+              boxShadow: `0 0 0 3px ${theme.focusRing}, 0 10px 24px color-mix(in srgb, ${theme.primaryDeep} 45%, transparent)`,
+            }}
             aria-label="Open chat"
           />
         }
@@ -59,6 +69,7 @@ export function LandingChatLauncher({
             embedOrigin={null}
             greetingMessage={greetingMessage}
             primaryColour={primaryColour}
+            secondaryColour={secondaryColour}
             widgetToken={null}
             onClose={() => setOpen(false)}
           />

@@ -33,7 +33,7 @@ test.describe("Chat Widget", () => {
     await expect(page.getByText("Hello, I need help")).toBeVisible();
 
     // Should get an assistant response (may take a moment for streaming)
-    const assistantMessages = page.locator('[class*="rounded-bl-sm"][class*="bg-muted"]');
+    const assistantMessages = page.locator('[data-role="assistant"]');
     await expect(assistantMessages.first()).toBeVisible({ timeout: 30000 });
   });
 
@@ -107,7 +107,7 @@ test.describe("Chat Widget", () => {
     await expect(page.getByText("When are you free?")).toBeVisible();
 
     // Graft should respond — either with slot suggestions or a message about calendar config
-    const assistantMessages = page.locator('[class*="rounded-bl-sm"][class*="bg-muted"]');
+    const assistantMessages = page.locator('[data-role="assistant"]');
     await expect(assistantMessages.first()).toBeVisible({ timeout: 30000 });
 
     // Response should mention availability, slots, or calendar (or explain config is needed)

@@ -26,6 +26,7 @@ describe("agentService", () => {
       agentName: "Bot",
       greetingMessage: "Hi",
       widgetPrimaryColour: "#000000",
+      widgetSecondaryColour: null,
       calComUsername: null,
       defaultEventSlug: null,
       createdAt: new Date(),
@@ -39,6 +40,7 @@ describe("agentService", () => {
         agentName: "GRAFT",
         greetingMessage: "Hi! I'm GRAFT AI Assistant — how can I help you today?",
         widgetPrimaryColour: "#E49B57",
+        widgetSecondaryColour: "#2A2118",
       });
     });
   });

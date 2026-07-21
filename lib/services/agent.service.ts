@@ -10,6 +10,7 @@ export const PLATFORM_LANDING_WIDGET_DEFAULTS = {
   agentName: "GRAFT",
   greetingMessage: "Hi! I'm GRAFT AI Assistant — how can I help you today?",
   widgetPrimaryColour: "#E49B57",
+  widgetSecondaryColour: "#2A2118",
 } as const;
 
 type AgentConfigRow = Prisma.AgentConfigGetPayload<{}>;
@@ -39,6 +40,7 @@ function createFallbackAgentConfig(clientId: string): AgentConfigRow {
     calComUsername: getOptionalEnv("CAL_USER_USERNAME"),
     defaultEventSlug: getOptionalEnv("CAL_USER_EVENT_SLUG"),
     widgetPrimaryColour: "#7c3aed",
+    widgetSecondaryColour: "#1e1b4b",
     createdAt: now,
     updatedAt: now,
   };

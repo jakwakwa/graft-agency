@@ -9,6 +9,7 @@ const baseConfig = {
   agentName: "GRAFT Bot",
   greetingMessage: "Hello! How can I help you today?",
   widgetPrimaryColour: "#000000",
+  widgetSecondaryColour: null,
   createdAt: new Date(),
   updatedAt: new Date(),
 };

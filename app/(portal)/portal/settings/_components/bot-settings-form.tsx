@@ -24,6 +24,7 @@ interface BotSettingsFormProps {
     greetingMessage: string | null;
     systemPrompt: string;
     widgetPrimaryColour: string | null;
+    widgetSecondaryColour: string | null;
     calComUsername: string | null;
     defaultEventSlug: string | null;
     knowledgeBase: KnowledgeSnippet[] | null;
@@ -118,24 +119,49 @@ export function BotSettingsForm({ initialData, bookingEnabled }: BotSettingsForm
               <Typography.Muted>The first message your bot says when someone opens chat.</Typography.Muted>
             </div>
 
-            <div className="space-y-2 ">
-              <Label htmlFor="widgetPrimaryColour">Brand colour</Label>
-              <div className="flex justify-start items-center gap-1 rounded-full overflow-hidden h-fit p-0 m-0">
-                <Input
-                  id="widgetPrimaryColour"
-                  name="widgetPrimaryColour"
-                  type="color"
-                  defaultValue={initialData.widgetPrimaryColour ?? "#7c3aed"}
-                  className={`w-12 h-10 -inset-2 p-1 m-1 border-white/50 outline-1  outline-white overflow-hidden rounded-b-2xl`}
-                />
-                <Input
-                  defaultValue={initialData.widgetPrimaryColour ?? "#7c3aed"}
-                  placeholder="#7C3AED"
-                  className="font-mono uppercase h-12"
-                  disabled
-                />
+            <div className="space-y-2">
+              <Label>Brand colours</Label>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Typography.Muted className="text-xs">Primary</Typography.Muted>
+                  <div className="flex items-center gap-1 overflow-hidden">
+                    <Input
+                      id="widgetPrimaryColour"
+                      name="widgetPrimaryColour"
+                      type="color"
+                      defaultValue={initialData.widgetPrimaryColour ?? "#7c3aed"}
+                      className="w-12 h-10 p-1 m-0 border-white/50 outline-1 outline-white overflow-hidden rounded-lg"
+                    />
+                    <Input
+                      defaultValue={initialData.widgetPrimaryColour ?? "#7c3aed"}
+                      placeholder="#7C3AED"
+                      className="font-mono uppercase h-10"
+                      disabled
+                    />
+                  </div>
+                </div>
+                <div className="space-y-1.5">
+                  <Typography.Muted className="text-xs">Secondary</Typography.Muted>
+                  <div className="flex items-center gap-1 overflow-hidden">
+                    <Input
+                      id="widgetSecondaryColour"
+                      name="widgetSecondaryColour"
+                      type="color"
+                      defaultValue={initialData.widgetSecondaryColour ?? "#1e1b4b"}
+                      className="w-12 h-10 p-1 m-0 border-white/50 outline-1 outline-white overflow-hidden rounded-lg"
+                    />
+                    <Input
+                      defaultValue={initialData.widgetSecondaryColour ?? "#1e1b4b"}
+                      placeholder="#1E1B4B"
+                      className="font-mono uppercase h-10"
+                      disabled
+                    />
+                  </div>
+                </div>
               </div>
-              <Typography.Muted>Used for the chat button and accents.</Typography.Muted>
+              <Typography.Muted>
+                Primary drives accents and user bubbles; secondary shades the chrome and surfaces.
+              </Typography.Muted>
             </div>
           </CardContent>
         </Card>

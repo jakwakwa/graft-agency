@@ -8,6 +8,7 @@ import { DefaultChatTransport } from "ai";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Streamdown } from "streamdown";
 import { TypographySmall } from "@/components/ui/typography";
+import { buildWidgetTheme, widgetThemeToCssVars } from "@/lib/utils/widget-theme";
 import { ChatInput } from "./chat-input";
 import { ToolStatus } from "./tool-status";
 import {
@@ -25,6 +26,7 @@ interface ChatWidgetProps {
   embedOrigin: string | null;
   greetingMessage: string;
   primaryColour: string;
+  secondaryColour: string | null;
   widgetToken: string | null;
   /** When provided (e.g. landing dialog), closes the host shell. */
   onClose?: () => void;
@@ -51,6 +53,7 @@ function ChatSession({
   embedOrigin,
   greetingMessage,
   primaryColour,
+  secondaryColour,
   widgetToken,
   onClose,
   onNewSession,
@@ -58,6 +61,8 @@ function ChatSession({
   const [sessionId] = useState(() => readOrCreateSessionId(clientId));
   const [inputValue, setInputValue] = useState("");
   const [isEmbedded, setIsEmbedded] = useState(false);
+
+  const themeVars = widgetThemeToCssVars(buildWidgetTheme(primaryColour, secondaryColour));
 
   const { messages, sendMessage, status } = useChat({
     transport: new DefaultChatTransport({
@@ -104,18 +109,34 @@ function ChatSession({
   );
 
   return (
-    <div className="flex h-full flex-col">
-      <header className="flex items-center gap-2 px-4 bg-primary py-3" style={{ backgroundColor: primaryColour }}>
+    <div
+      className="flex h-full flex-col"
+      style={{
+        ...themeVars,
+        backgroundColor: "var(--widget-surface)",
+        color: "var(--widget-on-surface)",
+      }}
+    >
+      <header
+        className="flex items-center gap-2 px-4 py-3"
+        style={{
+          background:
+            "linear-gradient(135deg, var(--widget-primary) 0%, var(--widget-primary-deep) 55%, var(--widget-secondary) 140%)",
+        }}
+      >
         <div
           className="flex size-8 items-center justify-center rounded-full text-sm font-bold"
           style={{
-            color: `${primaryColour}`,
-            backgroundColor: "hsl(35.71 100% 11.76%)",
+            color: "var(--widget-primary)",
+            backgroundColor: "var(--widget-secondary-deep)",
+            boxShadow: "inset 0 0 0 1px color-mix(in srgb, var(--widget-primary-soft) 40%, transparent)",
           }}
         >
           {agentName.charAt(0).toUpperCase()}
         </div>
-        <TypographySmall className="font-semibold text-black flex-1">{agentName} ASSISTANT</TypographySmall>
+        <TypographySmall className="font-semibold flex-1" style={{ color: "var(--widget-on-primary)" }}>
+          {agentName} ASSISTANT
+        </TypographySmall>
         <div className="flex shrink-0 items-center gap-1">
           {hasMessages ? (
             <button
@@ -123,7 +144,8 @@ function ChatSession({
               onClick={onNewSession}
               disabled={isLoading}
               aria-label="Start new chat"
-              className="flex size-8 items-center justify-center rounded-full text-black/80 transition-opacity hover:bg-black/10 disabled:opacity-40"
+              className="flex size-8 items-center justify-center rounded-full transition-opacity hover:opacity-80 disabled:opacity-40"
+              style={{ color: "var(--widget-on-primary)" }}
             >
               <HugeiconsIcon icon={BubbleChatAddIcon} className="size-5" />
             </button>
@@ -133,7 +155,8 @@ function ChatSession({
               type="button"
               onClick={handleClose}
               aria-label="Close chat"
-              className="flex size-8 items-center justify-center rounded-full text-black/80 transition-opacity hover:bg-black/10"
+              className="flex size-8 items-center justify-center rounded-full transition-opacity hover:opacity-80"
+              style={{ color: "var(--widget-on-primary)" }}
             >
               <HugeiconsIcon icon={Cancel01Icon} className="size-5" />
             </button>
@@ -144,8 +167,16 @@ function ChatSession({
       <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
         {messages.length === 0 && (
           <div className="flex justify-start">
-            <div className="max-w-[80%] flex gap-2 font-display outline-1 outline-white/10 rounded-bl-0 rounded-tr-lg rounded-br-lg rounded-tl-lg shadow-[0_7px_10px] shadow-black bg-stone-800 px-4 py-2 text-white/70 text-xs">
-              <HugeiconsIcon icon={BotFreeIcons} className="size-6" />
+            <div
+              className="max-w-[80%] flex gap-2 font-display rounded-bl-0 rounded-tr-lg rounded-br-lg rounded-tl-lg px-4 py-2 text-xs"
+              style={{
+                backgroundColor: "var(--widget-surface-elevated)",
+                color: "color-mix(in srgb, var(--widget-on-surface) 75%, transparent)",
+                boxShadow: "0 7px 10px color-mix(in srgb, #000 35%, transparent)",
+                outline: "1px solid var(--widget-border)",
+              }}
+            >
+              <HugeiconsIcon icon={BotFreeIcons} className="size-6 shrink-0" />
               {greetingMessage}
             </div>
           </div>
@@ -158,13 +189,7 @@ function ChatSession({
         <div ref={bottomRef} />
       </div>
 
-      <ChatInput
-        input={inputValue}
-        onChange={setInputValue}
-        onSend={handleSend}
-        isLoading={isLoading}
-        primaryColour={primaryColour}
-      />
+      <ChatInput input={inputValue} onChange={setInputValue} onSend={handleSend} isLoading={isLoading} />
     </div>
   );
 }
@@ -180,16 +205,29 @@ function MessageBubble({ message }: { message: UIMessage }) {
             return (
               <div
                 key={`text-${part.text.slice(0, 20)}`}
-                className={`rounded-2xl px-3 py-2 text-sm [&_a]:underline [&_a]:text-primary [&_a]:hover:opacity-80 ${
+                data-role={isUser ? "user" : "assistant"}
+                className="rounded-2xl px-3 py-2 text-sm font-sans [&_a]:underline [&_a]:hover:opacity-80"
+                style={
                   isUser
-                    ? "rounded-br-sm bg-primary font-sans text-primary-foreground"
-                    : "rounded-bl-sm font-sans bg-muted"
-                }`}
+                    ? {
+                        borderBottomRightRadius: "0.25rem",
+                        background: "linear-gradient(160deg, var(--widget-primary-soft) 0%, var(--widget-primary) 70%)",
+                        color: "var(--widget-on-primary)",
+                      }
+                    : {
+                        borderBottomLeftRadius: "0.25rem",
+                        backgroundColor: "var(--widget-secondary-soft)",
+                        color: "var(--widget-on-secondary)",
+                        outline: "1px solid var(--widget-border)",
+                      }
+                }
               >
                 {isUser ? (
                   part.text
                 ) : (
-                  <Streamdown className="[&>*:first-child]:mt-0 [&>*:last-child]:mb-0">{part.text}</Streamdown>
+                  <Streamdown className="[&>*:first-child]:mt-0 [&>*:last-child]:mb-0 [&_a]:text-[var(--widget-primary-soft)]">
+                    {part.text}
+                  </Streamdown>
                 )}
               </div>
             );
@@ -197,7 +235,6 @@ function MessageBubble({ message }: { message: UIMessage }) {
 
           if (part.type.startsWith("tool-") && "toolCallId" in part) {
             const toolPart = part as { type: string; toolCallId: string; state: string };
-            // AI SDK v6: type is "tool-{toolName}", e.g. "tool-captureLeadDetails"
             const toolName = toolPart.type.slice(5);
             return <ToolStatus key={`tool-${toolPart.toolCallId}`} toolName={toolName} state={toolPart.state} />;
           }

@@ -27,7 +27,9 @@ async function resolvePlatformClientIdFromEnv(): Promise<string | null> {
 
 /**
  * Returns the platform owner's client ID.
- * Priority: validated PLATFORM_CLIENT_ID > client for PLATFORM_CLERK_ORG_ID > first isPlatformOwner.
+ * Priority: validated PLATFORM_CLIENT_ID >
+ * PLATFORM_CLERK_ORG_ID (prefer isPlatformOwner in that org) >
+ * newest isPlatformOwner globally.
  */
 export async function getPlatformClientId(): Promise<string | null> {
   try {
@@ -36,6 +38,16 @@ export async function getPlatformClientId(): Promise<string | null> {
 
     const orgId = process.env.PLATFORM_CLERK_ORG_ID;
     if (orgId) {
+      // Prefer the platform-owner row when multiple Clients share the org
+      // (common after member invites). Otherwise findFirst can return a
+      // non-owner with no agent_configs → landing falls back to orange defaults.
+      const ownerInOrg = await prisma.client.findFirst({
+        where: { clerkOrganizationId: orgId, isPlatformOwner: true },
+        orderBy: { createdAt: "desc" },
+        select: { id: true },
+      });
+      if (ownerInOrg) return ownerInOrg.id;
+
       const client = await prisma.client.findFirst({
         where: { clerkOrganizationId: orgId },
         select: { id: true },
@@ -51,10 +63,10 @@ export async function getPlatformClientId(): Promise<string | null> {
     return client?.id ?? null;
   } catch (error) {
     // Empty / unmigrated DBs (e.g. brand-new Prisma Postgres) must not fail SSG of `/`.
-      if (isMissingTableError(error)) {
-        console.warn("[resolve-client] clients table missing — returning null until migrations are applied.");
-        return null;
-      }
+    if (isMissingTableError(error)) {
+      console.warn("[resolve-client] clients table missing — returning null until migrations are applied.");
+      return null;
+    }
     throw error;
   }
 }
