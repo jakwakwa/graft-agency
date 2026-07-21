@@ -18,8 +18,8 @@ export async function generateCampaignStrategy(params: {
   draftSubject: string | null;
   draftBody: string | null;
 }): Promise<CampaignSop> {
-  const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
-  if (!apiKey) throw new Error("GOOGLE_GENERATIVE_AI_API_KEY not configured");
+  const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY;
+  if (!apiKey) throw new Error("GEMINI_API_KEY not configured");
 
   const { profiledNeeds: needs, prdContent, engagementObjectives, draftSubject, draftBody } = params;
   const ai = new GoogleGenAI({ apiKey });

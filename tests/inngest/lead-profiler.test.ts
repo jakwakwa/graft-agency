@@ -53,7 +53,8 @@ vi.mock("@google/genai", () => ({
 describe("profileLead", () => {
   it("returns profiled needs for a lead", async () => {
     // We need to set the API key for the test to proceed
-    process.env.GOOGLE_GENERATIVE_AI_API_KEY = "test-key";
+    process.env.GEMINI_API_KEY = "test-key";
+    process.env.GEMINI_API_KEY = "test-key"; process.env.GOOGLE_GENERATIVE_AI_API_KEY = "test-key";
 
     const result = await profileLead("lead-123", "client-456");
     expect(result.primaryNeed).toContain("booking");

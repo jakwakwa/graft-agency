@@ -42,7 +42,7 @@ describe("writePRD", () => {
   };
 
   it("returns a non-empty PRD string", async () => {
-    process.env.GOOGLE_GENERATIVE_AI_API_KEY = "test-key";
+    process.env.GEMINI_API_KEY = "test-key"; process.env.GOOGLE_GENERATIVE_AI_API_KEY = "test-key";
     const prd = await writePRD(profiledNeeds);
     expect(prd).toContain("# PRD");
     expect(prd).toContain("Features");
@@ -50,7 +50,7 @@ describe("writePRD", () => {
   });
 
   it("campaign variant frames the PRD as an engagement campaign presentation, not a landing page", async () => {
-    process.env.GOOGLE_GENERATIVE_AI_API_KEY = "test-key";
+    process.env.GEMINI_API_KEY = "test-key"; process.env.GOOGLE_GENERATIVE_AI_API_KEY = "test-key";
     h.prompts.length = 0;
     await writePRD(profiledNeeds, "campaign");
     const prompt = h.prompts[0] ?? "";
@@ -62,7 +62,7 @@ describe("writePRD", () => {
   });
 
   it("landing variant frames the PRD as a landing page / prototype", async () => {
-    process.env.GOOGLE_GENERATIVE_AI_API_KEY = "test-key";
+    process.env.GEMINI_API_KEY = "test-key"; process.env.GOOGLE_GENERATIVE_AI_API_KEY = "test-key";
     h.prompts.length = 0;
     await writePRD(profiledNeeds, "landing");
     const prompt = h.prompts[0] ?? "";

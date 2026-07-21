@@ -7,8 +7,8 @@ import type { ProfiledNeeds } from "@/lib/types/engagement";
 import { makeOnFailure } from "./_shared/on-failure";
 
 export async function profileLead(leadId: string, clientId: string): Promise<ProfiledNeeds> {
-  const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
-  if (!apiKey) throw new Error("GOOGLE_GENERATIVE_AI_API_KEY not configured");
+  const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY;
+  if (!apiKey) throw new Error("GEMINI_API_KEY not configured");
 
   const lead = await prisma.lead.findUniqueOrThrow({ where: { id: leadId } });
   const scraped = (lead.scrapedData ?? {}) as Record<string, any>;

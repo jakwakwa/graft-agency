@@ -92,8 +92,8 @@ Keep it ruthlessly scoped to a single persuasive page an AI agent can implement 
 }
 
 export async function writePRD(needs: ProfiledNeeds, buildVariant: BuildVariant = "campaign"): Promise<string> {
-  const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
-  if (!apiKey) throw new Error("GOOGLE_GENERATIVE_AI_API_KEY not configured");
+  const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY;
+  if (!apiKey) throw new Error("GEMINI_API_KEY not configured");
 
   const ai = new GoogleGenAI({ apiKey });
 

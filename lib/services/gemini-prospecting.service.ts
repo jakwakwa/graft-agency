@@ -182,8 +182,8 @@ export const geminiProspectingService = {
     searchCriteria: { industries?: string[]; locations?: string[]; keywords?: string[] } | null;
     valueProposition?: string | null;
   }): Promise<ProspectingRunResult> {
-    const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
-    if (!apiKey) throw new Error("GOOGLE_GENERATIVE_AI_API_KEY not configured");
+    const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY;
+    if (!apiKey) throw new Error("GEMINI_API_KEY not configured");
 
     const { excludedNameKeys, excludedUrlKeys, leads } = await loadCrmExclusionSets(config.clientId);
     const crmExclusionBlock = formatCrmExclusionBlock(leads);

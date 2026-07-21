@@ -45,6 +45,7 @@ describe("generateCampaignStrategy", () => {
   };
 
   it("returns a parsed Campaign SOP with refined email and design tone", async () => {
+    process.env.GEMINI_API_KEY = "test-key";
     process.env.GOOGLE_GENERATIVE_AI_API_KEY = "test-key";
 
     const sop = await generateCampaignStrategy({
@@ -64,6 +65,7 @@ describe("generateCampaignStrategy", () => {
   });
 
   it("throws when the Gemini API key is missing", async () => {
+    delete process.env.GEMINI_API_KEY;
     delete process.env.GOOGLE_GENERATIVE_AI_API_KEY;
     await expect(
       generateCampaignStrategy({
@@ -73,6 +75,6 @@ describe("generateCampaignStrategy", () => {
         draftSubject: null,
         draftBody: null,
       }),
-    ).rejects.toThrow("GOOGLE_GENERATIVE_AI_API_KEY");
+    ).rejects.toThrow("GEMINI_API_KEY");
   });
 });
