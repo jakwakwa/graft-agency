@@ -54,7 +54,7 @@ const CardTitle = React.forwardRef<HTMLDivElement, React.ComponentProps<"div">>(
       ref={ref}
       data-slot="card-title"
       data-size={size}
-      className={cn("text-base leading-snug font-medium data-[size=sm]:text-sm", className)}
+      className={cn("text-lg leading-snug font-bold data-[size=sm]:text-sm", className)}
       {...props}
     />
   );
@@ -125,4 +125,4 @@ const Card = Object.assign(CardRoot, {
   Footer: CardFooter,
 });
 
-export { Card, CardHeader, CardFooter, CardTitle, CardAction, CardDescription, CardContent };
+export { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle };

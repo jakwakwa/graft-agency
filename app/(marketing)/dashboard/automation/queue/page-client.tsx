@@ -1,6 +1,6 @@
 "use client";
-
-import { ChevronRight, Timer } from "lucide-react";
+import { ArrowRight01Icon, Timer01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { MarketingShell } from "@/components/layout/marketing-shell";
@@ -178,7 +178,7 @@ export default function QueuePage() {
                 <span className="text-xs text-secondary-foreground/70">
                   <span>
                     {" "}
-                    <Timer />{" "}
+                    <HugeiconsIcon icon={Timer01Icon} />{" "}
                   </span>
                 </span>
               </span>
@@ -220,7 +220,7 @@ export default function QueuePage() {
               </Link>
             </div>
 
-            {(highlightedLeads.length === 0 ? highlightedLeads : leads.slice(0, 15)).map((lead, index) => {
+            {(highlightedLeads.length === 0 ? highlightedLeads : leads.slice(0, 15)).map((lead) => {
               const statusLabel = lead.status === "CONTACTED" ? "DONE" : "PENDING";
               return (
                 <Link
@@ -242,7 +242,7 @@ export default function QueuePage() {
                     <div className="mt-1 text-[10px] uppercase text-muted-foreground">{statusLabel}</div>
                   </div>
                   <span className="rounded-sm bg-card p-2 text-foreground transition-colors group-hover:bg-chart-3 group-hover:text-primary-foreground">
-                    <ChevronRight className="h-[18px] w-[18px]" />
+                    <HugeiconsIcon icon={ArrowRight01Icon} className="h-[18px] w-[18px]" />
                   </span>
                 </Link>
               );

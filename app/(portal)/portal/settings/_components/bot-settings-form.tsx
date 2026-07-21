@@ -1,6 +1,6 @@
 "use client";
-
-import { Plus, Save, Trash2 } from "lucide-react";
+import { Add01Icon, Delete02Icon, FloppyDiskIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { useState } from "react";
 import { useFormStatus } from "react-dom";
 import { toast } from "sonner";
@@ -36,7 +36,7 @@ function SubmitButton() {
   const { pending } = useFormStatus();
   return (
     <Button type="submit" disabled={pending} className="w-full md:w-auto">
-      <Save className="mr-2 h-4 w-4" />
+      <HugeiconsIcon icon={FloppyDiskIcon} className="mr-2 h-4 w-4" />
       {pending ? "Saving..." : "Save Settings"}
     </Button>
   );
@@ -215,7 +215,7 @@ export function BotSettingsForm({ initialData, bookingEnabled }: BotSettingsForm
               <CardDescription>Q&A pairs your bot can pull from to answer questions.</CardDescription>
             </div>
             <Button type="button" variant="outline" size="sm" onClick={addSnippet}>
-              <Plus className="h-4 w-4 mr-2" />
+              <HugeiconsIcon icon={Add01Icon} className="h-4 w-4 mr-2" />
               Add Snippet
             </Button>
           </CardHeader>
@@ -254,7 +254,7 @@ export function BotSettingsForm({ initialData, bookingEnabled }: BotSettingsForm
                     className="text-destructive hover:text-destructive hover:bg-destructive/10"
                     onClick={() => removeSnippet(snippet.id)}
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <HugeiconsIcon icon={Delete02Icon} className="h-4 w-4" />
                   </Button>
                 </div>
               </div>

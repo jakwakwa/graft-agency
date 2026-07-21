@@ -1,6 +1,6 @@
 "use client";
-
-import { Check } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Tick01Icon } from "@hugeicons/core-free-icons";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -126,7 +126,7 @@ export function SubscriptionConfirmDialog({
                     className={cn(
                       "flex w-full cursor-pointer items-start gap-3 rounded-xl border p-3 text-left transition-colors",
                       selectedCycle === cycle
-                        ? "border-blue-500/50 bg-blue-500/10"
+                        ? "border-chart-3/50 bg-chart-3/10"
                         : "border-white/10 bg-white/5 hover:border-white/20",
                     )}
                   >
@@ -151,7 +151,7 @@ export function SubscriptionConfirmDialog({
                       <span className="flex flex-wrap items-center gap-2">
                         <span className="font-semibold text-on-surface">{option.label}</span>
                         {cycle === "annual" && savings ? (
-                          <span className="inline-flex items-center rounded-full border border-blue-500/20 bg-blue-500/10 px-2 py-0.5 text-xs font-semibold text-blue-400">
+                          <span className="inline-flex items-center rounded-full border border-chart-3/20 bg-chart-3/10 px-2 py-0.5 text-xs font-semibold text-blue-400">
                             Best value — Save {savings}
                           </span>
                         ) : null}
@@ -180,7 +180,7 @@ export function SubscriptionConfirmDialog({
           <ul className="space-y-3 text-sm mt-4 text-on-surface-variant list-none pl-0">
             {offer.features.map((feature) => (
               <li key={feature} className="flex items-start gap-3">
-                <Check className="mt-0.5 h-4 w-4 shrink-0 text-blue-400" />
+                <HugeiconsIcon icon={Tick01Icon} className="mt-0.5 h-4 w-4 shrink-0 text-blue-400" />
                 <span className="leading-snug">{feature}</span>
               </li>
             ))}
@@ -192,7 +192,7 @@ export function SubscriptionConfirmDialog({
             type="button"
             onClick={onConfirm}
             disabled={pending}
-            className="w-full rounded-xl bg-blue-500 py-5 text-sm font-semibold uppercase tracking-wider text-white shadow-md shadow-blue-500/10 transition-all hover:bg-blue-400 hover:scale-[1.01] active:scale-[0.99] disabled:opacity-60 disabled:hover:scale-100"
+            className="w-full rounded-xl bg-chart-3 py-5 text-sm font-semibold uppercase tracking-wider text-white shadow-md shadow-chart-3/10 transition-all hover:bg-blue-400 hover:scale-[1.01] active:scale-[0.99] disabled:opacity-60 disabled:hover:scale-100"
           >
             {pending ? "Starting checkout…" : "Continue to payment"}
           </Button>

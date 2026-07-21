@@ -1,10 +1,10 @@
 "use client";
 
 import { Button as ButtonPrimitive } from "@base-ui/react/button";
+import { Loading02Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import type { VariantProps } from "class-variance-authority";
 import React, { createContext, useContext } from "react";
-import { Loader2 } from "lucide-react";
-
 import { buttonVariants } from "@/components/ui/button-variants";
 import { cn } from "@/lib/utils";
 
@@ -87,7 +87,7 @@ const ButtonSpinner = React.forwardRef<HTMLSpanElement, React.HTMLAttributes<HTM
         className={cn("inline-flex shrink-0 items-center justify-center animate-spin", className)}
         {...props}
       >
-        <Loader2 className="w-4 h-4" />
+        <HugeiconsIcon icon={Loading02Icon} className="w-4 h-4" />
       </span>
     );
   },

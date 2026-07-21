@@ -1,21 +1,23 @@
 "use client";
 
+import {
+  Agreement01Icon,
+  AlertCircleIcon,
+  ArrowDown01Icon,
+  BrainIcon,
+  Building02FreeIcons,
+  Building03FreeIcons,
+  ColorPickerIcon,
+  FileAttachmentIcon,
+  LinkSquare01Icon,
+  RocketIcon,
+  Tick01Icon,
+} from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { cjk } from "@streamdown/cjk";
 import { code } from "@streamdown/code";
 import { math } from "@streamdown/math";
 import { mermaid } from "@streamdown/mermaid";
-import {
-  AlertCircle,
-  Brain,
-  Check,
-  ChevronDown,
-  ExternalLink,
-  FileText,
-  Hammer,
-  Handshake,
-  Palette,
-  Rocket,
-} from "lucide-react";
 import type React from "react";
 import { useState } from "react";
 import { Streamdown } from "streamdown";
@@ -101,12 +103,12 @@ function getStepStatusLabel(stepStatus: string, isFailed: boolean): string {
 type StepIconFn = (props: StepIconProps) => React.ReactNode;
 
 const STEP_ICONS: [StepIconFn, StepIconFn, StepIconFn, StepIconFn, StepIconFn, StepIconFn] = [
-  (p) => <Brain {...p} />,
-  (p) => <FileText {...p} />,
-  (p) => <Palette {...p} />,
-  (p) => <Hammer {...p} />,
-  (p) => <Rocket {...p} />,
-  (p) => <Handshake {...p} />,
+  (p) => <HugeiconsIcon icon={BrainIcon} {...p} />,
+  (p) => <HugeiconsIcon icon={FileAttachmentIcon} {...p} />,
+  (p) => <HugeiconsIcon icon={ColorPickerIcon} {...p} />,
+  (p) => <HugeiconsIcon icon={Building03FreeIcons} {...p} />,
+  (p) => <HugeiconsIcon icon={RocketIcon} {...p} />,
+  (p) => <HugeiconsIcon icon={Agreement01Icon} {...p} />,
 ];
 
 const streamdownPlugins = { cjk, code, math, mermaid };
@@ -212,7 +214,7 @@ function ActionButton({ href, label, ariaLabel, disabledAriaLabel }: ActionButto
         className={cn(buttonVariants({ variant: "outline", size: "sm" }), "inline-flex items-center gap-0")}
         aria-label={ariaLabel}
       >
-        <ExternalLink className="h-3.5 w-3.5" aria-hidden />
+        <HugeiconsIcon icon={LinkSquare01Icon} className="h-3.5 w-3.5" aria-hidden />
         {label}
       </a>
     );
@@ -223,7 +225,7 @@ function ActionButton({ href, label, ariaLabel, disabledAriaLabel }: ActionButto
       <TooltipTrigger
         render={
           <Button variant="outline" size="sm" disabled aria-label={disabledAriaLabel}>
-            <ExternalLink className="h-3.5 w-3.5 mr-1.5" />
+            <HugeiconsIcon icon={LinkSquare01Icon} className="h-3.5 w-3.5 mr-1.5" />
             {label}
           </Button>
         }
@@ -418,7 +420,7 @@ export function EngagementPanel({ status, statusUnavailable = false }: Engagemen
           {status === null && statusUnavailable && (
             <CardContent>
               <Alert variant="destructive">
-                <AlertCircle className="h-4 w-4" />
+                <HugeiconsIcon icon={AlertCircleIcon} className="h-4 w-4" />
                 <AlertDescription>
                   Pipeline status temporarily unavailable — retrying every 10s. The pipeline may still be running.
                 </AlertDescription>
@@ -449,7 +451,7 @@ export function EngagementPanel({ status, statusUnavailable = false }: Engagemen
               {isFailed && status?.errorMessage && (
                 <div className="pb-4">
                   <Alert variant="destructive">
-                    <AlertCircle className="h-4 w-4" />
+                    <HugeiconsIcon icon={AlertCircleIcon} className="h-4 w-4" />
                     <AlertDescription>{status.errorMessage}</AlertDescription>
                   </Alert>
                 </div>
@@ -472,7 +474,7 @@ export function EngagementPanel({ status, statusUnavailable = false }: Engagemen
                       <div key={step.label} className="flex flex-col items-center gap-2 text-center">
                         {stepStatus === "done" && (
                           <div className="w-10 h-10 rounded-full border-2 border-emerald-300 bg-emerald-900 flex items-center justify-center text-primary-foreground">
-                            <Check className="h-4 w-4 text-emerald-50" strokeWidth={4} />
+                            <HugeiconsIcon icon={Tick01Icon} className="h-4 w-4 text-emerald-50" strokeWidth={4} />
                           </div>
                         )}
 
@@ -484,7 +486,7 @@ export function EngagementPanel({ status, statusUnavailable = false }: Engagemen
 
                         {stepStatus === "current" && isFailed && (
                           <div className="w-12 h-12 -mt-1 rounded-full border-2 border-destructive bg-card flex items-center justify-center text-destructive">
-                            <AlertCircle className="h-5 w-5" />
+                            <HugeiconsIcon icon={AlertCircleIcon} className="h-5 w-5" />
                           </div>
                         )}
 
@@ -535,7 +537,8 @@ export function EngagementPanel({ status, statusUnavailable = false }: Engagemen
                         }
                       >
                         <span>Profiled needs</span>
-                        <ChevronDown
+                        <HugeiconsIcon
+                          icon={ArrowDown01Icon}
                           className={cn("h-4 w-4 shrink-0 transition-transform", openProfile && "rotate-180")}
                         />
                       </CollapsibleTrigger>
@@ -558,7 +561,10 @@ export function EngagementPanel({ status, statusUnavailable = false }: Engagemen
                         }
                       >
                         <span>PRD preview</span>
-                        <ChevronDown className={cn("h-4 w-4 shrink-0 transition-transform", openPrd && "rotate-180")} />
+                        <HugeiconsIcon
+                          icon={ArrowDown01Icon}
+                          className={cn("h-4 w-4 shrink-0 transition-transform", openPrd && "rotate-180")}
+                        />
                       </CollapsibleTrigger>
                       <CollapsibleContent className="border-t border-border/80 p-3 data-[state=open]:animate-in">
                         {prdContent.length > 0 ? (
@@ -600,7 +606,8 @@ export function EngagementPanel({ status, statusUnavailable = false }: Engagemen
                             </Badge>
                           )}
                         </div>
-                        <ChevronDown
+                        <HugeiconsIcon
+                          icon={ArrowDown01Icon}
                           className={cn("h-4 w-4 shrink-0 transition-transform", openDesigns && "rotate-180")}
                         />
                       </CollapsibleTrigger>
@@ -669,7 +676,7 @@ export function EngagementPanel({ status, statusUnavailable = false }: Engagemen
                                           rel="noopener noreferrer"
                                           className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
                                         >
-                                          <ExternalLink className="h-3 w-3" />
+                                          <HugeiconsIcon icon={LinkSquare01Icon} className="h-3 w-3" />
                                           Open in Stitch
                                         </a>
                                       )}
@@ -683,7 +690,7 @@ export function EngagementPanel({ status, statusUnavailable = false }: Engagemen
                                               rel="noopener noreferrer"
                                               className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:underline"
                                             >
-                                              <ExternalLink className="h-3 w-3" />
+                                              <HugeiconsIcon icon={LinkSquare01Icon} className="h-3 w-3" />
                                               Open HTML
                                             </a>
                                           );
@@ -721,7 +728,8 @@ export function EngagementPanel({ status, statusUnavailable = false }: Engagemen
                     <div className="flex items-center gap-2">
                       <span>Coding Agent</span>
                     </div>
-                    <ChevronDown
+                    <HugeiconsIcon
+                      icon={ArrowDown01Icon}
                       className={cn("h-4 w-4 shrink-0 transition-transform", openDesigns && "rotate-180")}
                     />{" "}
                   </CollapsibleTrigger>
@@ -729,7 +737,7 @@ export function EngagementPanel({ status, statusUnavailable = false }: Engagemen
                   <CollapsibleContent className="border-t border-border/80 p-3 data-[state=open]:animate-in">
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-2">
-                        <Hammer className="h-4 w-4 text-muted-foreground" aria-hidden />
+                        <HugeiconsIcon icon={Building02FreeIcons} className="h-4 w-4 text-muted-foreground" aria-hidden />
                         <span className="text-sm font-medium">Jules build</span>
                         {julesIsRunning && <Spinner className="h-3.5 w-3.5 text-primary" />}
                       </div>
@@ -822,7 +830,7 @@ export function EngagementPanel({ status, statusUnavailable = false }: Engagemen
                     )}
                     {julesIsRunning && status?.inngestRunStatus === "Failed" && (
                       <Alert variant="destructive" className="py-2">
-                        <AlertCircle className="h-3.5 w-3.5" />
+                        <HugeiconsIcon icon={AlertCircleIcon} className="h-3.5 w-3.5" />
                         <AlertDescription className="text-xs">
                           Orchestrator crashed — Jules session is still building. Reconciler is tracking progress and
                           will update this page automatically.

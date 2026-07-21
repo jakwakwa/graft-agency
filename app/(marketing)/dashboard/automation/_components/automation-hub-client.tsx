@@ -1,6 +1,7 @@
 "use client";
 
-import { Bolt } from "lucide-react";
+import { FlashIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Typography } from "@/components/ui/typography";
@@ -54,7 +55,7 @@ export function AutomationHubClient() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shadow-neon">
-              <Bolt className="h-5 w-5 animate-[spin_8s_linear_infinite]" />
+              <HugeiconsIcon icon={FlashIcon} className="h-5 w-5 animate-[spin_8s_linear_infinite]" />
             </div>
             <div>
               <Typography.H3 className="mt-0 mb-0 text-xl font-bold text-foreground">

@@ -1,6 +1,8 @@
 "use client";
 
-import { CodeIcon, GlobeIcon, InfoIcon, LayoutIcon, TerminalIcon } from "lucide-react";
+import { CodeIcon, GlobeIcon, InformationCircleIcon, Layout01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { TerminalIcon } from "lucide-react";
 import {
   CodeBlock,
   CodeBlockActions,
@@ -60,15 +62,15 @@ export const ChatBot = () => {
       <Tabs defaultValue="modern" className="w-full">
         <TabsList className="grid w-full grid-cols-3 mb-10 h-auto p-1 bg-muted/50">
           <TabsTrigger value="modern" className="py-3 gap-2">
-            <GlobeIcon className="size-4" />
+            <HugeiconsIcon icon={GlobeIcon} className="size-4" />
             Modern Loader
           </TabsTrigger>
           <TabsTrigger value="react" className="py-3 gap-2">
-            <CodeIcon className="size-4" />
+            <HugeiconsIcon icon={CodeIcon} className="size-4" />
             React / Next.js
           </TabsTrigger>
           <TabsTrigger value="iframe" className="py-3 gap-2">
-            <LayoutIcon className="size-4" />
+            <HugeiconsIcon icon={Layout01Icon} className="size-4" />
             Iframe Embed
           </TabsTrigger>
         </TabsList>
@@ -86,7 +88,7 @@ export const ChatBot = () => {
 
               <div className="space-y-4">
                 <div className="flex items-start gap-3 p-4 rounded-xl bg-primary/5 border border-primary/10 w-full">
-                  <InfoIcon className="size-5 text-emerald-400 mt-0.5 shrink-0" />
+                  <HugeiconsIcon icon={InformationCircleIcon} className="size-5 text-emerald-400 mt-0.5 shrink-0" />
                   <Typography.Small className="text-emerald-300 font-normal leading-relaxed italic">
                     Best Practice: Place this{" "}
                     <Typography.Code className=" text-pink-400 border-primary/30 font-light font-mono">
@@ -106,7 +108,7 @@ export const ChatBot = () => {
               <CodeBlock code={htmlSnippet} language="html" wrap>
                 <CodeBlockHeader className="bg-chart-3">
                   <CodeBlockTitle>
-                    <GlobeIcon className="size-3" />
+                    <HugeiconsIcon icon={GlobeIcon} className="size-3" />
                     HTML Snippet
                   </CodeBlockTitle>
                   <CodeBlockActions>
@@ -134,7 +136,7 @@ export const ChatBot = () => {
               <CodeBlock code={reactSnippet} language="tsx" wrap>
                 <CodeBlockHeader>
                   <CodeBlockTitle>
-                    <CodeIcon className="size-3" />
+                    <HugeiconsIcon icon={CodeIcon} className="size-3" />
                     ChatBot.tsx
                   </CodeBlockTitle>
                   <CodeBlockActions>
@@ -162,7 +164,7 @@ export const ChatBot = () => {
               <CodeBlock code={iframeSnippet} language="html" wrap>
                 <CodeBlockHeader>
                   <CodeBlockTitle>
-                    <LayoutIcon className="size-3" />
+                    <HugeiconsIcon icon={Layout01Icon} className="size-3" />
                     Iframe Snippet
                   </CodeBlockTitle>
                   <CodeBlockActions>

@@ -1,4 +1,5 @@
-import { AlertTriangle, Cpu, Layers } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Alert01Icon, CpuIcon, Layers01Icon } from "@hugeicons/core-free-icons";
 import Link from "next/link";
 import { AutomationWrapper } from "@/components/layout/automation-wrapper";
 import { DashboardWrapper } from "@/components/layout/dashboard-wrapper";
@@ -20,7 +21,7 @@ export default async function AutomationHubPage() {
             <div className="w-full max-w-6xl p-8 mx-auto flex flex-col items-center justify-center min-h-[50dvh]">
               <div className="bg-destructive/10 border border-destructive/20 rounded-2xl p-8 max-w-md text-center space-y-4">
                 <div className="w-12 h-12 rounded-full bg-destructive/10 border border-destructive/20 flex items-center justify-center mx-auto">
-                  <AlertTriangle className="h-6 w-6 text-destructive" />
+                  <HugeiconsIcon icon={Alert01Icon} className="h-6 w-6 text-destructive" />
                 </div>
                 <Typography.H3 className="mt-0 text-foreground">Access Denied</Typography.H3>
                 <Typography.P className="text-sm text-muted-foreground leading-relaxed">{access.error}</Typography.P>
@@ -204,7 +205,7 @@ export default async function AutomationHubPage() {
                     <Card className="hover:bg-muted/30 transition-all duration-300 cursor-pointer group hover:border-primary/40">
                       <CardHeader className="p-6">
                         <CardTitle className="flex items-center gap-2 text-base">
-                          <Layers className="h-4 w-4 text-primary group-hover:scale-110 transition-transform duration-300" />
+                          <HugeiconsIcon icon={Layers01Icon} className="h-4 w-4 text-primary group-hover:scale-110 transition-transform duration-300" />
                           Prospect Queue
                         </CardTitle>
                       </CardHeader>
@@ -223,7 +224,7 @@ export default async function AutomationHubPage() {
                     <Card className="hover:bg-muted/30 transition-all duration-300 cursor-pointer group hover:border-secondary/40">
                       <CardHeader className="p-6">
                         <CardTitle className="flex items-center gap-2 text-base">
-                          <Cpu className="h-4 w-4 text-secondary group-hover:scale-110 transition-transform duration-300" />
+                          <HugeiconsIcon icon={CpuIcon} className="h-4 w-4 text-secondary group-hover:scale-110 transition-transform duration-300" />
                           Draft Leads
                         </CardTitle>
                       </CardHeader>
@@ -285,7 +286,7 @@ export default async function AutomationHubPage() {
                     ) : (
                       <div className="flex flex-col items-center justify-center py-12 text-center text-muted-foreground h-full">
                         <div className="w-10 h-10 rounded-full border border-outline-ghost/10 flex items-center justify-center mb-3 bg-muted/20">
-                          <Layers className="h-4 w-4 text-muted-foreground/50" />
+                          <HugeiconsIcon icon={Layers01Icon} className="h-4 w-4 text-muted-foreground/50" />
                         </div>
                         <p className="text-xs font-semibold text-foreground/80">No operational events yet</p>
                         <p className="text-[10px] text-muted-foreground/60 max-w-[200px] mt-1 leading-relaxed">

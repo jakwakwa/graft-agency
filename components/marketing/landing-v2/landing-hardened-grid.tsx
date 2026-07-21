@@ -1,6 +1,6 @@
 "use client";
-
-import { Cloud, Shield } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { CloudIcon, Shield01Icon } from "@hugeicons/core-free-icons";
 import Image from "next/image";
 
 export function LandingHardenedGrid() {
@@ -17,7 +17,7 @@ export function LandingHardenedGrid() {
           </p>
           <div className="space-y-8">
             <div className="flex items-start gap-4 p-0 rounded-lg bg-surface-container-highest/50">
-              <Shield className="text-secondary h-8 w-10" />
+              <HugeiconsIcon icon={Shield01Icon} className="text-secondary h-8 w-10" />
               <div>
                 <div className="text-lg font-sans text-on-surface">Secure Transport</div>
                 <div className="text-base mt-4 text-on-surface-variant">
@@ -26,7 +26,7 @@ export function LandingHardenedGrid() {
               </div>
             </div>
             <div className="flex items-start gap-4 p-0  rounded-lg bg-surface-container-highest/50">
-              <Cloud className="text-violet-400  w-18" />
+              <HugeiconsIcon icon={CloudIcon} className="text-violet-400  w-18" />
               <div>
                 
                 <div className="text-lg font-sans leading-normal h-8 text-on-surface">Isolated Widget &amp; Tenant Scope</div>

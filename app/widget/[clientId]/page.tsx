@@ -14,7 +14,7 @@ export default async function WidgetPage({ params }: WidgetPageProps) {
 
   let agentName = "AI Assistant";
   let greetingMessage = "Hello! How can I help you today?";
-  let primaryColour = "#7c3aed";
+  let primaryColour = "#5F75F4";
   let widgetToken: string | null = null;
 
   try {

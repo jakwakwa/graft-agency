@@ -1,5 +1,6 @@
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Mail01Icon, Refresh01Icon } from "@hugeicons/core-free-icons";
 import { UserButton } from "@clerk/nextjs";
-import { Mail, RefreshCcw } from "lucide-react";
 import Link from "next/link";
 import { DashboardWrapper } from "@/components/layout/dashboard-wrapper";
 import { Card, CardContent } from "@/components/ui/card";
@@ -26,14 +27,14 @@ export default function AccessRequiredPage() {
               <div className="flex flex-col gap-3">
                 <Button asChild variant="outline" className="w-full">
                   <a href="mailto:support@graft.today" className="flex items-center gap-2">
-                    <Mail className="h-4 w-4" />
+                    <HugeiconsIcon icon={Mail01Icon} className="h-4 w-4" />
                     Contact support
                   </a>
                 </Button>
 
                 <Button asChild variant="ghost" className="w-full">
                   <Link href="/dashboard" className="flex items-center gap-2">
-                    <RefreshCcw className="h-4 w-4" />
+                    <HugeiconsIcon icon={Refresh01Icon} className="h-4 w-4" />
                     Try again
                   </Link>
                 </Button>

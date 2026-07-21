@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
-import { Playfair, Lexend, Work_Sans } from "next/font/google";
+import { Lexend, Playfair, Work_Sans } from "next/font/google";
 import NextTopLoader from "nextjs-toploader";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
@@ -15,7 +15,7 @@ const workSans = Work_Sans({
 
 const beVietnamPro = Playfair({
   subsets: ["latin"],
-  weight: ["300","400", "500"],
+  weight: ["300", "400", "500"],
   variable: "--font-display",
   display: "swap",
 });

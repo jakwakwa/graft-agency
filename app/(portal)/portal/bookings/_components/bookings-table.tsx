@@ -1,6 +1,6 @@
 "use client";
-
-import { ArrowDown, ArrowUp, ArrowUpDown, CalendarX } from "lucide-react";
+import { ArrowDown01Icon, ArrowUp01Icon, ArrowUpDownIcon, CalendarRemove01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import type { ReactNode } from "react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -55,8 +55,8 @@ function getSortHref(
 }
 
 function SortIcon({ active, order }: { active: boolean; order: CalBookingSortOrder }) {
-  if (!active) return <ArrowUpDown />;
-  return order === "asc" ? <ArrowUp /> : <ArrowDown />;
+  if (!active) return <HugeiconsIcon icon={ArrowUpDownIcon} />;
+  return order === "asc" ? <HugeiconsIcon icon={ArrowUp01Icon} /> : <HugeiconsIcon icon={ArrowDown01Icon} />;
 }
 
 function SortableHead({ children, month, sortKey, sortOrder, value }: SortableHeadProps) {
@@ -143,7 +143,7 @@ export function BookingsTable({
   if (bookings.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center gap-4 py-16 text-center">
-        <CalendarX className="text-muted-foreground" />
+        <HugeiconsIcon icon={CalendarRemove01Icon} className="text-muted-foreground" />
         <div className="flex flex-col gap-2">
           <Typography.H3 className="m-0">No bookings this month</Typography.H3>
           <Typography.P className="text-muted-foreground">

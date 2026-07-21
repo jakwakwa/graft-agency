@@ -1,11 +1,11 @@
 "use client";
 
-import * as React from "react";
-import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp } from "lucide-react";
+import { ArrowDown01Icon, ArrowLeft01Icon, ArrowRight01Icon, ArrowUp01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
+import type * as React from "react";
 import { DayPicker } from "react-day-picker";
-
-import { cn } from "./utils";
 import { buttonVariants } from "./button";
+import { cn } from "./utils";
 
 function Calendar({ className, classNames, showOutsideDays = true, ...props }: React.ComponentProps<typeof DayPicker>) {
   return (
@@ -53,15 +53,15 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: R
           const iconClass = cn("size-4", className);
           switch (orientation) {
             case "left":
-              return <ChevronLeft className={iconClass} />;
+              return <HugeiconsIcon icon={ArrowLeft01Icon} className={iconClass} />;
             case "right":
-              return <ChevronRight className={iconClass} />;
+              return <HugeiconsIcon icon={ArrowRight01Icon} className={iconClass} />;
             case "up":
-              return <ChevronUp className={iconClass} />;
+              return <HugeiconsIcon icon={ArrowUp01Icon} className={iconClass} />;
             case "down":
-              return <ChevronDown className={iconClass} />;
+              return <HugeiconsIcon icon={ArrowDown01Icon} className={iconClass} />;
             default:
-              return <ChevronRight className={iconClass} />;
+              return <HugeiconsIcon icon={ArrowRight01Icon} className={iconClass} />;
           }
         },
       }}

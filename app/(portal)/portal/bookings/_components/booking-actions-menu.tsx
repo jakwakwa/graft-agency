@@ -1,6 +1,6 @@
 "use client";
-
-import { CalendarClock, ExternalLink, MoreHorizontal, Trash2 } from "lucide-react";
+import { Calendar01Icon, Delete02Icon, LinkSquare01Icon, MoreHorizontalIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -28,7 +28,7 @@ export function BookingActionsMenu({ booking, onCancel }: BookingActionsMenuProp
       <DropdownMenuTrigger
         render={
           <Button aria-label={`Open actions for ${booking.title}`} size="icon-sm" variant="ghost">
-            <MoreHorizontal />
+            <HugeiconsIcon icon={MoreHorizontalIcon} />
           </Button>
         }
       />
@@ -36,7 +36,7 @@ export function BookingActionsMenu({ booking, onCancel }: BookingActionsMenuProp
         <DropdownMenuItem
           render={
             <a href={calUrl} rel="noreferrer" target="_blank">
-              <ExternalLink />
+              <HugeiconsIcon icon={LinkSquare01Icon} />
               Open in Cal.com
             </a>
           }
@@ -44,14 +44,14 @@ export function BookingActionsMenu({ booking, onCancel }: BookingActionsMenuProp
         <DropdownMenuItem
           render={
             <a href={calUrl} rel="noreferrer" target="_blank">
-              <CalendarClock />
+              <HugeiconsIcon icon={Calendar01Icon} />
               Reschedule in Cal.com
             </a>
           }
         />
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => onCancel(booking)} variant="destructive">
-          <Trash2 />
+          <HugeiconsIcon icon={Delete02Icon} />
           Cancel booking
         </DropdownMenuItem>
       </DropdownMenuContent>

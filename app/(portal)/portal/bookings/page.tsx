@@ -1,4 +1,5 @@
-import { ArrowRight, CalendarDays, Sparkles, Wand } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowRight01Icon, Calendar01Icon, MagicWand01Icon, SparklesIcon } from "@hugeicons/core-free-icons";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Typography } from "@/components/ui/typography";
@@ -104,7 +105,7 @@ export default async function BookingsPage({ searchParams }: BookingsPageProps) 
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <CalendarDays className="text-primary" />
+              <HugeiconsIcon icon={Calendar01Icon} className="text-primary" />
               {monthRange.label} bookings
             </CardTitle>
           </CardHeader>
@@ -118,7 +119,7 @@ export default async function BookingsPage({ searchParams }: BookingsPageProps) 
               <Button asChild>
                 <Link href="/portal/billing" className="flex items-center gap-2 font-semibold text-shadow-md">
                   {entitlements?.hasBookingAccess ? "View add-ons" : "Upgrade Now"}
-                  <Sparkles className="h-4 w-4 opacity-60" />
+                  <HugeiconsIcon icon={SparklesIcon} className="h-4 w-4 opacity-60" />
                 </Link>
               </Button>
             </div>
@@ -155,7 +156,7 @@ export default async function BookingsPage({ searchParams }: BookingsPageProps) 
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <CalendarDays className="text-primary" />
+            <HugeiconsIcon icon={Calendar01Icon} className="text-primary" />
             {monthRange.label} bookings
           </CardTitle>
         </CardHeader>

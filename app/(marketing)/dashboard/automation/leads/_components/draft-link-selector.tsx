@@ -1,6 +1,6 @@
 "use client";
-
-import { Link2 } from "lucide-react";
+import { Link02Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -99,7 +99,7 @@ export function DraftLinkSelector({ engagement, onInsert }: DraftLinkSelectorPro
         onClick={handleInsert}
         disabled={!selected?.ready}
       >
-        <Link2 className="h-3.5 w-3.5 mr-2" />
+        <HugeiconsIcon icon={Link02Icon} className="h-3.5 w-3.5 mr-2" />
         Insert link into draft
       </Button>
     </div>

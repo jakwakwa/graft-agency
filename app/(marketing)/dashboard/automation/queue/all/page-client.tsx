@@ -1,25 +1,19 @@
 "use client";
-
-import { ChevronLeft, ChevronRight, Trash2, ExternalLink, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
-import Link from "next/link";
-import { useSearchParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { MarketingShell } from "@/components/layout/marketing-shell";
-import { Typography } from "@/components/ui/typography";
-import { Button } from "@/components/ui-v2/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-  PaginationEllipsis,
-} from "@/components/ui/pagination";
-import { formatStageLabel, getStageCategory } from "@/lib/utils/engagement-stages";
-import { cn } from "@/components/ui/utils";
+  ArrowDown01Icon,
+  ArrowLeft01Icon,
+  ArrowRight01Icon,
+  ArrowUp01Icon,
+  ArrowUpDownIcon,
+  Delete02Icon,
+  LinkSquare01Icon,
+} from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
+import { MarketingShell } from "@/components/layout/marketing-shell";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -31,6 +25,20 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Typography } from "@/components/ui/typography";
+import { cn } from "@/components/ui/utils";
+import { Button } from "@/components/ui-v2/button";
+import { formatStageLabel, getStageCategory } from "@/lib/utils/engagement-stages";
 
 interface Lead {
   id: string;
@@ -63,23 +71,23 @@ export default function AllProspectsPageClient() {
   const [data, setData] = useState<PaginatedLeads | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchLeads = async () => {
+  const fetchLeads = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch(`/api/leads?page=${page}&limit=25&sort=${sortBy}&order=${sortOrder}`);
       if (!res.ok) throw new Error("Failed to fetch leads");
       const json = await res.json();
       setData(json);
-    } catch (err) {
+    } catch (_err) {
       toast.error("Failed to load prospects");
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, sortBy, sortOrder]);
 
   useEffect(() => {
     fetchLeads();
-  }, [page, sortBy, sortOrder]);
+  }, [fetchLeads]);
 
   const toggleSort = (column: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -94,8 +102,12 @@ export default function AllProspectsPageClient() {
   };
 
   const getSortIcon = (column: string) => {
-    if (sortBy !== column) return <ArrowUpDown className="ml-2 h-4 w-4" />;
-    return sortOrder === "asc" ? <ArrowUp className="ml-2 h-4 w-4" /> : <ArrowDown className="ml-2 h-4 w-4" />;
+    if (sortBy !== column) return <HugeiconsIcon icon={ArrowUpDownIcon} className="ml-2 h-4 w-4" />;
+    return sortOrder === "asc" ? (
+      <HugeiconsIcon icon={ArrowUp01Icon} className="ml-2 h-4 w-4" />
+    ) : (
+      <HugeiconsIcon icon={ArrowDown01Icon} className="ml-2 h-4 w-4" />
+    );
   };
 
   const handleDelete = async (id: string) => {
@@ -118,7 +130,7 @@ export default function AllProspectsPageClient() {
     const items = [];
     const maxVisible = 5;
     let start = Math.max(1, data.page - 2);
-    let end = Math.min(data.pages, start + maxVisible - 1);
+    const end = Math.min(data.pages, start + maxVisible - 1);
 
     if (end - start + 1 < maxVisible) {
       start = Math.max(1, end - maxVisible + 1);
@@ -182,7 +194,7 @@ export default function AllProspectsPageClient() {
       <div className="mx-auto max-w-7xl space-y-8 p-8">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="sm" onClick={() => router.back()}>
-            <ChevronLeft className="mr-2 h-4 w-4" />
+            <HugeiconsIcon icon={ArrowLeft01Icon} className="mr-2 h-4 w-4" />
             Back to Queue
           </Button>
           <Typography.H2 className="mt-0 mb-0">All Prospects</Typography.H2>
@@ -218,13 +230,15 @@ export default function AllProspectsPageClient() {
             </TableHeader>
             <TableBody>
               {loading ? (
-                Array.from({ length: 5 }).map((_, i) => (
-                  <TableRow key={i}>
-                    {Array.from({ length: 6 }).map((_, j) => (
-                      <TableCell key={j}>
-                        <div className="h-4 w-full animate-pulse rounded bg-muted" />
-                      </TableCell>
-                    ))}
+                ["sk-1", "sk-2", "sk-3", "sk-4", "sk-5"].map((rowId) => (
+                  <TableRow key={rowId}>
+                    {["col-select", "col-prospect", "col-status", "col-score", "col-date", "col-actions"].map(
+                      (colId) => (
+                        <TableCell key={`${rowId}-${colId}`}>
+                          <div className="h-4 w-full animate-pulse rounded bg-muted" />
+                        </TableCell>
+                      ),
+                    )}
                   </TableRow>
                 ))
               ) : data?.data.length === 0 ? (
@@ -256,7 +270,7 @@ export default function AllProspectsPageClient() {
                             className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
                           >
                             {lead.scrapedData.websiteUrl}
-                            <ExternalLink className="h-3 w-3" />
+                            <HugeiconsIcon icon={LinkSquare01Icon} className="h-3 w-3" />
                           </a>
                         ) : (
                           <span className="text-xs text-muted-foreground italic">None</span>
@@ -297,7 +311,7 @@ export default function AllProspectsPageClient() {
                                 lead.customerName ? `View details for ${lead.customerName}` : "View prospect details"
                               }
                             >
-                              <ChevronRight className="h-4 w-4" />
+                              <HugeiconsIcon icon={ArrowRight01Icon} className="h-4 w-4" />
                             </Link>
                           </Button>
 
@@ -308,7 +322,7 @@ export default function AllProspectsPageClient() {
                                 size="icon"
                                 className="text-muted-foreground hover:text-destructive"
                               >
-                                <Trash2 className="h-4 w-4" />
+                                <HugeiconsIcon icon={Delete02Icon} className="h-4 w-4" />
                               </Button>
                             </AlertDialogTrigger>
                             <AlertDialogContent>

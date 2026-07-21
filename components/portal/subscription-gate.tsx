@@ -1,4 +1,5 @@
-import { Lock, Sparkles } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { LockIcon, SparklesIcon } from "@hugeicons/core-free-icons";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -31,7 +32,7 @@ export function SubscriptionGate({ title, description, highlights, children }: S
         <Card className="w-full max-w-md border-primary/20 shadow-2xl backdrop-blur">
           <CardContent className="flex flex-col items-center gap-4 p-8 text-center">
             <span className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-              <Lock className="h-6 w-6 text-primary" />
+              <HugeiconsIcon icon={LockIcon} className="h-6 w-6 text-primary" />
             </span>
             <Typography.H3 className="m-0">{title}</Typography.H3>
             <Typography.Muted className="leading-relaxed">{description}</Typography.Muted>
@@ -39,7 +40,7 @@ export function SubscriptionGate({ title, description, highlights, children }: S
               <ul className="m-0 list-none space-y-2 p-0 text-sm text-muted-foreground">
                 {highlights.map((highlight) => (
                   <li key={highlight} className="flex items-center justify-center gap-2">
-                    <Sparkles className="h-3.5 w-3.5 shrink-0 text-primary" />
+                    <HugeiconsIcon icon={SparklesIcon} className="h-3.5 w-3.5 shrink-0 text-primary" />
                     <span>{highlight}</span>
                   </li>
                 ))}

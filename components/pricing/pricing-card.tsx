@@ -1,4 +1,5 @@
-import { Check } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Tick01Icon } from "@hugeicons/core-free-icons";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Typography } from "@/components/ui/typography";
@@ -35,15 +36,15 @@ interface CardTheme {
 
 const THEMES: Record<string, CardTheme> = {
   "ai-chatbot": {
-    borderHover: "hover:border-blue-500/40",
-    shadowHover: "hover:shadow-blue-500/5",
-    badgeBg: "bg-blue-500/10",
+    borderHover: "hover:border-chart-3/40",
+    shadowHover: "hover:shadow-chart-3/5",
+    badgeBg: "bg-chart-3/10",
     badgeText: "text-blue-400",
-    badgeBorder: "border-blue-500/20",
+    badgeBorder: "border-chart-3/20",
     checkText: "text-blue-400",
-    btnPrimary: "bg-blue-500 text-white hover:bg-blue-400 shadow-md shadow-blue-500/10",
+    btnPrimary: "bg-chart-3 text-white hover:bg-blue-400 shadow-md shadow-chart-3/10",
     btnOutline:
-      "bg-transparent text-on-surface border-white/10 hover:bg-blue-500/10 hover:border-blue-500/30 hover:text-blue-400",
+      "bg-transparent text-on-surface border-white/10 hover:bg-chart-3/10 hover:border-chart-3/30 hover:text-blue-400",
     defaultBadge: "Core Subscription",
   },
   "voice-agent": {
@@ -173,7 +174,7 @@ export function PricingCard({
       <ul className="my-0 space-y-3 text-sm mt-4 text-on-surface-variant list-none pl-0">
         {offer.features.map((feature) => (
           <li key={feature} className="flex items-start gap-3">
-            <Check className={cn("h-4 w-4 shrink-0 mt-0.5", theme.checkText)} />
+            <HugeiconsIcon icon={Tick01Icon} className={cn("h-4 w-4 shrink-0 mt-0.5", theme.checkText)} />
             <span className="leading-snug text-on-surface-variant">{feature}</span>
           </li>
         ))}

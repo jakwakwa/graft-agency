@@ -24,16 +24,16 @@ export function MarketingShell({ children }: MarketingShellProps) {
 
   // Sidebar Nav Configuration
   let sidebarLinks: { href: string; label: string }[] = [];
-  let sidebarTitle = "Marketing Folder";
+  let _sidebarTitle = "Marketing Folder";
 
   if (pathname.includes("/dashboard/automation/queue")) {
-    sidebarTitle = "Marketing Folder";
+    _sidebarTitle = "Marketing Folder";
     sidebarLinks.push({ href: "/dashboard/automation/queue", label: "prospect dashboard" });
     if (params.id) {
       sidebarLinks.push({ href: `/dashboard/automation/queue/${params.id}`, label: "prospect name" });
     }
   } else if (pathname.includes("/dashboard/automation/leads")) {
-    sidebarTitle = "Platform master owners";
+    _sidebarTitle = "Platform master owners";
     sidebarLinks = [
       { href: "/dashboard/automation/leads", label: "leads dashboard" },
       { href: "#consultations", label: "consultations" },
@@ -43,10 +43,10 @@ export function MarketingShell({ children }: MarketingShellProps) {
       { href: "#integration", label: "integration settings" },
     ];
   } else if (pathname.includes("/dashboard/automation/members")) {
-    sidebarTitle = "Platform master owners";
+    _sidebarTitle = "Platform master owners";
     sidebarLinks = [{ href: "/dashboard/automation/members", label: "members dashboard" }];
   } else if (pathname.includes("/dashboard/automation")) {
-    sidebarTitle = "Platform master owners";
+    _sidebarTitle = "Platform master owners";
     sidebarLinks = [{ href: "/dashboard/automation", label: "automation dashboard" }];
   }
 

@@ -1,6 +1,7 @@
 "use client";
 
-import { CheckIcon, Loader2Icon, XIcon } from "lucide-react";
+import { Cancel01Icon, Loading02Icon, Tick01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 
 const TOOL_LABELS: Record<string, { pending: string; complete: string }> = {
   captureLeadDetails: {
@@ -43,18 +44,18 @@ export function ToolStatus({ toolName, state }: ToolStatusProps) {
     <div className="flex items-center gap-1.5 rounded-full bg-muted/60 px-2.5 py-1 text-xs text-muted-foreground">
       {isError ? (
         <>
-          <XIcon className="size-3 text-destructive" />
+          <HugeiconsIcon icon={Cancel01Icon} className="size-3 text-destructive" />
           <span>Something went wrong</span>
         </>
       ) : isComplete ? (
         <>
-          <CheckIcon className="size-3 text-green-600" />
+          <HugeiconsIcon icon={Tick01Icon} className="size-3 text-green-600" />
           <span>{labels.complete}</span>
         </>
       ) : (
         <>
           <span className="status-pulse inline-flex rounded-full p-0.5 text-primary">
-            <Loader2Icon className="size-3 animate-spin" />
+            <HugeiconsIcon icon={Loading02Icon} className="size-3 animate-spin" />
           </span>
           <span>{labels.pending}</span>
         </>

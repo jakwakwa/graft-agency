@@ -1,7 +1,15 @@
 "use client";
 
+import {
+  ArrowDown01Icon,
+  CancelCircleIcon,
+  CheckmarkCircle01Icon,
+  CircleIcon,
+  Clock01Icon,
+  Wrench01Icon,
+} from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import type { DynamicToolUIPart, ToolUIPart } from "ai";
-import { CheckCircleIcon, ChevronDownIcon, CircleIcon, ClockIcon, WrenchIcon, XCircleIcon } from "lucide-react";
 import type { ComponentProps, ReactNode } from "react";
 import { isValidElement } from "react";
 import { Badge } from "@/components/ui/badge";
@@ -41,13 +49,13 @@ const statusLabels: Record<ToolPart["state"], string> = {
 };
 
 const statusIcons: Record<ToolPart["state"], ReactNode> = {
-  "approval-requested": <ClockIcon className="size-4 text-yellow-600" />,
-  "approval-responded": <CheckCircleIcon className="size-4 text-blue-600" />,
-  "input-available": <ClockIcon className="size-4 animate-pulse" />,
-  "input-streaming": <CircleIcon className="size-4" />,
-  "output-available": <CheckCircleIcon className="size-4 text-green-600" />,
-  "output-denied": <XCircleIcon className="size-4 text-orange-600" />,
-  "output-error": <XCircleIcon className="size-4 text-red-600" />,
+  "approval-requested": <HugeiconsIcon icon={Clock01Icon} className="size-4 text-yellow-600" />,
+  "approval-responded": <HugeiconsIcon icon={CheckmarkCircle01Icon} className="size-4 text-chart-3" />,
+  "input-available": <HugeiconsIcon icon={Clock01Icon} className="size-4 animate-pulse" />,
+  "input-streaming": <HugeiconsIcon icon={CircleIcon} className="size-4" />,
+  "output-available": <HugeiconsIcon icon={CheckmarkCircle01Icon} className="size-4 text-green-600" />,
+  "output-denied": <HugeiconsIcon icon={CancelCircleIcon} className="size-4 text-orange-600" />,
+  "output-error": <HugeiconsIcon icon={CancelCircleIcon} className="size-4 text-red-600" />,
 };
 
 export const getStatusBadge = (status: ToolPart["state"]) => (
@@ -63,11 +71,14 @@ export const ToolHeader = ({ className, title, type, state, toolName, ...props }
   return (
     <CollapsibleTrigger className={cn("flex w-full items-center justify-between gap-4 p-3", className)} {...props}>
       <div className="flex items-center gap-2">
-        <WrenchIcon className="size-4 text-muted-foreground" />
+        <HugeiconsIcon icon={Wrench01Icon} className="size-4 text-muted-foreground" />
         <span className="font-medium text-sm">{title ?? derivedName}</span>
         {getStatusBadge(state)}
       </div>
-      <ChevronDownIcon className="size-4 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
+      <HugeiconsIcon
+        icon={ArrowDown01Icon}
+        className="size-4 text-muted-foreground transition-transform group-data-[state=open]:rotate-180"
+      />
     </CollapsibleTrigger>
   );
 };

@@ -1,6 +1,7 @@
-"use client";
+"use-client";
 
-import { SendIcon } from "lucide-react";
+import { SentIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 
 interface ChatInputProps {
   input: string;
@@ -17,15 +18,16 @@ export function ChatInput({ input, onChange, onSend, isLoading, primaryColour }:
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex items-center gap-2 border-t border-border px-3 py-2">
+    <form onSubmit={handleSubmit} className="flex w-full items-center gap-2 border-t bg-primary border-border px-2 py-2" style={{ backgroundColor: primaryColour }}>
       <input
         type="text"
         value={input}
         onChange={(e) => onChange(e.target.value)}
         placeholder="Type a message"
         disabled={isLoading}
-        className="flex-1 rounded-full placeholder:text-white/20 focus-visible:border-indigo-500 focus-visible:shadow-indigo focus-visible:shadow-[0_0px_25px_violet]/60 border border-border bg-background px-3 py-2 text-sm outline-none  focus:ring-1 focus:ring-ring disabled:opacity-50"
+        className="flex-1 rounded-full placeholder:text-white/40 focus-visible:border-cyan-800 shadow-sm shadow-blue-600 focus-visible:shadow-blue-500 focus-visible:shadow-[0_-1px_1px] border-1 border-blue-200 px-3 py-3 text-sm outline-1 outline-blue-400 text-[11px] font-sans tracking-wide focus:ring-2 focus:ring-blue-900 disabled:opacity-50"
         aria-label="Chat message"
+        style={{ backgroundColor: `${primaryColour} !important` }}
       />
       <button
         type="submit"
@@ -34,7 +36,7 @@ export function ChatInput({ input, onChange, onSend, isLoading, primaryColour }:
         style={{ backgroundColor: primaryColour }}
         aria-label="Send message"
       >
-        <SendIcon className="size-4" />
+        <HugeiconsIcon icon={SentIcon} className="size-4" />
       </button>
     </form>
   );

@@ -1,5 +1,6 @@
+import { HugeiconsIcon } from "@hugeicons/react";
+import { UserMinus01Icon, UserRemove01Icon } from "@hugeicons/core-free-icons";
 import { clerkClient } from "@clerk/nextjs/server";
-import { UserMinus, UserX } from "lucide-react";
 import { AutomationWrapper } from "@/components/layout/automation-wrapper";
 import { DashboardWrapper } from "@/components/layout/dashboard-wrapper";
 import { MarketingShell } from "@/components/layout/marketing-shell";
@@ -108,7 +109,7 @@ export default async function MembersAdminPage() {
                                   size="sm"
                                   className="text-destructive hover:text-destructive hover:bg-destructive/10"
                                 >
-                                  <UserMinus className="h-4 w-4 mr-2" />
+                                  <HugeiconsIcon icon={UserMinus01Icon} className="h-4 w-4 mr-2" />
                                   Remove
                                 </Button>
                               </form>
@@ -143,7 +144,7 @@ export default async function MembersAdminPage() {
                               }}
                             >
                               <Button variant="ghost" size="sm" className="text-muted-foreground">
-                                <UserX className="h-4 w-4 mr-2" />
+                                <HugeiconsIcon icon={UserRemove01Icon} className="h-4 w-4 mr-2" />
                                 Revoke
                               </Button>
                             </form>

@@ -88,7 +88,7 @@ export function PricingTabs({ className }: PricingTabsProps) {
               type="button"
               onClick={() => handleTabClick(tab.id)}
               className={cn(
-                "relative rounded-full px-6 py-2.5 text-xs md:text-sm font-bold uppercase tracking-wider transition-colors duration-200 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-black",
+                "relative rounded-full px-6 py-2.5 text-xs md:text-sm font-bold uppercase tracking-wider transition-colors duration-200 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-chart-3 focus-visible:ring-offset-2 focus-visible:ring-offset-black",
                 isActive ? "text-white" : "text-[#acb1d6] hover:text-white",
               )}
             >
@@ -96,7 +96,7 @@ export function PricingTabs({ className }: PricingTabsProps) {
                 <motion.div
                   layoutId="activePricingTab"
                   transition={isReducedMotion ? { duration: 0 } : { type: "spring", stiffness: 380, damping: 30 }}
-                  className="absolute inset-0 bg-blue-500 rounded-full z-[-1] shadow-lg shadow-blue-500/25"
+                  className="absolute inset-0 bg-chart-3 rounded-full z-[-1] shadow-lg shadow-chart-3/25"
                 />
               )}
               {tab.label}

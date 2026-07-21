@@ -143,7 +143,6 @@ export default function EngagementPipelinePreview() {
           <div key={label} className="space-y-2">
             <p className="text-xs font-data uppercase tracking-widest text-muted-foreground">{label}</p>
             <EngagementPanel
-              // biome-ignore lint: preview mock accepts readonly status shapes
               status={status as Parameters<typeof EngagementPanel>[0]["status"]}
             />
           </div>

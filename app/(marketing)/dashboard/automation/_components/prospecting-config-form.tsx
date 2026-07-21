@@ -1,6 +1,13 @@
 "use client";
-
-import { Clock, Globe, Loader2, Mail, MessageSquare, Save } from "lucide-react";
+import {
+  Clock01Icon,
+  FloppyDiskIcon,
+  GlobeIcon,
+  Loading02Icon,
+  Mail01Icon,
+  Message01Icon,
+} from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -137,7 +144,7 @@ export function ProspectingConfigForm() {
                 htmlFor="cron-enabled-toggle"
                 className="text-sm font-bold text-foreground flex items-center gap-2"
               >
-                <Clock className="h-4 w-4 text-primary" />
+                <HugeiconsIcon icon={Clock01Icon} className="h-4 w-4 text-primary" />
                 Automated Prospecting Schedule
               </Label>
               <p className="text-xs text-muted-foreground leading-relaxed max-w-[55ch]">
@@ -231,7 +238,7 @@ export function ProspectingConfigForm() {
         <div className="p-6 rounded-[calc(2rem-0.375rem)] bg-card/40 backdrop-blur-md space-y-6">
           <div className="space-y-1">
             <Typography.Small className="text-[10px] uppercase tracking-widest text-secondary font-bold flex items-center gap-1.5">
-              <Globe className="h-3.5 w-3.5 text-secondary" />
+              <HugeiconsIcon icon={GlobeIcon} className="h-3.5 w-3.5 text-secondary" />
               Targeting Parameters
             </Typography.Small>
             <Typography.H4 className="text-lg font-bold text-foreground">Target Prospect Audience</Typography.H4>
@@ -285,7 +292,7 @@ export function ProspectingConfigForm() {
         <div className="p-6 rounded-[calc(2rem-0.375rem)] bg-card/40 backdrop-blur-md space-y-6">
           <div className="space-y-1">
             <Typography.Small className="text-[10px] uppercase tracking-widest text-accent font-bold flex items-center gap-1.5">
-              <MessageSquare className="h-3.5 w-3.5 text-accent" />
+              <HugeiconsIcon icon={Message01Icon} className="h-3.5 w-3.5 text-accent" />
               Outreach Details
             </Typography.Small>
             <Typography.H4 className="text-lg font-bold text-foreground">Outreach Identity & Proposition</Typography.H4>
@@ -293,7 +300,7 @@ export function ProspectingConfigForm() {
 
           <div className="space-y-2">
             <Label htmlFor="fromEmail" className="text-xs font-semibold text-foreground flex items-center gap-1.5">
-              <Mail className="h-3.5 w-3.5 text-muted-foreground" />
+              <HugeiconsIcon icon={Mail01Icon} className="h-3.5 w-3.5 text-muted-foreground" />
               Outreach From Email
             </Label>
             <Input
@@ -332,12 +339,12 @@ export function ProspectingConfigForm() {
       >
         {saving ? (
           <>
-            <Loader2 className="h-4 w-4 animate-spin" />
+            <HugeiconsIcon icon={Loading02Icon} className="h-4 w-4 animate-spin" />
             Saving Configuration...
           </>
         ) : (
           <>
-            <Save className="h-4 w-4" />
+            <HugeiconsIcon icon={FloppyDiskIcon} className="h-4 w-4" />
             Save Configuration
           </>
         )}

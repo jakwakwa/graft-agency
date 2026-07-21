@@ -1,6 +1,6 @@
 "use client";
-
-import { Globe, Mail } from "lucide-react";
+import { GlobeIcon, Mail01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { getLeadPipelineStatus } from "@/lib/utils/lead-pipeline-status";
 import { PipelineStatusBadge } from "../../_components/status-badges";
 import type { LeadItem } from "./types";
@@ -40,11 +40,11 @@ export function LeadCard({ lead, isSelected, onSelect }: LeadCardProps) {
 
         <div className="flex items-center gap-4 text-[10px] text-muted-foreground border-t border-outline-ghost/10 pt-2.5">
           <span className="flex items-center gap-1">
-            <Globe className="h-3.5 w-3.5 text-secondary" />
+            <HugeiconsIcon icon={GlobeIcon} className="h-3.5 w-3.5 text-secondary" />
             {lead.scrapedData?.hasChatbot ? "Has Chatbot" : "No Chatbot"}
           </span>
           <span className="flex items-center gap-1">
-            <Mail className="h-3.5 w-3.5 text-accent" />
+            <HugeiconsIcon icon={Mail01Icon} className="h-3.5 w-3.5 text-accent" />
             {lead.scrapedData?.hasVoiceAgent ? "Has Voice" : "No Voice"}
           </span>
         </div>

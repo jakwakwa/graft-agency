@@ -1,5 +1,6 @@
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Typography } from "@/components/ui/typography";
 
 export type SubscriptionStatus = "inactive" | "active" | "paused" | "canceled" | "past_due";
@@ -11,8 +12,11 @@ interface BillingStatusCardProps {
 }
 
 const STATUS_CONFIG: Record<SubscriptionStatus, { label: string; color: string }> = {
-  inactive: { label: "No subscription", color: "bg-gray-950 text-gray-100 border-2 border-gray-700 shadow-black shadow-sm min-w-30" },
-  active: { label: "Active", color: "bg-green-100 text-green-700" },
+  inactive: {
+    label: "No subscription",
+    color: "bg-gray-950 text-gray-100 border-2 border-gray-700 shadow-black shadow-sm min-w-30",
+  },
+  active: { label: "Subscribed", color: "bg-emerald-800 text-emerald-100" },
   paused: { label: "Paused", color: "bg-yellow-100 text-yellow-700" },
   canceled: { label: "Cancelled", color: "bg-red-100 text-red-600" },
   past_due: { label: "Payment issue", color: "bg-red-100 text-red-700" },
@@ -31,9 +35,9 @@ export function BillingStatusCard({
         <div className="flex items-center justify-between gap-4">
           <div>
             <CardTitle>Graft AI Agent Subscription</CardTitle>
-            <CardDescription>Your bot, embedded on your website, always on</CardDescription>
+           
           </div>
-          <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${status.color}`}>{status.label}</span>
+          <Badge variant={"outline"} className={`rounded-full px-2 py-1 text-[10px] font-light`}>{status.label}</Badge>
         </div>
       </CardHeader>
       <CardContent>
@@ -55,7 +59,7 @@ export function BillingStatusCard({
           </Typography.Muted>
         ) : null}
         {subscriptionActive ? (
-          <Typography.Muted>Your bot is active. Manage payment details and invoices below.</Typography.Muted>
+          <Typography.Muted>Manage payment details and invoices below.</Typography.Muted>
         ) : null}
         {!subscriptionActive && subscriptionStatus !== "paused" && subscriptionStatus !== "past_due" ? (
           <Typography.Muted>Choose a chatbot plan in the pricing section below to activate your bot.</Typography.Muted>

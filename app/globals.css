@@ -49,7 +49,7 @@
   --chart-1: oklch(0.38 0.18 283.75);
   --chart-2: oklch(0.606 0.25 292.717);
   --chart-3: oklch(0.541 0.281 293.009);
-  --chart-4: oklch(0.491 0.27 292.581);
+  --chart-4: oklch(0.7 0.18 303.85);
   --chart-5: oklch(0.432 0.232 292.759);
   --radius: 0.875rem;
   --sidebar: oklch(0.985 0 0);
@@ -99,18 +99,18 @@ body {
   /* Secondary — soft blossom */
   --secondary: #28daf9;
   --secondary-container: #09a5ee;
-  --secondary-foreground: #f46346;
+  --secondary-foreground: #F9D6CF;
   /* Accent — tangerine */
   --accent: #0688d4ed;
   --accent-foreground: #7f9bf7;
   /* Semantic */
-  --destructive: #de4a59;
+  --destructive: #EE3B4D;
   --destructive-foreground: #f4c6c9;
   --border: transparent;
   --input: color-mix(in srgb, #7272f4eb 30%, #3c2ff1);
   --input-background: color-mix(in srgb, #c2cbce8c 10%, #0606089a);
   --input-background-hover: color-mix(in srgb, #08192d 20%, #4f4f4f);
-  --ring: #e74123;
+  --ring: #0281CF;
   /* Ghost outline — outline-variant at 15% */
   --outline-ghost: color-mix(in srgb, #8777f9 15%, transparent);
   /* Surface tiers for cards/chips */
@@ -120,9 +120,9 @@ body {
   /* Charts */
   --chart-1: oklch(79.786% 0.127 60.915);
   --chart-2: hsl(199, 89%, 55%);
-  --chart-3: hsla(0, 94%, 68%, 0.97);
-  --chart-4: #c300c3;
-  --chart-5: #1d6fc6;
+  --chart-3: hsla(219.85 91.95% 70.78% / 0.97);
+  --chart-4: #F96565;
+  --chart-5: #1DC67D;
   /* Sidebar */
   --sidebar: #7048d4;
   --sidebar-foreground: #c4c4c4;

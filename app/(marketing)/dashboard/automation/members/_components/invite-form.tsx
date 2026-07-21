@@ -1,6 +1,6 @@
 "use client";
-
-import { Mail } from "lucide-react";
+import { Mail01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { useState } from "react";
 import { useFormStatus } from "react-dom";
 import { toast } from "sonner";
@@ -35,7 +35,7 @@ export function InviteForm() {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Mail className="h-5 w-5 text-primary" />
+          <HugeiconsIcon icon={Mail01Icon} className="h-5 w-5 text-primary" />
           Invite Member
         </CardTitle>
         <CardDescription>

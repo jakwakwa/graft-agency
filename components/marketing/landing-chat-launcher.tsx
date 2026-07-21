@@ -1,6 +1,7 @@
 "use client";
 
-import { MessageCircle } from "lucide-react";
+import { MessageUser01FreeIcons } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { ChatWidget } from "@/app/widget/[clientId]/_components/chat-widget";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -36,19 +37,19 @@ export function LandingChatLauncher({
             type="button"
             variant="default"
             size="icon"
-            className="fixed bottom-6 right-6 z-50 size-12 rounded-full shadow-md ring-1 ring-foreground/10"
+            className={`fixed bottom-6 right-6 z-50 size-12 rounded-full outline-1 outline-[${primaryColour}] shadow-lg shadow-indigo-700 ring-3 ring-indigo-500`}
             aria-label="Open chat"
           />
         }
       >
-        <MessageCircle className="size-5" aria-hidden />
+        <HugeiconsIcon icon={MessageUser01FreeIcons} className="size-6" aria-hidden />
       </DialogTrigger>
       <DialogContent
-        className="max-h-[min(90vh,640px)] w-[calc(100vw-2rem)] max-w-md gap-0 overflow-hidden p-0 sm:max-w-md"
+        className="max-h-[min(96vh,640px)] w-[calc(100vw-3rem)] max-w-full gap-0 overflow-hidden p-0 sm:max-w-2xl"
         showCloseButton
       >
         <DialogTitle className="sr-only">Chat with {agentName}</DialogTitle>
-        <div className="h-[min(70vh,560px)] w-full">
+        <div className="h-[min(80vh,660px)] w-full">
           <ChatWidget
             clientId={clientId}
             agentName={agentName}

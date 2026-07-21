@@ -16,11 +16,9 @@ export const LANDING_ROUTES = {
  * Marketing header + on-page footer rows: must match `id` on sections (`landing-hero-section`, `landing-features-section`, `landing-cta-section`).
  */
 export const LANDING_HEADER_SECTIONS = [
-  { id: "lead-capture", label: "Lead Capture" },
   { id: "smart-triage", label: "Smart Triage" },
-  { id: "white-label", label: "White-Label" },
-  { id: "bot-pricing", label: "Bot Pricing" },
-  { id: "website-pricing", label: "GRAFT AI Assistant Website Setup" },
+  { id: "bot-pricing", label: "Pricing" },
+  { id: "website-pricing", label:"Pre-configured Builds" },
 ] as const;
 
 export const landingShellClassName =

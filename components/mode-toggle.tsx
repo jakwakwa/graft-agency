@@ -1,6 +1,6 @@
 "use client";
-
-import { Monitor, Moon, Sun } from "lucide-react";
+import { ComputerIcon, MoonIcon, Sun01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -24,7 +24,7 @@ export function ModeToggle() {
   if (!mounted) {
     return (
       <Button variant="ghost" size="icon" className="size-8" aria-label="Theme">
-        <Sun className="size-4" />
+        <HugeiconsIcon icon={Sun01Icon} className="size-4" />
       </Button>
     );
   }
@@ -32,13 +32,13 @@ export function ModeToggle() {
   const currentTheme = (theme ?? "system") as Theme;
   const icon =
     currentTheme === "dark" ? (
-      <Moon className="size-4" />
+      <HugeiconsIcon icon={MoonIcon} className="size-4" />
     ) : currentTheme === "light" ? (
-      <Sun className="size-4" />
+      <HugeiconsIcon icon={Sun01Icon} className="size-4" />
     ) : resolvedTheme === "dark" ? (
-      <Moon className="size-4" />
+      <HugeiconsIcon icon={MoonIcon} className="size-4" />
     ) : (
-      <Sun className="size-4" />
+      <HugeiconsIcon icon={Sun01Icon} className="size-4" />
     );
 
   return (
@@ -52,15 +52,15 @@ export function ModeToggle() {
       />
       <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={() => setTheme("light")}>
-          <Sun className="mr-2 size-4" />
+          <HugeiconsIcon icon={Sun01Icon} className="mr-2 size-4" />
           Light
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setTheme("dark")}>
-          <Moon className="mr-2 size-4" />
+          <HugeiconsIcon icon={MoonIcon} className="mr-2 size-4" />
           Dark
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setTheme("system")}>
-          <Monitor className="mr-2 size-4" />
+          <HugeiconsIcon icon={ComputerIcon} className="mr-2 size-4" />
           System
         </DropdownMenuItem>
       </DropdownMenuContent>

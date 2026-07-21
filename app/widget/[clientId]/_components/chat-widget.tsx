@@ -1,6 +1,8 @@
 "use client";
 
 import { useChat } from "@ai-sdk/react";
+import {  BotFreeIcons } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import type { UIMessage } from "ai";
 import { DefaultChatTransport } from "ai";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -76,17 +78,17 @@ export function ChatWidget({
   return (
     <div className="flex h-full flex-col">
       {/* Header */}
-      <header className="flex items-center gap-2 px-4 py-3" style={{ backgroundColor: primaryColour }}>
+      <header className="flex items-center gap-2 px-4 bg-primary py-3" style={{ backgroundColor: primaryColour }} >
         <div
-          className="flex size-8 items-center justify-center rounded-full text-sm font-bold"
+          className="flex size-8 items-center justify-center rounded-full text-sm font-bold "
           style={{
-            backgroundColor: "rgba(255,255,255,0.2)",
-            color: "#fff",
+            color:  `${primaryColour }`,
+            backgroundColor: "hsl(35.71 100% 11.76%)",
           }}
         >
-          {agentName.charAt(0).toUpperCase()}
+          {agentName.charAt(0).toUpperCase()} 
         </div>
-        <TypographySmall className="font-semibold text-white">{agentName}</TypographySmall>
+        <TypographySmall className="font-semibold text-black">{agentName} ASSISTANT</TypographySmall>
       </header>
 
       {/* Messages */}
@@ -94,7 +96,11 @@ export function ChatWidget({
         {/* Greeting */}
         {messages.length === 0 && (
           <div className="flex justify-start">
-            <div className="max-w-[80%] rounded-2xl rounded-bl-sm bg-muted px-3 py-2 text-sm">{greetingMessage}</div>
+     
+            <div className="max-w-[80%] flex gap-2 font-display outline-1 outline-white/10 rounded-bl-0 rounded-tr-lg rounded-br-lg rounded-tl-lg shadow-[0_7px_10px] shadow-black   bg-stone-800 px-4 py-2 text-white/70 text-xs">
+                 <HugeiconsIcon icon={BotFreeIcons} className="size-6" />
+                 {greetingMessage}
+            </div>
           </div>
         )}
 
@@ -122,7 +128,7 @@ function MessageBubble({ message }: { message: UIMessage }) {
 
   return (
     <div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
-      <div className="max-w-[80%] space-y-1">
+      <div className="min-w-[90%] space-y-1">
         {message.parts.map((part) => {
           if (part.type === "text" && part.text) {
             return (

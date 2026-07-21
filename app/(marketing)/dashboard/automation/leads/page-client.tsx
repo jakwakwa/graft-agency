@@ -1,6 +1,15 @@
 "use client";
-
-import { Check, ExternalLink, FileText, Loader2, Mail, Save, Send, Trash2 } from "lucide-react";
+import {
+  Delete02Icon,
+  FileAttachmentIcon,
+  FloppyDiskIcon,
+  LinkSquare01Icon,
+  Loading02Icon,
+  Mail01Icon,
+  SentIcon,
+  Tick01Icon,
+} from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -177,7 +186,7 @@ export default function LeadsPageClient({ initialLeads }: LeadsPageClientProps) 
       <div className="w-full max-w-6xl mx-auto p-8 flex flex-col items-center justify-center min-h-[60dvh] text-center space-y-6">
         <div className="p-1.5 rounded-[2.5rem]  bg-slate-400 sm:bg-transparent ring-1 ring-white/10 dark:ring-white/10 shadow-neon">
           <div className="w-16 h-16 rounded-[calc(2.5rem-0.375rem)] bg-card/50 flex items-center justify-center border border-white/5">
-            <Check className="h-8 w-8 text-primary animate-pulse" />
+            <HugeiconsIcon icon={Tick01Icon} className="h-8 w-8 text-primary animate-pulse" />
           </div>
         </div>
         <div className="space-y-2 max-w-md">
@@ -313,7 +322,10 @@ export default function LeadsPageClient({ initialLeads }: LeadsPageClientProps) 
                             rel="noopener noreferrer"
                             className="text-[10px] mt-4 font-bold uppercase tracking-widest hover:text-accent/50 flex items-center gap-1 transition-colors"
                           >
-                            <ExternalLink className="h-3 w-3 text-primary dark:text-primary-kinetic" />
+                            <HugeiconsIcon
+                              icon={LinkSquare01Icon}
+                              className="h-3 w-3 text-primary dark:text-primary-kinetic"
+                            />
                             Visit Website
                           </Link>
                         )}
@@ -410,12 +422,12 @@ export default function LeadsPageClient({ initialLeads }: LeadsPageClientProps) 
                       >
                         {saving ? (
                           <>
-                            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                            <HugeiconsIcon icon={Loading02Icon} className="h-4 w-4 animate-spin mr-2" />
                             Saving...
                           </>
                         ) : (
                           <>
-                            <Save className="h-4 w-4 mr-2" />
+                            <HugeiconsIcon icon={FloppyDiskIcon} className="h-4 w-4 mr-2" />
                             Save Draft
                           </>
                         )}
@@ -431,12 +443,12 @@ export default function LeadsPageClient({ initialLeads }: LeadsPageClientProps) 
                         >
                           {approving ? (
                             <>
-                              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                              <HugeiconsIcon icon={Loading02Icon} className="h-4 w-4 animate-spin mr-2" />
                               Approving...
                             </>
                           ) : (
                             <>
-                              <Send className="h-4 w-4 mr-2" />
+                              <HugeiconsIcon icon={SentIcon} className="h-4 w-4 mr-2" />
                               Approve Engagement
                             </>
                           )}
@@ -453,12 +465,12 @@ export default function LeadsPageClient({ initialLeads }: LeadsPageClientProps) 
                         >
                           {sending ? (
                             <>
-                              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                              <HugeiconsIcon icon={Loading02Icon} className="h-4 w-4 animate-spin mr-2" />
                               Sending...
                             </>
                           ) : (
                             <>
-                              <Mail className="h-4 w-4 mr-2" />
+                              <HugeiconsIcon icon={Mail01Icon} className="h-4 w-4 mr-2" />
                               Send Email
                             </>
                           )}
@@ -473,7 +485,11 @@ export default function LeadsPageClient({ initialLeads }: LeadsPageClientProps) 
                         disabled={actionPending}
                         title="Delete and Decline"
                       >
-                        {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                        {deleting ? (
+                          <HugeiconsIcon icon={Loading02Icon} className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <HugeiconsIcon icon={Delete02Icon} className="h-4 w-4" />
+                        )}
                       </Button>
                     </div>
                   </div>
@@ -482,7 +498,7 @@ export default function LeadsPageClient({ initialLeads }: LeadsPageClientProps) 
             ) : (
               <div className="flex flex-col items-center justify-center h-full border border-dashed border-outline-ghost/20 rounded-[2.5rem] py-24 text-center text-muted-foreground bg-card/10">
                 <div className="w-12 h-12 rounded-full border border-outline-ghost/10 flex items-center justify-center mb-4 bg-muted/20">
-                  <FileText className="h-5 w-5 text-muted-foreground/60" />
+                  <HugeiconsIcon icon={FileAttachmentIcon} className="h-5 w-5 text-muted-foreground/60" />
                 </div>
                 <Typography.H4 className="text-sm font-bold text-foreground">Select a draft</Typography.H4>
                 <p className="text-[11px] text-muted-foreground/60 max-w-[240px] mt-1 leading-relaxed">

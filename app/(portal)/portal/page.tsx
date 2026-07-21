@@ -1,4 +1,5 @@
-import { ArrowRight, Bot, Calendar, MessageSquare } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowRight01Icon, BotIcon, Calendar01Icon, Message01Icon } from "@hugeicons/core-free-icons";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { SubscriptionGate } from "@/components/portal/subscription-gate";
@@ -150,13 +151,13 @@ export default async function PortalDashboardPage() {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="flex items-center gap-2">
-            <MessageSquare className="h-5 w-5 text-primary" />
+            <HugeiconsIcon icon={Message01Icon} className="h-5 w-5 text-primary" />
             Recent Activity
           </CardTitle>
           <Button asChild variant="ghost" size="sm">
             <Link href="/portal/conversations" className="flex items-center gap-1">
               View all
-              <ArrowRight className="h-4 w-4" />
+              <HugeiconsIcon icon={ArrowRight01Icon} className="h-4 w-4" />
             </Link>
           </Button>
         </CardHeader>
@@ -169,7 +170,7 @@ export default async function PortalDashboardPage() {
               <Button asChild variant="outline">
                 <Link href="/portal/embed" className="flex items-center gap-2">
                   Get embed code
-                  <ArrowRight className="h-4 w-4" />
+                  <HugeiconsIcon icon={ArrowRight01Icon} className="h-4 w-4" />
                 </Link>
               </Button>
             </div>
@@ -187,12 +188,12 @@ export default async function PortalDashboardPage() {
                         {convo.lead?.customerName || "Anonymous Visitor"}
                       </span>
                       <Badge variant="default" className="gap-1.5">
-                        <Bot className="h-3 w-3" />
+                        <HugeiconsIcon icon={BotIcon} className="h-3 w-3" />
                         {botName}
                       </Badge>
                     </div>
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <Calendar className="h-3 w-3" />
+                      <HugeiconsIcon icon={Calendar01Icon} className="h-3 w-3" />
                       {new Date(convo.updatedAt).toLocaleDateString()}
                     </div>
                   </div>
@@ -206,7 +207,7 @@ export default async function PortalDashboardPage() {
                       {convo.lead?.email || "No email captured"}
                     </span>
                     <div className="flex items-center gap-1 text-[10px] font-bold text-primary uppercase opacity-0 group-hover:opacity-100 transition-opacity">
-                      View Transcript <ArrowRight className="h-3 w-3" />
+                      View Transcript <HugeiconsIcon icon={ArrowRight01Icon} className="h-3 w-3" />
                     </div>
                   </div>
                 </Link>

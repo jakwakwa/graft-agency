@@ -1,11 +1,12 @@
 "use client";
 
+import { ArrowDown01Icon, BrainIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { useControllableState } from "@radix-ui/react-use-controllable-state";
 import { cjk } from "@streamdown/cjk";
 import { code } from "@streamdown/code";
 import { math } from "@streamdown/math";
 import { mermaid } from "@streamdown/mermaid";
-import { BrainIcon, ChevronDownIcon } from "lucide-react";
 import type { ComponentProps, ReactNode } from "react";
 import { createContext, memo, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Streamdown } from "streamdown";
@@ -158,9 +159,12 @@ export const ReasoningTrigger = memo(
       >
         {children ?? (
           <>
-            <BrainIcon className="size-4" />
+            <HugeiconsIcon icon={BrainIcon} className="size-4" />
             {getThinkingMessage(isStreaming, duration)}
-            <ChevronDownIcon className={cn("size-4 transition-transform", isOpen ? "rotate-180" : "rotate-0")} />
+            <HugeiconsIcon
+              icon={ArrowDown01Icon}
+              className={cn("size-4 transition-transform", isOpen ? "rotate-180" : "rotate-0")}
+            />
           </>
         )}
       </CollapsibleTrigger>

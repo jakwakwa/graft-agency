@@ -1,5 +1,7 @@
+import { HugeiconsIcon } from "@hugeicons/react";
+import { BotIcon, Calendar01Icon, Clock01Icon } from "@hugeicons/core-free-icons";
 import { Clock03Icon, Robot, RobotFreeIcons, RobotIcon } from "@hugeicons/core-free-icons";
-import { Bot, BotIcon, CalendarClock, ClockIcon, IdCard } from "lucide-react";
+import { IdCard } from "lucide-react";
 import Image from "next/image";
 import { Shimmer } from "@/components/ai-elements/shimmer";
 
@@ -34,7 +36,7 @@ export function LandingFeaturesSection() {
           <div className="relative z-10 flex flex-col h-full justify-between">
             <div>
               <div className="mb-3 inline-flex items-center justify-center w-10 h-10 rounded-lg bg-secondary/5">
-                <Bot className="h-10 w-10 text-xl text-chart-3 " />
+                <HugeiconsIcon icon={BotIcon} className="h-10 w-10 text-xl text-chart-3 " />
               </div>
               <h3 className="text-xl font-display md:text-2xl font-bold text-on-surface mb-2">24-Hour Omnipresence</h3>
               <p className="text-on-surface-variant text-lg font-light max-w-md">
@@ -51,7 +53,7 @@ export function LandingFeaturesSection() {
         >
           <div>
             <div className="mb-3 inline-flex items-center justify-center w-8 h-8 rounded-lg bg-secondary/15">
-              <CalendarClock className="h-8 w-8 text-secondary" />
+              <HugeiconsIcon icon={Calendar01Icon} className="h-8 w-8 text-secondary" />
             </div>
             <h3 className="text-2xl font-display font-normal text-on-surface mb-2">
               Seamless Enquiry Triage Synchronization &amp; Scheduling

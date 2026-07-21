@@ -15,7 +15,7 @@ export function LandingCtaSection() {
         <div className="flex justify-center items-center">
           <LandingSectionLink
             sectionId="bot-pricing"
-            className="inline-flex px-5 py-3 text-sm md:px-10 md:py-4 md:text-base bg-blue-500 text-white font-bold rounded-xl uppercase tracking-[0.1em] md:tracking-[0.2em] hover:bg-blue-400 hover:scale-105 transition-all shadow-2xl shadow-blue-500/30 cursor-pointer"
+            className="inline-flex px-5 py-3 text-sm md:px-10 md:py-4 md:text-base bg-chart-3 text-white font-bold rounded-xl uppercase tracking-[0.1em] md:tracking-[0.2em] hover:bg-blue-400 hover:scale-105 transition-all shadow-2xl shadow-chart-3/30 cursor-pointer"
           >
             Explore Plans
           </LandingSectionLink>

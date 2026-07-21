@@ -1,4 +1,5 @@
-import { ArrowRight, Calendar, MessageSquare } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowRight01Icon, Calendar01Icon, Message01Icon } from "@hugeicons/core-free-icons";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Typography } from "@/components/ui/typography";
@@ -29,7 +30,7 @@ export default async function ConversationsPage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <MessageSquare className="h-5 w-5 text-primary" />
+            <HugeiconsIcon icon={Message01Icon} className="h-5 w-5 text-primary" />
             All Conversations
           </CardTitle>
         </CardHeader>
@@ -44,7 +45,7 @@ export default async function ConversationsPage() {
               <Button asChild variant={gated ? "default" : "outline"}>
                 <Link href={gated ? "/portal/billing" : "/portal/embed"} className="flex items-center gap-2">
                   {gated ? "Subscribe" : "Get embed code"}
-                  <ArrowRight className="h-4 w-4" />
+                  <HugeiconsIcon icon={ArrowRight01Icon} className="h-4 w-4" />
                 </Link>
               </Button>
             </div>
@@ -65,14 +66,14 @@ export default async function ConversationsPage() {
                   <div className="flex items-center gap-6">
                     <div className="flex flex-col items-end">
                       <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <Calendar className="h-3 w-3" />
+                        <HugeiconsIcon icon={Calendar01Icon} className="h-3 w-3" />
                         {new Date(convo.updatedAt).toLocaleDateString()}
                       </div>
                       <span className="text-[10px] text-muted-foreground uppercase tracking-widest mt-1">
                         Session: {convo.sessionId.slice(0, 8)}...
                       </span>
                     </div>
-                    <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                    <HugeiconsIcon icon={ArrowRight01Icon} className="h-4 w-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
                   </div>
                 </Link>
               ))}

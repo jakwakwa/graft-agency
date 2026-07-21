@@ -260,7 +260,7 @@ export function PricingSectionClient({
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-normal tracking-tight text-on-surface leading-tight">
               {kindFilter === "website" ? (
                 <>
-                  Bespoke Agency <span className="text-orange-200">Websites</span>
+                  AI Assistant Setup <span className="text-orange-200">Web Builds</span>
                 </>
               ) : (
                 <>
@@ -270,8 +270,8 @@ export function PricingSectionClient({
             </h2>
             <p className="text-on-surface-variant text-base sm:text-base leading-relaxed">
               {kindFilter === "website"
-                ? "High-converting, hand-crafted landing pages and multi-page websites with your Graft AI Agent pre-configured and installed."
-                : "Simple, up-front monthly pricing for your whitelabelled AI Support and Triage assistant. No surprises. No hidden costs."}
+                ? "High-converting, custom-crafted landing pages and multi-page websites with your Graft AI Agent pre-configured and installed."
+                : "Simple, up-front monthly pricing for your AI Support & Triage assistant."}
             </p>
           </div>
           {kindFilter !== "website" && (

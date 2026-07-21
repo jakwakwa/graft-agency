@@ -1,5 +1,6 @@
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowLeft01Icon, Calendar01Icon, HashtagIcon, Mail01Icon, UserIcon } from "@hugeicons/core-free-icons";
 import type { UIMessage } from "ai";
-import { ArrowLeft, Calendar, Hash, Mail, User } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -34,7 +35,7 @@ export default async function ConversationDetailPage({ params }: ConversationDet
       <div className="flex items-center gap-4">
         <Button asChild variant="ghost" size="sm">
           <Link href="/portal/conversations" className="flex items-center gap-2">
-            <ArrowLeft className="h-4 w-4" />
+            <HugeiconsIcon icon={ArrowLeft01Icon} className="h-4 w-4" />
             Back to list
           </Link>
         </Button>
@@ -52,7 +53,7 @@ export default async function ConversationDetailPage({ params }: ConversationDet
           <Card className="min-h-[600px] flex flex-col">
             <CardHeader className="border-b bg-muted/30">
               <CardTitle className="text-sm font-medium flex items-center gap-2">
-                <Hash className="h-4 w-4 text-primary" />
+                <HugeiconsIcon icon={HashtagIcon} className="h-4 w-4 text-primary" />
                 Session: {conversation.sessionId}
               </CardTitle>
             </CardHeader>
@@ -69,7 +70,7 @@ export default async function ConversationDetailPage({ params }: ConversationDet
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-start gap-3">
-                <User className="h-5 w-5 text-muted-foreground mt-0.5" />
+                <HugeiconsIcon icon={UserIcon} className="h-5 w-5 text-muted-foreground mt-0.5" />
                 <div className="flex flex-col">
                   <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Name</span>
                   <span className="font-medium">{conversation.lead?.customerName || "Anonymous"}</span>
@@ -77,7 +78,7 @@ export default async function ConversationDetailPage({ params }: ConversationDet
               </div>
 
               <div className="flex items-start gap-3">
-                <Mail className="h-5 w-5 text-muted-foreground mt-0.5" />
+                <HugeiconsIcon icon={Mail01Icon} className="h-5 w-5 text-muted-foreground mt-0.5" />
                 <div className="flex flex-col">
                   <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Email</span>
                   <span className="font-medium">{conversation.lead?.email || "Not provided"}</span>
@@ -85,7 +86,7 @@ export default async function ConversationDetailPage({ params }: ConversationDet
               </div>
 
               <div className="flex items-start gap-3">
-                <Calendar className="h-5 w-5 text-muted-foreground mt-0.5" />
+                <HugeiconsIcon icon={Calendar01Icon} className="h-5 w-5 text-muted-foreground mt-0.5" />
                 <div className="flex flex-col">
                   <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Started</span>
                   <span className="font-medium">{new Date(conversation.createdAt).toLocaleString()}</span>

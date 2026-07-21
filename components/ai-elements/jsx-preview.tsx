@@ -1,6 +1,6 @@
 "use client";
-
-import { AlertCircle } from "lucide-react";
+import { AlertCircleIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import type { ComponentProps, ReactNode } from "react";
 import { createContext, memo, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import type { TProps as JsxParserProps } from "react-jsx-parser";
@@ -261,7 +261,7 @@ export const JSXPreviewError = memo(({ className, children, ...props }: JSXPrevi
         renderChildren(children, error)
       ) : (
         <>
-          <AlertCircle className="size-4 shrink-0" />
+          <HugeiconsIcon icon={AlertCircleIcon} className="size-4 shrink-0" />
           <span>{error.message}</span>
         </>
       )}

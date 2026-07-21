@@ -1,6 +1,6 @@
 "use client";
-
-import { ChevronDownIcon } from "lucide-react";
+import { ArrowDown01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import type { ComponentProps, ReactNode } from "react";
 import { createContext, useCallback, useContext, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -156,7 +156,7 @@ export const WebPreviewBody = ({ className, loading, src, ...props }: WebPreview
     <div className="flex-1">
       <iframe
         className={cn("size-full", className)}
-        // oxlint-disable-next-line eslint-plugin-react(iframe-missing-sandbox)
+
         sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation"
         src={(src ?? url) || undefined}
         title="Preview"
@@ -180,7 +180,7 @@ export const WebPreviewConsole = ({ className, logs = [], children, ...props }: 
 
   return (
     <Collapsible
-      className={cn("border-t bg-muted/50 font-mono text-sm", className)}
+      className={cn("border-t bg-muted font-mono text-sm", className)}
       onOpenChange={setConsoleOpen}
       open={consoleOpen}
       {...props}
@@ -194,7 +194,10 @@ export const WebPreviewConsole = ({ className, logs = [], children, ...props }: 
         }
       >
         Console
-        <ChevronDownIcon className={cn("h-4 w-4 transition-transform duration-200", consoleOpen && "rotate-180")} />
+        <HugeiconsIcon
+          icon={ArrowDown01Icon}
+          className={cn("h-4 w-4 transition-transform duration-200", consoleOpen && "rotate-180")}
+        />
       </CollapsibleTrigger>
       <CollapsibleContent
         className={cn(
@@ -216,7 +219,7 @@ export const WebPreviewConsole = ({ className, logs = [], children, ...props }: 
                 )}
                 key={`${log.timestamp.getTime()}-${log.level}-${log.message}`}
               >
-                <span className="text-muted-foreground">{log.timestamp.toLocaleTimeString()}</span> {log.message}
+                <span className="text-muted">{log.timestamp.toLocaleTimeString()}</span> {log.message}
               </div>
             ))
           )}
