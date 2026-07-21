@@ -88,11 +88,11 @@ export function buildWidgetTheme(
     ? normaliseHex(secondaryInput, defaults.secondary)
     : deriveSecondaryFromPrimary(primary);
 
-  const primarySoft = mixHex(primary, "#FFFFFF", 0.28);
-  const primaryMuted = mixHex(primary, "#FFFFFF", 0.55);
-  const primaryDeep = mixHex(primary, "#000000", 0.28);
-  const secondarySoft = mixHex(secondary, "#FFFFFF", 0.22);
-  const secondaryDeep = mixHex(secondary, "#000000", 0.35);
+  const primarySoft = mixHex(primary, "#000000", 0.8);
+  const primaryMuted = mixHex(primary, "#AFC4FF", 0.95);
+  const primaryDeep = mixHex(primary, "#FFFFFF", 0.11);
+  const secondarySoft = mixHex(secondary, "#FFFFFF", 0.15);
+  const secondaryDeep = mixHex(secondary, "#000000", 0.05);
   // Surface: secondary base lightly lifted, then nudged toward primary for cohesion
   const surface = mixHex(mixHex(secondary, "#0C0C0C", 0.55), primary, 0.08);
   const surfaceElevated = mixHex(surface, "#FFFFFF", 0.08);

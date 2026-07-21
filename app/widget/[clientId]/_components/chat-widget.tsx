@@ -113,7 +113,8 @@ function ChatSession({
       className="flex h-full flex-col"
       style={{
         ...themeVars,
-        backgroundColor: "var(--widget-surface)",
+        boxShadow: "inset 0px 130px 60px rgba(254 235 235 / 5%)",
+        backgroundColor: "var(--widget-primary-soft)",
         color: "var(--widget-on-surface)",
       }}
     >
@@ -124,18 +125,11 @@ function ChatSession({
             "linear-gradient(135deg, var(--widget-primary) 0%, var(--widget-primary-deep) 55%, var(--widget-secondary) 140%)",
         }}
       >
-        <div
-          className="flex size-8 items-center justify-center rounded-full text-sm font-bold"
-          style={{
-            color: "var(--widget-primary)",
-            backgroundColor: "var(--widget-secondary-deep)",
-            boxShadow: "inset 0 0 0 1px color-mix(in srgb, var(--widget-primary-soft) 40%, transparent)",
-          }}
-        >
-          {agentName.charAt(0).toUpperCase()}
-        </div>
+    
+         <HugeiconsIcon icon={BotFreeIcons} className="size-8" />
         <TypographySmall className="font-semibold flex-1" style={{ color: "var(--widget-on-primary)" }}>
-          {agentName} ASSISTANT
+          {agentName} <span className="italic font-light text-[9px] text-white/70 ml-2 mt-1  shadow-black shadow-sm bg-black/60 p-[4px] px-3 rounded-full">AI Powered by GRAFT</span>
+         
         </TypographySmall>
         <div className="flex shrink-0 items-center gap-1">
           {hasMessages ? (
@@ -147,7 +141,7 @@ function ChatSession({
               className="flex size-8 items-center justify-center rounded-full transition-opacity hover:opacity-80 disabled:opacity-40"
               style={{ color: "var(--widget-on-primary)" }}
             >
-              <HugeiconsIcon icon={BubbleChatAddIcon} className="size-5" />
+              <HugeiconsIcon icon={BubbleChatAddIcon} className="size-5" /> 
             </button>
           ) : null}
           {showClose ? (
@@ -211,7 +205,7 @@ function MessageBubble({ message }: { message: UIMessage }) {
                   isUser
                     ? {
                         borderBottomRightRadius: "0.25rem",
-                        background: "linear-gradient(160deg, var(--widget-primary-soft) 0%, var(--widget-primary) 70%)",
+                        background: "linear-gradient(160deg, var(--widget-primary-deep) 0%, var(--widget-primary) 70%)",
                         color: "var(--widget-on-primary)",
                       }
                     : {

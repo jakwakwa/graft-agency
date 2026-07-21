@@ -84,7 +84,7 @@ TypographyLarge.displayName = "TypographyLarge";
 
 const TypographySmall = React.forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(
   ({ className, ...props }, ref) => (
-    <small ref={ref} className={cn("font-data text-xs leading-none font-light", className)} {...props} />
+    <small ref={ref} className={cn("font-data text-sm leading-none font-light", className)} {...props} />
   ),
 );
 TypographySmall.displayName = "TypographySmall";
@@ -199,22 +199,22 @@ const Typography = {
 
 export {
   Typography,
+  TypographyBlockquote,
+  TypographyCode,
   TypographyH1,
   TypographyH2,
   TypographyH3,
   TypographyH4,
-  TypographyP,
-  TypographyBlockquote,
-  TypographyLead,
   TypographyLarge,
-  TypographySmall,
-  TypographyMuted,
-  TypographyCode,
+  TypographyLead,
   TypographyList,
+  TypographyMuted,
+  TypographyP,
+  TypographySmall,
   TypographyTable,
-  TypographyTableHeader,
   TypographyTableBody,
-  TypographyTableRow,
-  TypographyTableHead,
   TypographyTableCell,
+  TypographyTableHead,
+  TypographyTableHeader,
+  TypographyTableRow,
 };
