@@ -52,7 +52,7 @@ describe("SubscriptionConfirmDialog", () => {
   it("renders the confirmation, features, and legal links", () => {
     render(<SubscriptionConfirmDialog {...baseProps} />);
 
-    expect(screen.getByText("Are you sure you want to subscribe to Graft AI Agent?")).toBeInTheDocument();
+    expect(screen.getByText("Are you sure you want to subscribe to GRAFT AI Assistant?")).toBeInTheDocument();
     // Plan options.
     expect(screen.getByRole("radio", { name: /Monthly/ })).toBeInTheDocument();
     expect(screen.getByRole("radio", { name: /Annual/ })).toBeInTheDocument();

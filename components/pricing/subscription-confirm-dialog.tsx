@@ -1,6 +1,6 @@
 "use client";
-import { HugeiconsIcon } from "@hugeicons/react";
 import { Tick01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -80,6 +80,67 @@ function priceLabel(option: PricingOption | undefined, localizedPrices: Record<s
   return localizedPrices[option.priceId] ?? null;
 }
 
+function BillingCycleOption({
+  cycle,
+  option,
+  price,
+  selectedCycle,
+  onSelectCycle,
+  savings,
+}: {
+  cycle: SubscriptionCycle;
+  option: PricingOption;
+  price: string | null;
+  selectedCycle: SubscriptionCycle;
+  onSelectCycle: (cycle: SubscriptionCycle) => void;
+  savings: string | null;
+}) {
+  return (
+    <label
+      className={cn(
+        "flex w-full cursor-pointer items-start gap-3 rounded-xl border p-3 text-left transition-colors",
+        selectedCycle === cycle
+          ? "border-chart-3/50 bg-chart-3/10"
+          : "border-white/10 bg-white/5 hover:border-white/20",
+      )}
+    >
+      <input
+        type="radio"
+        name="billing-cycle"
+        value={cycle}
+        checked={selectedCycle === cycle}
+        onChange={() => onSelectCycle(cycle)}
+        className="sr-only"
+      />
+      <span
+        aria-hidden
+        className={cn(
+          "mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border",
+          selectedCycle === cycle ? "border-blue-400" : "border-white/30",
+        )}
+      >
+        {selectedCycle === cycle ? <span className="h-2 w-2 rounded-full bg-blue-400" /> : null}
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="flex flex-wrap items-center gap-2">
+          <span className="font-semibold text-on-surface">{option.label}</span>
+          {cycle === "annual" && savings ? (
+            <span className="inline-flex items-center rounded-full border border-chart-3/20 bg-chart-3/10 px-2 py-0.5 text-xs font-semibold text-blue-400">
+              Best value — Save {savings}
+            </span>
+          ) : null}
+        </span>
+        {price ? (
+          <span className="mt-1 block text-sm mt-4 text-on-surface-variant">
+            {price}
+            <span className="text-on-surface-variant/70">{option.suffix}</span>
+          </span>
+        ) : null}
+      </span>
+    </label>
+  );
+}
+
 export function SubscriptionConfirmDialog({
   open,
   onOpenChange,
@@ -121,49 +182,15 @@ export function SubscriptionConfirmDialog({
               <legend className="sr-only">Billing cycle</legend>
               {cycleOptions.map(({ cycle, option, price }) =>
                 option ? (
-                  <label
+                  <BillingCycleOption
                     key={cycle}
-                    className={cn(
-                      "flex w-full cursor-pointer items-start gap-3 rounded-xl border p-3 text-left transition-colors",
-                      selectedCycle === cycle
-                        ? "border-chart-3/50 bg-chart-3/10"
-                        : "border-white/10 bg-white/5 hover:border-white/20",
-                    )}
-                  >
-                    <input
-                      type="radio"
-                      name="billing-cycle"
-                      value={cycle}
-                      checked={selectedCycle === cycle}
-                      onChange={() => onSelectCycle(cycle)}
-                      className="sr-only"
-                    />
-                    <span
-                      aria-hidden
-                      className={cn(
-                        "mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border",
-                        selectedCycle === cycle ? "border-blue-400" : "border-white/30",
-                      )}
-                    >
-                      {selectedCycle === cycle ? <span className="h-2 w-2 rounded-full bg-blue-400" /> : null}
-                    </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="flex flex-wrap items-center gap-2">
-                        <span className="font-semibold text-on-surface">{option.label}</span>
-                        {cycle === "annual" && savings ? (
-                          <span className="inline-flex items-center rounded-full border border-chart-3/20 bg-chart-3/10 px-2 py-0.5 text-xs font-semibold text-blue-400">
-                            Best value — Save {savings}
-                          </span>
-                        ) : null}
-                      </span>
-                      {price ? (
-                        <span className="mt-1 block text-sm mt-4 text-on-surface-variant">
-                          {price}
-                          <span className="text-on-surface-variant/70">{option.suffix}</span>
-                        </span>
-                      ) : null}
-                    </span>
-                  </label>
+                    cycle={cycle}
+                    option={option}
+                    price={price}
+                    selectedCycle={selectedCycle}
+                    onSelectCycle={onSelectCycle}
+                    savings={savings}
+                  />
                 ) : null,
               )}
             </fieldset>
