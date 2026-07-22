@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import type { z } from "zod";
 import { createReserveSlotTool } from "@/lib/ai/tools/reserve-slot";
 
-vi.mock("@/lib/services/cal.service", () => ({
+vi.mock("@/lib/services/cal", () => ({
   calService: {
     reserveSlot: vi.fn().mockResolvedValue({
       uid: "mock-reservation-uid",
@@ -60,7 +60,7 @@ describe("createReserveSlotTool", () => {
   });
 
   it("calls calService.reserveSlot with input parameters", async () => {
-    const { calService } = await import("@/lib/services/cal.service");
+    const { calService } = await import("@/lib/services/cal");
     const execute = executeReserveSlotTool();
     await execute(validInputWithOptionals, {
       toolCallId: "tc-1",
@@ -90,7 +90,7 @@ describe("createReserveSlotTool", () => {
   });
 
   it("propagates errors from calService.reserveSlot", async () => {
-    const { calService } = await import("@/lib/services/cal.service");
+    const { calService } = await import("@/lib/services/cal");
     vi.mocked(calService.reserveSlot).mockRejectedValueOnce(new Error("API Error"));
 
     const execute = executeReserveSlotTool();

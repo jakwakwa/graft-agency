@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { calService } from "@/lib/services/cal.service";
+import { calService } from "@/lib/services/cal";
 
 const mockFetch = vi.fn();
 vi.stubGlobal("fetch", mockFetch);

@@ -11,7 +11,7 @@ vi.mock("@/lib/services/agent.service", () => ({
   },
 }));
 
-vi.mock("@/lib/services/cal.service", () => ({
+vi.mock("@/lib/services/cal", () => ({
   calService: {
     createBooking: vi.fn().mockResolvedValue({
       bookingUid: "booking-abc",
@@ -54,7 +54,7 @@ describe("createBookAppointmentTool", () => {
   });
 
   it("calls calService.createBooking with config defaults", async () => {
-    const { calService } = await import("@/lib/services/cal.service");
+    const { calService } = await import("@/lib/services/cal");
     const execute = executeBookAppointmentTool();
     await execute(validInput, {
       toolCallId: "tc-1",

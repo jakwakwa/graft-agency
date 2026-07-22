@@ -8,7 +8,7 @@ import { redirectToAccessRequired, requireAuthOrSignIn } from "@/lib/auth/guards
 import { resolveClientIdFromAuth } from "@/lib/auth/resolve-client";
 import { getClientEntitlements } from "@/lib/billing/entitlements";
 import { agentService } from "@/lib/services/agent.service";
-import { type CalBookingSortOrder, calService, type ListBookingsInput } from "@/lib/services/cal.service";
+import { type CalBookingSortOrder, calService, type ListBookingsInput } from "@/lib/services/cal";
 import { type BookingSortKey, BookingsTable } from "./_components/bookings-table";
 
 const PAGE_SIZE = 25;

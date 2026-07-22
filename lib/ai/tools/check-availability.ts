@@ -1,7 +1,7 @@
 import { tool } from "ai";
 import { z } from "zod";
 import { agentService } from "@/lib/services/agent.service";
-import { calService } from "@/lib/services/cal.service";
+import { calService } from "@/lib/services/cal";
 
 export const createCheckAvailabilityTool = (clientId: string) =>
   tool({

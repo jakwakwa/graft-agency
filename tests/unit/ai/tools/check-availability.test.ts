@@ -11,7 +11,7 @@ vi.mock("@/lib/services/agent.service", () => ({
   },
 }));
 
-vi.mock("@/lib/services/cal.service", () => ({
+vi.mock("@/lib/services/cal", () => ({
   calService: {
     getAvailability: vi.fn().mockResolvedValue({
       slots: [
@@ -55,7 +55,7 @@ describe("createCheckAvailabilityTool", () => {
   });
 
   it("calls calService.getAvailability with config defaults", async () => {
-    const { calService } = await import("@/lib/services/cal.service");
+    const { calService } = await import("@/lib/services/cal");
     const execute = executeCheckAvailabilityTool();
     await execute(dateRangeInput, { toolCallId: "tc-1", messages: [], abortSignal: new AbortController().signal });
     expect(calService.getAvailability).toHaveBeenCalledWith(
