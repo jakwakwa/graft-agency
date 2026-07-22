@@ -1,14 +1,6 @@
 import Link from "next/link";
 import { Typography } from "@/components/ui/typography";
-
-function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
-  return (
-    <section id={id} className="mt-10 scroll-mt-8">
-      <Typography.H3 className="block mb-4 text-foreground">{title}</Typography.H3>
-      <div className="space-y-3">{children}</div>
-    </section>
-  );
-}
+import { PolicySection } from "@/components/marketing/policy-section";
 
 export const metadata = {
   title: "Terms of Service — GRAFT.TODAY",
@@ -36,7 +28,7 @@ export default function TermsPage() {
       </Typography.Lead>
 
       {/* ─── Section 1 ─── */}
-      <Section id="about" title="1. About GRAFT.TODAY">
+      <PolicySection id="about" title="1. About GRAFT.TODAY">
         <Typography.P>
           GRAFT.TODAY is operated by <strong>Jacob Kotzee trading as GRAFT.TODAY</strong>, a sole proprietor registered
           in the Republic of South Africa (&ldquo;we,&rdquo; &ldquo;us,&rdquo; &ldquo;our&rdquo;). Our platform is
@@ -53,29 +45,31 @@ export default function TermsPage() {
           These Terms constitute a binding legal agreement between you (the subscriber or user) and us. References to
           &ldquo;you&rdquo; or &ldquo;your&rdquo; mean the person or entity that registers for or uses GRAFT.TODAY.
         </Typography.P>
-      </Section>
+      </PolicySection>
 
       {/* ─── Section 2 ─── */}
-      <Section id="services" title="2. The Services">
+      <PolicySection id="services" title="2. The Services">
         <Typography.P>GRAFT.TODAY provides the following services to subscribers:</Typography.P>
         <ul className="list-disc list-inside space-y-2 text-sm text-muted-foreground mt-2">
           <li>
-            <strong className="text-foreground">AI chatbot widget (GRAFT AI Assistant):</strong> An embeddable chatbot powered by
-            AI that engages your website visitors, triaging initiated enquiries, and answers queries on your behalf
+            <strong className="text-foreground">AI chatbot widget (GRAFT AI Assistant):</strong> An embeddable chatbot
+            powered by AI that engages your website visitors, triaging initiated enquiries, and answers queries on your
+            behalf
           </li>
           <li>
-            <strong className="text-foreground">Triage enquiry management and appointment booking:</strong> Tools for reviewing
-            triaging initiated enquiries by your chatbot, managing conversations, and booking appointments through the Cal.com
-            integration
+            <strong className="text-foreground">Triage enquiry management and appointment booking:</strong> Tools for
+            reviewing triaging initiated enquiries by your chatbot, managing conversations, and booking appointments
+            through the Cal.com integration
           </li>
           <li>
             <strong className="text-foreground">GRAFT AI Assistant website setup packages:</strong> Fixed-scope software
-            implementation packages that deliver a landing page or multi-page site with the GRAFT AI Assistant widget installed
-            and configured, as described on our pricing page — not standalone design or marketing agency services
+            implementation packages that deliver a landing page or multi-page site with the GRAFT AI Assistant widget
+            installed and configured, as described on our pricing page — not standalone design or marketing agency
+            services
           </li>
           <li>
             <strong className="text-foreground">Subscriber dashboard:</strong> A management interface for conversations,
-           triaged initiated enquiries  billing, and settings
+            triaged initiated enquiries billing, and settings
           </li>
         </ul>
         <Typography.P>
@@ -83,10 +77,10 @@ export default function TermsPage() {
           notice. Features described as &ldquo;beta&rdquo; or &ldquo;preview&rdquo; are provided as-is and may change or
           be removed without notice.
         </Typography.P>
-      </Section>
+      </PolicySection>
 
       {/* ─── Section 3 ─── */}
-      <Section id="accounts" title="3. Accounts and Registration">
+      <PolicySection id="accounts" title="3. Accounts and Registration">
         <Typography.P>
           You must create an account to access GRAFT.TODAY. Account creation and identity management is handled by Clerk
           (clerk.com). By creating an account, you agree to:
@@ -101,10 +95,10 @@ export default function TermsPage() {
           You must be at least 18 years old (or the age of majority in your jurisdiction) to create an account. We
           reserve the right to refuse registration or suspend accounts at our sole discretion.
         </Typography.P>
-      </Section>
+      </PolicySection>
 
       {/* ─── Section 4 ─── */}
-      <Section id="payments" title="4. Payments, Billing, and Subscriptions">
+      <PolicySection id="payments" title="4. Payments, Billing, and Subscriptions">
         <Typography.P>
           <strong>Merchant of Record:</strong> All payment processing for GRAFT.TODAY subscriptions is handled by{" "}
           <a
@@ -156,10 +150,10 @@ export default function TermsPage() {
           30 days&rsquo; advance notice of any price change by email and/or in-platform notification. Your continued
           subscription after the effective date constitutes acceptance of the new price.
         </Typography.P>
-      </Section>
+      </PolicySection>
 
       {/* ─── Section 5 ─── */}
-      <Section id="acceptable-use" title="5. Acceptable Use">
+      <PolicySection id="acceptable-use" title="5. Acceptable Use">
         <Typography.P>
           You may use GRAFT.TODAY only for lawful purposes and in accordance with these Terms. You agree not to:
         </Typography.P>
@@ -183,10 +177,10 @@ export default function TermsPage() {
           defined in your subscription plan. Excessive use that materially impacts platform performance for other users
           may result in throttling or account suspension.
         </Typography.P>
-      </Section>
+      </PolicySection>
 
       {/* ─── Section 6 ─── */}
-      <Section id="ai-content" title="6. AI-Generated Content">
+      <PolicySection id="ai-content" title="6. AI-Generated Content">
         <Typography.P>
           GRAFT.TODAY uses AI models (including Google Gemini and Anthropic Claude) to generate content such as chatbot
           responses, engagement copy. You acknowledge and agree that:
@@ -207,10 +201,10 @@ export default function TermsPage() {
             You must not present AI-generated content in a way that constitutes fraud, misrepresentation, or deception
           </li>
         </ul>
-      </Section>
+      </PolicySection>
 
       {/* ─── Section 7 ─── */}
-      <Section id="ip-data" title="7. Intellectual Property and Your Data">
+      <PolicySection id="ip-data" title="7. Intellectual Property and Your Data">
         <Typography.P>
           <strong>Your content:</strong> You retain full ownership of all data, content, and materials you upload or
           create through GRAFT.TODAY (&ldquo;Customer Data&rdquo;). You grant GRAFT.TODAY a limited, non-exclusive,
@@ -226,20 +220,20 @@ export default function TermsPage() {
           <strong>Feedback:</strong> If you provide us with feedback, suggestions, or ideas about the services, you
           grant us a non-exclusive, perpetual, royalty-free right to use that feedback without any obligation to you.
         </Typography.P>
-      </Section>
+      </PolicySection>
 
       {/* ─── Section 8 ─── */}
-      <Section id="confidentiality" title="8. Confidentiality">
+      <PolicySection id="confidentiality" title="8. Confidentiality">
         <Typography.P>
           Each party agrees to keep the other party&rsquo;s non-public business information confidential and not to
           disclose it to third parties, except: (a) as required by applicable law or a court order; (b) to service
           providers bound by equivalent confidentiality obligations; or (c) with the other party&rsquo;s prior written
           consent.
         </Typography.P>
-      </Section>
+      </PolicySection>
 
       {/* ─── Section 9 ─── */}
-      <Section id="disclaimer" title="9. Disclaimer of Warranties">
+      <PolicySection id="disclaimer" title="9. Disclaimer of Warranties">
         <Typography.P>
           GRAFT.TODAY is provided <strong>&ldquo;as is&rdquo;</strong> and <strong>&ldquo;as available&rdquo;</strong>{" "}
           without warranties of any kind, whether express or implied. To the maximum extent permitted by law, we
@@ -255,10 +249,10 @@ export default function TermsPage() {
           </li>
           <li>The services will be free from bugs, vulnerabilities, or data loss</li>
         </ul>
-      </Section>
+      </PolicySection>
 
       {/* ─── Section 10 ─── */}
-      <Section id="liability" title="10. Limitation of Liability">
+      <PolicySection id="liability" title="10. Limitation of Liability">
         <Typography.P>
           To the maximum extent permitted by South African law, GRAFT.TODAY&rsquo;s total cumulative liability to you
           for any and all claims arising out of or related to these Terms or the services shall not exceed the total
@@ -275,10 +269,10 @@ export default function TermsPage() {
           Nothing in these Terms excludes or limits liability for death or personal injury caused by our negligence,
           fraud, or any other liability that cannot be excluded or limited by South African law.
         </Typography.P>
-      </Section>
+      </PolicySection>
 
       {/* ─── Section 11 ─── */}
-      <Section id="indemnification" title="11. Indemnification">
+      <PolicySection id="indemnification" title="11. Indemnification">
         <Typography.P>
           You agree to indemnify, defend, and hold harmless GRAFT.TODAY and its personnel from and against any claims,
           liabilities, losses, damages, and expenses (including reasonable legal fees) arising out of or relating to:
@@ -286,10 +280,10 @@ export default function TermsPage() {
           (including intellectual property or data protection rights); or (d) content or data you submit through the
           platform.
         </Typography.P>
-      </Section>
+      </PolicySection>
 
       {/* ─── Section 12 ─── */}
-      <Section id="termination" title="12. Termination">
+      <PolicySection id="termination" title="12. Termination">
         <Typography.P>
           <strong>By you:</strong> You may cancel your subscription at any time through the billing section of your
           dashboard or by emailing{" "}
@@ -316,10 +310,10 @@ export default function TermsPage() {
           . Sections that by their nature should survive termination (IP, confidentiality, liability, governing law)
           remain in effect.
         </Typography.P>
-      </Section>
+      </PolicySection>
 
       {/* ─── Section 13 ─── */}
-      <Section id="governing-law" title="13. Governing Law and Jurisdiction">
+      <PolicySection id="governing-law" title="13. Governing Law and Jurisdiction">
         <Typography.P>
           These Terms are governed by and construed in accordance with the laws of the{" "}
           <strong>Republic of South Africa</strong>, without regard to conflict-of-law rules. Any dispute arising out of
@@ -336,10 +330,10 @@ export default function TermsPage() {
           </a>{" "}
           to resolve any dispute informally before initiating formal proceedings.
         </Typography.P>
-      </Section>
+      </PolicySection>
 
       {/* ─── Section 14 ─── */}
-      <Section id="changes" title="14. Changes to These Terms">
+      <PolicySection id="changes" title="14. Changes to These Terms">
         <Typography.P>
           We may update these Terms from time to time to reflect changes to our services, applicable law, or business
           practices. When we make material changes, we will notify you by email and/or in-platform notification at least{" "}
@@ -349,10 +343,10 @@ export default function TermsPage() {
         <Typography.P>
           If you do not agree to updated Terms, you may cancel your subscription before the effective date.
         </Typography.P>
-      </Section>
+      </PolicySection>
 
       {/* ─── Section 15 ─── */}
-      <Section id="contact" title="15. Contact">
+      <PolicySection id="contact" title="15. Contact">
         <Typography.P>For any questions or concerns about these Terms, please contact us:</Typography.P>
         <ul className="list-none space-y-1 text-sm mt-2">
           <li>
@@ -377,7 +371,7 @@ export default function TermsPage() {
             advice. We recommend consulting a South African attorney for a full legal review before launch.
           </em>
         </Typography.P>
-      </Section>
+      </PolicySection>
 
       <div className="mt-16 pt-8 border-t border-border">
         <Link href="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">

@@ -1,30 +1,7 @@
 import { AlertTriangle, Bot, CreditCard, Eye, Lock, Server, ShieldCheck, Users } from "lucide-react";
 import Link from "next/link";
 import { Typography } from "@/components/ui/typography";
-
-function Section({
-  id,
-  icon: Icon,
-  title,
-  children,
-}: {
-  id: string;
-  icon: React.ElementType;
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <section id={id} className="mt-10 scroll-mt-8">
-      <div className="flex items-center gap-3 mb-4 h-8">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted">
-          <Icon className="h-4 w-4  mt-6 text-foreground" aria-hidden />
-        </div>
-        <Typography.H3 className="block h-8 text-foreground">{title}</Typography.H3>
-      </div>
-      <div className="space-y-3 pl-11">{children}</div>
-    </section>
-  );
-}
+import { PolicySection } from "@/components/marketing/policy-section";
 
 function Pill({ children }: { children: React.ReactNode }) {
   return (
@@ -56,11 +33,12 @@ export default function SecurityPage() {
 
       <Typography.Lead className="mt-8">
         We built GRAFT.TODAY to handle sensitive business conversations and customer data. This page explains exactly
-        how we protect your data, your customers&rsquo; data, and your Ai Assistant — in plain language, not marketing copy.
+        how we protect your data, your customers&rsquo; data, and your Ai Assistant — in plain language, not marketing
+        copy.
       </Typography.Lead>
 
       {/* ─── Infrastructure ─── */}
-      <Section id="infrastructure" icon={Server} title="Infrastructure and hosting">
+      <PolicySection id="infrastructure" icon={Server} title="Infrastructure and hosting">
         <Typography.P>
           GRAFT.TODAY is hosted entirely on{" "}
           <a
@@ -84,10 +62,10 @@ export default function SecurityPage() {
           <code className="rounded bg-muted px-1 py-0.5 text-xs font-mono">sslmode=require</code>). Data at rest and in
           transit between application and database is encrypted.
         </Typography.P>
-      </Section>
+      </PolicySection>
 
       {/* ─── Authentication ─── */}
-      <Section id="auth" icon={Lock} title="Authentication and access control">
+      <PolicySection id="auth" icon={Lock} title="Authentication and access control">
         <Typography.P>
           All user authentication is handled by{" "}
           <a
@@ -112,13 +90,13 @@ export default function SecurityPage() {
         </ul>
         <Typography.P>
           Access to your organisation&rsquo;s data within the platform is scoped to your Clerk organisation. No other
-          tenant can access yourtriaged initiated enquiries  conversations, or settings — this is enforced at the data-query layer, not just
-          the UI.
+          tenant can access yourtriaged initiated enquiries conversations, or settings — this is enforced at the
+          data-query layer, not just the UI.
         </Typography.P>
-      </Section>
+      </PolicySection>
 
       {/* ─── Multi-tenancy ─── */}
-      <Section id="multi-tenancy" icon={Users} title="Multi-tenant data isolation">
+      <PolicySection id="multi-tenancy" icon={Users} title="Multi-tenant data isolation">
         <Typography.P>
           GRAFT.TODAY is a multi-tenant platform — many businesses share the same infrastructure. Here is how we ensure
           one tenant cannot access another&rsquo;s data:
@@ -141,10 +119,10 @@ export default function SecurityPage() {
           customers&rsquo; data is similarly isolated under your organisation and is not visible to other GRAFT.TODAY
           tenants.
         </Typography.P>
-      </Section>
+      </PolicySection>
 
       {/* ─── Payments ─── */}
-      <Section id="payments" icon={CreditCard} title="Payment security">
+      <PolicySection id="payments" icon={CreditCard} title="Payment security">
         <Typography.P>
           All payment processing is handled exclusively by{" "}
           <a
@@ -156,7 +134,8 @@ export default function SecurityPage() {
             Paddle
           </a>{" "}
           as our Merchant of Record.{" "}
-          <span className="font-semibold">GRAFT.TODAY never sees, handles, or stores your payment card details.</span> This means:
+          <span className="font-semibold">GRAFT.TODAY never sees, handles, or stores your payment card details.</span>{" "}
+          This means:
         </Typography.P>
         <ul className="list-disc list-inside space-y-2 text-sm text-muted-foreground mt-2">
           <li>Your card number, CVV, and expiry date go directly to Paddle&rsquo;s PCI-DSS compliant infrastructure</li>
@@ -169,13 +148,13 @@ export default function SecurityPage() {
             processed
           </li>
         </ul>
-      </Section>
+      </PolicySection>
 
       {/* ─── AI data handling ─── */}
-      <Section id="ai" icon={Bot} title="AI models and your data">
+      <PolicySection id="ai" icon={Bot} title="AI models and your data">
         <Typography.P>
-          GRAFT.TODAY uses AI models to power the Ai Assistant and engagement features. We want to be fully transparent about
-          which providers receive your data and under what conditions.
+          GRAFT.TODAY uses AI models to power the Ai Assistant and engagement features. We want to be fully transparent
+          about which providers receive your data and under what conditions.
         </Typography.P>
 
         <div className="mt-4 space-y-4">
@@ -185,9 +164,9 @@ export default function SecurityPage() {
               <Pill>AI inference</Pill>
             </div>
             <p className="text-sm text-muted-foreground">
-              Used for Ai Assistant responses and engagement analysis. Data sent to Gemini includes conversation messages and
-              contact context. Google&rsquo;s API terms state that data submitted via the API is not used to train
-              Google&rsquo;s models by default. See{" "}
+              Used for Ai Assistant responses and engagement analysis. Data sent to Gemini includes conversation
+              messages and contact context. Google&rsquo;s API terms state that data submitted via the API is not used
+              to train Google&rsquo;s models by default. See{" "}
               <a
                 href="https://ai.google.dev/gemini-api/terms"
                 className="underline underline-offset-4 text-foreground"
@@ -206,9 +185,9 @@ export default function SecurityPage() {
               <Pill>AI inference</Pill>
             </div>
             <p className="text-sm text-muted-foreground">
-              Used as an alternative model for Ai Assistant responses. Data sent includes conversation history and relevant
-              context. Anthropic&rsquo;s API policy states that API inputs and outputs are not used to train their
-              models. See{" "}
+              Used as an alternative model for Ai Assistant responses. Data sent includes conversation history and
+              relevant context. Anthropic&rsquo;s API policy states that API inputs and outputs are not used to train
+              their models. See{" "}
               <a
                 href="https://www.anthropic.com/legal/privacy"
                 className="underline underline-offset-4 text-foreground"
@@ -220,19 +199,17 @@ export default function SecurityPage() {
               .
             </p>
           </div>
-
-         
-        </div>  
+        </div>
 
         <Typography.P>
           We apply data minimisation: AI calls receive only the context necessary for the specific task. We do not send
           your entire database to any AI provider. Conversation messages are sent to the AI model in real time and are
           not persisted by us on third-party AI platforms.
         </Typography.P>
-      </Section>
+      </PolicySection>
 
       {/* ─── Ai Assistant widget ─── */}
-      <Section id="widget" icon={ShieldCheck} title="Ai Assistant widget security">
+      <PolicySection id="widget" icon={ShieldCheck} title="Ai Assistant widget security">
         <Typography.P>
           When you embed the GRAFT AI Assistant widget on your website, a script loads an iframe served from
           GRAFT.TODAY. Here is what that means for your site&rsquo;s security:
@@ -252,22 +229,22 @@ export default function SecurityPage() {
           We recommend embedding the widget via our official script tag. Custom or modified embed code is not supported
           and may introduce security risks.
         </Typography.P>
-      </Section>
+      </PolicySection>
 
       {/* ─── Transparency ─── */}
-      <Section id="transparency" icon={Eye} title="What we do not do">
+      <PolicySection id="transparency" icon={Eye} title="What we do not do">
         <Typography.P>To be explicit about our data practices:</Typography.P>
         <ul className="list-disc list-inside space-y-2 text-sm text-muted-foreground mt-2">
           <li>We do not sell your data or your customers&rsquo; data to third parties</li>
-          <li>We do not use your conversation  data or visitor context  for advertising targeting</li>
+          <li>We do not use your conversation data or visitor context for advertising targeting</li>
           <li>We do not allow any AI provider to train on your data via API calls (per their respective policies)</li>
           <li>We do not share your data between tenants</li>
           <li>We do not store payment card details — ever</li>
         </ul>
-      </Section>
+      </PolicySection>
 
       {/* ─── Vulnerability disclosure ─── */}
-      <Section id="disclosure" icon={AlertTriangle} title="Reporting a security issue">
+      <PolicySection id="disclosure" icon={AlertTriangle} title="Reporting a security issue">
         <Typography.P>
           If you discover a vulnerability or security issue in GRAFT.TODAY, please report it responsibly before public
           disclosure. We take all reports seriously and will respond promptly.
@@ -291,10 +268,10 @@ export default function SecurityPage() {
           We ask that you do not access, modify, or delete data belonging to other users while investigating any
           potential issue, and that you give us a reasonable time to resolve the issue before disclosing it publicly.
         </Typography.P>
-      </Section>
+      </PolicySection>
 
       {/* ─── Your responsibilities ─── */}
-      <Section id="your-responsibilities" icon={Lock} title="Your security responsibilities">
+      <PolicySection id="your-responsibilities" icon={Lock} title="Your security responsibilities">
         <Typography.P>
           Security is a shared responsibility. As a GRAFT.TODAY subscriber, you can significantly reduce risk by:
         </Typography.P>
@@ -315,7 +292,7 @@ export default function SecurityPage() {
             </a>
           </li>
         </ul>
-      </Section>
+      </PolicySection>
 
       {/* ─── More ─── */}
       <div className="mt-12 rounded-lg border border-border bg-muted/30 px-5 py-4 text-sm">

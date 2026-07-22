@@ -1,14 +1,6 @@
 import Link from "next/link";
 import { Typography } from "@/components/ui/typography";
-
-function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
-  return (
-    <section id={id} className="mt-10 scroll-mt-8">
-      <Typography.H3 className="block mb-4 text-foreground">{title}</Typography.H3>
-      <div className="space-y-3">{children}</div>
-    </section>
-  );
-}
+import { PolicySection } from "@/components/marketing/policy-section";
 
 export const metadata = {
   title: "Refund & Cancellation Policy — GRAFT.TODAY",
@@ -41,7 +33,7 @@ export default function RefundsPage() {
       </Typography.Lead>
 
       {/* ─── Merchant of Record ─── */}
-      <Section id="merchant-of-record" title="Merchant of Record">
+      <PolicySection id="merchant-of-record" title="Merchant of Record">
         <Typography.P>
           All payment processing for GRAFT.TODAY subscriptions is handled by{" "}
           <a
@@ -65,26 +57,26 @@ export default function RefundsPage() {
           </a>
           .
         </Typography.P>
-      </Section>
+      </PolicySection>
 
       {/* ─── Subscription ─── */}
-      <Section id="subscription" title="Subscription">
+      <PolicySection id="subscription" title="Subscription">
         <Typography.P>
           GRAFT.TODAY is provided on a subscription basis (monthly or annual as chosen at checkout). Your subscription
           starts when Paddle confirms payment and provides access to the selected plan&rsquo;s features.
         </Typography.P>
-      </Section>
+      </PolicySection>
 
       {/* ─── Automatic renewal ─── */}
-      <Section id="automatic-renewal" title="Automatic renewal">
+      <PolicySection id="automatic-renewal" title="Automatic renewal">
         <Typography.P>
           Subscriptions renew automatically at the end of each billing period. Paddle will charge your payment method on
           file unless you cancel before the renewal date.
         </Typography.P>
-      </Section>
+      </PolicySection>
 
       {/* ─── Refunds ─── */}
-      <Section id="refunds" title="Refunds">
+      <PolicySection id="refunds" title="Refunds">
         <Typography.P>
           Refund requests are handled by Paddle in accordance with their Merchant of Record refund policy. For billing
           disputes or refund requests, contact Paddle support directly through your invoice or at{" "}
@@ -98,10 +90,10 @@ export default function RefundsPage() {
           </a>
           .
         </Typography.P>
-      </Section>
+      </PolicySection>
 
       {/* ─── Cancellation ─── */}
-      <Section id="cancellation" title="Cancellation">
+      <PolicySection id="cancellation" title="Cancellation">
         <Typography.P>
           For compliance reasons, subscription-related emails Paddle sends to customers include a link to cancel. This
           is handled by Paddle — you don&rsquo;t need to build or use any separate process. When you cancel using the
@@ -124,19 +116,19 @@ export default function RefundsPage() {
           Canceled subscriptions cannot be reinstated. If you have cancelled and want to return, contact Paddle directly
           to start a new subscription.
         </Typography.P>
-      </Section>
+      </PolicySection>
 
       {/* ─── Price changes ─── */}
-      <Section id="price-changes" title="Price changes">
+      <PolicySection id="price-changes" title="Price changes">
         <Typography.P>
           We reserve the right to change subscription prices. We will give you at least 30 days&rsquo; advance notice of
           any price change by email and/or in-platform notification. Your continued subscription after the effective
           date constitutes acceptance of the new price.
         </Typography.P>
-      </Section>
+      </PolicySection>
 
       {/* ─── More information ─── */}
-      <Section id="more-information" title="More information">
+      <PolicySection id="more-information" title="More information">
         <Typography.P>
           For the complete terms governing payments, billing, and your use of GRAFT.TODAY, see our{" "}
           <Link href="/terms" className="underline underline-offset-4 text-foreground hover:text-muted-foreground">
@@ -157,7 +149,7 @@ export default function RefundsPage() {
             advice.
           </em>
         </Typography.P>
-      </Section>
+      </PolicySection>
 
       <div className="mt-16 pt-8 border-t border-border">
         <Link href="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
