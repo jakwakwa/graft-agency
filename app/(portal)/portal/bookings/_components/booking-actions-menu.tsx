@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { CalBooking } from "@/lib/services/cal.service";
+import type { CalBooking } from "@/lib/services/cal";
 
 interface BookingActionsMenuProps {
   booking: CalBooking;

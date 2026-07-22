@@ -11,7 +11,7 @@ import { redirectToAccessRequired, requireAuthOrSignIn } from "@/lib/auth/guards
 import { getPlatformClientId, resolveClientIdFromAuth } from "@/lib/auth/resolve-client";
 import { getClientEntitlements } from "@/lib/billing/entitlements";
 import prisma from "@/lib/db/prisma";
-import { calService } from "@/lib/services/cal.service";
+import { calService } from "@/lib/services/cal";
 import type { Prisma } from "../../../generated/prisma/client";
 
 type RecentConversation = Prisma.ConversationGetPayload<{

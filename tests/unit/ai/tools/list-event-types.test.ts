@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import type { z } from "zod";
 import { createListEventTypesTool } from "@/lib/ai/tools/list-event-types";
 
-vi.mock("@/lib/services/cal.service", () => ({
+vi.mock("@/lib/services/cal", () => ({
   calService: {
     getEventTypes: vi.fn().mockResolvedValue([
       { id: 1, title: "15 Min Meeting", slug: "15min" },
@@ -33,7 +33,7 @@ describe("createListEventTypesTool", () => {
   });
 
   it("calls calService.getEventTypes and returns the result", async () => {
-    const { calService } = await import("@/lib/services/cal.service");
+    const { calService } = await import("@/lib/services/cal");
     const execute = executeListEventTypesTool();
     const result = await execute(
       {},
@@ -52,7 +52,7 @@ describe("createListEventTypesTool", () => {
   });
 
   it("handles errors from calService.getEventTypes", async () => {
-    const { calService } = await import("@/lib/services/cal.service");
+    const { calService } = await import("@/lib/services/cal");
     vi.mocked(calService.getEventTypes).mockRejectedValueOnce(new Error("API Error"));
 
     const execute = executeListEventTypesTool();

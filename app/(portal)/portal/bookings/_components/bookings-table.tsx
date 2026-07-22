@@ -18,7 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Typography } from "@/components/ui/typography";
-import type { CalBooking, CalBookingSortOrder, CalBookingsPagination } from "@/lib/services/cal.service";
+import type { CalBooking, CalBookingSortOrder, CalBookingsPagination } from "@/lib/services/cal";
 import { cancelBookingAction } from "../actions";
 import { BookingActionsMenu } from "./booking-actions-menu";
 import { BookingsPagination } from "./bookings-pagination";

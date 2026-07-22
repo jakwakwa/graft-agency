@@ -5,7 +5,7 @@ import { z } from "zod";
 import { redirectToAccessRequired, requireAuthOrSignIn } from "@/lib/auth/guards";
 import { resolveClientIdFromAuth } from "@/lib/auth/resolve-client";
 import { requireBookingAddon } from "@/lib/billing/entitlements";
-import { calService } from "@/lib/services/cal.service";
+import { calService } from "@/lib/services/cal";
 
 const cancelBookingSchema = z.object({
   bookingUid: z.string().trim().min(1, "Booking UID is required"),

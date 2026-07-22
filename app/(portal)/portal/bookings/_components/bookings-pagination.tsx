@@ -7,7 +7,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import type { CalBookingSortOrder, CalBookingsPagination } from "@/lib/services/cal.service";
+import type { CalBookingSortOrder, CalBookingsPagination } from "@/lib/services/cal";
 import { cn } from "@/lib/utils";
 import type { BookingSortKey } from "./bookings-table";
 

@@ -1,6 +1,6 @@
 import { tool } from "ai";
 import { z } from "zod";
-import { calService } from "@/lib/services/cal.service";
+import { calService } from "@/lib/services/cal";
 
 export const createListEventTypesTool = (clientId: string) =>
   tool({
