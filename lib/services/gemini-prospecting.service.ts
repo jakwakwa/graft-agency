@@ -374,26 +374,28 @@ Omit any business that matches the CRM list by name or website. Return the resul
         }
       } catch {
         // fallback to per-row create to preserve partial progress
-        for (const lead of leadsToCreate) {
-          try {
-            await prisma.lead.create({
-              data: lead,
-            });
-            added++;
-            const { nameKey, urlKey } = prospectIdentityKeys(
-              (lead.customerName as string) || "",
-              scrapedDataWebsiteUrl(lead.scrapedData) || "",
-            );
-            if (nameKey.length > 0) {
-              excludedNameKeys.add(nameKey);
+        await Promise.allSettled(
+          leadsToCreate.map(async (lead) => {
+            try {
+              await prisma.lead.create({
+                data: lead,
+              });
+              added++;
+              const { nameKey, urlKey } = prospectIdentityKeys(
+                (lead.customerName as string) || "",
+                scrapedDataWebsiteUrl(lead.scrapedData) || "",
+              );
+              if (nameKey.length > 0) {
+                excludedNameKeys.add(nameKey);
+              }
+              if (urlKey.length > 0) {
+                excludedUrlKeys.add(urlKey);
+              }
+            } catch {
+              errors++;
             }
-            if (urlKey.length > 0) {
-              excludedUrlKeys.add(urlKey);
-            }
-          } catch {
-            errors++;
-          }
-        }
+          })
+        );
       }
     }
 
