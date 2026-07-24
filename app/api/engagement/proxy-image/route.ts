@@ -4,7 +4,7 @@ import { requirePlatformAccess } from "@/lib/auth/resolve-client";
 
 function isAllowedGoogleUserContentHost(hostname: string): boolean {
   const h = hostname.toLowerCase();
-  return h === "lh3.googleusercontent.com" || h.endsWith(".googleusercontent.com");
+  return /^lh[0-9]+\.googleusercontent\.com$/.test(h);
 }
 
 /**
@@ -36,7 +36,7 @@ export async function GET(req: NextRequest): Promise<Response> {
       Accept: "image/avif,image/webp,image/apng,image/*,*/*;q=0.8",
       "User-Agent": "Mozilla/5.0 (compatible; GraftToday/1.0; +https://graft.today) engagement-image-proxy/1.0",
     },
-    redirect: "follow",
+    redirect: "error",
     cache: "no-store",
   });
 

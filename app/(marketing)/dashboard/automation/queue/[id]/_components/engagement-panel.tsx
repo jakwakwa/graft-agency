@@ -180,7 +180,7 @@ function designConceptPreviewSrc(url: string, screenId?: string, projectId?: str
     const u = new URL(url);
     if (u.protocol !== "https:") return url;
     const h = u.hostname.toLowerCase();
-    if (h === "lh3.googleusercontent.com" || h.endsWith(".googleusercontent.com")) {
+    if (/^lh[0-9]+\.googleusercontent\.com$/.test(h)) {
       return `/api/engagement/proxy-image?url=${encodeURIComponent(url)}`;
     }
     return url;
